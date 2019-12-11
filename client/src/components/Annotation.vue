@@ -8,13 +8,13 @@
                 <p>
                     <strong style="color:green">Pass:</strong> DNA Master's gene call is the same as or longer than GeneMark's gene call.<br />
                     <strong style="color:red">Fail:</strong> DNA Master's gene call is shorter than GeneMark's gene call.<br /> 
-                    <strong style="color:orange">Not called by GeneMark:</strong> DNA Master's gene call has not been called at all in GeneMark.<br/>
+                    <strong style="color:orange">Need more information:</strong> DNA Master's gene call has not been called at all in GeneMark.<br/>
                 </p>
                 <p>
                     The "Action" column must contain only "Done"s for you to continue. Once all anotations are complete, click the button below to continue.
                 </p>
             </div>
-            <button class="btn btn-primary" disabled><strong>Create GenBank File</strong></button>
+            <button class="btn btn-primary" @click="downloadGBFile"><strong>Create GenBank File</strong></button>
             <br><br>
             <table class="table table-hover" align="center">
                 <thead>
@@ -56,7 +56,7 @@
                             </router-link>
                             <router-link :to="{ name: 'More', params: {id: curr.id} }">
                                 <button class="btn btn-warning btn-sm" style="width:141px"
-                                        v-if="curr.status =='Not called by GeneMark'">
+                                        v-if="curr.status =='Need more information'">
                                     <strong>See more</strong>
                                 </button>
                             </router-link>
@@ -95,6 +95,24 @@ export default {
                 console.error(error);
             });
         },
+        downloadGBFile() {
+            axios.post('http://localhost:5000/annotate_data')
+            .then(response => {
+                let data = response.data;
+                const blob = new Blob([data], { type: 'application/gb' })
+                let link = document.createElement('a')
+                link.href = window.URL.createObjectURL(blob)
+                link.download = 'example.gb'
+                link.click()
+                // ---------------------------
+                // const url = window.URL.createObjectURL(new Blob([response.data]));
+                // const link = document.createElement('a');
+                // link.href = url;
+                // link.setAttribute('download', 'file.pdf'); //or any other extension
+                // document.body.appendChild(link);
+                // link.click();
+            });
+        }
     },
     created() {
         this.getData();

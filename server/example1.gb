@@ -1,0 +1,6 @@
+LOCUS       Example	24bp	DNA	PHG	current date
+DEFINITION  An example description
+ACCESSION   12345678
+VERSION     12345678
+SOURCE      .
+  ORGANISM  .

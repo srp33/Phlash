@@ -7,7 +7,8 @@ SOURCE      .
   ORGANISM  .
             .
 FEATURES             Location/Qualifiers
-     misc_feature    4..12
+     gene            4..12
+                     /product="hello"
 ORIGIN
         1 ggggaaaatt ttaaaacccc aaaa
 //

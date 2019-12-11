@@ -5,12 +5,14 @@
         <div id="dnamaster">
             <hr><br><br>
             <div align="left">
-                <p>DOCS</p>
-                <p>FIXME:</p>
-                <ul>
+                <h4>Instructions</h4>
+                <p>
+                    Below is the data from the your uploaded GenBank file from DNA Master. If you would like to modify any information, please <b>add</b>, <b>update</b>,or <b>delete</b> the appropriate coding sequences.  
+                </p>
+                <!-- <ul>
                     <li>Delete button: are you sure you want to delete alert</li>
                     <li>When updating CDS, GET method doesn't resort start positions</li>
-                </ul>
+                </ul> -->
             </div>
             <br>
             <router-link to="/api/upload_genemark">

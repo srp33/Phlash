@@ -13,7 +13,7 @@
             <h3 align="center">BLAST for Function</h3><br>
             <p>
                 For this gene call, we will do a BLAST search on the sequence ranging from positions 
-                <strong>{{ lowestStart }}</strong> to <strong>{{ currentCDS.stop }}</strong>.
+                <strong>{{ currentCDS.start }}</strong> to <strong>{{ currentCDS.stop }}</strong>.
             </p>
             <h5>Instructions</h5>
             <p style="color:#0066CC">

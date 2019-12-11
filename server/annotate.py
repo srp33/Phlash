@@ -199,7 +199,7 @@ def compare():
 			else:
 				dnamaster_cds.status = "Fail"
 		elif not genemark_cds:
-			dnamaster_cds.status = "Not called by GeneMark"
+			dnamaster_cds.status = "Need more information"
 		db.session.commit()
 
 
@@ -237,7 +237,7 @@ def need_more_info_genes(cds_id, genemark_gdata_file):
 	gdata_df = pd.read_csv(genemark_gdata_file, sep='\t', skiprows=16)
 	gdata_df.columns = ['Base', '1', '2', '3', '4', '5', '6']
 	gdata_df = gdata_df.set_index('Base')
-	cds = DNAMaster.query.filter_by(id=cds_id, status="Not called by GeneMark").first()
+	cds = DNAMaster.query.filter_by(id=cds_id, status="Need more information").first()
 	probabilities = make_avg_prob_dict(gdata_df, cds.start, cds.stop)
 	return(probabilities)
 

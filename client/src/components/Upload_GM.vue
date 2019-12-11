@@ -4,18 +4,17 @@
         <br>
         <div align="left">
             <!-- <p>FIXME: Try drag-and-drop multiple files uploader</p> -->
-            <p>Improve docs</p>
+            <!-- <p>Improve docs</p> -->
             <p>Please upload the following files from GeneMark:</p>
             <ul>
                 <!-- <li>.fasta.gdata (GeneMark)</li> -->
-                <li>.fasta.ldata (GeneMark)</li>
-                <li>.fasta.gdata (GeneMark)</li>
-                <li>.fasta</li>
+                <li>.fasta.ldata</li>
+                <li>.fasta.gdata</li>
             </ul>
         </div>
         <alert :message="message" v-if="showMessage"></alert>
         <form id="upload_form" role="form" enctype="multipart/form-data">
-            <input type="file" id="file" ref="file" v-on:change="handleFileUpload" class="form-control">
+            <input type="file" id="files" ref="files" multiple v-on:change="handleFilesUpload" class="form-control">
             <button class="btn btn-success btn-block" @click="upload">Upload</button>
         </form>
         <br>
@@ -34,7 +33,7 @@ import Alert from './Alert.vue';
 export default {
     data() {
         return {
-            file: null,
+            files: '',
             message: '',
             showMessage: false,
             showDatabase: false,
@@ -44,15 +43,25 @@ export default {
         alert: Alert,
     },
     methods: {
-        handleFileUpload() {
-            this.file = this.$refs.file.files[0]
+        handleFilesUpload() {
+            this.files = this.$refs.files.files
         },
         upload() {
             var data = new FormData();
-            data.append('file', this.file);
-            axios.post('http://localhost:5000/api/upload_genemark', data)
-            .then(() => {
-                this.message = 'File successfully uploaded!';
+            // data.append('file', this.file);
+            for (var i = 0; i < this.files.length; i++) {
+                let file = this.files[i];
+                data.append('files[' + i + ']', file);
+            }
+            axios.post('http://localhost:5000/api/upload_genemark',
+                data,
+                {
+                    headers: {
+                        'Content-Type': 'multipart/form-data'
+                    }
+                }
+            ).then(() => {
+                this.message = 'Files successfully uploaded!';
                 this.showMessage = true;
                 console.log(this.message)
             })

@@ -128,7 +128,11 @@
             <strong>Update {{ $route.params.id }}</strong>
         </button>
         <br><br>
-        <button class="btn btn-primary" @click="keepOriginal"><strong>Go back</strong></button>
+        <button type="button" class="btn btn-danger" @click="deleteCDS(currentCDS.id)">
+            <strong>Delete {{ $route.params.id }}</strong>
+        </button> 
+        <br><br>
+        <button class="btn btn-primary" @click="keepOriginal"><strong>Keep original data</strong></button>
     </div>
 </template>
 
@@ -236,6 +240,16 @@ export default {
             })
             .catch(error => {
                 console.error(error);
+            });
+        },
+        deleteCDS(cdsID) {
+            axios.delete(`http://localhost:5000/annotate_data/more/${cdsID}`)
+            .then(() => {
+                this.$router.push("/annotate_data");
+            })
+            .catch(error => {
+                console.error(error);
+                // this.getData();
             });
         },
         keepOriginal() {

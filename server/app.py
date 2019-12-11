@@ -169,7 +169,7 @@ def upload_gm_file():
     return jsonify(response_object)
 
 
-@app.route('/annotate_data', methods=['GET'])
+@app.route('/annotate_data', methods=['GET', 'POST'])
 def annotate_data():
     """
     Compares DNA Master's predictions against GeneMark's. 
@@ -187,6 +187,10 @@ def annotate_data():
                              'function': cds.function,
                              'status': cds.status})
         response_object['dnamaster'] = dnamaster
+
+    if request.method == "POST":
+        f = open("example.gb", "r")
+        return f.read()
 
     return jsonify(response_object)
 
