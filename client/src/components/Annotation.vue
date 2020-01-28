@@ -14,7 +14,12 @@
                     The "Action" column must contain only "Done"s for you to continue. Once all anotations are complete, click the button below to continue.
                 </p>
             </div>
-            <button class="btn btn-primary" @click="downloadGBFile"><strong>Create GenBank File</strong></button>
+            <button class="btn btn-primary" @click="downloadGBFile">
+                <strong>Create GenBank File</strong>
+            </button>
+            <router-link  to="/genbank">
+                <button class="btn btn-success"><strong>Next: Create GenBank File</strong></button>
+            </router-link>
             <br><br>
             <table class="table table-hover" align="center">
                 <thead>
@@ -102,15 +107,8 @@ export default {
                 const blob = new Blob([data], { type: 'application/gb' })
                 let link = document.createElement('a')
                 link.href = window.URL.createObjectURL(blob)
-                link.download = 'example.gb'
+                link.download = 'modified.gb'
                 link.click()
-                // ---------------------------
-                // const url = window.URL.createObjectURL(new Blob([response.data]));
-                // const link = document.createElement('a');
-                // link.href = url;
-                // link.setAttribute('download', 'file.pdf'); //or any other extension
-                // document.body.appendChild(link);
-                // link.click();
             });
         }
     },

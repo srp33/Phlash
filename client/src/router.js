@@ -10,6 +10,7 @@ import Failed from './components/Failed.vue';
 import More from './components/More.vue';
 import Upload_Test from './components/Upload_Test.vue';
 import Blast from './components/Blast.vue';
+import GenBank from './components/GenBank.vue';
 
 
 Vue.use(Router);
@@ -67,6 +68,11 @@ export default new Router({
       path: '/blast/:id',
       name: 'Blast',
       component: Blast,
+    },
+    {
+      path: '/genbank',
+      name: 'GenBank',
+      component: GenBank,
     },
   ],
 });

@@ -1,10 +1,11 @@
-from Bio import SeqIO
-# from Bio.Blast import NCBIWWW, NCBIXML
-# from Bio.Blast.Applications import *
+from Bio import SeqIO, Seq, SeqFeature
+from models import *
 import os
 import pandas as pd
-from models import *
-from plot import *
+import re
+# from Bio.Blast import NCBIWWW, NCBIXML
+# from Bio.Blast.Applications import *
+# from plot import *
 
 
 # HELPER FUNCTIONS -----------------------------------------------------------------------------------------------------
@@ -93,20 +94,20 @@ def make_avg_prob_dict(df, start, stop):
 
 # Helper: Parse through BLAST file (used by translate_and_blast)
 # FIXME: Parse BLAST output. Not finished.
-def parse_blast(file):
-	# E_VALUE_THRESH = 0.04
-	result_handle = open(file)
-	blast_record = NCBIXML.read(result_handle)
-	for alignment in blast_record.alignments:
-		for hsp in alignment.hsps:
-			# if hsp.expect < E_VALUE_THRESH:
-			print("****Alignment****")
-			print("sequence:", alignment.title)
-			print("length:", alignment.length)
-			print("e value:", hsp.expect)
-			print(hsp.query[0:75] + "...")
-			print(hsp.match[0:75] + "...")
-			print(hsp.sbjct[0:75] + "...")
+# def parse_blast(file):
+# 	# E_VALUE_THRESH = 0.04
+# 	result_handle = open(file)
+# 	blast_record = NCBIXML.read(result_handle)
+# 	for alignment in blast_record.alignments:
+# 		for hsp in alignment.hsps:
+# 			# if hsp.expect < E_VALUE_THRESH:
+# 			print("****Alignment****")
+# 			print("sequence:", alignment.title)
+# 			print("length:", alignment.length)
+# 			print("e value:", hsp.expect)
+# 			print(hsp.query[0:75] + "...")
+# 			print(hsp.match[0:75] + "...")
+# 			print(hsp.sbjct[0:75] + "...")
 
 
 # MAIN FUNCTIONS ------------------------------------------------------------------------------------------------------
@@ -115,22 +116,23 @@ def parse_blast(file):
 def parse_genbank(genbank_file):
     with open(genbank_file, "r") as handle:
         for record in SeqIO.parse(handle, "genbank"):
-            id_number = 1
+            # id_number = 1
             for feature in record.features:
                 if feature.type == "CDS":
-                    id = "dnamaster_" + str(id_number)
+                	# id = "dnamaster_" + str(id_number)
+                    id = feature.qualifiers["locus_tag"][0]
                     gene_info = parse_location(feature.location)
                     cds = DNAMaster(id=id,
                                     start=gene_info[0],
                                     stop=gene_info[1],
                                     strand=gene_info[2],
-									function="None",
+                                    function="None",
                                     status="None")
                     exists = DNAMaster.query.filter_by(id=id).first()
                     if not exists:
                         db.session.add(cds)
                         db.session.commit()
-                        id_number += 1
+                        # id_number += 1
 
 
 # Parse through genemark ldata
@@ -242,18 +244,57 @@ def need_more_info_genes(cds_id, genemark_gdata_file):
 	return(probabilities)
 
 
-# # FIXME: Translate to protein sequence and BLAST
-# def translate_and_blast(cds):
-# 	record = SeqIO.read("fern.fasta", "fasta")
-# 	table = 11  # Bacterial code
-# 	genome = record.seq
+# --------------------------
+# Create FASTA for input into Sequin's GenBank
+def create_fasta(fasta_file):
+	record = SeqIO.read(fasta_file, "fasta")
+	genome = record.seq
+	output = ""
+	for cds in DNAMaster.query.order_by(DNAMaster.start).all():
+		output += f">{cds.id}\n"
+		sequence = genome[cds.start - 1: cds.stop]
+		# sequence = Seq.translate(sequence=genome[cds.start - 1: cds.stop], table=11)
+		output += f"{sequence}\n"
+	with open("nuc.fasta", "w") as out_handle:
+		out_handle.write(output)
 
-# 	curr_sequence = genome[cds.start: cds.stop].translate(table)
-# 	result_handle = NCBIWWW.qblast("blastp", "nt", curr_sequence)
-# 	with open("my_blast.xml", "w") as out_handle:
-# 		out_handle.write(result_handle.read())
-# 	result_handle.close()
-# 	parse_blast("my_blast.xml")
+# Create modified GenBank file for input into Sequin
+def modify_gb(gb_file):
+    out_file_init = re.search(r'uploads/(.*).(\w*)', gb_file)
+    out_file = str(out_file_init.group(1)) + '_modified.' + str(out_file_init.group(2))
+    final_genes = create_final_dict()
+    final_features = []
+    for record in SeqIO.parse(open(gb_file, "r"), "genbank"):
+        for feature in record.features:
+            if feature.type == "gene" or feature.type == "CDS":
+                locus_tag = feature.qualifiers["locus_tag"][0]
+                if locus_tag in final_genes:
+                    new_start = final_genes[locus_tag]['start']
+                    if feature.location.strand == 1:
+                        feature.location = SeqFeature.FeatureLocation(SeqFeature.ExactPosition(new_start - 1), 
+                        SeqFeature.ExactPosition(feature.location.end.position), 
+                        feature.location.strand)
+                    else:
+                        feature.location = SeqFeature.FeatureLocation(
+                        SeqFeature.ExactPosition(feature.location.start.position),
+                        SeqFeature.ExactPosition(new_start), feature.location.strand)
+            final_features.append(feature)  # Append final features
+        record.features = final_features
+        with open(out_file, "w") as new_gb:
+            SeqIO.write(record, new_gb, "genbank")
+    return out_file
+
+
+def create_final_dict():
+	final_genes = {}
+	row = {}
+	for cds in DNAMaster.query.order_by(DNAMaster.start).all():
+		row['start'] = cds.start
+		row['strand'] = cds.strand
+		final_genes[cds.id] = row
+	return final_genes
+	
+
 
 
 
@@ -272,5 +313,3 @@ def need_more_info_genes(cds_id, genemark_gdata_file):
 
 	# create_dnamaster_html(db)
 	# # create_final_html(db)
-
-

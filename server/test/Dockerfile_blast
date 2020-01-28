@@ -1,0 +1,6 @@
+FROM ncbi/blast
+
+LABEL \
+    author="Erica Suh" \
+    maintainer="esuh@byu.edu"
+

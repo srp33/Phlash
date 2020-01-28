@@ -189,7 +189,12 @@ def annotate_data():
         response_object['dnamaster'] = dnamaster
 
     if request.method == "POST":
-        f = open("example.gb", "r")
+        # f = open("example.gb", "r")
+        # return f.read()
+        # ----------------------------
+        gb_file = get_file("GenBank")
+        out_file = annotate.modify_gb(gb_file)
+        f = open(out_file, "r")
         return f.read()
 
     return jsonify(response_object)

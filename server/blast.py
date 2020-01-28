@@ -1,14 +1,16 @@
 from Bio import SeqIO, Seq
 from Bio.Blast import NCBIWWW, NCBIXML
 from Bio.Blast.Applications import *
-# from decimal import *
 import re
 
-# start = 345 - 1
-# stop = 2069
+# start = 50 - 1
+# stop = 364
 # record = SeqIO.read("uploads/fern.fasta", "fasta")
 # table = 11  # Bacterial code
 # genome = record.seq
+
+# sequence = Seq.translate(sequence=genome[start: stop], table=11)
+# print(sequence)
 
 def run_blast(fasta_file, start, stop, e_value_thresh):
     start = start - 1
