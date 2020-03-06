@@ -23,7 +23,7 @@
             <li>GeneMark instructions</li>
         </ul> -->
     </div>
-    <router-link to="/api/upload">
+    <router-link to="/upload">
         <button class="btn btn-primary">Next: Upload DNA Master file</button>
     </router-link>
 </div>

@@ -3,7 +3,7 @@ import Router from 'vue-router';
 import Home from './components/Home.vue';
 import Ping from './components/Ping.vue';
 import Upload from './components/Upload.vue';
-import Database from './components/Database.vue';
+import DNAMaster from './components/DNAMaster.vue';
 import Upload_GM from './components/Upload_GM.vue';
 import Annotation from './components/Annotation.vue';
 import Failed from './components/Failed.vue';
@@ -30,14 +30,14 @@ export default new Router({
       component: Ping,
     },
     {
-      path: '/api/upload',
+      path: '/upload',
       name: 'Upload',
       component: Upload,
     },
     {
-      path: '/database',
-      name: 'Database',
-      component: Database,
+      path: '/dnamaster',
+      name: 'DNAMaster',
+      component: DNAMaster,
     },
     {
       path: '/api/upload_genemark',

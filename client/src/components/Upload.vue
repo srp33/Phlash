@@ -9,8 +9,11 @@
             <li v-if="genbank">GenBank file from DNA Master <strong>(.gb, .gbk)</strong></li>
             <li v-if="gdata">gdata file from GeneMark <strong>(.gdata)</strong></li>
             <li v-if="ldata">ldata file from GeneMark <strong>(.ldata)</strong></li>
-            <li v-if="allUploaded">All required files uploaded. Thank you!</li>
+            <li v-if="allUploaded">You have uploaded the required files. Thank you!</li>
          </ul>
+         <router-link  to="/dnamaster" v-if="allUploaded">
+            <button class="btn btn-primary btn-large" id="next-top"><strong>Next</strong></button>
+         </router-link>
       </div>
 
       <div id="success-alert" class="alert alert-success" role="alert" v-if="showSuccessAlert"></div>
@@ -38,8 +41,8 @@
       <!-- <br>
       <button class="btn btn-primary" @click="updateDatabase">Add DNA Master data to database</button>
       <br><br> -->
-      <router-link  to="/database" v-if="allUploaded">
-         <button class="btn btn-primary btn-large" id="next"><strong>Next</strong></button>
+      <router-link  to="/dnamaster" v-if="allUploaded">
+         <button class="btn btn-primary" id="next-bottom"><strong>Next</strong></button>
       </router-link>
    </div>
 </template>
@@ -135,22 +138,7 @@ export default {
          .catch(error => {
             console.log(error)
          });
-
-         // e.preventDefault();
       },
-      // updateDatabase() {
-      //    this.message = 'Updating the database will take a few seconds...';
-      //    this.showMessage = true;
-      //    axios.get('http://localhost:5000/api/upload')
-      //    .then(() => {
-      //       this.message = "Finished updating database.";
-      //       this.showMessage = true;
-      //       this.showDatabase = true;
-      //    })
-      //    .catch(error => {
-      //    console.log(error)
-      //    });
-      // },
    },
 };
 </script>
@@ -211,7 +199,11 @@ h1 {
 }
 
 /* ----- Rest of Page ----- */
-#next {
+#next-top {
+   margin: 10px auto;
+}
+
+#next-bottom {
    margin: 40px auto;
 }
 </style>

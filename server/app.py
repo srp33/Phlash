@@ -47,7 +47,8 @@ def upload_file():
    response_object = {'status': 'success'}
    response_object["uploaded"] = []
    response_object["not_allowed"] = []
-   response_object["required"] = ["fasta", "genbank", "gdata", "ldata"]
+   response_object["required"] = []
+   response_object["already_have"] = []
 
    # # generate GUUID
    # file_id = str(uuid.uuid4())
@@ -63,6 +64,18 @@ def upload_file():
       if request.files.getlist('files') is None: 
          response_object["status"]: "request.files.getlist('files') is None"
       else:
+         for curr_file in os.listdir(UPLOAD_FOLDER):
+            if os.path.isfile(curr_file):
+               file_ext = curr_file.rsplit('.', 1)[1].lower()
+               if file_ext in ['fasta', 'fna', 'faa', 'ffn', 'frn']:
+                  response_object["already_have"].append("fasta")
+               elif file_ext in ['gb', 'gbk']:
+                  response_object["already_have"].append("genbank")
+               elif file_ext == "gdata":
+                  response_object["already_have"].append("gdata")
+               elif file_ext == "ldata":
+                  response_object["already_have"].append("ldata")
+
          for file in request.files.getlist('files'):
             if file and allowed_file(file.filename):
                print(allowed_file(file.filename))
@@ -76,6 +89,8 @@ def upload_file():
                   response_object["required"].remove("fasta")
                elif file_ext in ['gb', 'gbk']:
                   response_object["required"].remove("genbank")
+                  genbank_file = get_file("GenBank")
+                  annotate.parse_genbank(genbank_file)
                elif file_ext == "gdata":
                   response_object["required"].remove("gdata")
                elif file_ext == "ldata":
@@ -93,72 +108,73 @@ def upload_file():
    return jsonify(response_object)
 
 
-@app.route('/database', methods=['GET', 'POST'])
-def view_database():
-    """
-    User can view DNA Master data in database.
-    GET method displays all data in table format.
-    POST method allows user to add a new CDS to the data.
-    """
-    response_object = {'status': 'success'}
+@app.route('/dnamaster', methods=['GET', 'POST'])
+def view_dnamaster():
+   """
+   User can view DNA Master data in database.
+   GET method displays all data in table format.
+   POST method allows user to add a new CDS to the data.
+   """
+   response_object = {'status': 'success'}
 
-    if request.method == "GET":
-        dnamaster = []
-        for cds in db.session.query(DNAMaster).order_by(DNAMaster.start):
-            dnamaster.append({'id': cds.id,
-                             'start': cds.start,
-                             'stop': cds.stop,
-                             'strand': cds.strand})
-                            #  'status': cds.status})
-        response_object['dnamaster'] = dnamaster
+   if request.method == "GET":
+      dnamaster = []
+      for cds in db.session.query(DNAMaster).order_by(DNAMaster.start):
+         dnamaster.append({'id': cds.id,
+                        'start': cds.start,
+                        'stop': cds.stop,
+                        'strand': cds.strand})
+      response_object['dnamaster'] = dnamaster
 
-    if request.method == "POST":
-        post_data = request.get_json()
-        cds = DNAMaster(id=post_data.get('id'),
-                        start=int(post_data.get('start')),
-                        stop=int(post_data.get('stop')),
-                        strand=post_data.get('strand'),
-                        function="None",
-                        status="None")
-        exists = DNAMaster.query.filter_by(id=post_data.get('id')).first()
-        if not exists:
-            db.session.add(cds)
-            db.session.commit()
-            response_object['message'] = 'CDS added!'
-        else:
-            response_object['message'] = 'CDS already exists'
+   if request.method == "POST":
+      post_data = request.get_json()
+      cds = DNAMaster(id=post_data.get('id'),
+                     start=int(post_data.get('start')),
+                     stop=int(post_data.get('stop')),
+                     strand=post_data.get('strand'),
+                     function="None",
+                     status="None")
+      start_exists = DNAMaster.query.filter_by(start=post_data.get('start')).first()
+      stop_exists = DNAMaster.query.filter_by(stop=post_data.get('stop')).first()
+      if start_exists and stop_exists:
+         if start_exists.id == stop_exists.id:
+            response_object['message'] = 'CDS with the same start and stop positions already exists.'
+      else:
+         db.session.add(cds)
+         db.session.commit()
+         response_object['message'] = 'CDS added!'       
     
-    return jsonify(response_object)
+   return jsonify(response_object)
 
 
-@app.route('/database/<cds_id>', methods=['PUT', 'DELETE'])
+@app.route('/dnamaster/<cds_id>', methods=['PUT', 'DELETE'])
 def single_cds(cds_id):
-    """
-    User can update or delete a CDS from the DNA Master table in database.
-    PUT method updates a CDS.
-    DELETE method deletes a CDS.
-    """
-    response_object = {'status': 'success'}
+   """
+   User can update or delete a CDS from the DNA Master table in database.
+   PUT method updates a CDS.
+   DELETE method deletes a CDS.
+   """
+   response_object = {'status': 'success'}
 
-    if request.method == "PUT":
-        put_data = request.get_json()
-        cds = DNAMaster.query.filter_by(id=put_data.get('id')).first()
-        if cds:
-            cds.start = put_data.get('start')
-            cds.stop = put_data.get('stop')
-            cds.strand = put_data.get('strand')
-            db.session.commit()
-            response_object['message'] = 'CDS updated!'
-        else:
-            response_object['message'] = 'CDS did not updated.'
+   if request.method == "PUT":
+      put_data = request.get_json()
+      cds = DNAMaster.query.filter_by(id=put_data.get('id')).first()
+      if cds:
+         cds.start = put_data.get('start')
+         cds.stop = put_data.get('stop')
+         cds.strand = put_data.get('strand')
+         db.session.commit()
+         response_object['message'] = 'CDS updated!'
+      else:
+         response_object['message'] = 'Error: CDS could not get updated.'
 
-    if request.method == 'DELETE':
-        if DNAMaster.query.filter_by(id=cds_id).first():
-            DNAMaster.query.filter_by(id=cds_id).delete()
-            db.session.commit()
-            response_object['message'] = 'CDS removed!'
-    
-    return jsonify(response_object)
+   if request.method == 'DELETE':
+      if DNAMaster.query.filter_by(id=cds_id).first():
+         DNAMaster.query.filter_by(id=cds_id).delete()
+         db.session.commit()
+         response_object['message'] = 'CDS removed!'
+   
+   return jsonify(response_object)
 
 
 @app.route('/api/upload_genemark', methods=['GET', 'POST'])
