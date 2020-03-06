@@ -14,7 +14,7 @@ DEBUG = True
 ROOT = os.path.dirname(os.path.abspath(__file__))
 UPLOAD_FOLDER = os.path.join(ROOT, 'uploads')
 DATABASE = "sqlite:///{}".format(os.path.join(ROOT, "database.db"))
-ALLOWED_EXTENSIONS = set(['txt', 'gb', 'genbank', 'fasta', 'gdata', 'ldata'])
+ALLOWED_EXTENSIONS = set(['gb', 'gbk', 'fasta', 'fna', 'faa', 'ffn', 'frn', 'gdata', 'ldata'])
 
 # instantiate the app
 app = Flask(__name__)
@@ -38,34 +38,59 @@ def ping_pong():
 # real routers ------------------------------------------------------------------
 @app.route('/api/upload', methods=['GET', 'POST'])
 def upload_file():
-    """
-    User uploads DNA Master file (genbank). Add data from file to the database.
-    POST method uploads file.
-    GET method adds data in file to database.
-    """
-    create_directory(UPLOAD_FOLDER)
-    response_object = {'status': 'success'}
+   """
+   User uploads DNA Master file (genbank). Add data from file to the database.
+   POST method uploads file.
+   GET method adds data in file to database.
+   """
+   create_directory(UPLOAD_FOLDER)
+   response_object = {'status': 'success'}
+   response_object["uploaded"] = []
+   response_object["not_allowed"] = []
+   response_object["required"] = ["fasta", "genbank", "gdata", "ldata"]
 
-    if request.method == 'POST':
-        file = request.files['file']
-        if file and allowed_file(file.filename):
-            file_name = secure_filename(file.filename)
-            # generate GUUID
-            file_id = str(uuid.uuid4())
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], file_name))
-            # save file info into DB
-            file = Files(id=file_id, name=file_name, \
-                         date=datetime.datetime.now(datetime.timezone.utc))
-            db.session.add(file)
-            db.session.commit()
-        response_object['message'] = f"{file_name} uploaded successfully."
+   # # generate GUUID
+   # file_id = str(uuid.uuid4())
+   # file.save(os.path.join(app.config['UPLOAD_FOLDER'], file_name))
+   # save file info into DB
+   # file = Files(id=file_id, name=file_name, \
+   #              date=datetime.datetime.now(datetime.timezone.utc))
+   # db.session.add(file)
+   #    db.session.commit()
+   # response_object['message'] = f"{file_name} uploaded successfully."
 
-    if request.method == 'GET':
-        genbank_file = get_file("GenBank")
-        annotate.parse_genbank(genbank_file)
-        response_object['message'] = "Data added to database."
+   if request.method == "POST":
+      if request.files.getlist('files') is None: 
+         response_object["status"]: "request.files.getlist('files') is None"
+      else:
+         for file in request.files.getlist('files'):
+            if file and allowed_file(file.filename):
+               print(allowed_file(file.filename))
+               file_name = secure_filename(file.filename)
+               file.save(os.path.join(app.config['UPLOAD_FOLDER'], file_name))
+               print(' * file uploaded', file_name)
+               response_object["uploaded"].append(f"{file_name}")
+               file_ext = file_name.rsplit('.', 1)[1].lower()
+               print(file_ext)
+               if file_ext in ['fasta', 'fna', 'faa', 'ffn', 'frn']:
+                  response_object["required"].remove("fasta")
+               elif file_ext in ['gb', 'gbk']:
+                  response_object["required"].remove("genbank")
+               elif file_ext == "gdata":
+                  response_object["required"].remove("gdata")
+               elif file_ext == "ldata":
+                  response_object["required"].remove("ldata")
+            elif file and allowed_file(file.filename) == False:
+               response_object["not_allowed"].append(file.filename)
+            else:
+               response_object["status"] = "error"
 
-    return jsonify(response_object)
+   # if request.method == 'GET':
+   #    genbank_file = get_file("GenBank")
+   #    annotate.parse_genbank(genbank_file)
+   #    response_object['message'] = "Data added to database."
+
+   return jsonify(response_object)
 
 
 @app.route('/database', methods=['GET', 'POST'])
@@ -196,6 +221,8 @@ def annotate_data():
         out_file = annotate.modify_gb(gb_file)
         f = open(out_file, "r")
         return f.read()
+        
+
 
     return jsonify(response_object)
 

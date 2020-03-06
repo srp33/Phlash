@@ -5,9 +5,9 @@
   <BlastOutput_version>BLASTP 2.10.0+</BlastOutput_version>
   <BlastOutput_reference>Stephen F. Altschul, Thomas L. Madden, Alejandro A. Sch&amp;auml;ffer, Jinghui Zhang, Zheng Zhang, Webb Miller, and David J. Lipman (1997), &quot;Gapped BLAST and PSI-BLAST: a new generation of protein database search programs&quot;, Nucleic Acids Res. 25:3389-3402.</BlastOutput_reference>
   <BlastOutput_db>nr</BlastOutput_db>
-  <BlastOutput_query-ID>Query_15313</BlastOutput_query-ID>
-  <BlastOutput_query-def>unnamed protein product</BlastOutput_query-def>
-  <BlastOutput_query-len>104</BlastOutput_query-len>
+  <BlastOutput_query-ID>Query_44004</BlastOutput_query-ID>
+  <BlastOutput_query-def>dnamaster_1</BlastOutput_query-def>
+  <BlastOutput_query-len>105</BlastOutput_query-len>
   <BlastOutput_param>
     <Parameters>
       <Parameters_matrix>BLOSUM62</Parameters_matrix>
@@ -20,1420 +20,1294 @@
 <BlastOutput_iterations>
 <Iteration>
   <Iteration_iter-num>1</Iteration_iter-num>
-  <Iteration_query-ID>Query_15313</Iteration_query-ID>
-  <Iteration_query-def>unnamed protein product</Iteration_query-def>
-  <Iteration_query-len>104</Iteration_query-len>
+  <Iteration_query-ID>Query_44004</Iteration_query-ID>
+  <Iteration_query-def>dnamaster_1</Iteration_query-def>
+  <Iteration_query-len>105</Iteration_query-len>
 <Iteration_hits>
-<Hit>
-  <Hit_num>1</Hit_num>
-  <Hit_id>ref|WP_036654546.1|</Hit_id>
-  <Hit_def>P27 family phage terminase small subunit [Paenibacillus larvae] &gt;ref|YP_009195191.1| putative terminase small subunit [Paenibacillus phage HB10c2] &gt;ref|YP_009197946.1| terminase small subunit [Paenibacillus phage Diva] &gt;ref|YP_009203203.1| terminase small subunit [Paenibacillus phage Fern] &gt;ref|YP_009203446.1| terminase small subunit [Paenibacillus phage Sitara] &gt;ref|YP_009224867.1| terminase small subunit [Paenibacillus phage Rani] &gt;ref|YP_009593410.1| terminase small subunit [Paenibacillus phage Willow] &gt;ref|YP_009598524.1| terminase small subunit [Paenibacillus phage Shelly] &gt;gb|AJK27860.1| terminase small subunit [Bacteriophage Redbud] &gt;gb|AUS03627.1| terminase small subunit [Paenibacillus phage Kiel007] &gt;gb|AUS03690.1| terminase small subunit [Paenibacillus phage Pagassa] &gt;gb|AUS03825.1| terminase small subunit [Paenibacillus phage Leyra] &gt;gb|AUS03900.1| terminase small subunit [Paenibacillus phage Likha] &gt;gb|AXF39491.1| terminase small subunit [Paenibacillus phage Yerffej] &gt;gb|AXF39626.1| terminase small subunit [Paenibacillus phage Kawika] &gt;gb|AXF39697.1| terminase small subunit [Paenibacillus phage Lucielle] &gt;gb|AXF40082.1| terminase small subunit [Paenibacillus phage Eltigre] &gt;gb|AXF40149.1| terminase small subunit [Paenibacillus phage Jacopo] &gt;gb|AXF40441.1| terminase small subunit [Paenibacillus phage Saudage] &gt;gb|AXH45263.1| terminase small subunit [Paenibacillus phage Arcticfreeze] &gt;gb|AXH45329.1| terminase small subunit [Paenibacillus phage DevRi] &gt;gb|ETK25597.1| phage terminase, small subunit [Paenibacillus larvae subsp. larvae DSM 25719]</Hit_def>
-  <Hit_accession>WP_036654546</Hit_accession>
-  <Hit_len>104</Hit_len>
-  <Hit_hsps>
-    <Hsp>
-      <Hsp_num>1</Hsp_num>
-      <Hsp_bit-score>212.231</Hsp_bit-score>
-      <Hsp_score>539</Hsp_score>
-      <Hsp_evalue>2.24908e-69</Hsp_evalue>
-      <Hsp_query-from>1</Hsp_query-from>
-      <Hsp_query-to>104</Hsp_query-to>
-      <Hsp_hit-from>1</Hsp_hit-from>
-      <Hsp_hit-to>104</Hsp_hit-to>
-      <Hsp_query-frame>0</Hsp_query-frame>
-      <Hsp_hit-frame>0</Hsp_hit-frame>
-      <Hsp_identity>104</Hsp_identity>
-      <Hsp_positive>104</Hsp_positive>
-      <Hsp_gaps>0</Hsp_gaps>
-      <Hsp_align-len>104</Hsp_align-len>
-      <Hsp_qseq>MAVPTSKLIREYLGETYEESDEQLIQLYIETHQFYRRLQKEIKNSELMYEYTNKAGATNLVKNPLSIELTKTVQTLNNLLKSLGLTPAQRKKVVSEDDDDFDDF</Hsp_qseq>
-      <Hsp_hseq>MAVPTSKLIREYLGETYEESDEQLIQLYIETHQFYRRLQKEIKNSELMYEYTNKAGATNLVKNPLSIELTKTVQTLNNLLKSLGLTPAQRKKVVSEDDDDFDDF</Hsp_hseq>
-      <Hsp_midline>MAVPTSKLIREYLGETYEESDEQLIQLYIETHQFYRRLQKEIKNSELMYEYTNKAGATNLVKNPLSIELTKTVQTLNNLLKSLGLTPAQRKKVVSEDDDDFDDF</Hsp_midline>
-    </Hsp>
-  </Hit_hsps>
-</Hit>
-<Hit>
-  <Hit_num>2</Hit_num>
-  <Hit_id>ref|YP_008320337.1|</Hit_id>
-  <Hit_def>terminase small subunit [Paenibacillus phage phiIBB_Pl23] &gt;gb|AGN89315.1| terminase small subunit [Paenibacillus phage phiIBB_Pl23]</Hit_def>
-  <Hit_accession>YP_008320337</Hit_accession>
-  <Hit_len>111</Hit_len>
-  <Hit_hsps>
-    <Hsp>
-      <Hsp_num>1</Hsp_num>
-      <Hsp_bit-score>211.846</Hsp_bit-score>
-      <Hsp_score>538</Hsp_score>
-      <Hsp_evalue>3.66533e-69</Hsp_evalue>
-      <Hsp_query-from>1</Hsp_query-from>
-      <Hsp_query-to>104</Hsp_query-to>
-      <Hsp_hit-from>8</Hsp_hit-from>
-      <Hsp_hit-to>111</Hsp_hit-to>
-      <Hsp_query-frame>0</Hsp_query-frame>
-      <Hsp_hit-frame>0</Hsp_hit-frame>
-      <Hsp_identity>104</Hsp_identity>
-      <Hsp_positive>104</Hsp_positive>
-      <Hsp_gaps>0</Hsp_gaps>
-      <Hsp_align-len>104</Hsp_align-len>
-      <Hsp_qseq>MAVPTSKLIREYLGETYEESDEQLIQLYIETHQFYRRLQKEIKNSELMYEYTNKAGATNLVKNPLSIELTKTVQTLNNLLKSLGLTPAQRKKVVSEDDDDFDDF</Hsp_qseq>
-      <Hsp_hseq>MAVPTSKLIREYLGETYEESDEQLIQLYIETHQFYRRLQKEIKNSELMYEYTNKAGATNLVKNPLSIELTKTVQTLNNLLKSLGLTPAQRKKVVSEDDDDFDDF</Hsp_hseq>
-      <Hsp_midline>MAVPTSKLIREYLGETYEESDEQLIQLYIETHQFYRRLQKEIKNSELMYEYTNKAGATNLVKNPLSIELTKTVQTLNNLLKSLGLTPAQRKKVVSEDDDDFDDF</Hsp_midline>
-    </Hsp>
-  </Hit_hsps>
-</Hit>
-<Hit>
-  <Hit_num>3</Hit_num>
-  <Hit_id>gb|AUS03760.1|</Hit_id>
-  <Hit_def>terminase small subunit [Paenibacillus phage Tadhana] &gt;gb|AXF39560.1| terminase small subunit [Paenibacillus phage Honeybear] &gt;gb|AXF40506.1| terminase small subunit [Paenibacillus phage Toothless]</Hit_def>
-  <Hit_accession>AUS03760</Hit_accession>
-  <Hit_len>104</Hit_len>
-  <Hit_hsps>
-    <Hsp>
-      <Hsp_num>1</Hsp_num>
-      <Hsp_bit-score>210.305</Hsp_bit-score>
-      <Hsp_score>534</Hsp_score>
-      <Hsp_evalue>1.11734e-68</Hsp_evalue>
-      <Hsp_query-from>1</Hsp_query-from>
-      <Hsp_query-to>104</Hsp_query-to>
-      <Hsp_hit-from>1</Hsp_hit-from>
-      <Hsp_hit-to>104</Hsp_hit-to>
-      <Hsp_query-frame>0</Hsp_query-frame>
-      <Hsp_hit-frame>0</Hsp_hit-frame>
-      <Hsp_identity>103</Hsp_identity>
-      <Hsp_positive>104</Hsp_positive>
-      <Hsp_gaps>0</Hsp_gaps>
-      <Hsp_align-len>104</Hsp_align-len>
-      <Hsp_qseq>MAVPTSKLIREYLGETYEESDEQLIQLYIETHQFYRRLQKEIKNSELMYEYTNKAGATNLVKNPLSIELTKTVQTLNNLLKSLGLTPAQRKKVVSEDDDDFDDF</Hsp_qseq>
-      <Hsp_hseq>MAVPTSKLIREYLGETYEESDEQLIQLYIETHQFYRRLQKEIKNSELMYEYTNKAGATNLVKNPLSIELTKTVQTLNNLLKSLGLTPAQRKKVVSEDDDDFDEF</Hsp_hseq>
-      <Hsp_midline>MAVPTSKLIREYLGETYEESDEQLIQLYIETHQFYRRLQKEIKNSELMYEYTNKAGATNLVKNPLSIELTKTVQTLNNLLKSLGLTPAQRKKVVSEDDDDFD+F</Hsp_midline>
-    </Hsp>
-  </Hit_hsps>
-</Hit>
-<Hit>
-  <Hit_num>4</Hit_num>
-  <Hit_id>ref|WP_046655341.1|</Hit_id>
-  <Hit_def>P27 family phage terminase small subunit [Paenibacillus larvae] &gt;ref|YP_009201911.1| terminase small subunit [Paenibacillus phage Xenia] &gt;gb|AUS03475.1| terminase small subunit [Paenibacillus phage PBL1c] &gt;gb|AXF40016.1| terminase small subunit [Paenibacillus phage Bloom] &gt;gb|AXF40375.1| terminase small subunit [Paenibacillus phage Genki] &gt;gb|AXF42243.1| terminase small subunit [Paenibacillus phage Gryphonian] &gt;gb|ALA12490.1| terminase small subunit [Paenibacillus phage Xenia]</Hit_def>
-  <Hit_accession>WP_046655341</Hit_accession>
-  <Hit_len>104</Hit_len>
-  <Hit_hsps>
-    <Hsp>
-      <Hsp_num>1</Hsp_num>
-      <Hsp_bit-score>209.92</Hsp_bit-score>
-      <Hsp_score>533</Hsp_score>
-      <Hsp_evalue>1.89262e-68</Hsp_evalue>
-      <Hsp_query-from>1</Hsp_query-from>
-      <Hsp_query-to>104</Hsp_query-to>
-      <Hsp_hit-from>1</Hsp_hit-from>
-      <Hsp_hit-to>104</Hsp_hit-to>
-      <Hsp_query-frame>0</Hsp_query-frame>
-      <Hsp_hit-frame>0</Hsp_hit-frame>
-      <Hsp_identity>103</Hsp_identity>
-      <Hsp_positive>103</Hsp_positive>
-      <Hsp_gaps>0</Hsp_gaps>
-      <Hsp_align-len>104</Hsp_align-len>
-      <Hsp_qseq>MAVPTSKLIREYLGETYEESDEQLIQLYIETHQFYRRLQKEIKNSELMYEYTNKAGATNLVKNPLSIELTKTVQTLNNLLKSLGLTPAQRKKVVSEDDDDFDDF</Hsp_qseq>
-      <Hsp_hseq>MAVPTSKLIREYLGETYEESDEQLIQLYIETHQFYRRLQKEIKQSELMYEYTNKAGATNLVKNPLSIELTKTVQTLNNLLKSLGLTPAQRKKVVSEDDDDFDDF</Hsp_hseq>
-      <Hsp_midline>MAVPTSKLIREYLGETYEESDEQLIQLYIETHQFYRRLQKEIK SELMYEYTNKAGATNLVKNPLSIELTKTVQTLNNLLKSLGLTPAQRKKVVSEDDDDFDDF</Hsp_midline>
-    </Hsp>
-  </Hit_hsps>
-</Hit>
-<Hit>
-  <Hit_num>5</Hit_num>
-  <Hit_id>ref|WP_023484459.1|</Hit_id>
-  <Hit_def>P27 family phage terminase small subunit [Paenibacillus larvae] &gt;gb|PCK71433.1| hypothetical protein PL1_2394 [Paenibacillus larvae subsp. larvae B-3650]</Hit_def>
-  <Hit_accession>WP_023484459</Hit_accession>
-  <Hit_len>104</Hit_len>
-  <Hit_hsps>
-    <Hsp>
-      <Hsp_num>1</Hsp_num>
-      <Hsp_bit-score>206.068</Hsp_bit-score>
-      <Hsp_score>523</Hsp_score>
-      <Hsp_evalue>5.27013e-67</Hsp_evalue>
-      <Hsp_query-from>1</Hsp_query-from>
-      <Hsp_query-to>104</Hsp_query-to>
-      <Hsp_hit-from>1</Hsp_hit-from>
-      <Hsp_hit-to>104</Hsp_hit-to>
-      <Hsp_query-frame>0</Hsp_query-frame>
-      <Hsp_hit-frame>0</Hsp_hit-frame>
-      <Hsp_identity>100</Hsp_identity>
-      <Hsp_positive>102</Hsp_positive>
-      <Hsp_gaps>0</Hsp_gaps>
-      <Hsp_align-len>104</Hsp_align-len>
-      <Hsp_qseq>MAVPTSKLIREYLGETYEESDEQLIQLYIETHQFYRRLQKEIKNSELMYEYTNKAGATNLVKNPLSIELTKTVQTLNNLLKSLGLTPAQRKKVVSEDDDDFDDF</Hsp_qseq>
-      <Hsp_hseq>MAVPTSKFLREYLGETYEESDEQLIQLYIETHQFYRRLQKEIKNSELMYEYTNKAGATNLVKNPLSIELTKTVQTLNNLLKSLGLTPAQRKKVVGDDDDDFDDF</Hsp_hseq>
-      <Hsp_midline>MAVPTSK +REYLGETYEESDEQLIQLYIETHQFYRRLQKEIKNSELMYEYTNKAGATNLVKNPLSIELTKTVQTLNNLLKSLGLTPAQRKKVV +DDDDFDDF</Hsp_midline>
-    </Hsp>
-  </Hit_hsps>
-</Hit>
-<Hit>
-  <Hit_num>6</Hit_num>
-  <Hit_id>ref|YP_009196100.1|</Hit_id>
-  <Hit_def>terminase small subunit [Paenibacillus phage Vegas] &gt;gb|ALA12651.1| terminase small subunit [Paenibacillus phage Vegas] &gt;gb|AUS03554.1| terminase small subunit [Paenibacillus phage BN12]</Hit_def>
-  <Hit_accession>YP_009196100</Hit_accession>
-  <Hit_len>104</Hit_len>
-  <Hit_hsps>
-    <Hsp>
-      <Hsp_num>1</Hsp_num>
-      <Hsp_bit-score>188.348</Hsp_bit-score>
-      <Hsp_score>477</Hsp_score>
-      <Hsp_evalue>6.83856e-60</Hsp_evalue>
-      <Hsp_query-from>1</Hsp_query-from>
-      <Hsp_query-to>95</Hsp_query-to>
-      <Hsp_hit-from>1</Hsp_hit-from>
-      <Hsp_hit-to>95</Hsp_hit-to>
-      <Hsp_query-frame>0</Hsp_query-frame>
-      <Hsp_hit-frame>0</Hsp_hit-frame>
-      <Hsp_identity>93</Hsp_identity>
-      <Hsp_positive>93</Hsp_positive>
-      <Hsp_gaps>0</Hsp_gaps>
-      <Hsp_align-len>95</Hsp_align-len>
-      <Hsp_qseq>MAVPTSKLIREYLGETYEESDEQLIQLYIETHQFYRRLQKEIKNSELMYEYTNKAGATNLVKNPLSIELTKTVQTLNNLLKSLGLTPAQRKKVVS</Hsp_qseq>
-      <Hsp_hseq>MAVPTSKLIREYLGETYEESDEQLIQLYIETHQFYRRLQKEIKNSELMYEYTNKAGATNLVKNPLSIELTKTVQTLNNLLKSLGLTPAQRKKVAG</Hsp_hseq>
-      <Hsp_midline>MAVPTSKLIREYLGETYEESDEQLIQLYIETHQFYRRLQKEIKNSELMYEYTNKAGATNLVKNPLSIELTKTVQTLNNLLKSLGLTPAQRKKV  </Hsp_midline>
-    </Hsp>
-  </Hit_hsps>
-</Hit>
-<Hit>
-  <Hit_num>7</Hit_num>
-  <Hit_id>gb|ALA12821.1|</Hit_id>
-  <Hit_def>terminase small subunit [Paenibacillus phage Vadim]</Hit_def>
-  <Hit_accession>ALA12821</Hit_accession>
-  <Hit_len>104</Hit_len>
-  <Hit_hsps>
-    <Hsp>
-      <Hsp_num>1</Hsp_num>
-      <Hsp_bit-score>186.037</Hsp_bit-score>
-      <Hsp_score>471</Hsp_score>
-      <Hsp_evalue>5.7508e-59</Hsp_evalue>
-      <Hsp_query-from>1</Hsp_query-from>
-      <Hsp_query-to>95</Hsp_query-to>
-      <Hsp_hit-from>1</Hsp_hit-from>
-      <Hsp_hit-to>95</Hsp_hit-to>
-      <Hsp_query-frame>0</Hsp_query-frame>
-      <Hsp_hit-frame>0</Hsp_hit-frame>
-      <Hsp_identity>92</Hsp_identity>
-      <Hsp_positive>92</Hsp_positive>
-      <Hsp_gaps>0</Hsp_gaps>
-      <Hsp_align-len>95</Hsp_align-len>
-      <Hsp_qseq>MAVPTSKLIREYLGETYEESDEQLIQLYIETHQFYRRLQKEIKNSELMYEYTNKAGATNLVKNPLSIELTKTVQTLNNLLKSLGLTPAQRKKVVS</Hsp_qseq>
-      <Hsp_hseq>MAVPTSKLIREYLGETYEESDEQLIQLYIETHQFYRRLQKEIKQSELMYEYTNKAGATNLVKNPLSIELTKTVQTLNNLLKSLGLTPAQRKKVAG</Hsp_hseq>
-      <Hsp_midline>MAVPTSKLIREYLGETYEESDEQLIQLYIETHQFYRRLQKEIK SELMYEYTNKAGATNLVKNPLSIELTKTVQTLNNLLKSLGLTPAQRKKV  </Hsp_midline>
-    </Hsp>
-  </Hit_hsps>
-</Hit>
-<Hit>
-  <Hit_num>8</Hit_num>
-  <Hit_id>ref|WP_023484127.1|</Hit_id>
-  <Hit_def>P27 family phage terminase small subunit [Paenibacillus larvae] &gt;ref|YP_009193814.1| terminase small subunit [Paenibacillus phage Harrison] &gt;gb|ALA12567.1| terminase small subunit [Paenibacillus phage Paisley] &gt;gb|ALA12737.1| terminase small subunit [Paenibacillus phage Hayley] &gt;gb|AQR76549.1| terminase [Paenibacillus larvae subsp. larvae] &gt;gb|ETK30022.1| phage related putative terminase small subunit [Paenibacillus larvae subsp. larvae DSM 25719] &gt;gb|PCK70154.1| hypothetical protein PL1_2047 [Paenibacillus larvae subsp. larvae B-3650]</Hit_def>
-  <Hit_accession>WP_023484127</Hit_accession>
-  <Hit_len>104</Hit_len>
-  <Hit_hsps>
-    <Hsp>
-      <Hsp_num>1</Hsp_num>
-      <Hsp_bit-score>185.267</Hsp_bit-score>
-      <Hsp_score>469</Hsp_score>
-      <Hsp_evalue>8.72696e-59</Hsp_evalue>
-      <Hsp_query-from>1</Hsp_query-from>
-      <Hsp_query-to>95</Hsp_query-to>
-      <Hsp_hit-from>1</Hsp_hit-from>
-      <Hsp_hit-to>95</Hsp_hit-to>
-      <Hsp_query-frame>0</Hsp_query-frame>
-      <Hsp_hit-frame>0</Hsp_hit-frame>
-      <Hsp_identity>91</Hsp_identity>
-      <Hsp_positive>92</Hsp_positive>
-      <Hsp_gaps>0</Hsp_gaps>
-      <Hsp_align-len>95</Hsp_align-len>
-      <Hsp_qseq>MAVPTSKLIREYLGETYEESDEQLIQLYIETHQFYRRLQKEIKNSELMYEYTNKAGATNLVKNPLSIELTKTVQTLNNLLKSLGLTPAQRKKVVS</Hsp_qseq>
-      <Hsp_hseq>MAVPTSKLLREYLGEAYEESDEQLIQLYIETHQFYRRLQKEIKNSELMYEYTNKAGATNLVKNPLSIELTKTVQTLNNLLKSLGLTPAQRKKVAG</Hsp_hseq>
-      <Hsp_midline>MAVPTSKL+REYLGE YEESDEQLIQLYIETHQFYRRLQKEIKNSELMYEYTNKAGATNLVKNPLSIELTKTVQTLNNLLKSLGLTPAQRKKV  </Hsp_midline>
-    </Hsp>
-  </Hit_hsps>
-</Hit>
-<Hit>
-  <Hit_num>9</Hit_num>
-  <Hit_id>gb|ALA12907.1|</Hit_id>
-  <Hit_def>terminase small subunit [Paenibacillus phage Diane]</Hit_def>
-  <Hit_accession>ALA12907</Hit_accession>
-  <Hit_len>104</Hit_len>
-  <Hit_hsps>
-    <Hsp>
-      <Hsp_num>1</Hsp_num>
-      <Hsp_bit-score>183.341</Hsp_bit-score>
-      <Hsp_score>464</Hsp_score>
-      <Hsp_evalue>5.45617e-58</Hsp_evalue>
-      <Hsp_query-from>1</Hsp_query-from>
-      <Hsp_query-to>95</Hsp_query-to>
-      <Hsp_hit-from>1</Hsp_hit-from>
-      <Hsp_hit-to>95</Hsp_hit-to>
-      <Hsp_query-frame>0</Hsp_query-frame>
-      <Hsp_hit-frame>0</Hsp_hit-frame>
-      <Hsp_identity>91</Hsp_identity>
-      <Hsp_positive>91</Hsp_positive>
-      <Hsp_gaps>0</Hsp_gaps>
-      <Hsp_align-len>95</Hsp_align-len>
-      <Hsp_qseq>MAVPTSKLIREYLGETYEESDEQLIQLYIETHQFYRRLQKEIKNSELMYEYTNKAGATNLVKNPLSIELTKTVQTLNNLLKSLGLTPAQRKKVVS</Hsp_qseq>
-      <Hsp_hseq>MAVPTSKLIREYLGETYEESDEQLIQLYIETHQFYRRLQKEIKQSELMYEYTNKAGATNLVKNPLSIELTKTVQTLNNLLKSHGLTPAQRKKVAG</Hsp_hseq>
-      <Hsp_midline>MAVPTSKLIREYLGETYEESDEQLIQLYIETHQFYRRLQKEIK SELMYEYTNKAGATNLVKNPLSIELTKTVQTLNNLLKS GLTPAQRKKV  </Hsp_midline>
-    </Hsp>
-  </Hit_hsps>
-</Hit>
-<Hit>
-  <Hit_num>10</Hit_num>
-  <Hit_id>ref|WP_066147814.1|</Hit_id>
-  <Hit_def>phage terminase small subunit P27 family [Anoxybacillus sp. P3H1B] &gt;gb|KXG09941.1| hypothetical protein AT864_01501 [Anoxybacillus sp. P3H1B]</Hit_def>
-  <Hit_accession>WP_066147814</Hit_accession>
-  <Hit_len>104</Hit_len>
-  <Hit_hsps>
-    <Hsp>
-      <Hsp_num>1</Hsp_num>
-      <Hsp_bit-score>183.341</Hsp_bit-score>
-      <Hsp_score>464</Hsp_score>
-      <Hsp_evalue>6.43259e-58</Hsp_evalue>
-      <Hsp_query-from>1</Hsp_query-from>
-      <Hsp_query-to>104</Hsp_query-to>
-      <Hsp_hit-from>1</Hsp_hit-from>
-      <Hsp_hit-to>104</Hsp_hit-to>
-      <Hsp_query-frame>0</Hsp_query-frame>
-      <Hsp_hit-frame>0</Hsp_hit-frame>
-      <Hsp_identity>86</Hsp_identity>
-      <Hsp_positive>100</Hsp_positive>
-      <Hsp_gaps>0</Hsp_gaps>
-      <Hsp_align-len>104</Hsp_align-len>
-      <Hsp_qseq>MAVPTSKLIREYLGETYEESDEQLIQLYIETHQFYRRLQKEIKNSELMYEYTNKAGATNLVKNPLSIELTKTVQTLNNLLKSLGLTPAQRKKVVSEDDDDFDDF</Hsp_qseq>
-      <Hsp_hseq>MAVPTEKLIREYLGDSYQESDEQLIKLYVETHQFYRRLRNEIKKTDLLMEHTNKAGATNLVKNPLAIELTKTVQTLNNLLKSLGLTPAQRKKVVNEDEDDFEDF</Hsp_hseq>
-      <Hsp_midline>MAVPT KLIREYLG++Y+ESDEQLI+LY+ETHQFYRRL+ EIK ++L+ E+TNKAGATNLVKNPL+IELTKTVQTLNNLLKSLGLTPAQRKKVV+ED+DDF+DF</Hsp_midline>
-    </Hsp>
-  </Hit_hsps>
-</Hit>
-<Hit>
-  <Hit_num>11</Hit_num>
-  <Hit_id>ref|WP_050352209.1|</Hit_id>
-  <Hit_def>phage terminase small subunit P27 family [Virgibacillus pantothenticus] &gt;gb|KNE19663.1| terminase [Virgibacillus pantothenticus] &gt;emb|SIS79493.1| phage terminase, small subunit, putative, P27 family [Virgibacillus pantothenticus]</Hit_def>
-  <Hit_accession>WP_050352209</Hit_accession>
-  <Hit_len>105</Hit_len>
-  <Hit_hsps>
-    <Hsp>
-      <Hsp_num>1</Hsp_num>
-      <Hsp_bit-score>182.956</Hsp_bit-score>
-      <Hsp_score>463</Hsp_score>
-      <Hsp_evalue>7.91278e-58</Hsp_evalue>
-      <Hsp_query-from>1</Hsp_query-from>
-      <Hsp_query-to>104</Hsp_query-to>
-      <Hsp_hit-from>1</Hsp_hit-from>
-      <Hsp_hit-to>105</Hsp_hit-to>
-      <Hsp_query-frame>0</Hsp_query-frame>
-      <Hsp_hit-frame>0</Hsp_hit-frame>
-      <Hsp_identity>90</Hsp_identity>
-      <Hsp_positive>99</Hsp_positive>
-      <Hsp_gaps>1</Hsp_gaps>
-      <Hsp_align-len>105</Hsp_align-len>
-      <Hsp_qseq>MAVPTSKLIREYLGETYEESDEQLIQLYIETHQFYRRLQKEIKNSELMYEYTNKAGATNLVKNPLSIELTKTVQTLNNLLKSLGLTPAQRKKVVS-EDDDDFDDF</Hsp_qseq>
-      <Hsp_hseq>MAVPTKKMLIDYLGDSYQESDEQLIQLYIETHQFYRRLQKEIKKSELMYDYTNKNGSTNKVKNPLSIELTKTVQTLNNLLKSLGLTPAQRKKVVSGEDDDDFDNF</Hsp_hseq>
-      <Hsp_midline>MAVPT K++ +YLG++Y+ESDEQLIQLYIETHQFYRRLQKEIK SELMY+YTNK G+TN VKNPLSIELTKTVQTLNNLLKSLGLTPAQRKKVVS EDDDDFD+F</Hsp_midline>
-    </Hsp>
-  </Hit_hsps>
-</Hit>
-<Hit>
-  <Hit_num>12</Hit_num>
-  <Hit_id>ref|WP_104067449.1|</Hit_id>
-  <Hit_def>phage terminase small subunit P27 family [Brevibacillus laterosporus] &gt;gb|PPA82512.1| phage terminase small subunit P27 family [Brevibacillus laterosporus]</Hit_def>
-  <Hit_accession>WP_104067449</Hit_accession>
-  <Hit_len>104</Hit_len>
-  <Hit_hsps>
-    <Hsp>
-      <Hsp_num>1</Hsp_num>
-      <Hsp_bit-score>181.03</Hsp_bit-score>
-      <Hsp_score>458</Hsp_score>
-      <Hsp_evalue>4.48792e-57</Hsp_evalue>
-      <Hsp_query-from>1</Hsp_query-from>
-      <Hsp_query-to>104</Hsp_query-to>
-      <Hsp_hit-from>1</Hsp_hit-from>
-      <Hsp_hit-to>104</Hsp_hit-to>
-      <Hsp_query-frame>0</Hsp_query-frame>
-      <Hsp_hit-frame>0</Hsp_hit-frame>
-      <Hsp_identity>86</Hsp_identity>
-      <Hsp_positive>98</Hsp_positive>
-      <Hsp_gaps>0</Hsp_gaps>
-      <Hsp_align-len>104</Hsp_align-len>
-      <Hsp_qseq>MAVPTSKLIREYLGETYEESDEQLIQLYIETHQFYRRLQKEIKNSELMYEYTNKAGATNLVKNPLSIELTKTVQTLNNLLKSLGLTPAQRKKVVSEDDDDFDDF</Hsp_qseq>
-      <Hsp_hseq>MAVPTAKILREYLGDLYTESDEEIINLYIETHQFYRRLKQEIKKSPLMHEYTNKAGATNLVKNPLSIELTKTVQTLNNLLKSLGLTPAQRKKVVNGEDDDFEDF</Hsp_hseq>
-      <Hsp_midline>MAVPT+K++REYLG+ Y ESDE++I LYIETHQFYRRL++EIK S LM+EYTNKAGATNLVKNPLSIELTKTVQTLNNLLKSLGLTPAQRKKVV+ +DDDF+DF</Hsp_midline>
-    </Hsp>
-  </Hit_hsps>
-</Hit>
-<Hit>
-  <Hit_num>13</Hit_num>
-  <Hit_id>ref|WP_017797577.1|</Hit_id>
-  <Hit_def>phage terminase small subunit P27 family [Oceanobacillus kimchii]</Hit_def>
-  <Hit_accession>WP_017797577</Hit_accession>
-  <Hit_len>104</Hit_len>
-  <Hit_hsps>
-    <Hsp>
-      <Hsp_num>1</Hsp_num>
-      <Hsp_bit-score>179.874</Hsp_bit-score>
-      <Hsp_score>455</Hsp_score>
-      <Hsp_evalue>1.15331e-56</Hsp_evalue>
-      <Hsp_query-from>1</Hsp_query-from>
-      <Hsp_query-to>104</Hsp_query-to>
-      <Hsp_hit-from>1</Hsp_hit-from>
-      <Hsp_hit-to>104</Hsp_hit-to>
-      <Hsp_query-frame>0</Hsp_query-frame>
-      <Hsp_hit-frame>0</Hsp_hit-frame>
-      <Hsp_identity>85</Hsp_identity>
-      <Hsp_positive>98</Hsp_positive>
-      <Hsp_gaps>0</Hsp_gaps>
-      <Hsp_align-len>104</Hsp_align-len>
-      <Hsp_qseq>MAVPTSKLIREYLGETYEESDEQLIQLYIETHQFYRRLQKEIKNSELMYEYTNKAGATNLVKNPLSIELTKTVQTLNNLLKSLGLTPAQRKKVVSEDDDDFDDF</Hsp_qseq>
-      <Hsp_hseq>MAKPTAAKIKAYLGESYQESDEELIQLYIETHEFYTRMKKELKKSDLMYEYTNKAGATNLVKNPLSIELTKTVQTLNNLLKSLGLTPAQRKKVVNEDDNDFDNF</Hsp_hseq>
-      <Hsp_midline>MA PT+  I+ YLGE+Y+ESDE+LIQLYIETH+FY R++KE+K S+LMYEYTNKAGATNLVKNPLSIELTKTVQTLNNLLKSLGLTPAQRKKVV+EDD+DFD+F</Hsp_midline>
-    </Hsp>
-  </Hit_hsps>
-</Hit>
-<Hit>
-  <Hit_num>14</Hit_num>
-  <Hit_id>ref|WP_116555622.1|</Hit_id>
-  <Hit_def>P27 family phage terminase small subunit [Pueribacillus theae] &gt;gb|PWA08649.1| phage terminase small subunit P27 family [Pueribacillus theae]</Hit_def>
-  <Hit_accession>WP_116555622</Hit_accession>
-  <Hit_len>105</Hit_len>
-  <Hit_hsps>
-    <Hsp>
-      <Hsp_num>1</Hsp_num>
-      <Hsp_bit-score>178.333</Hsp_bit-score>
-      <Hsp_score>451</Hsp_score>
-      <Hsp_evalue>6.6661e-56</Hsp_evalue>
-      <Hsp_query-from>1</Hsp_query-from>
-      <Hsp_query-to>95</Hsp_query-to>
-      <Hsp_hit-from>1</Hsp_hit-from>
-      <Hsp_hit-to>95</Hsp_hit-to>
-      <Hsp_query-frame>0</Hsp_query-frame>
-      <Hsp_hit-frame>0</Hsp_hit-frame>
-      <Hsp_identity>87</Hsp_identity>
-      <Hsp_positive>91</Hsp_positive>
-      <Hsp_gaps>0</Hsp_gaps>
-      <Hsp_align-len>95</Hsp_align-len>
-      <Hsp_qseq>MAVPTSKLIREYLGETYEESDEQLIQLYIETHQFYRRLQKEIKNSELMYEYTNKAGATNLVKNPLSIELTKTVQTLNNLLKSLGLTPAQRKKVVS</Hsp_qseq>
-      <Hsp_hseq>MAVPTKKMLIEYLGENYEESDEQLIQLYIETHQFYRRLQREIKKSELMYEYTNKAGATNLVKNPLSIELTKTVQTLNNLLKSLGLTPAQRKKIVS</Hsp_hseq>
-      <Hsp_midline>MAVPT K++ EYLGE YEESDEQLIQLYIETHQFYRRLQ+EIK SELMYEYTNKAGATNLVKNPLSIELTKTVQTLNNLLKSLGLTPAQRKK+VS</Hsp_midline>
-    </Hsp>
-  </Hit_hsps>
-</Hit>
-<Hit>
-  <Hit_num>15</Hit_num>
-  <Hit_id>ref|WP_077996841.1|</Hit_id>
-  <Hit_def>phage terminase small subunit P27 family [Paenibacillus larvae] &gt;gb|AQT85685.1| terminase [Paenibacillus larvae subsp. pulvifaciens] &gt;gb|AVF25087.1| putative phage terminase, small subunit, P27 family [Paenibacillus larvae subsp. larvae] &gt;gb|AVF29851.1| putative phage terminase, small subunit, P27 family [Paenibacillus larvae subsp. larvae]</Hit_def>
-  <Hit_accession>WP_077996841</Hit_accession>
-  <Hit_len>105</Hit_len>
-  <Hit_hsps>
-    <Hsp>
-      <Hsp_num>1</Hsp_num>
-      <Hsp_bit-score>177.563</Hsp_bit-score>
-      <Hsp_score>449</Hsp_score>
-      <Hsp_evalue>1.08037e-55</Hsp_evalue>
-      <Hsp_query-from>1</Hsp_query-from>
-      <Hsp_query-to>95</Hsp_query-to>
-      <Hsp_hit-from>1</Hsp_hit-from>
-      <Hsp_hit-to>95</Hsp_hit-to>
-      <Hsp_query-frame>0</Hsp_query-frame>
-      <Hsp_hit-frame>0</Hsp_hit-frame>
-      <Hsp_identity>86</Hsp_identity>
-      <Hsp_positive>92</Hsp_positive>
-      <Hsp_gaps>0</Hsp_gaps>
-      <Hsp_align-len>95</Hsp_align-len>
-      <Hsp_qseq>MAVPTSKLIREYLGETYEESDEQLIQLYIETHQFYRRLQKEIKNSELMYEYTNKAGATNLVKNPLSIELTKTVQTLNNLLKSLGLTPAQRKKVVS</Hsp_qseq>
-      <Hsp_hseq>MAVPTAKKIQEYLGDSYQESDEQLIQLYVETHQFYRRLQKEIKNSELMYEYTNKAGATNLVKNPLSIELTKTVQTLNNLLKSLGLTPAQRKKFVG</Hsp_hseq>
-      <Hsp_midline>MAVPT+K I+EYLG++Y+ESDEQLIQLY+ETHQFYRRLQKEIKNSELMYEYTNKAGATNLVKNPLSIELTKTVQTLNNLLKSLGLTPAQRKK V </Hsp_midline>
-    </Hsp>
-  </Hit_hsps>
-</Hit>
-<Hit>
-  <Hit_num>16</Hit_num>
-  <Hit_id>ref|WP_083038823.1|</Hit_id>
-  <Hit_def>phage terminase small subunit P27 family [Paenibacillus larvae] &gt;gb|ARF67224.1| terminase [Paenibacillus larvae subsp. pulvifaciens]</Hit_def>
-  <Hit_accession>WP_083038823</Hit_accession>
-  <Hit_len>104</Hit_len>
-  <Hit_hsps>
-    <Hsp>
-      <Hsp_num>1</Hsp_num>
-      <Hsp_bit-score>177.563</Hsp_bit-score>
-      <Hsp_score>449</Hsp_score>
-      <Hsp_evalue>1.3329e-55</Hsp_evalue>
-      <Hsp_query-from>1</Hsp_query-from>
-      <Hsp_query-to>95</Hsp_query-to>
-      <Hsp_hit-from>1</Hsp_hit-from>
-      <Hsp_hit-to>95</Hsp_hit-to>
-      <Hsp_query-frame>0</Hsp_query-frame>
-      <Hsp_hit-frame>0</Hsp_hit-frame>
-      <Hsp_identity>87</Hsp_identity>
-      <Hsp_positive>91</Hsp_positive>
-      <Hsp_gaps>0</Hsp_gaps>
-      <Hsp_align-len>95</Hsp_align-len>
-      <Hsp_qseq>MAVPTSKLIREYLGETYEESDEQLIQLYIETHQFYRRLQKEIKNSELMYEYTNKAGATNLVKNPLSIELTKTVQTLNNLLKSLGLTPAQRKKVVS</Hsp_qseq>
-      <Hsp_hseq>MAVPTAKKIQEYLGDSYTESDEQLIQLYIETHQFYRRLQKEIKQSELMYEYTNKAGATNLVKNPLSIELTKTVQTLNNLLKSLGLTPAQRKKVAS</Hsp_hseq>
-      <Hsp_midline>MAVPT+K I+EYLG++Y ESDEQLIQLYIETHQFYRRLQKEIK SELMYEYTNKAGATNLVKNPLSIELTKTVQTLNNLLKSLGLTPAQRKKV S</Hsp_midline>
-    </Hsp>
-  </Hit_hsps>
-</Hit>
-<Hit>
-  <Hit_num>17</Hit_num>
-  <Hit_id>ref|WP_017470629.1|</Hit_id>
-  <Hit_def>phage terminase small subunit P27 family [Amphibacillus jilinensis]</Hit_def>
-  <Hit_accession>WP_017470629</Hit_accession>
-  <Hit_len>105</Hit_len>
-  <Hit_hsps>
-    <Hsp>
-      <Hsp_num>1</Hsp_num>
-      <Hsp_bit-score>174.481</Hsp_bit-score>
-      <Hsp_score>441</Hsp_score>
-      <Hsp_evalue>2.16088e-54</Hsp_evalue>
-      <Hsp_query-from>1</Hsp_query-from>
-      <Hsp_query-to>104</Hsp_query-to>
-      <Hsp_hit-from>1</Hsp_hit-from>
-      <Hsp_hit-to>105</Hsp_hit-to>
-      <Hsp_query-frame>0</Hsp_query-frame>
-      <Hsp_hit-frame>0</Hsp_hit-frame>
-      <Hsp_identity>82</Hsp_identity>
-      <Hsp_positive>99</Hsp_positive>
-      <Hsp_gaps>1</Hsp_gaps>
-      <Hsp_align-len>105</Hsp_align-len>
-      <Hsp_qseq>MAVPTSKLIREYLGETYEESDEQLIQLYIETHQFYRRLQKEIKNSELMYEYTNKAGATNLVKNPLSIELTKTVQTLNNLLKSLGLTPAQRKKVVS-EDDDDFDDF</Hsp_qseq>
-      <Hsp_hseq>MAVPTAKLLREYLGENYQESDEELIKLYVETHQFYRKMKSELKKSDLLMEHTNKAGATNLVKNPLAIELTKTVQVLNNLLKSLGLTPAQRKKVVNGEDDNDFDNF</Hsp_hseq>
-      <Hsp_midline>MAVPT+KL+REYLGE Y+ESDE+LI+LY+ETHQFYR+++ E+K S+L+ E+TNKAGATNLVKNPL+IELTKTVQ LNNLLKSLGLTPAQRKKVV+ EDD+DFD+F</Hsp_midline>
-    </Hsp>
-  </Hit_hsps>
-</Hit>
-<Hit>
-  <Hit_num>18</Hit_num>
-  <Hit_id>ref|WP_043070130.1|</Hit_id>
-  <Hit_def>phage terminase small subunit P27 family [Aneurinibacillus migulanus] &gt;gb|KIV56941.1| terminase [Aneurinibacillus migulanus] &gt;gb|KPD05279.1| terminase [Aneurinibacillus migulanus]</Hit_def>
-  <Hit_accession>WP_043070130</Hit_accession>
-  <Hit_len>108</Hit_len>
-  <Hit_hsps>
-    <Hsp>
-      <Hsp_num>1</Hsp_num>
-      <Hsp_bit-score>171.785</Hsp_bit-score>
-      <Hsp_score>434</Hsp_score>
-      <Hsp_evalue>2.27583e-53</Hsp_evalue>
-      <Hsp_query-from>1</Hsp_query-from>
-      <Hsp_query-to>95</Hsp_query-to>
-      <Hsp_hit-from>1</Hsp_hit-from>
-      <Hsp_hit-to>95</Hsp_hit-to>
-      <Hsp_query-frame>0</Hsp_query-frame>
-      <Hsp_hit-frame>0</Hsp_hit-frame>
-      <Hsp_identity>83</Hsp_identity>
-      <Hsp_positive>90</Hsp_positive>
-      <Hsp_gaps>0</Hsp_gaps>
-      <Hsp_align-len>95</Hsp_align-len>
-      <Hsp_qseq>MAVPTSKLIREYLGETYEESDEQLIQLYIETHQFYRRLQKEIKNSELMYEYTNKAGATNLVKNPLSIELTKTVQTLNNLLKSLGLTPAQRKKVVS</Hsp_qseq>
-      <Hsp_hseq>MAVPTVKKIREYLGESYQESDEEIIQLYIETHQFYRRLQKEVKASDLMYEYTNKAGAKNLVKNPLSIELTKTVQTLNNLLKSLGLTPAQRKKLAS</Hsp_hseq>
-      <Hsp_midline>MAVPT K IREYLGE+Y+ESDE++IQLYIETHQFYRRLQKE+K S+LMYEYTNKAGA NLVKNPLSIELTKTVQTLNNLLKSLGLTPAQRKK+ S</Hsp_midline>
-    </Hsp>
-  </Hit_hsps>
-</Hit>
-<Hit>
-  <Hit_num>19</Hit_num>
-  <Hit_id>ref|WP_034643471.1|</Hit_id>
-  <Hit_def>phage terminase small subunit P27 family [Bacillus manliponensis] &gt;gb|KEK17353.1| terminase [Bacillus manliponensis]</Hit_def>
-  <Hit_accession>WP_034643471</Hit_accession>
-  <Hit_len>109</Hit_len>
-  <Hit_hsps>
-    <Hsp>
-      <Hsp_num>1</Hsp_num>
-      <Hsp_bit-score>169.859</Hsp_bit-score>
-      <Hsp_score>429</Hsp_score>
-      <Hsp_evalue>1.72965e-52</Hsp_evalue>
-      <Hsp_query-from>1</Hsp_query-from>
-      <Hsp_query-to>93</Hsp_query-to>
-      <Hsp_hit-from>1</Hsp_hit-from>
-      <Hsp_hit-to>93</Hsp_hit-to>
-      <Hsp_query-frame>0</Hsp_query-frame>
-      <Hsp_hit-frame>0</Hsp_hit-frame>
-      <Hsp_identity>79</Hsp_identity>
-      <Hsp_positive>92</Hsp_positive>
-      <Hsp_gaps>0</Hsp_gaps>
-      <Hsp_align-len>93</Hsp_align-len>
-      <Hsp_qseq>MAVPTSKLIREYLGETYEESDEQLIQLYIETHQFYRRLQKEIKNSELMYEYTNKAGATNLVKNPLSIELTKTVQTLNNLLKSLGLTPAQRKKV</Hsp_qseq>
-      <Hsp_hseq>MAVPSAKVLREYLGEDYEESDEELIKLYVETHQFYRRLQKEVKSSKLMYEYTNKAGATNMVKNPLSIELTKTVQTLNNLLKSLGLTPSQRKKL</Hsp_hseq>
-      <Hsp_midline>MAVP++K++REYLGE YEESDE+LI+LY+ETHQFYRRLQKE+K+S+LMYEYTNKAGATN+VKNPLSIELTKTVQTLNNLLKSLGLTP+QRKK+</Hsp_midline>
-    </Hsp>
-  </Hit_hsps>
-</Hit>
-<Hit>
-  <Hit_num>20</Hit_num>
-  <Hit_id>ref|WP_125482245.1|</Hit_id>
-  <Hit_def>P27 family phage terminase small subunit [Bacillus subterraneus] &gt;gb|RSD21068.1| P27 family phage terminase small subunit [Bacillus subterraneus]</Hit_def>
-  <Hit_accession>WP_125482245</Hit_accession>
-  <Hit_len>107</Hit_len>
-  <Hit_hsps>
-    <Hsp>
-      <Hsp_num>1</Hsp_num>
-      <Hsp_bit-score>167.548</Hsp_bit-score>
-      <Hsp_score>423</Hsp_score>
-      <Hsp_evalue>9.82155e-52</Hsp_evalue>
-      <Hsp_query-from>1</Hsp_query-from>
-      <Hsp_query-to>93</Hsp_query-to>
-      <Hsp_hit-from>1</Hsp_hit-from>
-      <Hsp_hit-to>93</Hsp_hit-to>
-      <Hsp_query-frame>0</Hsp_query-frame>
-      <Hsp_hit-frame>0</Hsp_hit-frame>
-      <Hsp_identity>80</Hsp_identity>
-      <Hsp_positive>91</Hsp_positive>
-      <Hsp_gaps>0</Hsp_gaps>
-      <Hsp_align-len>93</Hsp_align-len>
-      <Hsp_qseq>MAVPTSKLIREYLGETYEESDEQLIQLYIETHQFYRRLQKEIKNSELMYEYTNKAGATNLVKNPLSIELTKTVQTLNNLLKSLGLTPAQRKKV</Hsp_qseq>
-      <Hsp_hseq>MAVPTAKKIREYLGDSYKESDEELIKLYLETHQFYRRLQKEIKDADLMYEYTNKAGAKNLVKNPLSIELTKTVQTLNNLLKSLGLTPAQRKKL</Hsp_hseq>
-      <Hsp_midline>MAVPT+K IREYLG++Y+ESDE+LI+LY+ETHQFYRRLQKEIK+++LMYEYTNKAGA NLVKNPLSIELTKTVQTLNNLLKSLGLTPAQRKK+</Hsp_midline>
-    </Hsp>
-  </Hit_hsps>
-</Hit>
-<Hit>
-  <Hit_num>21</Hit_num>
-  <Hit_id>ref|WP_038243580.1|</Hit_id>
-  <Hit_def>phage terminase small subunit P27 family [Virgibacillus massiliensis] &gt;emb|CDQ39544.1| putative phage terminase, small subunit, P27 family [Virgibacillus massiliensis]</Hit_def>
-  <Hit_accession>WP_038243580</Hit_accession>
-  <Hit_len>105</Hit_len>
-  <Hit_hsps>
-    <Hsp>
-      <Hsp_num>1</Hsp_num>
-      <Hsp_bit-score>167.162</Hsp_bit-score>
-      <Hsp_score>422</Hsp_score>
-      <Hsp_evalue>1.65049e-51</Hsp_evalue>
-      <Hsp_query-from>1</Hsp_query-from>
-      <Hsp_query-to>95</Hsp_query-to>
-      <Hsp_hit-from>1</Hsp_hit-from>
-      <Hsp_hit-to>95</Hsp_hit-to>
-      <Hsp_query-frame>0</Hsp_query-frame>
-      <Hsp_hit-frame>0</Hsp_hit-frame>
-      <Hsp_identity>80</Hsp_identity>
-      <Hsp_positive>90</Hsp_positive>
-      <Hsp_gaps>0</Hsp_gaps>
-      <Hsp_align-len>95</Hsp_align-len>
-      <Hsp_qseq>MAVPTSKLIREYLGETYEESDEQLIQLYIETHQFYRRLQKEIKNSELMYEYTNKAGATNLVKNPLSIELTKTVQTLNNLLKSLGLTPAQRKKVVS</Hsp_qseq>
-      <Hsp_hseq>MAVPSAKTIREYLKDNYEESDEELIQIYVETHKFYRRLQKEIAKTDLMYEYTNKAGATNLVKNPLSIELTKTVQTLNNLLKSLGLTPAQRKKVVN</Hsp_hseq>
-      <Hsp_midline>MAVP++K IREYL + YEESDE+LIQ+Y+ETH+FYRRLQKEI  ++LMYEYTNKAGATNLVKNPLSIELTKTVQTLNNLLKSLGLTPAQRKKVV+</Hsp_midline>
-    </Hsp>
-  </Hit_hsps>
-</Hit>
-<Hit>
-  <Hit_num>22</Hit_num>
-  <Hit_id>ref|WP_101354239.1|</Hit_id>
-  <Hit_def>phage terminase small subunit P27 family [Bacillus camelliae] &gt;gb|PKR84873.1| phage terminase small subunit P27 family [Bacillus camelliae]</Hit_def>
-  <Hit_accession>WP_101354239</Hit_accession>
-  <Hit_len>104</Hit_len>
-  <Hit_hsps>
-    <Hsp>
-      <Hsp_num>1</Hsp_num>
-      <Hsp_bit-score>166.777</Hsp_bit-score>
-      <Hsp_score>421</Hsp_score>
-      <Hsp_evalue>2.27282e-51</Hsp_evalue>
-      <Hsp_query-from>1</Hsp_query-from>
-      <Hsp_query-to>104</Hsp_query-to>
-      <Hsp_hit-from>1</Hsp_hit-from>
-      <Hsp_hit-to>104</Hsp_hit-to>
-      <Hsp_query-frame>0</Hsp_query-frame>
-      <Hsp_hit-frame>0</Hsp_hit-frame>
-      <Hsp_identity>79</Hsp_identity>
-      <Hsp_positive>93</Hsp_positive>
-      <Hsp_gaps>0</Hsp_gaps>
-      <Hsp_align-len>104</Hsp_align-len>
-      <Hsp_qseq>MAVPTSKLIREYLGETYEESDEQLIQLYIETHQFYRRLQKEIKNSELMYEYTNKAGATNLVKNPLSIELTKTVQTLNNLLKSLGLTPAQRKKVVSEDDDDFDDF</Hsp_qseq>
-      <Hsp_hseq>MSVPTRKKLMEYIGESYKESDEELIKLYLETHQVYRRLKAEIKKSDLMFEYTNKAGATNPVKNPLVGELTKAVQTLNNLLKSMGLTPAQRKKVVNEDDDDFKNF</Hsp_hseq>
-      <Hsp_midline>M+VPT K + EY+GE+Y+ESDE+LI+LY+ETHQ YRRL+ EIK S+LM+EYTNKAGATN VKNPL  ELTK VQTLNNLLKS+GLTPAQRKKVV+EDDDDF +F</Hsp_midline>
-    </Hsp>
-  </Hit_hsps>
-</Hit>
-<Hit>
-  <Hit_num>23</Hit_num>
-  <Hit_id>ref|WP_110000805.1|</Hit_id>
-  <Hit_def>MULTISPECIES: P27 family phage terminase small subunit [Paenibacillus] &gt;gb|PWW37387.1| P27 family predicted phage terminase small subunit [Paenibacillus pabuli] &gt;gb|PXW05529.1| P27 family predicted phage terminase small subunit [Paenibacillus taichungensis]</Hit_def>
-  <Hit_accession>WP_110000805</Hit_accession>
-  <Hit_len>105</Hit_len>
-  <Hit_hsps>
-    <Hsp>
-      <Hsp_num>1</Hsp_num>
-      <Hsp_bit-score>166.007</Hsp_bit-score>
-      <Hsp_score>419</Hsp_score>
-      <Hsp_evalue>4.52871e-51</Hsp_evalue>
-      <Hsp_query-from>1</Hsp_query-from>
-      <Hsp_query-to>95</Hsp_query-to>
-      <Hsp_hit-from>1</Hsp_hit-from>
-      <Hsp_hit-to>95</Hsp_hit-to>
-      <Hsp_query-frame>0</Hsp_query-frame>
-      <Hsp_hit-frame>0</Hsp_hit-frame>
-      <Hsp_identity>80</Hsp_identity>
-      <Hsp_positive>88</Hsp_positive>
-      <Hsp_gaps>0</Hsp_gaps>
-      <Hsp_align-len>95</Hsp_align-len>
-      <Hsp_qseq>MAVPTSKLIREYLGETYEESDEQLIQLYIETHQFYRRLQKEIKNSELMYEYTNKAGATNLVKNPLSIELTKTVQTLNNLLKSLGLTPAQRKKVVS</Hsp_qseq>
-      <Hsp_hseq>MAAPTAKQIKEYLGDSYEASDEQIIQLYIETHAFYSRLKKEIDKSDLMYEYTNKAGATNLVKNPLSIELTKTVQTLNNLLKSLGLTPAQRKKVVN</Hsp_hseq>
-      <Hsp_midline>MA PT+K I+EYLG++YE SDEQ+IQLYIETH FY RL+KEI  S+LMYEYTNKAGATNLVKNPLSIELTKTVQTLNNLLKSLGLTPAQRKKVV+</Hsp_midline>
-    </Hsp>
-  </Hit_hsps>
-</Hit>
-<Hit>
-  <Hit_num>24</Hit_num>
-  <Hit_id>ref|WP_158175914.1|</Hit_id>
-  <Hit_def>phage terminase small subunit P27 family [Bacillus sp. THG-D6.12]</Hit_def>
-  <Hit_accession>WP_158175914</Hit_accession>
-  <Hit_len>109</Hit_len>
-  <Hit_hsps>
-    <Hsp>
-      <Hsp_num>1</Hsp_num>
-      <Hsp_bit-score>166.007</Hsp_bit-score>
-      <Hsp_score>419</Hsp_score>
-      <Hsp_evalue>5.07463e-51</Hsp_evalue>
-      <Hsp_query-from>1</Hsp_query-from>
-      <Hsp_query-to>93</Hsp_query-to>
-      <Hsp_hit-from>1</Hsp_hit-from>
-      <Hsp_hit-to>93</Hsp_hit-to>
-      <Hsp_query-frame>0</Hsp_query-frame>
-      <Hsp_hit-frame>0</Hsp_hit-frame>
-      <Hsp_identity>79</Hsp_identity>
-      <Hsp_positive>88</Hsp_positive>
-      <Hsp_gaps>0</Hsp_gaps>
-      <Hsp_align-len>93</Hsp_align-len>
-      <Hsp_qseq>MAVPTSKLIREYLGETYEESDEQLIQLYIETHQFYRRLQKEIKNSELMYEYTNKAGATNLVKNPLSIELTKTVQTLNNLLKSLGLTPAQRKKV</Hsp_qseq>
-      <Hsp_hseq>MAVPTANKIREYLGENYKESDEELIKLYIETHQFYRRLQKEVKKAKLMYEYTNKAGATNLVKNPLSVELNKTVQTLNNLLKSLGLTPAQRKKL</Hsp_hseq>
-      <Hsp_midline>MAVPT+  IREYLGE Y+ESDE+LI+LYIETHQFYRRLQKE+K ++LMYEYTNKAGATNLVKNPLS+EL KTVQTLNNLLKSLGLTPAQRKK+</Hsp_midline>
-    </Hsp>
-  </Hit_hsps>
-</Hit>
-<Hit>
-  <Hit_num>25</Hit_num>
-  <Hit_id>ref|WP_095297608.1|</Hit_id>
-  <Hit_def>phage terminase small subunit P27 family [Bacillus sp. 7586-K] &gt;gb|PAD70878.1| terminase [Bacillus sp. 7586-K]</Hit_def>
-  <Hit_accession>WP_095297608</Hit_accession>
-  <Hit_len>108</Hit_len>
-  <Hit_hsps>
-    <Hsp>
-      <Hsp_num>1</Hsp_num>
-      <Hsp_bit-score>165.622</Hsp_bit-score>
-      <Hsp_score>418</Hsp_score>
-      <Hsp_evalue>7.97014e-51</Hsp_evalue>
-      <Hsp_query-from>1</Hsp_query-from>
-      <Hsp_query-to>93</Hsp_query-to>
-      <Hsp_hit-from>1</Hsp_hit-from>
-      <Hsp_hit-to>93</Hsp_hit-to>
-      <Hsp_query-frame>0</Hsp_query-frame>
-      <Hsp_hit-frame>0</Hsp_hit-frame>
-      <Hsp_identity>80</Hsp_identity>
-      <Hsp_positive>89</Hsp_positive>
-      <Hsp_gaps>0</Hsp_gaps>
-      <Hsp_align-len>93</Hsp_align-len>
-      <Hsp_qseq>MAVPTSKLIREYLGETYEESDEQLIQLYIETHQFYRRLQKEIKNSELMYEYTNKAGATNLVKNPLSIELTKTVQTLNNLLKSLGLTPAQRKKV</Hsp_qseq>
-      <Hsp_hseq>MAVPTANKIREYLGEDYKESDEELIKLYLETHQFYRRLQKEIKKNDLMYEYTNKAGATNLVKNPLSIELTKTVQTLNNLLKSLGLTPSQRKKL</Hsp_hseq>
-      <Hsp_midline>MAVPT+  IREYLGE Y+ESDE+LI+LY+ETHQFYRRLQKEIK ++LMYEYTNKAGATNLVKNPLSIELTKTVQTLNNLLKSLGLTP+QRKK+</Hsp_midline>
-    </Hsp>
-  </Hit_hsps>
-</Hit>
-<Hit>
-  <Hit_num>26</Hit_num>
-  <Hit_id>ref|WP_119733878.1|</Hit_id>
-  <Hit_def>phage terminase small subunit P27 family [Brevibacillus laterosporus] &gt;gb|AYB39690.1| phage terminase small subunit P27 family [Brevibacillus laterosporus]</Hit_def>
-  <Hit_accession>WP_119733878</Hit_accession>
-  <Hit_len>105</Hit_len>
-  <Hit_hsps>
-    <Hsp>
-      <Hsp_num>1</Hsp_num>
-      <Hsp_bit-score>165.236</Hsp_bit-score>
-      <Hsp_score>417</Hsp_score>
-      <Hsp_evalue>8.18972e-51</Hsp_evalue>
-      <Hsp_query-from>1</Hsp_query-from>
-      <Hsp_query-to>104</Hsp_query-to>
-      <Hsp_hit-from>1</Hsp_hit-from>
-      <Hsp_hit-to>105</Hsp_hit-to>
-      <Hsp_query-frame>0</Hsp_query-frame>
-      <Hsp_hit-frame>0</Hsp_hit-frame>
-      <Hsp_identity>84</Hsp_identity>
-      <Hsp_positive>95</Hsp_positive>
-      <Hsp_gaps>1</Hsp_gaps>
-      <Hsp_align-len>105</Hsp_align-len>
-      <Hsp_qseq>MAVPTSKLIREYLGETYEESDEQLIQLYIETHQFYRRLQKEIKNSELMYEYTNKAGATNLVKNPLSIELTKTVQTLNNLLKSLGLTPAQRKKVVS-EDDDDFDDF</Hsp_qseq>
-      <Hsp_hseq>MATPTAKLLREYLGDLYTESDEEIISLYIETHQFYRRLKQEIKKSPLMYEYTNKAGATNMVKNPLSIELTKTVQTLNNLLKSLGLTPAQRKKVTGDDDDDELNDF</Hsp_hseq>
-      <Hsp_midline>MA PT+KL+REYLG+ Y ESDE++I LYIETHQFYRRL++EIK S LMYEYTNKAGATN+VKNPLSIELTKTVQTLNNLLKSLGLTPAQRKKV   +DDD+ +DF</Hsp_midline>
-    </Hsp>
-  </Hit_hsps>
-</Hit>
-<Hit>
-  <Hit_num>27</Hit_num>
-  <Hit_id>ref|WP_153791617.1|</Hit_id>
-  <Hit_def>phage terminase small subunit P27 family [Gracilibacillus sp. SCU50] &gt;gb|QGH35143.1| phage terminase small subunit P27 family [Gracilibacillus sp. SCU50]</Hit_def>
-  <Hit_accession>WP_153791617</Hit_accession>
-  <Hit_len>105</Hit_len>
-  <Hit_hsps>
-    <Hsp>
-      <Hsp_num>1</Hsp_num>
-      <Hsp_bit-score>164.466</Hsp_bit-score>
-      <Hsp_score>415</Hsp_score>
-      <Hsp_evalue>1.78467e-50</Hsp_evalue>
-      <Hsp_query-from>1</Hsp_query-from>
-      <Hsp_query-to>93</Hsp_query-to>
-      <Hsp_hit-from>1</Hsp_hit-from>
-      <Hsp_hit-to>93</Hsp_hit-to>
-      <Hsp_query-frame>0</Hsp_query-frame>
-      <Hsp_hit-frame>0</Hsp_hit-frame>
-      <Hsp_identity>77</Hsp_identity>
-      <Hsp_positive>90</Hsp_positive>
-      <Hsp_gaps>0</Hsp_gaps>
-      <Hsp_align-len>93</Hsp_align-len>
-      <Hsp_qseq>MAVPTSKLIREYLGETYEESDEQLIQLYIETHQFYRRLQKEIKNSELMYEYTNKAGATNLVKNPLSIELTKTVQTLNNLLKSLGLTPAQRKKV</Hsp_qseq>
-      <Hsp_hseq>MAVPTAKLLREYLGDNYKESDEELIQIYIETHRFYRKLKKEINKTDLMYEYTNKAGATNLVKNPLAIELTKTVQTLNNLLKSLGLTPAQRKKI</Hsp_hseq>
-      <Hsp_midline>MAVPT+KL+REYLG+ Y+ESDE+LIQ+YIETH+FYR+L+KEI  ++LMYEYTNKAGATNLVKNPL+IELTKTVQTLNNLLKSLGLTPAQRKK+</Hsp_midline>
-    </Hsp>
-  </Hit_hsps>
-</Hit>
-<Hit>
-  <Hit_num>28</Hit_num>
-  <Hit_id>ref|WP_071356337.1|</Hit_id>
-  <Hit_def>P27 family phage terminase small subunit [Bacillus sp. MUM 116] &gt;gb|OIK13584.1| terminase [Bacillus sp. MUM 116]</Hit_def>
-  <Hit_accession>WP_071356337</Hit_accession>
-  <Hit_len>110</Hit_len>
-  <Hit_hsps>
-    <Hsp>
-      <Hsp_num>1</Hsp_num>
-      <Hsp_bit-score>162.155</Hsp_bit-score>
-      <Hsp_score>409</Hsp_score>
-      <Hsp_evalue>1.48579e-49</Hsp_evalue>
-      <Hsp_query-from>1</Hsp_query-from>
-      <Hsp_query-to>92</Hsp_query-to>
-      <Hsp_hit-from>1</Hsp_hit-from>
-      <Hsp_hit-to>92</Hsp_hit-to>
-      <Hsp_query-frame>0</Hsp_query-frame>
-      <Hsp_hit-frame>0</Hsp_hit-frame>
-      <Hsp_identity>78</Hsp_identity>
-      <Hsp_positive>87</Hsp_positive>
-      <Hsp_gaps>0</Hsp_gaps>
-      <Hsp_align-len>92</Hsp_align-len>
-      <Hsp_qseq>MAVPTSKLIREYLGETYEESDEQLIQLYIETHQFYRRLQKEIKNSELMYEYTNKAGATNLVKNPLSIELTKTVQTLNNLLKSLGLTPAQRKK</Hsp_qseq>
-      <Hsp_hseq>MAVPTAIKIREYLGDNYKESDDELIKLYLETHQFYRRLQKEVKKHDLMYEYTNKAGATNLVKNPLSIELTKTVQTLNNLLKSLGLTPAQRKK</Hsp_hseq>
-      <Hsp_midline>MAVPT+  IREYLG+ Y+ESD++LI+LY+ETHQFYRRLQKE+K  +LMYEYTNKAGATNLVKNPLSIELTKTVQTLNNLLKSLGLTPAQRKK</Hsp_midline>
-    </Hsp>
-  </Hit_hsps>
-</Hit>
-<Hit>
-  <Hit_num>29</Hit_num>
-  <Hit_id>ref|WP_085523858.1|</Hit_id>
-  <Hit_def>P27 family phage terminase small subunit [Tuberibacillus sp. Marseille-P3662]</Hit_def>
-  <Hit_accession>WP_085523858</Hit_accession>
-  <Hit_len>104</Hit_len>
-  <Hit_hsps>
-    <Hsp>
-      <Hsp_num>1</Hsp_num>
-      <Hsp_bit-score>161.384</Hsp_bit-score>
-      <Hsp_score>407</Hsp_score>
-      <Hsp_evalue>2.77643e-49</Hsp_evalue>
-      <Hsp_query-from>1</Hsp_query-from>
-      <Hsp_query-to>95</Hsp_query-to>
-      <Hsp_hit-from>1</Hsp_hit-from>
-      <Hsp_hit-to>95</Hsp_hit-to>
-      <Hsp_query-frame>0</Hsp_query-frame>
-      <Hsp_hit-frame>0</Hsp_hit-frame>
-      <Hsp_identity>77</Hsp_identity>
-      <Hsp_positive>89</Hsp_positive>
-      <Hsp_gaps>0</Hsp_gaps>
-      <Hsp_align-len>95</Hsp_align-len>
-      <Hsp_qseq>MAVPTSKLIREYLGETYEESDEQLIQLYIETHQFYRRLQKEIKNSELMYEYTNKAGATNLVKNPLSIELTKTVQTLNNLLKSLGLTPAQRKKVVS</Hsp_qseq>
-      <Hsp_hseq>MGVPTEKKIREYLGDSYQESDEELIKLYVETHRFYRRLQSEIKKNDLLYEYTNKAGATNIVKNPLSIELTKTVQTLNNLLKSLGLTAAQRKKVVN</Hsp_hseq>
-      <Hsp_midline>M VPT K IREYLG++Y+ESDE+LI+LY+ETH+FYRRLQ EIK ++L+YEYTNKAGATN+VKNPLSIELTKTVQTLNNLLKSLGLT AQRKKVV+</Hsp_midline>
-    </Hsp>
-  </Hit_hsps>
-</Hit>
-<Hit>
-  <Hit_num>30</Hit_num>
-  <Hit_id>ref|WP_078428773.1|</Hit_id>
-  <Hit_def>phage terminase small subunit P27 family [Bacillus alkalinitrilicus]</Hit_def>
-  <Hit_accession>WP_078428773</Hit_accession>
-  <Hit_len>106</Hit_len>
-  <Hit_hsps>
-    <Hsp>
-      <Hsp_num>1</Hsp_num>
-      <Hsp_bit-score>157.532</Hsp_bit-score>
-      <Hsp_score>397</Hsp_score>
-      <Hsp_evalue>1.20392e-47</Hsp_evalue>
-      <Hsp_query-from>1</Hsp_query-from>
-      <Hsp_query-to>104</Hsp_query-to>
-      <Hsp_hit-from>1</Hsp_hit-from>
-      <Hsp_hit-to>106</Hsp_hit-to>
-      <Hsp_query-frame>0</Hsp_query-frame>
-      <Hsp_hit-frame>0</Hsp_hit-frame>
-      <Hsp_identity>75</Hsp_identity>
-      <Hsp_positive>90</Hsp_positive>
-      <Hsp_gaps>2</Hsp_gaps>
-      <Hsp_align-len>106</Hsp_align-len>
-      <Hsp_qseq>MAVPTSKLIREYLGETYEESDEQLIQLYIETHQFYRRLQKEIKNSELMYEYTNKAGATNLVKNPLSIELTKTVQTLNNLLKSLGLTPAQRKKVVSED--DDDFDDF</Hsp_qseq>
-      <Hsp_hseq>MGIPTRNKLIEYLGDNYKESDEELISLYLETHKFYRKLKKEINKQDLMYEYTNKAGATNLTKNPLVVELAKTVQTLNNLLKSMGLTPAQRKKVVGENGGEDDFEDF</Hsp_hseq>
-      <Hsp_midline>M +PT   + EYLG+ Y+ESDE+LI LY+ETH+FYR+L+KEI   +LMYEYTNKAGATNL KNPL +EL KTVQTLNNLLKS+GLTPAQRKKVV E+  +DDF+DF</Hsp_midline>
-    </Hsp>
-  </Hit_hsps>
-</Hit>
-<Hit>
-  <Hit_num>31</Hit_num>
-  <Hit_id>ref|WP_091275786.1|</Hit_id>
-  <Hit_def>phage terminase small subunit P27 family [Alteribacillus persepolensis] &gt;emb|SDI18935.1| phage terminase, small subunit, putative, P27 family [Alteribacillus persepolensis]</Hit_def>
-  <Hit_accession>WP_091275786</Hit_accession>
-  <Hit_len>107</Hit_len>
-  <Hit_hsps>
-    <Hsp>
-      <Hsp_num>1</Hsp_num>
-      <Hsp_bit-score>156.762</Hsp_bit-score>
-      <Hsp_score>395</Hsp_score>
-      <Hsp_evalue>2.14885e-47</Hsp_evalue>
-      <Hsp_query-from>1</Hsp_query-from>
-      <Hsp_query-to>104</Hsp_query-to>
-      <Hsp_hit-from>1</Hsp_hit-from>
-      <Hsp_hit-to>104</Hsp_hit-to>
-      <Hsp_query-frame>0</Hsp_query-frame>
-      <Hsp_hit-frame>0</Hsp_hit-frame>
-      <Hsp_identity>73</Hsp_identity>
-      <Hsp_positive>90</Hsp_positive>
-      <Hsp_gaps>0</Hsp_gaps>
-      <Hsp_align-len>104</Hsp_align-len>
-      <Hsp_qseq>MAVPTSKLIREYLGETYEESDEQLIQLYIETHQFYRRLQKEIKNSELMYEYTNKAGATNLVKNPLSIELTKTVQTLNNLLKSLGLTPAQRKKVVSEDDDDFDDF</Hsp_qseq>
-      <Hsp_hseq>MGVPTRKKLIEYLGDSYKESDEELISLYLETHKFYRKLKKEINNQDLMYEYTNKAGATNLTKNPLVVELAKTVQTLNNLLKSMGLTPAQRKRMNGDGNDEEDDF</Hsp_hseq>
-      <Hsp_midline>M VPT K + EYLG++Y+ESDE+LI LY+ETH+FYR+L+KEI N +LMYEYTNKAGATNL KNPL +EL KTVQTLNNLLKS+GLTPAQRK++  + +D+ DDF</Hsp_midline>
-    </Hsp>
-  </Hit_hsps>
-</Hit>
-<Hit>
-  <Hit_num>32</Hit_num>
-  <Hit_id>gb|QBP06934.1|</Hit_id>
-  <Hit_def>terminase small subunit [Virgibacillus phage Mimir87]</Hit_def>
-  <Hit_accession>QBP06934</Hit_accession>
-  <Hit_len>104</Hit_len>
-  <Hit_hsps>
-    <Hsp>
-      <Hsp_num>1</Hsp_num>
-      <Hsp_bit-score>155.992</Hsp_bit-score>
-      <Hsp_score>393</Hsp_score>
-      <Hsp_evalue>3.54145e-47</Hsp_evalue>
-      <Hsp_query-from>1</Hsp_query-from>
-      <Hsp_query-to>94</Hsp_query-to>
-      <Hsp_hit-from>1</Hsp_hit-from>
-      <Hsp_hit-to>94</Hsp_hit-to>
-      <Hsp_query-frame>0</Hsp_query-frame>
-      <Hsp_hit-frame>0</Hsp_hit-frame>
-      <Hsp_identity>73</Hsp_identity>
-      <Hsp_positive>88</Hsp_positive>
-      <Hsp_gaps>0</Hsp_gaps>
-      <Hsp_align-len>94</Hsp_align-len>
-      <Hsp_qseq>MAVPTSKLIREYLGETYEESDEQLIQLYIETHQFYRRLQKEIKNSELMYEYTNKAGATNLVKNPLSIELTKTVQTLNNLLKSLGLTPAQRKKVV</Hsp_qseq>
-      <Hsp_hseq>MAVPTAPILRDYLGENYKESDEELIQLYVETHKFYRKLRKELNKTDLMMEHTNKANATNLVKNPLAIELTKTVQTLNNLLKSLGLTPAQRKKVV</Hsp_hseq>
-      <Hsp_midline>MAVPT+ ++R+YLGE Y+ESDE+LIQLY+ETH+FYR+L+KE+  ++LM E+TNKA ATNLVKNPL+IELTKTVQTLNNLLKSLGLTPAQRKKVV</Hsp_midline>
-    </Hsp>
-  </Hit_hsps>
-</Hit>
-<Hit>
-  <Hit_num>33</Hit_num>
-  <Hit_id>ref|WP_156290778.1|</Hit_id>
-  <Hit_def>phage terminase small subunit P27 family [Oceanobacillus sp. YIM B00359]</Hit_def>
-  <Hit_accession>WP_156290778</Hit_accession>
-  <Hit_len>105</Hit_len>
-  <Hit_hsps>
-    <Hsp>
-      <Hsp_num>1</Hsp_num>
-      <Hsp_bit-score>155.221</Hsp_bit-score>
-      <Hsp_score>391</Hsp_score>
-      <Hsp_evalue>9.27846e-47</Hsp_evalue>
-      <Hsp_query-from>1</Hsp_query-from>
-      <Hsp_query-to>94</Hsp_query-to>
-      <Hsp_hit-from>1</Hsp_hit-from>
-      <Hsp_hit-to>94</Hsp_hit-to>
-      <Hsp_query-frame>0</Hsp_query-frame>
-      <Hsp_hit-frame>0</Hsp_hit-frame>
-      <Hsp_identity>73</Hsp_identity>
-      <Hsp_positive>85</Hsp_positive>
-      <Hsp_gaps>0</Hsp_gaps>
-      <Hsp_align-len>94</Hsp_align-len>
-      <Hsp_qseq>MAVPTSKLIREYLGETYEESDEQLIQLYIETHQFYRRLQKEIKNSELMYEYTNKAGATNLVKNPLSIELTKTVQTLNNLLKSLGLTPAQRKKVV</Hsp_qseq>
-      <Hsp_hseq>MAVPTADKLREYLGDSYKESDEELITLYVETHRFYRKLKKEISKQDLMYEYTNKAGATNLTKNPLVVELAKTVQTLNNLLKSLGLTPAQRKKVV</Hsp_hseq>
-      <Hsp_midline>MAVPT+  +REYLG++Y+ESDE+LI LY+ETH+FYR+L+KEI   +LMYEYTNKAGATNL KNPL +EL KTVQTLNNLLKSLGLTPAQRKKVV</Hsp_midline>
-    </Hsp>
-  </Hit_hsps>
-</Hit>
-<Hit>
-  <Hit_num>34</Hit_num>
-  <Hit_id>ref|WP_018934568.1|</Hit_id>
-  <Hit_def>P27 family phage terminase small subunit [Gracilibacillus lacisalsi]</Hit_def>
-  <Hit_accession>WP_018934568</Hit_accession>
-  <Hit_len>105</Hit_len>
-  <Hit_hsps>
-    <Hsp>
-      <Hsp_num>1</Hsp_num>
-      <Hsp_bit-score>154.451</Hsp_bit-score>
-      <Hsp_score>389</Hsp_score>
-      <Hsp_evalue>1.42314e-46</Hsp_evalue>
-      <Hsp_query-from>1</Hsp_query-from>
-      <Hsp_query-to>93</Hsp_query-to>
-      <Hsp_hit-from>1</Hsp_hit-from>
-      <Hsp_hit-to>93</Hsp_hit-to>
-      <Hsp_query-frame>0</Hsp_query-frame>
-      <Hsp_hit-frame>0</Hsp_hit-frame>
-      <Hsp_identity>72</Hsp_identity>
-      <Hsp_positive>86</Hsp_positive>
-      <Hsp_gaps>0</Hsp_gaps>
-      <Hsp_align-len>93</Hsp_align-len>
-      <Hsp_qseq>MAVPTSKLIREYLGETYEESDEQLIQLYIETHQFYRRLQKEIKNSELMYEYTNKAGATNLVKNPLSIELTKTVQTLNNLLKSLGLTPAQRKKV</Hsp_qseq>
-      <Hsp_hseq>MAVPTAKLLREYLGENYQESDEELIKLYVETHQFYRKMKAELKKSTLLMEHTNKFGAKNLVKNPLAIELTKTVQTLNNLLKSLGLTPAQRKKI</Hsp_hseq>
-      <Hsp_midline>MAVPT+KL+REYLGE Y+ESDE+LI+LY+ETHQFYR+++ E+K S L+ E+TNK GA NLVKNPL+IELTKTVQTLNNLLKSLGLTPAQRKK+</Hsp_midline>
-    </Hsp>
-  </Hit_hsps>
-</Hit>
-<Hit>
-  <Hit_num>35</Hit_num>
-  <Hit_id>ref|WP_096465103.1|</Hit_id>
-  <Hit_def>phage terminase small subunit P27 family [Aneurinibacillus soli] &gt;gb|PYE63445.1| P27 family predicted phage terminase small subunit [Aneurinibacillus soli] &gt;dbj|BAU27623.1| Phage terminase, small subunit [Aneurinibacillus soli]</Hit_def>
-  <Hit_accession>WP_096465103</Hit_accession>
-  <Hit_len>107</Hit_len>
-  <Hit_hsps>
-    <Hsp>
-      <Hsp_num>1</Hsp_num>
-      <Hsp_bit-score>154.451</Hsp_bit-score>
-      <Hsp_score>389</Hsp_score>
-      <Hsp_evalue>1.48089e-46</Hsp_evalue>
-      <Hsp_query-from>1</Hsp_query-from>
-      <Hsp_query-to>93</Hsp_query-to>
-      <Hsp_hit-from>1</Hsp_hit-from>
-      <Hsp_hit-to>93</Hsp_hit-to>
-      <Hsp_query-frame>0</Hsp_query-frame>
-      <Hsp_hit-frame>0</Hsp_hit-frame>
-      <Hsp_identity>73</Hsp_identity>
-      <Hsp_positive>87</Hsp_positive>
-      <Hsp_gaps>0</Hsp_gaps>
-      <Hsp_align-len>93</Hsp_align-len>
-      <Hsp_qseq>MAVPTSKLIREYLGETYEESDEQLIQLYIETHQFYRRLQKEIKNSELMYEYTNKAGATNLVKNPLSIELTKTVQTLNNLLKSLGLTPAQRKKV</Hsp_qseq>
-      <Hsp_hseq>MAVPTAKKIREYLGDNYQESDEELIQLYIETHKYYRRLKKEVEKTPLMLEHTNKSGATNTVKNPLAIEVTKTVQTLNNLLKSLGLTPAQRKKV</Hsp_hseq>
-      <Hsp_midline>MAVPT+K IREYLG+ Y+ESDE+LIQLYIETH++YRRL+KE++ + LM E+TNK+GATN VKNPL+IE+TKTVQTLNNLLKSLGLTPAQRKKV</Hsp_midline>
-    </Hsp>
-  </Hit_hsps>
-</Hit>
-<Hit>
-  <Hit_num>36</Hit_num>
-  <Hit_id>gb|OUM84937.1|</Hit_id>
-  <Hit_def>terminase [Parageobacillus thermoglucosidasius] &gt;gb|RDE19273.1| phage terminase small subunit P27 family [Parageobacillus thermoglucosidasius]</Hit_def>
-  <Hit_accession>OUM84937</Hit_accession>
-  <Hit_len>107</Hit_len>
-  <Hit_hsps>
-    <Hsp>
-      <Hsp_num>1</Hsp_num>
-      <Hsp_bit-score>152.91</Hsp_bit-score>
-      <Hsp_score>385</Hsp_score>
-      <Hsp_evalue>7.75743e-46</Hsp_evalue>
-      <Hsp_query-from>1</Hsp_query-from>
-      <Hsp_query-to>93</Hsp_query-to>
-      <Hsp_hit-from>1</Hsp_hit-from>
-      <Hsp_hit-to>93</Hsp_hit-to>
-      <Hsp_query-frame>0</Hsp_query-frame>
-      <Hsp_hit-frame>0</Hsp_hit-frame>
-      <Hsp_identity>71</Hsp_identity>
-      <Hsp_positive>86</Hsp_positive>
-      <Hsp_gaps>0</Hsp_gaps>
-      <Hsp_align-len>93</Hsp_align-len>
-      <Hsp_qseq>MAVPTSKLIREYLGETYEESDEQLIQLYIETHQFYRRLQKEIKNSELMYEYTNKAGATNLVKNPLSIELTKTVQTLNNLLKSLGLTPAQRKKV</Hsp_qseq>
-      <Hsp_hseq>MAIPTAQKIREYLGEDYRESDEELIQLYVETHKYYRRLKKEVAKNPLMMEYTNKAGATNVVKNPLAIEITKTVQTLNSLLKSLGLTPAQRKKL</Hsp_hseq>
-      <Hsp_midline>MA+PT++ IREYLGE Y ESDE+LIQLY+ETH++YRRL+KE+  + LM EYTNKAGATN+VKNPL+IE+TKTVQTLN+LLKSLGLTPAQRKK+</Hsp_midline>
-    </Hsp>
-  </Hit_hsps>
-</Hit>
-<Hit>
-  <Hit_num>37</Hit_num>
-  <Hit_id>ref|WP_026699327.1|</Hit_id>
-  <Hit_def>MULTISPECIES: P27 family phage terminase small subunit [Bacillus] &gt;gb|ATH93310.1| phage terminase small subunit P27 family [Bacillus glycinifermentans] &gt;gb|ATH95355.1| phage terminase small subunit P27 family [Bacillus glycinifermentans] &gt;gb|AWV40345.1| terminase [Bacillus licheniformis] &gt;gb|AZN79861.1| phage terminase small subunit P27 family [Bacillus licheniformis] &gt;gb|KRT90694.1| terminase [Bacillus glycinifermentans]</Hit_def>
-  <Hit_accession>WP_026699327</Hit_accession>
-  <Hit_len>107</Hit_len>
-  <Hit_hsps>
-    <Hsp>
-      <Hsp_num>1</Hsp_num>
-      <Hsp_bit-score>152.525</Hsp_bit-score>
-      <Hsp_score>384</Hsp_score>
-      <Hsp_evalue>9.55454e-46</Hsp_evalue>
-      <Hsp_query-from>1</Hsp_query-from>
-      <Hsp_query-to>104</Hsp_query-to>
-      <Hsp_hit-from>1</Hsp_hit-from>
-      <Hsp_hit-to>107</Hsp_hit-to>
-      <Hsp_query-frame>0</Hsp_query-frame>
-      <Hsp_hit-frame>0</Hsp_hit-frame>
-      <Hsp_identity>74</Hsp_identity>
-      <Hsp_positive>93</Hsp_positive>
-      <Hsp_gaps>3</Hsp_gaps>
-      <Hsp_align-len>107</Hsp_align-len>
-      <Hsp_qseq>MAVPTSKLIREYLGETYEESDEQLIQLYIETHQFYRRLQKEIKNSELMYEYTNKAGATNLVKNPLSIELTKTVQTLNNLLKSLGLTPAQRKKVVS---EDDDDFDDF</Hsp_qseq>
-      <Hsp_hseq>MAVPTAKKIREYLGDRYKESDEELIELYVDTHKFYRRLKKEVAENPLMMRHTNKAGAENLVKNPLAIELTKTVTTLNNLLKSLDLTPAQRKELNAGGGENDDDYDEF</Hsp_hseq>
-      <Hsp_midline>MAVPT+K IREYLG+ Y+ESDE+LI+LY++TH+FYRRL+KE+  + LM  +TNKAGA NLVKNPL+IELTKTV TLNNLLKSL LTPAQRK++ +   E+DDD+D+F</Hsp_midline>
-    </Hsp>
-  </Hit_hsps>
-</Hit>
-<Hit>
-  <Hit_num>38</Hit_num>
-  <Hit_id>ref|WP_044898908.1|</Hit_id>
-  <Hit_def>phage terminase small subunit P27 family [Aeribacillus pallidus]</Hit_def>
-  <Hit_accession>WP_044898908</Hit_accession>
-  <Hit_len>108</Hit_len>
-  <Hit_hsps>
-    <Hsp>
-      <Hsp_num>1</Hsp_num>
-      <Hsp_bit-score>152.525</Hsp_bit-score>
-      <Hsp_score>384</Hsp_score>
-      <Hsp_evalue>9.9624e-46</Hsp_evalue>
-      <Hsp_query-from>1</Hsp_query-from>
-      <Hsp_query-to>93</Hsp_query-to>
-      <Hsp_hit-from>1</Hsp_hit-from>
-      <Hsp_hit-to>93</Hsp_hit-to>
-      <Hsp_query-frame>0</Hsp_query-frame>
-      <Hsp_hit-frame>0</Hsp_hit-frame>
-      <Hsp_identity>71</Hsp_identity>
-      <Hsp_positive>86</Hsp_positive>
-      <Hsp_gaps>0</Hsp_gaps>
-      <Hsp_align-len>93</Hsp_align-len>
-      <Hsp_qseq>MAVPTSKLIREYLGETYEESDEQLIQLYIETHQFYRRLQKEIKNSELMYEYTNKAGATNLVKNPLSIELTKTVQTLNNLLKSLGLTPAQRKKV</Hsp_qseq>
-      <Hsp_hseq>MAAPTAKKIREYLGDSYKESDEELIQLYIETHRYYRRLKKEVEKSPLLVEHTNKAGATNTIKNPLAIEVTKTVQTLNNLLKSLGLTPAQRKKA</Hsp_hseq>
-      <Hsp_midline>MA PT+K IREYLG++Y+ESDE+LIQLYIETH++YRRL+KE++ S L+ E+TNKAGATN +KNPL+IE+TKTVQTLNNLLKSLGLTPAQRKK </Hsp_midline>
-    </Hsp>
-  </Hit_hsps>
-</Hit>
-<Hit>
-  <Hit_num>39</Hit_num>
-  <Hit_id>ref|WP_144573543.1|</Hit_id>
-  <Hit_def>P27 family phage terminase small subunit [Bacillus licheniformis]</Hit_def>
-  <Hit_accession>WP_144573543</Hit_accession>
-  <Hit_len>107</Hit_len>
-  <Hit_hsps>
-    <Hsp>
-      <Hsp_num>1</Hsp_num>
-      <Hsp_bit-score>152.14</Hsp_bit-score>
-      <Hsp_score>383</Hsp_score>
-      <Hsp_evalue>1.6174e-45</Hsp_evalue>
-      <Hsp_query-from>1</Hsp_query-from>
-      <Hsp_query-to>104</Hsp_query-to>
-      <Hsp_hit-from>1</Hsp_hit-from>
-      <Hsp_hit-to>107</Hsp_hit-to>
-      <Hsp_query-frame>0</Hsp_query-frame>
-      <Hsp_hit-frame>0</Hsp_hit-frame>
-      <Hsp_identity>74</Hsp_identity>
-      <Hsp_positive>92</Hsp_positive>
-      <Hsp_gaps>3</Hsp_gaps>
-      <Hsp_align-len>107</Hsp_align-len>
-      <Hsp_qseq>MAVPTSKLIREYLGETYEESDEQLIQLYIETHQFYRRLQKEIKNSELMYEYTNKAGATNLVKNPLSIELTKTVQTLNNLLKSLGLTPAQRKKVVS---EDDDDFDDF</Hsp_qseq>
-      <Hsp_hseq>MAVPTAKKIREYLGDRYKESDEELIELYVDTHKFYRRLKKEVAENPLMMRHTNKAGAENLVKNPLAIELTKTVTTLNNLLKSLDLTPAQRKELNAGGGESDDDYDEF</Hsp_hseq>
-      <Hsp_midline>MAVPT+K IREYLG+ Y+ESDE+LI+LY++TH+FYRRL+KE+  + LM  +TNKAGA NLVKNPL+IELTKTV TLNNLLKSL LTPAQRK++ +   E DDD+D+F</Hsp_midline>
-    </Hsp>
-  </Hit_hsps>
-</Hit>
-<Hit>
-  <Hit_num>40</Hit_num>
-  <Hit_id>ref|WP_045509294.1|</Hit_id>
-  <Hit_def>P27 family phage terminase small subunit [Bacillus amyloliquefaciens]</Hit_def>
-  <Hit_accession>WP_045509294</Hit_accession>
-  <Hit_len>107</Hit_len>
-  <Hit_hsps>
-    <Hsp>
-      <Hsp_num>1</Hsp_num>
-      <Hsp_bit-score>151.369</Hsp_bit-score>
-      <Hsp_score>381</Hsp_score>
-      <Hsp_evalue>2.59184e-45</Hsp_evalue>
-      <Hsp_query-from>1</Hsp_query-from>
-      <Hsp_query-to>104</Hsp_query-to>
-      <Hsp_hit-from>1</Hsp_hit-from>
-      <Hsp_hit-to>107</Hsp_hit-to>
-      <Hsp_query-frame>0</Hsp_query-frame>
-      <Hsp_hit-frame>0</Hsp_hit-frame>
-      <Hsp_identity>74</Hsp_identity>
-      <Hsp_positive>92</Hsp_positive>
-      <Hsp_gaps>3</Hsp_gaps>
-      <Hsp_align-len>107</Hsp_align-len>
-      <Hsp_qseq>MAVPTSKLIREYLGETYEESDEQLIQLYIETHQFYRRLQKEIKNSELMYEYTNKAGATNLVKNPLSIELTKTVQTLNNLLKSLGLTPAQRKKVVS---EDDDDFDDF</Hsp_qseq>
-      <Hsp_hseq>MAVPTAKRLREYLGDRYTESDEELIELYIDTHKFYRRLKKEVAENPLMMRHTNKAGAENLVKNPLAIELTKTVTTLNNLLKSLDLTPAQRKELNAGGGENDDDYDEF</Hsp_hseq>
-      <Hsp_midline>MAVPT+K +REYLG+ Y ESDE+LI+LYI+TH+FYRRL+KE+  + LM  +TNKAGA NLVKNPL+IELTKTV TLNNLLKSL LTPAQRK++ +   E+DDD+D+F</Hsp_midline>
-    </Hsp>
-  </Hit_hsps>
-</Hit>
-<Hit>
-  <Hit_num>41</Hit_num>
-  <Hit_id>ref|WP_011197905.1|</Hit_id>
-  <Hit_def>P27 family phage terminase small subunit [Bacillus licheniformis] &gt;gb|AAU23092.1| phage related putative terminase small subunit [Bacillus licheniformis DSM 13 = ATCC 14580] &gt;gb|NBB46269.1| phage terminase small subunit P27 family [Bacillus sp. y1(2019)] &gt;gb|AAU40447.1| phage terminase small subunit [Bacillus licheniformis DSM 13 = ATCC 14580] &gt;gb|AOP14021.1| hypothetical protein BL1202_01070 [Bacillus licheniformis] &gt;gb|ARC72445.1| phage terminase, small subunit [Bacillus licheniformis]</Hit_def>
-  <Hit_accession>WP_011197905</Hit_accession>
-  <Hit_len>107</Hit_len>
-  <Hit_hsps>
-    <Hsp>
-      <Hsp_num>1</Hsp_num>
-      <Hsp_bit-score>148.673</Hsp_bit-score>
-      <Hsp_score>374</Hsp_score>
-      <Hsp_evalue>2.89283e-44</Hsp_evalue>
-      <Hsp_query-from>1</Hsp_query-from>
-      <Hsp_query-to>102</Hsp_query-to>
-      <Hsp_hit-from>1</Hsp_hit-from>
-      <Hsp_hit-to>105</Hsp_hit-to>
-      <Hsp_query-frame>0</Hsp_query-frame>
-      <Hsp_hit-frame>0</Hsp_hit-frame>
-      <Hsp_identity>73</Hsp_identity>
-      <Hsp_positive>90</Hsp_positive>
-      <Hsp_gaps>3</Hsp_gaps>
-      <Hsp_align-len>105</Hsp_align-len>
-      <Hsp_qseq>MAVPTSKLIREYLGETYEESDEQLIQLYIETHQFYRRLQKEIKNSELMYEYTNKAGATNLVKNPLSIELTKTVQTLNNLLKSLGLTPAQRKKVVS---EDDDDFD</Hsp_qseq>
-      <Hsp_hseq>MAVPTAKKIREYLGDRYKESDEELIELYVDTHKFYRRLKKEVAENPLMMRHTNKAGAENLVKNPLAIELTKTVTTLNNLLKSLDLTPAQRKELNAGGEENDDGFD</Hsp_hseq>
-      <Hsp_midline>MAVPT+K IREYLG+ Y+ESDE+LI+LY++TH+FYRRL+KE+  + LM  +TNKAGA NLVKNPL+IELTKTV TLNNLLKSL LTPAQRK++ +   E+DD FD</Hsp_midline>
-    </Hsp>
-  </Hit_hsps>
-</Hit>
-<Hit>
-  <Hit_num>42</Hit_num>
-  <Hit_id>ref|WP_081124770.1|</Hit_id>
-  <Hit_def>phage terminase small subunit P27 family [Bacillus safensis] &gt;gb|ARD57406.1| terminase [Bacillus safensis]</Hit_def>
-  <Hit_accession>WP_081124770</Hit_accession>
-  <Hit_len>107</Hit_len>
-  <Hit_hsps>
-    <Hsp>
-      <Hsp_num>1</Hsp_num>
-      <Hsp_bit-score>148.288</Hsp_bit-score>
-      <Hsp_score>373</Hsp_score>
-      <Hsp_evalue>5.40456e-44</Hsp_evalue>
-      <Hsp_query-from>1</Hsp_query-from>
-      <Hsp_query-to>104</Hsp_query-to>
-      <Hsp_hit-from>1</Hsp_hit-from>
-      <Hsp_hit-to>107</Hsp_hit-to>
-      <Hsp_query-frame>0</Hsp_query-frame>
-      <Hsp_hit-frame>0</Hsp_hit-frame>
-      <Hsp_identity>74</Hsp_identity>
-      <Hsp_positive>87</Hsp_positive>
-      <Hsp_gaps>3</Hsp_gaps>
-      <Hsp_align-len>107</Hsp_align-len>
-      <Hsp_qseq>MAVPTSKLIREYLGETYEESDEQLIQLYIETHQFYRRLQKEIKNSELMYEYTNKAGATNLVKNPLSIELTKTVQTLNNLLKSLGLTPAQRKKVVS---EDDDDFDDF</Hsp_qseq>
-      <Hsp_hseq>MANPTASKLREYLGTNYKESDEELIALYIDTHKFYRKLKKEVDEQPLMMEYVNKAGAKNLVKNPLAIELTKTVATLNTLLKSLGLTPAQRREVVSGGDEIDDDFNRF</Hsp_hseq>
-      <Hsp_midline>MA PT+  +REYLG  Y+ESDE+LI LYI+TH+FYR+L+KE+    LM EY NKAGA NLVKNPL+IELTKTV TLN LLKSLGLTPAQR++VVS   E DDDF+ F</Hsp_midline>
-    </Hsp>
-  </Hit_hsps>
-</Hit>
-<Hit>
-  <Hit_num>43</Hit_num>
-  <Hit_id>ref|WP_054637176.1|</Hit_id>
-  <Hit_def>phage terminase small subunit P27 family [Thalassobacillus sp. C254]</Hit_def>
-  <Hit_accession>WP_054637176</Hit_accession>
-  <Hit_len>106</Hit_len>
-  <Hit_hsps>
-    <Hsp>
-      <Hsp_num>1</Hsp_num>
-      <Hsp_bit-score>147.902</Hsp_bit-score>
-      <Hsp_score>372</Hsp_score>
-      <Hsp_evalue>5.65946e-44</Hsp_evalue>
-      <Hsp_query-from>1</Hsp_query-from>
-      <Hsp_query-to>94</Hsp_query-to>
-      <Hsp_hit-from>1</Hsp_hit-from>
-      <Hsp_hit-to>94</Hsp_hit-to>
-      <Hsp_query-frame>0</Hsp_query-frame>
-      <Hsp_hit-frame>0</Hsp_hit-frame>
-      <Hsp_identity>69</Hsp_identity>
-      <Hsp_positive>84</Hsp_positive>
-      <Hsp_gaps>0</Hsp_gaps>
-      <Hsp_align-len>94</Hsp_align-len>
-      <Hsp_qseq>MAVPTSKLIREYLGETYEESDEQLIQLYIETHQFYRRLQKEIKNSELMYEYTNKAGATNLVKNPLSIELTKTVQTLNNLLKSLGLTPAQRKKVV</Hsp_qseq>
-      <Hsp_hseq>MAVPTRQKLIDYLGDSYKESDEELISLYLETHKFYRKLKKEIHKQDLMYEYTNKAGATNLTKNPLVVEIAKTVQTLNNLLKSMGLTPAQRKKVV</Hsp_hseq>
-      <Hsp_midline>MAVPT + + +YLG++Y+ESDE+LI LY+ETH+FYR+L+KEI   +LMYEYTNKAGATNL KNPL +E+ KTVQTLNNLLKS+GLTPAQRKKVV</Hsp_midline>
-    </Hsp>
-  </Hit_hsps>
-</Hit>
-<Hit>
-  <Hit_num>44</Hit_num>
-  <Hit_id>ref|WP_016423526.1|</Hit_id>
-  <Hit_def>MULTISPECIES: hypothetical protein [unclassified Paenibacillus] &gt;gb|EPD90101.1| hypothetical protein HMPREF1207_01370 [Paenibacillus sp. HGH0039]</Hit_def>
-  <Hit_accession>WP_016423526</Hit_accession>
-  <Hit_len>88</Hit_len>
-  <Hit_hsps>
-    <Hsp>
-      <Hsp_num>1</Hsp_num>
-      <Hsp_bit-score>147.517</Hsp_bit-score>
-      <Hsp_score>371</Hsp_score>
-      <Hsp_evalue>6.1947e-44</Hsp_evalue>
-      <Hsp_query-from>1</Hsp_query-from>
-      <Hsp_query-to>83</Hsp_query-to>
-      <Hsp_hit-from>1</Hsp_hit-from>
-      <Hsp_hit-to>83</Hsp_hit-to>
-      <Hsp_query-frame>0</Hsp_query-frame>
-      <Hsp_hit-frame>0</Hsp_hit-frame>
-      <Hsp_identity>70</Hsp_identity>
-      <Hsp_positive>79</Hsp_positive>
-      <Hsp_gaps>0</Hsp_gaps>
-      <Hsp_align-len>83</Hsp_align-len>
-      <Hsp_qseq>MAVPTSKLIREYLGETYEESDEQLIQLYIETHQFYRRLQKEIKNSELMYEYTNKAGATNLVKNPLSIELTKTVQTLNNLLKSL</Hsp_qseq>
-      <Hsp_hseq>MAVPTAKRIREYLGDSYKESDEELIKLYLETHQFYRRLQAEVKNSKLMYEYTNKAGATNLVKNPLSIEQAKTVQTLNNLLKSL</Hsp_hseq>
-      <Hsp_midline>MAVPT+K IREYLG++Y+ESDE+LI+LY+ETHQFYRRLQ E+KNS+LMYEYTNKAGATNLVKNPLSIE  KTVQTLNNLLKSL</Hsp_midline>
-    </Hsp>
-  </Hit_hsps>
-</Hit>
-<Hit>
-  <Hit_num>45</Hit_num>
-  <Hit_id>ref|WP_042418969.1|</Hit_id>
-  <Hit_def>P27 family phage terminase small subunit [Geomicrobium sp. JCM 19038]</Hit_def>
-  <Hit_accession>WP_042418969</Hit_accession>
-  <Hit_len>106</Hit_len>
-  <Hit_hsps>
-    <Hsp>
-      <Hsp_num>1</Hsp_num>
-      <Hsp_bit-score>147.902</Hsp_bit-score>
-      <Hsp_score>372</Hsp_score>
-      <Hsp_evalue>7.12491e-44</Hsp_evalue>
-      <Hsp_query-from>1</Hsp_query-from>
-      <Hsp_query-to>104</Hsp_query-to>
-      <Hsp_hit-from>1</Hsp_hit-from>
-      <Hsp_hit-to>106</Hsp_hit-to>
-      <Hsp_query-frame>0</Hsp_query-frame>
-      <Hsp_hit-frame>0</Hsp_hit-frame>
-      <Hsp_identity>72</Hsp_identity>
-      <Hsp_positive>87</Hsp_positive>
-      <Hsp_gaps>2</Hsp_gaps>
-      <Hsp_align-len>106</Hsp_align-len>
-      <Hsp_qseq>MAVPTSKLIREYLGETYEESDEQLIQLYIETHQFYRRLQKEIKNSELMYEYTNKAGATNLVKNPLSIELTKTVQTLNNLLKSLGLTPAQRKKVVS--EDDDDFDDF</Hsp_qseq>
-      <Hsp_hseq>MAVPKRQDFIEYLGENYRESDEELIKLYLATHKFYRKLEKEVRDQPMMYEYTNKAGAENLVKNPLIPELTKVVQTLNNLLKSMGLTPAQRKKAMAGGEVDDEFDKF</Hsp_hseq>
-      <Hsp_midline>MAVP  +   EYLGE Y ESDE+LI+LY+ TH+FYR+L+KE+++  +MYEYTNKAGA NLVKNPL  ELTK VQTLNNLLKS+GLTPAQRKK ++  E DD+FD F</Hsp_midline>
-    </Hsp>
-  </Hit_hsps>
-</Hit>
-<Hit>
-  <Hit_num>46</Hit_num>
-  <Hit_id>dbj|GAK08991.1|</Hit_id>
-  <Hit_def>phage terminase, small subunit [Geomicrobium sp. JCM 19038]</Hit_def>
-  <Hit_accession>GAK08991</Hit_accession>
-  <Hit_len>107</Hit_len>
-  <Hit_hsps>
-    <Hsp>
-      <Hsp_num>1</Hsp_num>
-      <Hsp_bit-score>147.902</Hsp_bit-score>
-      <Hsp_score>372</Hsp_score>
-      <Hsp_evalue>7.1874e-44</Hsp_evalue>
-      <Hsp_query-from>1</Hsp_query-from>
-      <Hsp_query-to>104</Hsp_query-to>
-      <Hsp_hit-from>2</Hsp_hit-from>
-      <Hsp_hit-to>107</Hsp_hit-to>
-      <Hsp_query-frame>0</Hsp_query-frame>
-      <Hsp_hit-frame>0</Hsp_hit-frame>
-      <Hsp_identity>72</Hsp_identity>
-      <Hsp_positive>87</Hsp_positive>
-      <Hsp_gaps>2</Hsp_gaps>
-      <Hsp_align-len>106</Hsp_align-len>
-      <Hsp_qseq>MAVPTSKLIREYLGETYEESDEQLIQLYIETHQFYRRLQKEIKNSELMYEYTNKAGATNLVKNPLSIELTKTVQTLNNLLKSLGLTPAQRKKVVS--EDDDDFDDF</Hsp_qseq>
-      <Hsp_hseq>MAVPKRQDFIEYLGENYRESDEELIKLYLATHKFYRKLEKEVRDQPMMYEYTNKAGAENLVKNPLIPELTKVVQTLNNLLKSMGLTPAQRKKAMAGGEVDDEFDKF</Hsp_hseq>
-      <Hsp_midline>MAVP  +   EYLGE Y ESDE+LI+LY+ TH+FYR+L+KE+++  +MYEYTNKAGA NLVKNPL  ELTK VQTLNNLLKS+GLTPAQRKK ++  E DD+FD F</Hsp_midline>
-    </Hsp>
-  </Hit_hsps>
-</Hit>
-<Hit>
-  <Hit_num>47</Hit_num>
-  <Hit_id>ref|WP_046655400.1|</Hit_id>
-  <Hit_def>P27 family phage terminase small subunit, partial [Paenibacillus larvae]</Hit_def>
-  <Hit_accession>WP_046655400</Hit_accession>
-  <Hit_len>83</Hit_len>
-  <Hit_hsps>
-    <Hsp>
-      <Hsp_num>1</Hsp_num>
-      <Hsp_bit-score>145.976</Hsp_bit-score>
-      <Hsp_score>367</Hsp_score>
-      <Hsp_evalue>1.90679e-43</Hsp_evalue>
-      <Hsp_query-from>22</Hsp_query-from>
-      <Hsp_query-to>95</Hsp_query-to>
-      <Hsp_hit-from>1</Hsp_hit-from>
-      <Hsp_hit-to>74</Hsp_hit-to>
-      <Hsp_query-frame>0</Hsp_query-frame>
-      <Hsp_hit-frame>0</Hsp_hit-frame>
-      <Hsp_identity>72</Hsp_identity>
-      <Hsp_positive>72</Hsp_positive>
-      <Hsp_gaps>0</Hsp_gaps>
-      <Hsp_align-len>74</Hsp_align-len>
-      <Hsp_qseq>EQLIQLYIETHQFYRRLQKEIKNSELMYEYTNKAGATNLVKNPLSIELTKTVQTLNNLLKSLGLTPAQRKKVVS</Hsp_qseq>
-      <Hsp_hseq>EQLIQLYIETHQFYRRLQKEIKNSELMYEYTNKAGATNLVKNPLSIELTKTVQTLNNLLKSLGLTPAQRKKVAG</Hsp_hseq>
-      <Hsp_midline>EQLIQLYIETHQFYRRLQKEIKNSELMYEYTNKAGATNLVKNPLSIELTKTVQTLNNLLKSLGLTPAQRKKV  </Hsp_midline>
-    </Hsp>
-  </Hit_hsps>
-</Hit>
-<Hit>
-  <Hit_num>48</Hit_num>
-  <Hit_id>ref|WP_145680504.1|</Hit_id>
-  <Hit_def>P27 family phage terminase small subunit [Bacillus paralicheniformis] &gt;gb|TWL54195.1| hypothetical protein CHCC15332_3351 [Bacillus paralicheniformis] &gt;gb|TWN34871.1| hypothetical protein CHCC14527_0480 [Bacillus paralicheniformis]</Hit_def>
-  <Hit_accession>WP_145680504</Hit_accession>
-  <Hit_len>107</Hit_len>
-  <Hit_hsps>
-    <Hsp>
-      <Hsp_num>1</Hsp_num>
-      <Hsp_bit-score>142.895</Hsp_bit-score>
-      <Hsp_score>359</Hsp_score>
-      <Hsp_evalue>6.654e-42</Hsp_evalue>
-      <Hsp_query-from>1</Hsp_query-from>
-      <Hsp_query-to>93</Hsp_query-to>
-      <Hsp_hit-from>1</Hsp_hit-from>
-      <Hsp_hit-to>93</Hsp_hit-to>
-      <Hsp_query-frame>0</Hsp_query-frame>
-      <Hsp_hit-frame>0</Hsp_hit-frame>
-      <Hsp_identity>68</Hsp_identity>
-      <Hsp_positive>83</Hsp_positive>
-      <Hsp_gaps>0</Hsp_gaps>
-      <Hsp_align-len>93</Hsp_align-len>
-      <Hsp_qseq>MAVPTSKLIREYLGETYEESDEQLIQLYIETHQFYRRLQKEIKNSELMYEYTNKAGATNLVKNPLSIELTKTVQTLNNLLKSLGLTPAQRKKV</Hsp_qseq>
-      <Hsp_hseq>MAVPTAKKIREYLGDRYKESDEELIELYVDTHKFYRRLKKEVAENPLMMRHTNKAGAENLVKNPLAIELTKTVTTLNNLLKSLDLTPAQRKEL</Hsp_hseq>
-      <Hsp_midline>MAVPT+K IREYLG+ Y+ESDE+LI+LY++TH+FYRRL+KE+  + LM  +TNKAGA NLVKNPL+IELTKTV TLNNLLKSL LTPAQRK++</Hsp_midline>
-    </Hsp>
-  </Hit_hsps>
-</Hit>
-<Hit>
-  <Hit_num>49</Hit_num>
-  <Hit_id>gb|QGG51600.1|</Hit_id>
-  <Hit_def>phage terminase small subunit P27 family [Lysinibacillus pakistanensis]</Hit_def>
-  <Hit_accession>QGG51600</Hit_accession>
-  <Hit_len>105</Hit_len>
-  <Hit_hsps>
-    <Hsp>
-      <Hsp_num>1</Hsp_num>
-      <Hsp_bit-score>141.739</Hsp_bit-score>
-      <Hsp_score>356</Hsp_score>
-      <Hsp_evalue>1.52151e-41</Hsp_evalue>
-      <Hsp_query-from>1</Hsp_query-from>
-      <Hsp_query-to>93</Hsp_query-to>
-      <Hsp_hit-from>1</Hsp_hit-from>
-      <Hsp_hit-to>93</Hsp_hit-to>
-      <Hsp_query-frame>0</Hsp_query-frame>
-      <Hsp_hit-frame>0</Hsp_hit-frame>
-      <Hsp_identity>63</Hsp_identity>
-      <Hsp_positive>84</Hsp_positive>
-      <Hsp_gaps>0</Hsp_gaps>
-      <Hsp_align-len>93</Hsp_align-len>
-      <Hsp_qseq>MAVPTSKLIREYLGETYEESDEQLIQLYIETHQFYRRLQKEIKNSELMYEYTNKAGATNLVKNPLSIELTKTVQTLNNLLKSLGLTPAQRKKV</Hsp_qseq>
-      <Hsp_hseq>MAIPTAAKIRKYLGENYQKSDDEIIQLYVDTHRFYRKLKKEVDSGDLMMEHTNKGGATNVVKNPLAIELTKTVLVLNNLLKSLGLTPAQRKQL</Hsp_hseq>
-      <Hsp_midline>MA+PT+  IR+YLGE Y++SD+++IQLY++TH+FYR+L+KE+ + +LM E+TNK GATN+VKNPL+IELTKTV  LNNLLKSLGLTPAQRK++</Hsp_midline>
-    </Hsp>
-  </Hit_hsps>
-</Hit>
-<Hit>
-  <Hit_num>50</Hit_num>
-  <Hit_id>ref|WP_065180427.1|</Hit_id>
-  <Hit_def>MULTISPECIES: P27 family phage terminase small subunit [Bacillus] &gt;gb|OBR33825.1| hypothetical protein SRCM100731_01115 [Bacillus velezensis] &gt;gb|OCB92649.1| hypothetical protein SRCM100730_03978 [Bacillus velezensis] &gt;gb|PJH94879.1| phage terminase small subunit P27 family [Bacillus sp. SN1] &gt;gb|PSI05782.1| phage terminase small subunit P27 family [Bacillus subtilis] &gt;gb|QAV85171.1| P27 family phage terminase small subunit [Bacillus subtilis]</Hit_def>
-  <Hit_accession>WP_065180427</Hit_accession>
-  <Hit_len>107</Hit_len>
-  <Hit_hsps>
-    <Hsp>
-      <Hsp_num>1</Hsp_num>
-      <Hsp_bit-score>141.739</Hsp_bit-score>
-      <Hsp_score>356</Hsp_score>
-      <Hsp_evalue>1.68953e-41</Hsp_evalue>
-      <Hsp_query-from>1</Hsp_query-from>
-      <Hsp_query-to>93</Hsp_query-to>
-      <Hsp_hit-from>1</Hsp_hit-from>
-      <Hsp_hit-to>93</Hsp_hit-to>
-      <Hsp_query-frame>0</Hsp_query-frame>
-      <Hsp_hit-frame>0</Hsp_hit-frame>
-      <Hsp_identity>68</Hsp_identity>
-      <Hsp_positive>82</Hsp_positive>
-      <Hsp_gaps>0</Hsp_gaps>
-      <Hsp_align-len>93</Hsp_align-len>
-      <Hsp_qseq>MAVPTSKLIREYLGETYEESDEQLIQLYIETHQFYRRLQKEIKNSELMYEYTNKAGATNLVKNPLSIELTKTVQTLNNLLKSLGLTPAQRKKV</Hsp_qseq>
-      <Hsp_hseq>MAVPTAKRLREYLGDRYTESDEELIELYIDTHKFYRRLKKEVAENPLMMRHTNKAGAENLVKNPLAIELTKTVTTLNNLLKSLDLTPAQRKEL</Hsp_hseq>
-      <Hsp_midline>MAVPT+K +REYLG+ Y ESDE+LI+LYI+TH+FYRRL+KE+  + LM  +TNKAGA NLVKNPL+IELTKTV TLNNLLKSL LTPAQRK++</Hsp_midline>
-    </Hsp>
-  </Hit_hsps>
-</Hit>
 </Iteration_hits>
   <Iteration_stat>
     <Statistics>
-      <Statistics_db-num>250313575</Statistics_db-num>
-      <Statistics_db-len>76323563</Statistics_db-len>
+      <Statistics_db-num>0</Statistics_db-num>
+      <Statistics_db-len>0</Statistics_db-len>
       <Statistics_hsp-len>0</Statistics_hsp-len>
       <Statistics_eff-space>0</Statistics_eff-space>
-      <Statistics_kappa>0.041</Statistics_kappa>
-      <Statistics_lambda>0.267</Statistics_lambda>
-      <Statistics_entropy>0.14</Statistics_entropy>
+      <Statistics_kappa>-1</Statistics_kappa>
+      <Statistics_lambda>-1</Statistics_lambda>
+      <Statistics_entropy>-1</Statistics_entropy>
+    </Statistics>
+  </Iteration_stat>
+  <Iteration_message>[blastsrv4.REAL]: Error: CPU usage limit was exceeded, resulting in SIGXCPU (24).</Iteration_message>
+</Iteration>
+<Iteration>
+  <Iteration_iter-num>2</Iteration_iter-num>
+  <Iteration_query-ID>Query_44005</Iteration_query-ID>
+  <Iteration_query-def>dnamaster_2</Iteration_query-def>
+  <Iteration_query-len>575</Iteration_query-len>
+<Iteration_hits>
+</Iteration_hits>
+  <Iteration_stat>
+    <Statistics>
+      <Statistics_db-num>0</Statistics_db-num>
+      <Statistics_db-len>0</Statistics_db-len>
+      <Statistics_hsp-len>0</Statistics_hsp-len>
+      <Statistics_eff-space>0</Statistics_eff-space>
+      <Statistics_kappa>-1</Statistics_kappa>
+      <Statistics_lambda>-1</Statistics_lambda>
+      <Statistics_entropy>-1</Statistics_entropy>
+    </Statistics>
+  </Iteration_stat>
+</Iteration>
+<Iteration>
+  <Iteration_iter-num>3</Iteration_iter-num>
+  <Iteration_query-ID>Query_44006</Iteration_query-ID>
+  <Iteration_query-def>dnamaster_3</Iteration_query-def>
+  <Iteration_query-len>418</Iteration_query-len>
+<Iteration_hits>
+</Iteration_hits>
+  <Iteration_stat>
+    <Statistics>
+      <Statistics_db-num>0</Statistics_db-num>
+      <Statistics_db-len>0</Statistics_db-len>
+      <Statistics_hsp-len>0</Statistics_hsp-len>
+      <Statistics_eff-space>0</Statistics_eff-space>
+      <Statistics_kappa>-1</Statistics_kappa>
+      <Statistics_lambda>-1</Statistics_lambda>
+      <Statistics_entropy>-1</Statistics_entropy>
+    </Statistics>
+  </Iteration_stat>
+</Iteration>
+<Iteration>
+  <Iteration_iter-num>4</Iteration_iter-num>
+  <Iteration_query-ID>Query_44007</Iteration_query-ID>
+  <Iteration_query-def>dnamaster_4</Iteration_query-def>
+  <Iteration_query-len>241</Iteration_query-len>
+<Iteration_hits>
+</Iteration_hits>
+  <Iteration_stat>
+    <Statistics>
+      <Statistics_db-num>0</Statistics_db-num>
+      <Statistics_db-len>0</Statistics_db-len>
+      <Statistics_hsp-len>0</Statistics_hsp-len>
+      <Statistics_eff-space>0</Statistics_eff-space>
+      <Statistics_kappa>-1</Statistics_kappa>
+      <Statistics_lambda>-1</Statistics_lambda>
+      <Statistics_entropy>-1</Statistics_entropy>
+    </Statistics>
+  </Iteration_stat>
+</Iteration>
+<Iteration>
+  <Iteration_iter-num>5</Iteration_iter-num>
+  <Iteration_query-ID>Query_44008</Iteration_query-ID>
+  <Iteration_query-def>dnamaster_5</Iteration_query-def>
+  <Iteration_query-len>377</Iteration_query-len>
+<Iteration_hits>
+</Iteration_hits>
+  <Iteration_stat>
+    <Statistics>
+      <Statistics_db-num>0</Statistics_db-num>
+      <Statistics_db-len>0</Statistics_db-len>
+      <Statistics_hsp-len>0</Statistics_hsp-len>
+      <Statistics_eff-space>0</Statistics_eff-space>
+      <Statistics_kappa>-1</Statistics_kappa>
+      <Statistics_lambda>-1</Statistics_lambda>
+      <Statistics_entropy>-1</Statistics_entropy>
+    </Statistics>
+  </Iteration_stat>
+</Iteration>
+<Iteration>
+  <Iteration_iter-num>6</Iteration_iter-num>
+  <Iteration_query-ID>Query_44009</Iteration_query-ID>
+  <Iteration_query-def>dnamaster_6</Iteration_query-def>
+  <Iteration_query-len>58</Iteration_query-len>
+<Iteration_hits>
+</Iteration_hits>
+  <Iteration_stat>
+    <Statistics>
+      <Statistics_db-num>0</Statistics_db-num>
+      <Statistics_db-len>0</Statistics_db-len>
+      <Statistics_hsp-len>0</Statistics_hsp-len>
+      <Statistics_eff-space>0</Statistics_eff-space>
+      <Statistics_kappa>-1</Statistics_kappa>
+      <Statistics_lambda>-1</Statistics_lambda>
+      <Statistics_entropy>-1</Statistics_entropy>
+    </Statistics>
+  </Iteration_stat>
+</Iteration>
+<Iteration>
+  <Iteration_iter-num>7</Iteration_iter-num>
+  <Iteration_query-ID>Query_44010</Iteration_query-ID>
+  <Iteration_query-def>dnamaster_7</Iteration_query-def>
+  <Iteration_query-len>88</Iteration_query-len>
+<Iteration_hits>
+</Iteration_hits>
+  <Iteration_stat>
+    <Statistics>
+      <Statistics_db-num>0</Statistics_db-num>
+      <Statistics_db-len>0</Statistics_db-len>
+      <Statistics_hsp-len>0</Statistics_hsp-len>
+      <Statistics_eff-space>0</Statistics_eff-space>
+      <Statistics_kappa>-1</Statistics_kappa>
+      <Statistics_lambda>-1</Statistics_lambda>
+      <Statistics_entropy>-1</Statistics_entropy>
+    </Statistics>
+  </Iteration_stat>
+</Iteration>
+<Iteration>
+  <Iteration_iter-num>8</Iteration_iter-num>
+  <Iteration_query-ID>Query_44011</Iteration_query-ID>
+  <Iteration_query-def>dnamaster_8</Iteration_query-def>
+  <Iteration_query-len>106</Iteration_query-len>
+<Iteration_hits>
+</Iteration_hits>
+  <Iteration_stat>
+    <Statistics>
+      <Statistics_db-num>0</Statistics_db-num>
+      <Statistics_db-len>0</Statistics_db-len>
+      <Statistics_hsp-len>0</Statistics_hsp-len>
+      <Statistics_eff-space>0</Statistics_eff-space>
+      <Statistics_kappa>-1</Statistics_kappa>
+      <Statistics_lambda>-1</Statistics_lambda>
+      <Statistics_entropy>-1</Statistics_entropy>
+    </Statistics>
+  </Iteration_stat>
+</Iteration>
+<Iteration>
+  <Iteration_iter-num>9</Iteration_iter-num>
+  <Iteration_query-ID>Query_44012</Iteration_query-ID>
+  <Iteration_query-def>dnamaster_9</Iteration_query-def>
+  <Iteration_query-len>143</Iteration_query-len>
+<Iteration_hits>
+</Iteration_hits>
+  <Iteration_stat>
+    <Statistics>
+      <Statistics_db-num>0</Statistics_db-num>
+      <Statistics_db-len>0</Statistics_db-len>
+      <Statistics_hsp-len>0</Statistics_hsp-len>
+      <Statistics_eff-space>0</Statistics_eff-space>
+      <Statistics_kappa>-1</Statistics_kappa>
+      <Statistics_lambda>-1</Statistics_lambda>
+      <Statistics_entropy>-1</Statistics_entropy>
+    </Statistics>
+  </Iteration_stat>
+</Iteration>
+<Iteration>
+  <Iteration_iter-num>10</Iteration_iter-num>
+  <Iteration_query-ID>Query_44013</Iteration_query-ID>
+  <Iteration_query-def>dnamaster_10</Iteration_query-def>
+  <Iteration_query-len>132</Iteration_query-len>
+<Iteration_hits>
+</Iteration_hits>
+  <Iteration_stat>
+    <Statistics>
+      <Statistics_db-num>0</Statistics_db-num>
+      <Statistics_db-len>0</Statistics_db-len>
+      <Statistics_hsp-len>0</Statistics_hsp-len>
+      <Statistics_eff-space>0</Statistics_eff-space>
+      <Statistics_kappa>-1</Statistics_kappa>
+      <Statistics_lambda>-1</Statistics_lambda>
+      <Statistics_entropy>-1</Statistics_entropy>
+    </Statistics>
+  </Iteration_stat>
+</Iteration>
+<Iteration>
+  <Iteration_iter-num>11</Iteration_iter-num>
+  <Iteration_query-ID>Query_44014</Iteration_query-ID>
+  <Iteration_query-def>dnamaster_11</Iteration_query-def>
+  <Iteration_query-len>146</Iteration_query-len>
+<Iteration_hits>
+</Iteration_hits>
+  <Iteration_stat>
+    <Statistics>
+      <Statistics_db-num>0</Statistics_db-num>
+      <Statistics_db-len>0</Statistics_db-len>
+      <Statistics_hsp-len>0</Statistics_hsp-len>
+      <Statistics_eff-space>0</Statistics_eff-space>
+      <Statistics_kappa>-1</Statistics_kappa>
+      <Statistics_lambda>-1</Statistics_lambda>
+      <Statistics_entropy>-1</Statistics_entropy>
+    </Statistics>
+  </Iteration_stat>
+</Iteration>
+<Iteration>
+  <Iteration_iter-num>12</Iteration_iter-num>
+  <Iteration_query-ID>Query_44015</Iteration_query-ID>
+  <Iteration_query-def>dnamaster_12</Iteration_query-def>
+  <Iteration_query-len>113</Iteration_query-len>
+<Iteration_hits>
+</Iteration_hits>
+  <Iteration_stat>
+    <Statistics>
+      <Statistics_db-num>0</Statistics_db-num>
+      <Statistics_db-len>0</Statistics_db-len>
+      <Statistics_hsp-len>0</Statistics_hsp-len>
+      <Statistics_eff-space>0</Statistics_eff-space>
+      <Statistics_kappa>-1</Statistics_kappa>
+      <Statistics_lambda>-1</Statistics_lambda>
+      <Statistics_entropy>-1</Statistics_entropy>
+    </Statistics>
+  </Iteration_stat>
+</Iteration>
+<Iteration>
+  <Iteration_iter-num>13</Iteration_iter-num>
+  <Iteration_query-ID>Query_44016</Iteration_query-ID>
+  <Iteration_query-def>dnamaster_13</Iteration_query-def>
+  <Iteration_query-len>85</Iteration_query-len>
+<Iteration_hits>
+</Iteration_hits>
+  <Iteration_stat>
+    <Statistics>
+      <Statistics_db-num>0</Statistics_db-num>
+      <Statistics_db-len>0</Statistics_db-len>
+      <Statistics_hsp-len>0</Statistics_hsp-len>
+      <Statistics_eff-space>0</Statistics_eff-space>
+      <Statistics_kappa>-1</Statistics_kappa>
+      <Statistics_lambda>-1</Statistics_lambda>
+      <Statistics_entropy>-1</Statistics_entropy>
+    </Statistics>
+  </Iteration_stat>
+</Iteration>
+<Iteration>
+  <Iteration_iter-num>14</Iteration_iter-num>
+  <Iteration_query-ID>Query_44017</Iteration_query-ID>
+  <Iteration_query-def>dnamaster_14</Iteration_query-def>
+  <Iteration_query-len>879</Iteration_query-len>
+<Iteration_hits>
+</Iteration_hits>
+  <Iteration_stat>
+    <Statistics>
+      <Statistics_db-num>0</Statistics_db-num>
+      <Statistics_db-len>0</Statistics_db-len>
+      <Statistics_hsp-len>0</Statistics_hsp-len>
+      <Statistics_eff-space>0</Statistics_eff-space>
+      <Statistics_kappa>-1</Statistics_kappa>
+      <Statistics_lambda>-1</Statistics_lambda>
+      <Statistics_entropy>-1</Statistics_entropy>
+    </Statistics>
+  </Iteration_stat>
+</Iteration>
+<Iteration>
+  <Iteration_iter-num>15</Iteration_iter-num>
+  <Iteration_query-ID>Query_44018</Iteration_query-ID>
+  <Iteration_query-def>dnamaster_15</Iteration_query-def>
+  <Iteration_query-len>284</Iteration_query-len>
+<Iteration_hits>
+</Iteration_hits>
+  <Iteration_stat>
+    <Statistics>
+      <Statistics_db-num>0</Statistics_db-num>
+      <Statistics_db-len>0</Statistics_db-len>
+      <Statistics_hsp-len>0</Statistics_hsp-len>
+      <Statistics_eff-space>0</Statistics_eff-space>
+      <Statistics_kappa>-1</Statistics_kappa>
+      <Statistics_lambda>-1</Statistics_lambda>
+      <Statistics_entropy>-1</Statistics_entropy>
+    </Statistics>
+  </Iteration_stat>
+</Iteration>
+<Iteration>
+  <Iteration_iter-num>16</Iteration_iter-num>
+  <Iteration_query-ID>Query_44019</Iteration_query-ID>
+  <Iteration_query-def>dnamaster_16</Iteration_query-def>
+  <Iteration_query-len>373</Iteration_query-len>
+<Iteration_hits>
+</Iteration_hits>
+  <Iteration_stat>
+    <Statistics>
+      <Statistics_db-num>0</Statistics_db-num>
+      <Statistics_db-len>0</Statistics_db-len>
+      <Statistics_hsp-len>0</Statistics_hsp-len>
+      <Statistics_eff-space>0</Statistics_eff-space>
+      <Statistics_kappa>-1</Statistics_kappa>
+      <Statistics_lambda>-1</Statistics_lambda>
+      <Statistics_entropy>-1</Statistics_entropy>
+    </Statistics>
+  </Iteration_stat>
+</Iteration>
+<Iteration>
+  <Iteration_iter-num>17</Iteration_iter-num>
+  <Iteration_query-ID>Query_44020</Iteration_query-ID>
+  <Iteration_query-def>dnamaster_17</Iteration_query-def>
+  <Iteration_query-len>361</Iteration_query-len>
+<Iteration_hits>
+</Iteration_hits>
+  <Iteration_stat>
+    <Statistics>
+      <Statistics_db-num>0</Statistics_db-num>
+      <Statistics_db-len>0</Statistics_db-len>
+      <Statistics_hsp-len>0</Statistics_hsp-len>
+      <Statistics_eff-space>0</Statistics_eff-space>
+      <Statistics_kappa>-1</Statistics_kappa>
+      <Statistics_lambda>-1</Statistics_lambda>
+      <Statistics_entropy>-1</Statistics_entropy>
+    </Statistics>
+  </Iteration_stat>
+</Iteration>
+<Iteration>
+  <Iteration_iter-num>18</Iteration_iter-num>
+  <Iteration_query-ID>Query_44021</Iteration_query-ID>
+  <Iteration_query-def>dnamaster_18</Iteration_query-def>
+  <Iteration_query-len>116</Iteration_query-len>
+<Iteration_hits>
+</Iteration_hits>
+  <Iteration_stat>
+    <Statistics>
+      <Statistics_db-num>0</Statistics_db-num>
+      <Statistics_db-len>0</Statistics_db-len>
+      <Statistics_hsp-len>0</Statistics_hsp-len>
+      <Statistics_eff-space>0</Statistics_eff-space>
+      <Statistics_kappa>-1</Statistics_kappa>
+      <Statistics_lambda>-1</Statistics_lambda>
+      <Statistics_entropy>-1</Statistics_entropy>
+    </Statistics>
+  </Iteration_stat>
+</Iteration>
+<Iteration>
+  <Iteration_iter-num>19</Iteration_iter-num>
+  <Iteration_query-ID>Query_44022</Iteration_query-ID>
+  <Iteration_query-def>dnamaster_19</Iteration_query-def>
+  <Iteration_query-len>54</Iteration_query-len>
+<Iteration_hits>
+</Iteration_hits>
+  <Iteration_stat>
+    <Statistics>
+      <Statistics_db-num>0</Statistics_db-num>
+      <Statistics_db-len>0</Statistics_db-len>
+      <Statistics_hsp-len>0</Statistics_hsp-len>
+      <Statistics_eff-space>0</Statistics_eff-space>
+      <Statistics_kappa>-1</Statistics_kappa>
+      <Statistics_lambda>-1</Statistics_lambda>
+      <Statistics_entropy>-1</Statistics_entropy>
+    </Statistics>
+  </Iteration_stat>
+</Iteration>
+<Iteration>
+  <Iteration_iter-num>20</Iteration_iter-num>
+  <Iteration_query-ID>Query_44023</Iteration_query-ID>
+  <Iteration_query-def>dnamaster_20</Iteration_query-def>
+  <Iteration_query-len>80</Iteration_query-len>
+<Iteration_hits>
+</Iteration_hits>
+  <Iteration_stat>
+    <Statistics>
+      <Statistics_db-num>0</Statistics_db-num>
+      <Statistics_db-len>0</Statistics_db-len>
+      <Statistics_hsp-len>0</Statistics_hsp-len>
+      <Statistics_eff-space>0</Statistics_eff-space>
+      <Statistics_kappa>-1</Statistics_kappa>
+      <Statistics_lambda>-1</Statistics_lambda>
+      <Statistics_entropy>-1</Statistics_entropy>
+    </Statistics>
+  </Iteration_stat>
+</Iteration>
+<Iteration>
+  <Iteration_iter-num>21</Iteration_iter-num>
+  <Iteration_query-ID>Query_44024</Iteration_query-ID>
+  <Iteration_query-def>dnamaster_21</Iteration_query-def>
+  <Iteration_query-len>224</Iteration_query-len>
+<Iteration_hits>
+</Iteration_hits>
+  <Iteration_stat>
+    <Statistics>
+      <Statistics_db-num>0</Statistics_db-num>
+      <Statistics_db-len>0</Statistics_db-len>
+      <Statistics_hsp-len>0</Statistics_hsp-len>
+      <Statistics_eff-space>0</Statistics_eff-space>
+      <Statistics_kappa>-1</Statistics_kappa>
+      <Statistics_lambda>-1</Statistics_lambda>
+      <Statistics_entropy>-1</Statistics_entropy>
+    </Statistics>
+  </Iteration_stat>
+</Iteration>
+<Iteration>
+  <Iteration_iter-num>22</Iteration_iter-num>
+  <Iteration_query-ID>Query_44025</Iteration_query-ID>
+  <Iteration_query-def>dnamaster_22</Iteration_query-def>
+  <Iteration_query-len>81</Iteration_query-len>
+<Iteration_hits>
+</Iteration_hits>
+  <Iteration_stat>
+    <Statistics>
+      <Statistics_db-num>0</Statistics_db-num>
+      <Statistics_db-len>0</Statistics_db-len>
+      <Statistics_hsp-len>0</Statistics_hsp-len>
+      <Statistics_eff-space>0</Statistics_eff-space>
+      <Statistics_kappa>-1</Statistics_kappa>
+      <Statistics_lambda>-1</Statistics_lambda>
+      <Statistics_entropy>-1</Statistics_entropy>
+    </Statistics>
+  </Iteration_stat>
+</Iteration>
+<Iteration>
+  <Iteration_iter-num>23</Iteration_iter-num>
+  <Iteration_query-ID>Query_44026</Iteration_query-ID>
+  <Iteration_query-def>dnamaster_23</Iteration_query-def>
+  <Iteration_query-len>59</Iteration_query-len>
+<Iteration_hits>
+</Iteration_hits>
+  <Iteration_stat>
+    <Statistics>
+      <Statistics_db-num>0</Statistics_db-num>
+      <Statistics_db-len>0</Statistics_db-len>
+      <Statistics_hsp-len>0</Statistics_hsp-len>
+      <Statistics_eff-space>0</Statistics_eff-space>
+      <Statistics_kappa>-1</Statistics_kappa>
+      <Statistics_lambda>-1</Statistics_lambda>
+      <Statistics_entropy>-1</Statistics_entropy>
+    </Statistics>
+  </Iteration_stat>
+</Iteration>
+<Iteration>
+  <Iteration_iter-num>24</Iteration_iter-num>
+  <Iteration_query-ID>Query_44027</Iteration_query-ID>
+  <Iteration_query-def>dnamaster_24</Iteration_query-def>
+  <Iteration_query-len>51</Iteration_query-len>
+<Iteration_hits>
+</Iteration_hits>
+  <Iteration_stat>
+    <Statistics>
+      <Statistics_db-num>0</Statistics_db-num>
+      <Statistics_db-len>0</Statistics_db-len>
+      <Statistics_hsp-len>0</Statistics_hsp-len>
+      <Statistics_eff-space>0</Statistics_eff-space>
+      <Statistics_kappa>-1</Statistics_kappa>
+      <Statistics_lambda>-1</Statistics_lambda>
+      <Statistics_entropy>-1</Statistics_entropy>
+    </Statistics>
+  </Iteration_stat>
+</Iteration>
+<Iteration>
+  <Iteration_iter-num>25</Iteration_iter-num>
+  <Iteration_query-ID>Query_44028</Iteration_query-ID>
+  <Iteration_query-def>dnamaster_25</Iteration_query-def>
+  <Iteration_query-len>42</Iteration_query-len>
+<Iteration_hits>
+</Iteration_hits>
+  <Iteration_stat>
+    <Statistics>
+      <Statistics_db-num>0</Statistics_db-num>
+      <Statistics_db-len>0</Statistics_db-len>
+      <Statistics_hsp-len>0</Statistics_hsp-len>
+      <Statistics_eff-space>0</Statistics_eff-space>
+      <Statistics_kappa>-1</Statistics_kappa>
+      <Statistics_lambda>-1</Statistics_lambda>
+      <Statistics_entropy>-1</Statistics_entropy>
+    </Statistics>
+  </Iteration_stat>
+</Iteration>
+<Iteration>
+  <Iteration_iter-num>26</Iteration_iter-num>
+  <Iteration_query-ID>Query_44029</Iteration_query-ID>
+  <Iteration_query-def>dnamaster_26</Iteration_query-def>
+  <Iteration_query-len>677</Iteration_query-len>
+<Iteration_hits>
+</Iteration_hits>
+  <Iteration_stat>
+    <Statistics>
+      <Statistics_db-num>0</Statistics_db-num>
+      <Statistics_db-len>0</Statistics_db-len>
+      <Statistics_hsp-len>0</Statistics_hsp-len>
+      <Statistics_eff-space>0</Statistics_eff-space>
+      <Statistics_kappa>-1</Statistics_kappa>
+      <Statistics_lambda>-1</Statistics_lambda>
+      <Statistics_entropy>-1</Statistics_entropy>
+    </Statistics>
+  </Iteration_stat>
+</Iteration>
+<Iteration>
+  <Iteration_iter-num>27</Iteration_iter-num>
+  <Iteration_query-ID>Query_44030</Iteration_query-ID>
+  <Iteration_query-def>dnamaster_27</Iteration_query-def>
+  <Iteration_query-len>74</Iteration_query-len>
+<Iteration_hits>
+</Iteration_hits>
+  <Iteration_stat>
+    <Statistics>
+      <Statistics_db-num>0</Statistics_db-num>
+      <Statistics_db-len>0</Statistics_db-len>
+      <Statistics_hsp-len>0</Statistics_hsp-len>
+      <Statistics_eff-space>0</Statistics_eff-space>
+      <Statistics_kappa>-1</Statistics_kappa>
+      <Statistics_lambda>-1</Statistics_lambda>
+      <Statistics_entropy>-1</Statistics_entropy>
+    </Statistics>
+  </Iteration_stat>
+</Iteration>
+<Iteration>
+  <Iteration_iter-num>28</Iteration_iter-num>
+  <Iteration_query-ID>Query_44031</Iteration_query-ID>
+  <Iteration_query-def>dnamaster_28</Iteration_query-def>
+  <Iteration_query-len>85</Iteration_query-len>
+<Iteration_hits>
+</Iteration_hits>
+  <Iteration_stat>
+    <Statistics>
+      <Statistics_db-num>0</Statistics_db-num>
+      <Statistics_db-len>0</Statistics_db-len>
+      <Statistics_hsp-len>0</Statistics_hsp-len>
+      <Statistics_eff-space>0</Statistics_eff-space>
+      <Statistics_kappa>-1</Statistics_kappa>
+      <Statistics_lambda>-1</Statistics_lambda>
+      <Statistics_entropy>-1</Statistics_entropy>
+    </Statistics>
+  </Iteration_stat>
+</Iteration>
+<Iteration>
+  <Iteration_iter-num>29</Iteration_iter-num>
+  <Iteration_query-ID>Query_44032</Iteration_query-ID>
+  <Iteration_query-def>dnamaster_29</Iteration_query-def>
+  <Iteration_query-len>66</Iteration_query-len>
+<Iteration_hits>
+</Iteration_hits>
+  <Iteration_stat>
+    <Statistics>
+      <Statistics_db-num>0</Statistics_db-num>
+      <Statistics_db-len>0</Statistics_db-len>
+      <Statistics_hsp-len>0</Statistics_hsp-len>
+      <Statistics_eff-space>0</Statistics_eff-space>
+      <Statistics_kappa>-1</Statistics_kappa>
+      <Statistics_lambda>-1</Statistics_lambda>
+      <Statistics_entropy>-1</Statistics_entropy>
+    </Statistics>
+  </Iteration_stat>
+</Iteration>
+<Iteration>
+  <Iteration_iter-num>30</Iteration_iter-num>
+  <Iteration_query-ID>Query_44033</Iteration_query-ID>
+  <Iteration_query-def>dnamaster_30</Iteration_query-def>
+  <Iteration_query-len>86</Iteration_query-len>
+<Iteration_hits>
+</Iteration_hits>
+  <Iteration_stat>
+    <Statistics>
+      <Statistics_db-num>0</Statistics_db-num>
+      <Statistics_db-len>0</Statistics_db-len>
+      <Statistics_hsp-len>0</Statistics_hsp-len>
+      <Statistics_eff-space>0</Statistics_eff-space>
+      <Statistics_kappa>-1</Statistics_kappa>
+      <Statistics_lambda>-1</Statistics_lambda>
+      <Statistics_entropy>-1</Statistics_entropy>
+    </Statistics>
+  </Iteration_stat>
+</Iteration>
+<Iteration>
+  <Iteration_iter-num>31</Iteration_iter-num>
+  <Iteration_query-ID>Query_44034</Iteration_query-ID>
+  <Iteration_query-def>dnamaster_31</Iteration_query-def>
+  <Iteration_query-len>68</Iteration_query-len>
+<Iteration_hits>
+</Iteration_hits>
+  <Iteration_stat>
+    <Statistics>
+      <Statistics_db-num>0</Statistics_db-num>
+      <Statistics_db-len>0</Statistics_db-len>
+      <Statistics_hsp-len>0</Statistics_hsp-len>
+      <Statistics_eff-space>0</Statistics_eff-space>
+      <Statistics_kappa>-1</Statistics_kappa>
+      <Statistics_lambda>-1</Statistics_lambda>
+      <Statistics_entropy>-1</Statistics_entropy>
+    </Statistics>
+  </Iteration_stat>
+</Iteration>
+<Iteration>
+  <Iteration_iter-num>32</Iteration_iter-num>
+  <Iteration_query-ID>Query_44035</Iteration_query-ID>
+  <Iteration_query-def>dnamaster_32</Iteration_query-def>
+  <Iteration_query-len>382</Iteration_query-len>
+<Iteration_hits>
+</Iteration_hits>
+  <Iteration_stat>
+    <Statistics>
+      <Statistics_db-num>0</Statistics_db-num>
+      <Statistics_db-len>0</Statistics_db-len>
+      <Statistics_hsp-len>0</Statistics_hsp-len>
+      <Statistics_eff-space>0</Statistics_eff-space>
+      <Statistics_kappa>-1</Statistics_kappa>
+      <Statistics_lambda>-1</Statistics_lambda>
+      <Statistics_entropy>-1</Statistics_entropy>
+    </Statistics>
+  </Iteration_stat>
+</Iteration>
+<Iteration>
+  <Iteration_iter-num>33</Iteration_iter-num>
+  <Iteration_query-ID>Query_44036</Iteration_query-ID>
+  <Iteration_query-def>dnamaster_33</Iteration_query-def>
+  <Iteration_query-len>224</Iteration_query-len>
+<Iteration_hits>
+</Iteration_hits>
+  <Iteration_stat>
+    <Statistics>
+      <Statistics_db-num>0</Statistics_db-num>
+      <Statistics_db-len>0</Statistics_db-len>
+      <Statistics_hsp-len>0</Statistics_hsp-len>
+      <Statistics_eff-space>0</Statistics_eff-space>
+      <Statistics_kappa>-1</Statistics_kappa>
+      <Statistics_lambda>-1</Statistics_lambda>
+      <Statistics_entropy>-1</Statistics_entropy>
+    </Statistics>
+  </Iteration_stat>
+</Iteration>
+<Iteration>
+  <Iteration_iter-num>34</Iteration_iter-num>
+  <Iteration_query-ID>Query_44037</Iteration_query-ID>
+  <Iteration_query-def>dnamaster_34</Iteration_query-def>
+  <Iteration_query-len>77</Iteration_query-len>
+<Iteration_hits>
+</Iteration_hits>
+  <Iteration_stat>
+    <Statistics>
+      <Statistics_db-num>0</Statistics_db-num>
+      <Statistics_db-len>0</Statistics_db-len>
+      <Statistics_hsp-len>0</Statistics_hsp-len>
+      <Statistics_eff-space>0</Statistics_eff-space>
+      <Statistics_kappa>-1</Statistics_kappa>
+      <Statistics_lambda>-1</Statistics_lambda>
+      <Statistics_entropy>-1</Statistics_entropy>
+    </Statistics>
+  </Iteration_stat>
+</Iteration>
+<Iteration>
+  <Iteration_iter-num>35</Iteration_iter-num>
+  <Iteration_query-ID>Query_44038</Iteration_query-ID>
+  <Iteration_query-def>dnamaster_35</Iteration_query-def>
+  <Iteration_query-len>71</Iteration_query-len>
+<Iteration_hits>
+</Iteration_hits>
+  <Iteration_stat>
+    <Statistics>
+      <Statistics_db-num>0</Statistics_db-num>
+      <Statistics_db-len>0</Statistics_db-len>
+      <Statistics_hsp-len>0</Statistics_hsp-len>
+      <Statistics_eff-space>0</Statistics_eff-space>
+      <Statistics_kappa>-1</Statistics_kappa>
+      <Statistics_lambda>-1</Statistics_lambda>
+      <Statistics_entropy>-1</Statistics_entropy>
+    </Statistics>
+  </Iteration_stat>
+</Iteration>
+<Iteration>
+  <Iteration_iter-num>36</Iteration_iter-num>
+  <Iteration_query-ID>Query_44039</Iteration_query-ID>
+  <Iteration_query-def>dnamaster_36</Iteration_query-def>
+  <Iteration_query-len>49</Iteration_query-len>
+<Iteration_hits>
+</Iteration_hits>
+  <Iteration_stat>
+    <Statistics>
+      <Statistics_db-num>0</Statistics_db-num>
+      <Statistics_db-len>0</Statistics_db-len>
+      <Statistics_hsp-len>0</Statistics_hsp-len>
+      <Statistics_eff-space>0</Statistics_eff-space>
+      <Statistics_kappa>-1</Statistics_kappa>
+      <Statistics_lambda>-1</Statistics_lambda>
+      <Statistics_entropy>-1</Statistics_entropy>
+    </Statistics>
+  </Iteration_stat>
+</Iteration>
+<Iteration>
+  <Iteration_iter-num>37</Iteration_iter-num>
+  <Iteration_query-ID>Query_44040</Iteration_query-ID>
+  <Iteration_query-def>dnamaster_37</Iteration_query-def>
+  <Iteration_query-len>246</Iteration_query-len>
+<Iteration_hits>
+</Iteration_hits>
+  <Iteration_stat>
+    <Statistics>
+      <Statistics_db-num>0</Statistics_db-num>
+      <Statistics_db-len>0</Statistics_db-len>
+      <Statistics_hsp-len>0</Statistics_hsp-len>
+      <Statistics_eff-space>0</Statistics_eff-space>
+      <Statistics_kappa>-1</Statistics_kappa>
+      <Statistics_lambda>-1</Statistics_lambda>
+      <Statistics_entropy>-1</Statistics_entropy>
+    </Statistics>
+  </Iteration_stat>
+</Iteration>
+<Iteration>
+  <Iteration_iter-num>38</Iteration_iter-num>
+  <Iteration_query-ID>Query_44041</Iteration_query-ID>
+  <Iteration_query-def>dnamaster_38</Iteration_query-def>
+  <Iteration_query-len>128</Iteration_query-len>
+<Iteration_hits>
+</Iteration_hits>
+  <Iteration_stat>
+    <Statistics>
+      <Statistics_db-num>0</Statistics_db-num>
+      <Statistics_db-len>0</Statistics_db-len>
+      <Statistics_hsp-len>0</Statistics_hsp-len>
+      <Statistics_eff-space>0</Statistics_eff-space>
+      <Statistics_kappa>-1</Statistics_kappa>
+      <Statistics_lambda>-1</Statistics_lambda>
+      <Statistics_entropy>-1</Statistics_entropy>
+    </Statistics>
+  </Iteration_stat>
+</Iteration>
+<Iteration>
+  <Iteration_iter-num>39</Iteration_iter-num>
+  <Iteration_query-ID>Query_44042</Iteration_query-ID>
+  <Iteration_query-def>dnamaster_39</Iteration_query-def>
+  <Iteration_query-len>77</Iteration_query-len>
+<Iteration_hits>
+</Iteration_hits>
+  <Iteration_stat>
+    <Statistics>
+      <Statistics_db-num>0</Statistics_db-num>
+      <Statistics_db-len>0</Statistics_db-len>
+      <Statistics_hsp-len>0</Statistics_hsp-len>
+      <Statistics_eff-space>0</Statistics_eff-space>
+      <Statistics_kappa>-1</Statistics_kappa>
+      <Statistics_lambda>-1</Statistics_lambda>
+      <Statistics_entropy>-1</Statistics_entropy>
+    </Statistics>
+  </Iteration_stat>
+</Iteration>
+<Iteration>
+  <Iteration_iter-num>40</Iteration_iter-num>
+  <Iteration_query-ID>Query_44043</Iteration_query-ID>
+  <Iteration_query-def>dnamaster_40</Iteration_query-def>
+  <Iteration_query-len>58</Iteration_query-len>
+<Iteration_hits>
+</Iteration_hits>
+  <Iteration_stat>
+    <Statistics>
+      <Statistics_db-num>0</Statistics_db-num>
+      <Statistics_db-len>0</Statistics_db-len>
+      <Statistics_hsp-len>0</Statistics_hsp-len>
+      <Statistics_eff-space>0</Statistics_eff-space>
+      <Statistics_kappa>-1</Statistics_kappa>
+      <Statistics_lambda>-1</Statistics_lambda>
+      <Statistics_entropy>-1</Statistics_entropy>
+    </Statistics>
+  </Iteration_stat>
+</Iteration>
+<Iteration>
+  <Iteration_iter-num>41</Iteration_iter-num>
+  <Iteration_query-ID>Query_44044</Iteration_query-ID>
+  <Iteration_query-def>dnamaster_41</Iteration_query-def>
+  <Iteration_query-len>251</Iteration_query-len>
+<Iteration_hits>
+</Iteration_hits>
+  <Iteration_stat>
+    <Statistics>
+      <Statistics_db-num>0</Statistics_db-num>
+      <Statistics_db-len>0</Statistics_db-len>
+      <Statistics_hsp-len>0</Statistics_hsp-len>
+      <Statistics_eff-space>0</Statistics_eff-space>
+      <Statistics_kappa>-1</Statistics_kappa>
+      <Statistics_lambda>-1</Statistics_lambda>
+      <Statistics_entropy>-1</Statistics_entropy>
+    </Statistics>
+  </Iteration_stat>
+</Iteration>
+<Iteration>
+  <Iteration_iter-num>42</Iteration_iter-num>
+  <Iteration_query-ID>Query_44045</Iteration_query-ID>
+  <Iteration_query-def>dnamaster_42</Iteration_query-def>
+  <Iteration_query-len>185</Iteration_query-len>
+<Iteration_hits>
+</Iteration_hits>
+  <Iteration_stat>
+    <Statistics>
+      <Statistics_db-num>0</Statistics_db-num>
+      <Statistics_db-len>0</Statistics_db-len>
+      <Statistics_hsp-len>0</Statistics_hsp-len>
+      <Statistics_eff-space>0</Statistics_eff-space>
+      <Statistics_kappa>-1</Statistics_kappa>
+      <Statistics_lambda>-1</Statistics_lambda>
+      <Statistics_entropy>-1</Statistics_entropy>
+    </Statistics>
+  </Iteration_stat>
+</Iteration>
+<Iteration>
+  <Iteration_iter-num>43</Iteration_iter-num>
+  <Iteration_query-ID>Query_44046</Iteration_query-ID>
+  <Iteration_query-def>dnamaster_43</Iteration_query-def>
+  <Iteration_query-len>88</Iteration_query-len>
+<Iteration_hits>
+</Iteration_hits>
+  <Iteration_stat>
+    <Statistics>
+      <Statistics_db-num>0</Statistics_db-num>
+      <Statistics_db-len>0</Statistics_db-len>
+      <Statistics_hsp-len>0</Statistics_hsp-len>
+      <Statistics_eff-space>0</Statistics_eff-space>
+      <Statistics_kappa>-1</Statistics_kappa>
+      <Statistics_lambda>-1</Statistics_lambda>
+      <Statistics_entropy>-1</Statistics_entropy>
+    </Statistics>
+  </Iteration_stat>
+</Iteration>
+<Iteration>
+  <Iteration_iter-num>44</Iteration_iter-num>
+  <Iteration_query-ID>Query_44047</Iteration_query-ID>
+  <Iteration_query-def>dnamaster_44</Iteration_query-def>
+  <Iteration_query-len>97</Iteration_query-len>
+<Iteration_hits>
+</Iteration_hits>
+  <Iteration_stat>
+    <Statistics>
+      <Statistics_db-num>0</Statistics_db-num>
+      <Statistics_db-len>0</Statistics_db-len>
+      <Statistics_hsp-len>0</Statistics_hsp-len>
+      <Statistics_eff-space>0</Statistics_eff-space>
+      <Statistics_kappa>-1</Statistics_kappa>
+      <Statistics_lambda>-1</Statistics_lambda>
+      <Statistics_entropy>-1</Statistics_entropy>
+    </Statistics>
+  </Iteration_stat>
+</Iteration>
+<Iteration>
+  <Iteration_iter-num>45</Iteration_iter-num>
+  <Iteration_query-ID>Query_44048</Iteration_query-ID>
+  <Iteration_query-def>dnamaster_45</Iteration_query-def>
+  <Iteration_query-len>510</Iteration_query-len>
+<Iteration_hits>
+</Iteration_hits>
+  <Iteration_stat>
+    <Statistics>
+      <Statistics_db-num>0</Statistics_db-num>
+      <Statistics_db-len>0</Statistics_db-len>
+      <Statistics_hsp-len>0</Statistics_hsp-len>
+      <Statistics_eff-space>0</Statistics_eff-space>
+      <Statistics_kappa>-1</Statistics_kappa>
+      <Statistics_lambda>-1</Statistics_lambda>
+      <Statistics_entropy>-1</Statistics_entropy>
+    </Statistics>
+  </Iteration_stat>
+</Iteration>
+<Iteration>
+  <Iteration_iter-num>46</Iteration_iter-num>
+  <Iteration_query-ID>Query_44049</Iteration_query-ID>
+  <Iteration_query-def>dnamaster_46</Iteration_query-def>
+  <Iteration_query-len>66</Iteration_query-len>
+<Iteration_hits>
+</Iteration_hits>
+  <Iteration_stat>
+    <Statistics>
+      <Statistics_db-num>0</Statistics_db-num>
+      <Statistics_db-len>0</Statistics_db-len>
+      <Statistics_hsp-len>0</Statistics_hsp-len>
+      <Statistics_eff-space>0</Statistics_eff-space>
+      <Statistics_kappa>-1</Statistics_kappa>
+      <Statistics_lambda>-1</Statistics_lambda>
+      <Statistics_entropy>-1</Statistics_entropy>
+    </Statistics>
+  </Iteration_stat>
+</Iteration>
+<Iteration>
+  <Iteration_iter-num>47</Iteration_iter-num>
+  <Iteration_query-ID>Query_44050</Iteration_query-ID>
+  <Iteration_query-def>dnamaster_47</Iteration_query-def>
+  <Iteration_query-len>307</Iteration_query-len>
+<Iteration_hits>
+</Iteration_hits>
+  <Iteration_stat>
+    <Statistics>
+      <Statistics_db-num>0</Statistics_db-num>
+      <Statistics_db-len>0</Statistics_db-len>
+      <Statistics_hsp-len>0</Statistics_hsp-len>
+      <Statistics_eff-space>0</Statistics_eff-space>
+      <Statistics_kappa>-1</Statistics_kappa>
+      <Statistics_lambda>-1</Statistics_lambda>
+      <Statistics_entropy>-1</Statistics_entropy>
+    </Statistics>
+  </Iteration_stat>
+</Iteration>
+<Iteration>
+  <Iteration_iter-num>48</Iteration_iter-num>
+  <Iteration_query-ID>Query_44051</Iteration_query-ID>
+  <Iteration_query-def>dnamaster_48</Iteration_query-def>
+  <Iteration_query-len>253</Iteration_query-len>
+<Iteration_hits>
+</Iteration_hits>
+  <Iteration_stat>
+    <Statistics>
+      <Statistics_db-num>0</Statistics_db-num>
+      <Statistics_db-len>0</Statistics_db-len>
+      <Statistics_hsp-len>0</Statistics_hsp-len>
+      <Statistics_eff-space>0</Statistics_eff-space>
+      <Statistics_kappa>-1</Statistics_kappa>
+      <Statistics_lambda>-1</Statistics_lambda>
+      <Statistics_entropy>-1</Statistics_entropy>
+    </Statistics>
+  </Iteration_stat>
+</Iteration>
+<Iteration>
+  <Iteration_iter-num>49</Iteration_iter-num>
+  <Iteration_query-ID>Query_44052</Iteration_query-ID>
+  <Iteration_query-def>dnamaster_49</Iteration_query-def>
+  <Iteration_query-len>105</Iteration_query-len>
+<Iteration_hits>
+</Iteration_hits>
+  <Iteration_stat>
+    <Statistics>
+      <Statistics_db-num>0</Statistics_db-num>
+      <Statistics_db-len>0</Statistics_db-len>
+      <Statistics_hsp-len>0</Statistics_hsp-len>
+      <Statistics_eff-space>0</Statistics_eff-space>
+      <Statistics_kappa>-1</Statistics_kappa>
+      <Statistics_lambda>-1</Statistics_lambda>
+      <Statistics_entropy>-1</Statistics_entropy>
+    </Statistics>
+  </Iteration_stat>
+</Iteration>
+<Iteration>
+  <Iteration_iter-num>50</Iteration_iter-num>
+  <Iteration_query-ID>Query_44053</Iteration_query-ID>
+  <Iteration_query-def>dnamaster_50</Iteration_query-def>
+  <Iteration_query-len>277</Iteration_query-len>
+<Iteration_hits>
+</Iteration_hits>
+  <Iteration_stat>
+    <Statistics>
+      <Statistics_db-num>0</Statistics_db-num>
+      <Statistics_db-len>0</Statistics_db-len>
+      <Statistics_hsp-len>0</Statistics_hsp-len>
+      <Statistics_eff-space>0</Statistics_eff-space>
+      <Statistics_kappa>-1</Statistics_kappa>
+      <Statistics_lambda>-1</Statistics_lambda>
+      <Statistics_entropy>-1</Statistics_entropy>
+    </Statistics>
+  </Iteration_stat>
+</Iteration>
+<Iteration>
+  <Iteration_iter-num>51</Iteration_iter-num>
+  <Iteration_query-ID>Query_44054</Iteration_query-ID>
+  <Iteration_query-def>dnamaster_51</Iteration_query-def>
+  <Iteration_query-len>443</Iteration_query-len>
+<Iteration_hits>
+</Iteration_hits>
+  <Iteration_stat>
+    <Statistics>
+      <Statistics_db-num>0</Statistics_db-num>
+      <Statistics_db-len>0</Statistics_db-len>
+      <Statistics_hsp-len>0</Statistics_hsp-len>
+      <Statistics_eff-space>0</Statistics_eff-space>
+      <Statistics_kappa>-1</Statistics_kappa>
+      <Statistics_lambda>-1</Statistics_lambda>
+      <Statistics_entropy>-1</Statistics_entropy>
+    </Statistics>
+  </Iteration_stat>
+</Iteration>
+<Iteration>
+  <Iteration_iter-num>52</Iteration_iter-num>
+  <Iteration_query-ID>Query_44055</Iteration_query-ID>
+  <Iteration_query-def>dnamaster_52</Iteration_query-def>
+  <Iteration_query-len>104</Iteration_query-len>
+<Iteration_hits>
+</Iteration_hits>
+  <Iteration_stat>
+    <Statistics>
+      <Statistics_db-num>0</Statistics_db-num>
+      <Statistics_db-len>0</Statistics_db-len>
+      <Statistics_hsp-len>0</Statistics_hsp-len>
+      <Statistics_eff-space>0</Statistics_eff-space>
+      <Statistics_kappa>-1</Statistics_kappa>
+      <Statistics_lambda>-1</Statistics_lambda>
+      <Statistics_entropy>-1</Statistics_entropy>
+    </Statistics>
+  </Iteration_stat>
+</Iteration>
+<Iteration>
+  <Iteration_iter-num>53</Iteration_iter-num>
+  <Iteration_query-ID>Query_44056</Iteration_query-ID>
+  <Iteration_query-def>dnamaster_53</Iteration_query-def>
+  <Iteration_query-len>50</Iteration_query-len>
+<Iteration_hits>
+</Iteration_hits>
+  <Iteration_stat>
+    <Statistics>
+      <Statistics_db-num>0</Statistics_db-num>
+      <Statistics_db-len>0</Statistics_db-len>
+      <Statistics_hsp-len>0</Statistics_hsp-len>
+      <Statistics_eff-space>0</Statistics_eff-space>
+      <Statistics_kappa>-1</Statistics_kappa>
+      <Statistics_lambda>-1</Statistics_lambda>
+      <Statistics_entropy>-1</Statistics_entropy>
+    </Statistics>
+  </Iteration_stat>
+</Iteration>
+<Iteration>
+  <Iteration_iter-num>54</Iteration_iter-num>
+  <Iteration_query-ID>Query_44057</Iteration_query-ID>
+  <Iteration_query-def>dnamaster_54</Iteration_query-def>
+  <Iteration_query-len>69</Iteration_query-len>
+<Iteration_hits>
+</Iteration_hits>
+  <Iteration_stat>
+    <Statistics>
+      <Statistics_db-num>0</Statistics_db-num>
+      <Statistics_db-len>0</Statistics_db-len>
+      <Statistics_hsp-len>0</Statistics_hsp-len>
+      <Statistics_eff-space>0</Statistics_eff-space>
+      <Statistics_kappa>-1</Statistics_kappa>
+      <Statistics_lambda>-1</Statistics_lambda>
+      <Statistics_entropy>-1</Statistics_entropy>
+    </Statistics>
+  </Iteration_stat>
+</Iteration>
+<Iteration>
+  <Iteration_iter-num>55</Iteration_iter-num>
+  <Iteration_query-ID>Query_44058</Iteration_query-ID>
+  <Iteration_query-def>dnamaster_55</Iteration_query-def>
+  <Iteration_query-len>129</Iteration_query-len>
+<Iteration_hits>
+</Iteration_hits>
+  <Iteration_stat>
+    <Statistics>
+      <Statistics_db-num>0</Statistics_db-num>
+      <Statistics_db-len>0</Statistics_db-len>
+      <Statistics_hsp-len>0</Statistics_hsp-len>
+      <Statistics_eff-space>0</Statistics_eff-space>
+      <Statistics_kappa>-1</Statistics_kappa>
+      <Statistics_lambda>-1</Statistics_lambda>
+      <Statistics_entropy>-1</Statistics_entropy>
+    </Statistics>
+  </Iteration_stat>
+</Iteration>
+<Iteration>
+  <Iteration_iter-num>56</Iteration_iter-num>
+  <Iteration_query-ID>Query_44059</Iteration_query-ID>
+  <Iteration_query-def>dnamaster_56</Iteration_query-def>
+  <Iteration_query-len>72</Iteration_query-len>
+<Iteration_hits>
+</Iteration_hits>
+  <Iteration_stat>
+    <Statistics>
+      <Statistics_db-num>0</Statistics_db-num>
+      <Statistics_db-len>0</Statistics_db-len>
+      <Statistics_hsp-len>0</Statistics_hsp-len>
+      <Statistics_eff-space>0</Statistics_eff-space>
+      <Statistics_kappa>-1</Statistics_kappa>
+      <Statistics_lambda>-1</Statistics_lambda>
+      <Statistics_entropy>-1</Statistics_entropy>
+    </Statistics>
+  </Iteration_stat>
+</Iteration>
+<Iteration>
+  <Iteration_iter-num>57</Iteration_iter-num>
+  <Iteration_query-ID>Query_44060</Iteration_query-ID>
+  <Iteration_query-def>dnamaster_57</Iteration_query-def>
+  <Iteration_query-len>103</Iteration_query-len>
+<Iteration_hits>
+</Iteration_hits>
+  <Iteration_stat>
+    <Statistics>
+      <Statistics_db-num>0</Statistics_db-num>
+      <Statistics_db-len>0</Statistics_db-len>
+      <Statistics_hsp-len>0</Statistics_hsp-len>
+      <Statistics_eff-space>0</Statistics_eff-space>
+      <Statistics_kappa>-1</Statistics_kappa>
+      <Statistics_lambda>-1</Statistics_lambda>
+      <Statistics_entropy>-1</Statistics_entropy>
+    </Statistics>
+  </Iteration_stat>
+</Iteration>
+<Iteration>
+  <Iteration_iter-num>58</Iteration_iter-num>
+  <Iteration_query-ID>Query_44061</Iteration_query-ID>
+  <Iteration_query-def>dnamaster_58</Iteration_query-def>
+  <Iteration_query-len>108</Iteration_query-len>
+<Iteration_hits>
+</Iteration_hits>
+  <Iteration_stat>
+    <Statistics>
+      <Statistics_db-num>0</Statistics_db-num>
+      <Statistics_db-len>0</Statistics_db-len>
+      <Statistics_hsp-len>0</Statistics_hsp-len>
+      <Statistics_eff-space>0</Statistics_eff-space>
+      <Statistics_kappa>-1</Statistics_kappa>
+      <Statistics_lambda>-1</Statistics_lambda>
+      <Statistics_entropy>-1</Statistics_entropy>
+    </Statistics>
+  </Iteration_stat>
+</Iteration>
+<Iteration>
+  <Iteration_iter-num>59</Iteration_iter-num>
+  <Iteration_query-ID>Query_44062</Iteration_query-ID>
+  <Iteration_query-def>dnamaster_59</Iteration_query-def>
+  <Iteration_query-len>64</Iteration_query-len>
+<Iteration_hits>
+</Iteration_hits>
+  <Iteration_stat>
+    <Statistics>
+      <Statistics_db-num>0</Statistics_db-num>
+      <Statistics_db-len>0</Statistics_db-len>
+      <Statistics_hsp-len>0</Statistics_hsp-len>
+      <Statistics_eff-space>0</Statistics_eff-space>
+      <Statistics_kappa>-1</Statistics_kappa>
+      <Statistics_lambda>-1</Statistics_lambda>
+      <Statistics_entropy>-1</Statistics_entropy>
+    </Statistics>
+  </Iteration_stat>
+</Iteration>
+<Iteration>
+  <Iteration_iter-num>60</Iteration_iter-num>
+  <Iteration_query-ID>Query_44063</Iteration_query-ID>
+  <Iteration_query-def>dnamaster_60</Iteration_query-def>
+  <Iteration_query-len>55</Iteration_query-len>
+<Iteration_hits>
+</Iteration_hits>
+  <Iteration_stat>
+    <Statistics>
+      <Statistics_db-num>0</Statistics_db-num>
+      <Statistics_db-len>0</Statistics_db-len>
+      <Statistics_hsp-len>0</Statistics_hsp-len>
+      <Statistics_eff-space>0</Statistics_eff-space>
+      <Statistics_kappa>-1</Statistics_kappa>
+      <Statistics_lambda>-1</Statistics_lambda>
+      <Statistics_entropy>-1</Statistics_entropy>
+    </Statistics>
+  </Iteration_stat>
+</Iteration>
+<Iteration>
+  <Iteration_iter-num>61</Iteration_iter-num>
+  <Iteration_query-ID>Query_44064</Iteration_query-ID>
+  <Iteration_query-def>dnamaster_61</Iteration_query-def>
+  <Iteration_query-len>71</Iteration_query-len>
+<Iteration_hits>
+</Iteration_hits>
+  <Iteration_stat>
+    <Statistics>
+      <Statistics_db-num>0</Statistics_db-num>
+      <Statistics_db-len>0</Statistics_db-len>
+      <Statistics_hsp-len>0</Statistics_hsp-len>
+      <Statistics_eff-space>0</Statistics_eff-space>
+      <Statistics_kappa>-1</Statistics_kappa>
+      <Statistics_lambda>-1</Statistics_lambda>
+      <Statistics_entropy>-1</Statistics_entropy>
+    </Statistics>
+  </Iteration_stat>
+</Iteration>
+<Iteration>
+  <Iteration_iter-num>62</Iteration_iter-num>
+  <Iteration_query-ID>Query_44065</Iteration_query-ID>
+  <Iteration_query-def>dnamaster_62</Iteration_query-def>
+  <Iteration_query-len>186</Iteration_query-len>
+<Iteration_hits>
+</Iteration_hits>
+  <Iteration_stat>
+    <Statistics>
+      <Statistics_db-num>0</Statistics_db-num>
+      <Statistics_db-len>0</Statistics_db-len>
+      <Statistics_hsp-len>0</Statistics_hsp-len>
+      <Statistics_eff-space>0</Statistics_eff-space>
+      <Statistics_kappa>-1</Statistics_kappa>
+      <Statistics_lambda>-1</Statistics_lambda>
+      <Statistics_entropy>-1</Statistics_entropy>
+    </Statistics>
+  </Iteration_stat>
+</Iteration>
+<Iteration>
+  <Iteration_iter-num>63</Iteration_iter-num>
+  <Iteration_query-ID>Query_44066</Iteration_query-ID>
+  <Iteration_query-def>dnamaster_63</Iteration_query-def>
+  <Iteration_query-len>153</Iteration_query-len>
+<Iteration_hits>
+</Iteration_hits>
+  <Iteration_stat>
+    <Statistics>
+      <Statistics_db-num>0</Statistics_db-num>
+      <Statistics_db-len>0</Statistics_db-len>
+      <Statistics_hsp-len>0</Statistics_hsp-len>
+      <Statistics_eff-space>0</Statistics_eff-space>
+      <Statistics_kappa>-1</Statistics_kappa>
+      <Statistics_lambda>-1</Statistics_lambda>
+      <Statistics_entropy>-1</Statistics_entropy>
+    </Statistics>
+  </Iteration_stat>
+</Iteration>
+<Iteration>
+  <Iteration_iter-num>64</Iteration_iter-num>
+  <Iteration_query-ID>Query_44067</Iteration_query-ID>
+  <Iteration_query-def>dnamaster_64</Iteration_query-def>
+  <Iteration_query-len>147</Iteration_query-len>
+<Iteration_hits>
+</Iteration_hits>
+  <Iteration_stat>
+    <Statistics>
+      <Statistics_db-num>0</Statistics_db-num>
+      <Statistics_db-len>0</Statistics_db-len>
+      <Statistics_hsp-len>0</Statistics_hsp-len>
+      <Statistics_eff-space>0</Statistics_eff-space>
+      <Statistics_kappa>-1</Statistics_kappa>
+      <Statistics_lambda>-1</Statistics_lambda>
+      <Statistics_entropy>-1</Statistics_entropy>
+    </Statistics>
+  </Iteration_stat>
+</Iteration>
+<Iteration>
+  <Iteration_iter-num>65</Iteration_iter-num>
+  <Iteration_query-ID>Query_44068</Iteration_query-ID>
+  <Iteration_query-def>dnamaster_65</Iteration_query-def>
+  <Iteration_query-len>141</Iteration_query-len>
+<Iteration_hits>
+</Iteration_hits>
+  <Iteration_stat>
+    <Statistics>
+      <Statistics_db-num>0</Statistics_db-num>
+      <Statistics_db-len>0</Statistics_db-len>
+      <Statistics_hsp-len>0</Statistics_hsp-len>
+      <Statistics_eff-space>0</Statistics_eff-space>
+      <Statistics_kappa>-1</Statistics_kappa>
+      <Statistics_lambda>-1</Statistics_lambda>
+      <Statistics_entropy>-1</Statistics_entropy>
+    </Statistics>
+  </Iteration_stat>
+</Iteration>
+<Iteration>
+  <Iteration_iter-num>66</Iteration_iter-num>
+  <Iteration_query-ID>Query_44069</Iteration_query-ID>
+  <Iteration_query-def>dnamaster_66</Iteration_query-def>
+  <Iteration_query-len>72</Iteration_query-len>
+<Iteration_hits>
+</Iteration_hits>
+  <Iteration_stat>
+    <Statistics>
+      <Statistics_db-num>0</Statistics_db-num>
+      <Statistics_db-len>0</Statistics_db-len>
+      <Statistics_hsp-len>0</Statistics_hsp-len>
+      <Statistics_eff-space>0</Statistics_eff-space>
+      <Statistics_kappa>-1</Statistics_kappa>
+      <Statistics_lambda>-1</Statistics_lambda>
+      <Statistics_entropy>-1</Statistics_entropy>
+    </Statistics>
+  </Iteration_stat>
+</Iteration>
+<Iteration>
+  <Iteration_iter-num>67</Iteration_iter-num>
+  <Iteration_query-ID>Query_44070</Iteration_query-ID>
+  <Iteration_query-def>dnamaster_67</Iteration_query-def>
+  <Iteration_query-len>89</Iteration_query-len>
+<Iteration_hits>
+</Iteration_hits>
+  <Iteration_stat>
+    <Statistics>
+      <Statistics_db-num>0</Statistics_db-num>
+      <Statistics_db-len>0</Statistics_db-len>
+      <Statistics_hsp-len>0</Statistics_hsp-len>
+      <Statistics_eff-space>0</Statistics_eff-space>
+      <Statistics_kappa>-1</Statistics_kappa>
+      <Statistics_lambda>-1</Statistics_lambda>
+      <Statistics_entropy>-1</Statistics_entropy>
+    </Statistics>
+  </Iteration_stat>
+</Iteration>
+<Iteration>
+  <Iteration_iter-num>68</Iteration_iter-num>
+  <Iteration_query-ID>Query_44071</Iteration_query-ID>
+  <Iteration_query-def>dnamaster_68</Iteration_query-def>
+  <Iteration_query-len>113</Iteration_query-len>
+<Iteration_hits>
+</Iteration_hits>
+  <Iteration_stat>
+    <Statistics>
+      <Statistics_db-num>0</Statistics_db-num>
+      <Statistics_db-len>0</Statistics_db-len>
+      <Statistics_hsp-len>0</Statistics_hsp-len>
+      <Statistics_eff-space>0</Statistics_eff-space>
+      <Statistics_kappa>-1</Statistics_kappa>
+      <Statistics_lambda>-1</Statistics_lambda>
+      <Statistics_entropy>-1</Statistics_entropy>
     </Statistics>
   </Iteration_stat>
 </Iteration>

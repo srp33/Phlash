@@ -59,11 +59,11 @@ export default new Router({
       name: 'More',
       component: More,
     },
-    // {
-    //   path: '/test',
-    //   name: 'Test',
-    //   component: Upload_Test,
-    // },
+    {
+      path: '/test',
+      name: 'Test',
+      component: Upload_Test,
+    },
     {
       path: '/blast/:id',
       name: 'Blast',

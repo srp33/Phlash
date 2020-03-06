@@ -1,0 +1,11 @@
+total 32
+drwxr-xr-x  10 ericasuh  staff   320 Feb 25 13:36 .
+drwxr-xr-x+ 58 ericasuh  staff  1856 Feb 25 11:58 ..
+-rw-r--r--@  1 ericasuh  staff  6148 Jan 28 15:28 .DS_Store
+drwxr-xr-x  13 ericasuh  staff   416 Jan 28 16:56 .git
+-rw-r--r--@  1 ericasuh  staff   256 Feb 11 13:42 .gitignore
+-rw-r--r--   1 ericasuh  staff  4066 Dec  9 12:01 README.md
+drwxr-xr-x  11 ericasuh  staff   352 Jan  7 11:56 client
+-rw-r--r--   1 ericasuh  staff     0 Feb 25 13:36 output.txt
+drwxr-xr-x   6 ericasuh  staff   192 Feb 11 12:48 phlash
+drwxr-xr-x  23 ericasuh  staff   736 Feb 25 13:06 server

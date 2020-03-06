@@ -14,12 +14,12 @@
                     The "Action" column must contain only "Done"s for you to continue. Once all anotations are complete, click the button below to continue.
                 </p>
             </div>
+            <button class="btn btn-primary">
+                <strong>BLAST</strong>
+            </button><br/><br/>
             <button class="btn btn-primary" @click="downloadGBFile">
                 <strong>Create GenBank File</strong>
             </button>
-            <router-link  to="/genbank">
-                <button class="btn btn-success"><strong>Next: Create GenBank File</strong></button>
-            </router-link>
             <br><br>
             <table class="table table-hover" align="center">
                 <thead>

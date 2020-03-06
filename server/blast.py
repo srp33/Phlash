@@ -30,6 +30,20 @@ def run_blast(fasta_file, start, stop, e_value_thresh):
     blast = parse_blast(e_value_thresh)
     return blast
 
+# def run_blast(e_value_thresh):
+#     print("In `run_blast`")
+#     sequences = open("test.fasta").read()
+#     result_handle = NCBIWWW.qblast("blastp", "nr", sequences)
+#     print("Finished BLAST query")
+
+#     with open("blast.xml", "w") as out_handle:
+#         print("Writing BLAST results to file...")
+#         blast_results = result_handle.read()
+#         out_handle.write(blast_results)
+#     result_handle.close()
+
+# run_blast(1e-7)
+
 def parse_blast(e_value_thresh):
     blast = []
     for record in NCBIXML.parse(open("blast.xml")): 
