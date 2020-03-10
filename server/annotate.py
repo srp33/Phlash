@@ -245,44 +245,80 @@ def need_more_info_genes(cds_id, genemark_gdata_file):
 
 
 # --------------------------
-# Create FASTA for input into Sequin's GenBank
-def create_fasta(fasta_file):
-	record = SeqIO.read(fasta_file, "fasta")
-	genome = record.seq
-	output = ""
-	for cds in DNAMaster.query.order_by(DNAMaster.start).all():
-		output += f">{cds.id}\n"
-		sequence = genome[cds.start - 1: cds.stop]
-		# sequence = Seq.translate(sequence=genome[cds.start - 1: cds.stop], table=11)
-		output += f"{sequence}\n"
-	with open("nuc.fasta", "w") as out_handle:
-		out_handle.write(output)
+# Get start options for failed gene
+def get_starts(cds_id, genome):
+   bacteria_start_codons = ["ATG", "GTG", "TTG"]
+   dnamaster = DNAMaster.query.filter_by(id=cds_id, status="Fail").first()
+   genemark = GeneMark.query.filter_by(stop=dnamaster.stop).first()
+
+   start = (dnamaster.start - 1) - 3  #  Subtract 1 because indexing begins with 0. Subtract 3 to account for 3 bases in a codon.
+   starts = []
+   while start >= genemark.start - 9:
+      if dnamaster.strand == '+':
+         codon = genome[start: start + 3]
+      elif dnamaster.strand == '-':
+         codon = genome.reverse_complement()[start: start + 3]
+      if codon in bacteria_start_codons:
+         starts.append(start + 1)
+      start = start - 3
+
+   return starts
+
+# Get forward or reverse sequence
+def get_sequence(genome, strand, start, stop):
+   if strand == '-':
+      return genome.reverse_complement()[start - 1: stop]
+   else:
+      return genome[start - 1: stop]
+
+# Create FASTA for input into BLAST
+def create_fasta(fasta_file, genemark_gdata_file):
+   record = SeqIO.read(fasta_file, "fasta")
+   genome = record.seq
+   output = ""
+
+   for cds in DNAMaster.query.order_by(DNAMaster.start).all():
+      if cds.status == "Pass" or cds.status == "Need more information":
+         output += f">{cds.id}, {cds.start}-{cds.stop}\n"
+         output += f"{Seq.translate(sequence=get_sequence(genome, cds.strand, cds.start, cds.stop), table=11)}\n"
+      elif cds.status == "Fail":
+         output += f">{cds.id}, {cds.start}-{cds.stop}\n"
+         output += f"{Seq.translate(sequence=get_sequence(genome, cds.strand, cds.start, cds.stop), table=11)}\n"
+         starts = get_starts(cds.id, genome)
+         for i in range(len(starts)):
+            output += f">{cds.id}_{i + 1}, {starts[i]}-{cds.stop}\n"
+            output += f"{Seq.translate(sequence=get_sequence(genome, cds.strand, starts[i], cds.stop), table=11)}\n"
+
+   with open("sequences.fasta", "w") as out_handle:
+      out_handle.write(output)
+   
+   return "sequences.fasta"
 
 # Create modified GenBank file for input into Sequin
 def modify_gb(gb_file):
-    out_file_init = re.search(r'uploads/(.*).(\w*)', gb_file)
-    out_file = str(out_file_init.group(1)) + '_modified.' + str(out_file_init.group(2))
-    final_genes = create_final_dict()
-    final_features = []
-    for record in SeqIO.parse(open(gb_file, "r"), "genbank"):
-        for feature in record.features:
-            if feature.type == "gene" or feature.type == "CDS":
-                locus_tag = feature.qualifiers["locus_tag"][0]
-                if locus_tag in final_genes:
-                    new_start = final_genes[locus_tag]['start']
-                    if feature.location.strand == 1:
-                        feature.location = SeqFeature.FeatureLocation(SeqFeature.ExactPosition(new_start - 1), 
-                        SeqFeature.ExactPosition(feature.location.end.position), 
-                        feature.location.strand)
-                    else:
-                        feature.location = SeqFeature.FeatureLocation(
-                        SeqFeature.ExactPosition(feature.location.start.position),
-                        SeqFeature.ExactPosition(new_start), feature.location.strand)
-            final_features.append(feature)  # Append final features
-        record.features = final_features
-        with open(out_file, "w") as new_gb:
-            SeqIO.write(record, new_gb, "genbank")
-    return out_file
+   out_file_init = re.search(r'uploads/(.*).(\w*)', gb_file)
+   out_file = str(out_file_init.group(1)) + '_modified.' + str(out_file_init.group(2))
+   final_genes = create_final_dict()
+   final_features = []
+   for record in SeqIO.parse(open(gb_file, "r"), "genbank"):
+      for feature in record.features:
+         if feature.type == "gene" or feature.type == "CDS":
+               locus_tag = feature.qualifiers["locus_tag"][0]
+               if locus_tag in final_genes:
+                  new_start = final_genes[locus_tag]['start']
+                  if feature.location.strand == 1:
+                     feature.location = SeqFeature.FeatureLocation(SeqFeature.ExactPosition(new_start - 1), 
+                     SeqFeature.ExactPosition(feature.location.end.position), 
+                     feature.location.strand)
+                  else:
+                     feature.location = SeqFeature.FeatureLocation(
+                     SeqFeature.ExactPosition(feature.location.start.position),
+                     SeqFeature.ExactPosition(new_start), feature.location.strand)
+         final_features.append(feature)  # Append final features
+      record.features = final_features
+      with open(out_file, "w") as new_gb:
+         SeqIO.write(record, new_gb, "genbank")
+   return out_file
 
 
 def create_final_dict():

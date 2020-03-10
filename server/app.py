@@ -47,8 +47,8 @@ def upload_file():
    response_object = {'status': 'success'}
    response_object["uploaded"] = []
    response_object["not_allowed"] = []
-   response_object["required"] = []
-   response_object["already_have"] = []
+   response_object["required"] = ["fasta", "genbank", "gdata", "ldata"]
+   # response_object["already_have"] = []
 
    # # generate GUUID
    # file_id = str(uuid.uuid4())
@@ -64,17 +64,17 @@ def upload_file():
       if request.files.getlist('files') is None: 
          response_object["status"]: "request.files.getlist('files') is None"
       else:
-         for curr_file in os.listdir(UPLOAD_FOLDER):
-            if os.path.isfile(curr_file):
-               file_ext = curr_file.rsplit('.', 1)[1].lower()
-               if file_ext in ['fasta', 'fna', 'faa', 'ffn', 'frn']:
-                  response_object["already_have"].append("fasta")
-               elif file_ext in ['gb', 'gbk']:
-                  response_object["already_have"].append("genbank")
-               elif file_ext == "gdata":
-                  response_object["already_have"].append("gdata")
-               elif file_ext == "ldata":
-                  response_object["already_have"].append("ldata")
+         # for curr_file in os.listdir(UPLOAD_FOLDER):
+         #    if os.path.isfile(curr_file):
+         #       file_ext = curr_file.rsplit('.', 1)[1].lower()
+         #       if file_ext in ['fasta', 'fna', 'faa', 'ffn', 'frn']:
+         #          response_object["already_have"].append("fasta")
+         #       elif file_ext in ['gb', 'gbk']:
+         #          response_object["already_have"].append("genbank")
+         #       elif file_ext == "gdata":
+         #          response_object["already_have"].append("gdata")
+         #       elif file_ext == "ldata":
+         #          response_object["already_have"].append("ldata")
 
          for file in request.files.getlist('files'):
             if file and allowed_file(file.filename):
@@ -85,6 +85,7 @@ def upload_file():
                response_object["uploaded"].append(f"{file_name}")
                file_ext = file_name.rsplit('.', 1)[1].lower()
                print(file_ext)
+
                if file_ext in ['fasta', 'fna', 'faa', 'ffn', 'frn']:
                   response_object["required"].remove("fasta")
                elif file_ext in ['gb', 'gbk']:
@@ -95,6 +96,8 @@ def upload_file():
                   response_object["required"].remove("gdata")
                elif file_ext == "ldata":
                   response_object["required"].remove("ldata")
+                  genemark_ldata_file = get_file("GeneMark_ldata")
+                  annotate.parse_genemark_ldata(genemark_ldata_file)
             elif file and allowed_file(file.filename) == False:
                response_object["not_allowed"].append(file.filename)
             else:
@@ -136,9 +139,15 @@ def view_dnamaster():
                      status="None")
       start_exists = DNAMaster.query.filter_by(start=post_data.get('start')).first()
       stop_exists = DNAMaster.query.filter_by(stop=post_data.get('stop')).first()
-      if start_exists and stop_exists:
+      id_exists = DNAMaster.query.filter_by(id=post_data.get('id')).first()
+      if cds.start > cds.stop or cds.start == cds.stop:
+         response_object['message'] = 'Start is not less than start. CDS not added.'
+      elif start_exists and stop_exists:
          if start_exists.id == stop_exists.id:
-            response_object['message'] = 'CDS with the same start and stop positions already exists.'
+            response_object['message'] = 'Start and stop already exists. CDS not added.'
+      elif id_exists:
+         if id_exists.id == cds.id:
+            response_object['message'] = 'ID already exists. CDS not added.'
       else:
          db.session.add(cds)
          db.session.commit()
@@ -173,77 +182,81 @@ def single_cds(cds_id):
          DNAMaster.query.filter_by(id=cds_id).delete()
          db.session.commit()
          response_object['message'] = 'CDS removed!'
+      else:
+         response_object['message'] = 'Error: CDS could not be deleted.'
    
    return jsonify(response_object)
 
 
-@app.route('/api/upload_genemark', methods=['GET', 'POST'])
-def upload_gm_file():
-    """
-    User uploads GeneMark file (ldata). Add data from file to the database.
-    POST method uploads file.
-    GET method adds data in file to database.
-    """
-    create_directory(UPLOAD_FOLDER)
-    response_object = {'status': 'success'}
+# @app.route('/api/upload_genemark', methods=['GET', 'POST'])
+# def upload_gm_file():
+#     """
+#     User uploads GeneMark file (ldata). Add data from file to the database.
+#     POST method uploads file.
+#     GET method adds data in file to database.
+#     """
+#     create_directory(UPLOAD_FOLDER)
+#     response_object = {'status': 'success'}
 
-    if request.method == 'POST':
-        file = request.files['file']
-        if file and allowed_file(file.filename):
-            file_name = secure_filename(file.filename)
-            # generate GUUID
-            file_id = str(uuid.uuid4())
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], file_name))
-            # save file info into DB
-            file = Files(id=file_id, name=file_name, \
-                         date=datetime.datetime.now(datetime.timezone.utc))
-            db.session.add(file)
-            db.session.commit()
-        response_object['message'] = f"{file_name} uploaded successfully."
+#     if request.method == 'POST':
+#         file = request.files['file']
+#         if file and allowed_file(file.filename):
+#             file_name = secure_filename(file.filename)
+#             # generate GUUID
+#             file_id = str(uuid.uuid4())
+#             file.save(os.path.join(app.config['UPLOAD_FOLDER'], file_name))
+#             # save file info into DB
+#             file = Files(id=file_id, name=file_name, \
+#                          date=datetime.datetime.now(datetime.timezone.utc))
+#             db.session.add(file)
+#             db.session.commit()
+#         response_object['message'] = f"{file_name} uploaded successfully."
 
-    if request.method == 'GET':
-        genemark_ldata_file = get_file("GeneMark_ldata")
-        annotate.parse_genemark_ldata(genemark_ldata_file)
-        annotate.compare()
-        response_object['message'] = "Data added to database."
+#     if request.method == 'GET':
+#         genemark_ldata_file = get_file("GeneMark_ldata")
+#         annotate.parse_genemark_ldata(genemark_ldata_file)
+#         annotate.compare()
+#         response_object['message'] = "Data added to database."
 
-    return jsonify(response_object)
+#     return jsonify(response_object)
 
 
-@app.route('/annotate_data', methods=['GET', 'POST'])
+@app.route('/annotate', methods=['GET', 'POST'])
 def annotate_data():
-    """
-    Compares DNA Master's predictions against GeneMark's. 
-    GET method shows all the DNA Master predictions with a status and action item for each.
-    """
-    response_object = {'status': 'success'}
+   """
+   Compares DNA Master's predictions against GeneMark's. 
+   GET method shows all the DNA Master predictions with a status and action item for each.
+   """
+   response_object = {'status': 'success'}
 
-    if request.method == "GET":
-        dnamaster = []
-        for cds in db.session.query(DNAMaster).order_by(DNAMaster.start):
-            dnamaster.append({'id': cds.id,
-                             'start': cds.start,
-                             'stop': cds.stop,
-                             'strand': cds.strand,
-                             'function': cds.function,
-                             'status': cds.status})
-        response_object['dnamaster'] = dnamaster
+   if request.method == "GET":
+      annotate.compare()
+      dnamaster = []
+      for cds in db.session.query(DNAMaster).order_by(DNAMaster.start):
+         dnamaster.append({'id': cds.id,
+                           'start': cds.start,
+                           'stop': cds.stop,
+                           'strand': cds.strand,
+                           'function': cds.function,
+                           'status': cds.status})
+      response_object['dnamaster'] = dnamaster
 
-    if request.method == "POST":
-        # f = open("example.gb", "r")
-        # return f.read()
-        # ----------------------------
-        gb_file = get_file("GenBank")
-        out_file = annotate.modify_gb(gb_file)
-        f = open(out_file, "r")
-        return f.read()
-        
+   if request.method == "POST":
+      # -------for future reference: downloading GENBANK file----------
+      # gb_file = get_file("GenBank")
+      # out_file = annotate.modify_gb(gb_file)
+      fasta_file = get_file("Fasta")
+      genemark_gdata_file = get_file("GeneMark_gdata")
+      outfile = annotate.create_fasta(fasta_file, genemark_gdata_file)
+      f = open(outfile, "r")
+      return f.read()
+      
 
 
-    return jsonify(response_object)
+   return jsonify(response_object)
 
 
-@app.route('/annotate_data/failed/<cds_id>', methods=['GET', 'POST', 'PUT'])
+@app.route('/annotate/failed/<cds_id>', methods=['GET', 'POST', 'PUT'])
 def failed_annotation(cds_id):
     """
     Gives user new start options for CDSs with 'failed' status.
@@ -276,15 +289,15 @@ def failed_annotation(cds_id):
         response_object['lowest_start'] = lowest_start
         response_object['start_options'] = start_options
 
-        gdata_df = pd.read_csv(genemark_gdata_file, sep='\t', skiprows=16)
-        gdata_df.columns = ['Base', '1', '2', '3', '4', '5', '6']
-        gdata_df = gdata_df[gdata_df.Base.isin(range(cds.start-100, cds.stop+100))]
-        # response_object['base'] = list(gdata_df['Base'])
-        # response_object['one'] = list(gdata_df['1'])
-        direct_graph = graph.make_graph_direct(gdata_df, cds.start, cds.stop, start_options)
-        comp_graph = graph.make_graph_complementary(gdata_df, cds.start, cds.stop, start_options)
-        response_object['direct_graph'] = direct_graph
-        response_object['comp_graph'] = comp_graph
+      #   gdata_df = pd.read_csv(genemark_gdata_file, sep='\t', skiprows=16)
+      #   gdata_df.columns = ['Base', '1', '2', '3', '4', '5', '6']
+      #   gdata_df = gdata_df[gdata_df.Base.isin(range(cds.start-100, cds.stop+100))]
+      #   # response_object['base'] = list(gdata_df['Base'])
+      #   # response_object['one'] = list(gdata_df['1'])
+      #   direct_graph = graph.make_graph_direct(gdata_df, cds.start, cds.stop, start_options)
+      #   comp_graph = graph.make_graph_complementary(gdata_df, cds.start, cds.stop, start_options)
+      #   response_object['direct_graph'] = direct_graph
+      #   response_object['comp_graph'] = comp_graph
 
     if request.method == "POST":
         print("In fail post")
@@ -311,7 +324,7 @@ def failed_annotation(cds_id):
     return jsonify(response_object)
 
 
-@app.route('/annotate_data/more/<cds_id>', methods=['GET', 'PUT', 'POST'])
+@app.route('/annotate/more/<cds_id>', methods=['GET', 'PUT', 'POST'])
 def do_more_annotation(cds_id):
     """
 

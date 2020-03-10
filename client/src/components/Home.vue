@@ -24,7 +24,10 @@
         </ul> -->
     </div>
     <router-link to="/upload">
-        <button class="btn btn-primary">Next: Upload DNA Master file</button>
+        <button class="btn btn-light"><strong>Next</strong></button>
     </router-link>
 </div>
 </template>
+
+<style scoped>
+</style>

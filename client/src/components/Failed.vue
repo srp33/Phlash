@@ -194,7 +194,7 @@ export default {
     },
     methods: {
         getData(cdsID) {
-            axios.get(`http://localhost:5000/annotate_data/failed/${cdsID}`)
+            axios.get(`http://localhost:5000/annotate/failed/${cdsID}`)
             .then(response => {
                 this.currentCDS = response.data.cds;
                 this.startOptions = response.data.start_options;
@@ -224,7 +224,7 @@ export default {
             this.updateCDS(payload, this.updatedCDS.id);
         },
         updateCDS(payload, cdsID) {
-            axios.put(`http://localhost:5000/annotate_data/failed/${cdsID}`, payload)
+            axios.put(`http://localhost:5000/annotate/failed/${cdsID}`, payload)
             .then(() => {
                 this.$router.push("/annotate_data");
             })
@@ -247,7 +247,7 @@ export default {
             this.message = 'May take a few minutes. Please wait.'
             this.showMessage = true;
             this.showSpinner = true;
-            axios.post(`http://localhost:5000/annotate_data/failed/${cdsID}`)
+            axios.post(`http://localhost:5000/annotate/failed/${cdsID}`)
                 .then(response => {
                     this.blastResults = response.data.blast;
                     this.getData(this.$route.params.id);

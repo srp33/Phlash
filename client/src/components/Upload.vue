@@ -12,7 +12,7 @@
             <li v-if="allUploaded">You have uploaded the required files. Thank you!</li>
          </ul>
          <router-link  to="/dnamaster" v-if="allUploaded">
-            <button class="btn btn-primary btn-large" id="next-top"><strong>Next</strong></button>
+            <button class="btn btn-light" id="next-top"><strong>Next</strong></button>
          </router-link>
       </div>
 
@@ -22,27 +22,25 @@
       <div class="upload">
          <form id="upload-form" role="form" enctype="multipart/form-data">
             <div class="upload-btn-wrapper">
-               <button class="btn btn-upload">Drag files here or<br/>click to browse!</button>
+               <button class="btn btn-upload">Drag files here or<br/>click to browse!<br/>
+                  <div class="selected-files" v-if="showSelectedFiles">
+                     <strong>SELECTED FILES:</strong>
+                     <ul>
+                        <li v-for="file in files" :key="file">
+                           {{ file.name }}
+                        </li>
+                     </ul>
+                  </div>
+               </button>
                <input type="file" id="files" ref="files" name="files" multiple v-on:change="handleFilesUpload" class="form-control">
-            </div>
-            <div class="selected-files" v-if="showSelectedFiles">
-               <strong>SELECTED FILES:</strong>
-               <ul>
-                  <li v-for="file in files" :key="file">
-                     {{ file.name }}
-                  </li>
-               </ul>
             </div>
          </form>
       </div>
 
-      <button class="btn btn-success btn-upload-submit" v-if="showSelectedFiles" @click="upload">Upload</button>
+      <button class="btn btn-dark btn-upload-submit" v-if="showSelectedFiles" @click="upload"><strong>Upload</strong></button>
 
-      <!-- <br>
-      <button class="btn btn-primary" @click="updateDatabase">Add DNA Master data to database</button>
-      <br><br> -->
       <router-link  to="/dnamaster" v-if="allUploaded">
-         <button class="btn btn-primary" id="next-bottom"><strong>Next</strong></button>
+         <button class="btn btn-light" id="next-bottom"><strong>Next</strong></button>
       </router-link>
    </div>
 </template>
@@ -184,12 +182,22 @@ h1 {
 
 .selected-files {
    display: inline-block;
-   text-align: left;
+   /* text-align: left; */
    margin: 10px;
+}
+
+.selected-files strong {
+   color: #474747;
+   font-size: 16px;
+   text-align: center;
 }
 
 .selected-files ul {
    margin: 0;
+   color: #474747;
+   font-size: 16px;
+   font-weight: normal;
+   text-align: left;
 }
 
 .btn-upload-submit {

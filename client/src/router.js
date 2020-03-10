@@ -45,17 +45,17 @@ export default new Router({
       component: Upload_GM,
     },
     {
-      path: '/annotate_data',
+      path: '/annotate',
       name: 'Annotation',
       component: Annotation,
     },
     {
-      path: '/annotate_data/failed/:id',
+      path: '/annotate/failed/:id',
       name: 'Failed',
       component: Failed,
     },
     {
-      path: '/annotate_data/more/:id',
+      path: '/annotate/more/:id',
       name: 'More',
       component: More,
     },
