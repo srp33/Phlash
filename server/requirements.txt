@@ -3,7 +3,7 @@ astroid==1.6.6
 attrs==19.3.0
 backcall==0.1.0
 biopython==1.76
-bleach==3.1.0
+bleach==3.1.1
 decorator==4.4.0
 defusedxml==0.6.0
 entrypoints==0.3
