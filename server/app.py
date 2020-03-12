@@ -14,7 +14,10 @@ DEBUG = True
 ROOT = os.path.dirname(os.path.abspath(__file__))
 UPLOAD_FOLDER = os.path.join(ROOT, 'uploads')
 DATABASE = "sqlite:///{}".format(os.path.join(ROOT, "database.db"))
-ALLOWED_EXTENSIONS = set(['gb', 'gbk', 'fasta', 'fna', 'faa', 'ffn', 'frn', 'gdata', 'ldata'])
+FASTA_EXTENSIONS = set(['fasta', 'fna'])
+GENBANK_EXTENSIONS = set(['gb', 'gbk'])
+GDATA_EXTENSION = set(['gdata'])
+LDATA_EXTENSION = set(['ldata'])
 
 # instantiate the app
 app = Flask(__name__)
@@ -36,77 +39,44 @@ def ping_pong():
     return jsonify('pong!')
 
 # real routers ------------------------------------------------------------------
-@app.route('/api/upload', methods=['GET', 'POST'])
+@app.route('/api/upload', methods=['POST'])
 def upload_file():
    """
-   User uploads DNA Master file (genbank). Add data from file to the database.
+   User uploads all required files.
    POST method uploads file.
-   GET method adds data in file to database.
    """
    create_directory(UPLOAD_FOLDER)
    response_object = {'status': 'success'}
-   response_object["uploaded"] = []
-   response_object["not_allowed"] = []
-   response_object["required"] = ["fasta", "genbank", "gdata", "ldata"]
-   # response_object["already_have"] = []
-
-   # # generate GUUID
-   # file_id = str(uuid.uuid4())
-   # file.save(os.path.join(app.config['UPLOAD_FOLDER'], file_name))
-   # save file info into DB
-   # file = Files(id=file_id, name=file_name, \
-   #              date=datetime.datetime.now(datetime.timezone.utc))
-   # db.session.add(file)
-   #    db.session.commit()
-   # response_object['message'] = f"{file_name} uploaded successfully."
 
    if request.method == "POST":
-      if request.files.getlist('files') is None: 
-         response_object["status"]: "request.files.getlist('files') is None"
+      if 'file' not in request.files: 
+         response_object["status"]: "'file' not in request.files"
+         print("in fail")
       else:
-         # for curr_file in os.listdir(UPLOAD_FOLDER):
-         #    if os.path.isfile(curr_file):
-         #       file_ext = curr_file.rsplit('.', 1)[1].lower()
-         #       if file_ext in ['fasta', 'fna', 'faa', 'ffn', 'frn']:
-         #          response_object["already_have"].append("fasta")
-         #       elif file_ext in ['gb', 'gbk']:
-         #          response_object["already_have"].append("genbank")
-         #       elif file_ext == "gdata":
-         #          response_object["already_have"].append("gdata")
-         #       elif file_ext == "ldata":
-         #          response_object["already_have"].append("ldata")
-
-         for file in request.files.getlist('files'):
-            if file and allowed_file(file.filename):
-               print(allowed_file(file.filename))
-               file_name = secure_filename(file.filename)
+         print("in success")
+         file = request.files['file']
+         fileType = request.form['fileType']
+         if file:
+            file_name = secure_filename(file.filename)
+            if (fileType == "fasta" and allowed_file(file_name, FASTA_EXTENSIONS)) or \
+               (fileType == "genbank" and allowed_file(file_name, GENBANK_EXTENSIONS)) or \
+               (fileType == "gdata" and allowed_file(file_name, GDATA_EXTENSION)) or \
+               (fileType == "ldata" and allowed_file(file_name, LDATA_EXTENSION)):
                file.save(os.path.join(app.config['UPLOAD_FOLDER'], file_name))
-               print(' * file uploaded', file_name)
-               response_object["uploaded"].append(f"{file_name}")
+               response_object["uploaded"] = file_name
+               print(' * uploaded', file_name)
                file_ext = file_name.rsplit('.', 1)[1].lower()
-               print(file_ext)
 
-               if file_ext in ['fasta', 'fna', 'faa', 'ffn', 'frn']:
-                  response_object["required"].remove("fasta")
-               elif file_ext in ['gb', 'gbk']:
-                  response_object["required"].remove("genbank")
+               if file_ext in ['gb', 'gbk']:
                   genbank_file = get_file("GenBank")
                   annotate.parse_genbank(genbank_file)
-               elif file_ext == "gdata":
-                  response_object["required"].remove("gdata")
                elif file_ext == "ldata":
-                  response_object["required"].remove("ldata")
                   genemark_ldata_file = get_file("GeneMark_ldata")
                   annotate.parse_genemark_ldata(genemark_ldata_file)
-            elif file and allowed_file(file.filename) == False:
-               response_object["not_allowed"].append(file.filename)
             else:
-               response_object["status"] = "error"
-
-   # if request.method == 'GET':
-   #    genbank_file = get_file("GenBank")
-   #    annotate.parse_genbank(genbank_file)
-   #    response_object['message'] = "Data added to database."
+               response_object["not_allowed"] = file.filename
+         else:
+            response_object["status"] = "error"
 
    return jsonify(response_object)
 
@@ -425,8 +395,8 @@ if __name__ == '__main__':
 # ---------- HELPER FUNCTIONS ----------
 
 # check file extension. only allow specific ones
-def allowed_file(filename):
-    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+def allowed_file(filename, allowed_extensions):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in allowed_extensions
 
 # create directory
 def create_directory(directory):
