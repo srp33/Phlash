@@ -1,0 +1,130 @@
+<template>
+   <div class="container">
+      <div class="headers">
+         <h1>ID: {{ $route.params.id }}</h1>
+         <h4>Start: {{ currentCDS.start }}</h4>
+         <h4>Stop: {{ currentCDS.stop }}</h4>
+         <h4>Status: {{ currentCDS.status }}</h4>
+      </div>
+      <div class="alert alert-primary">
+         <p><strong>Instructions</strong></p>
+         <p>Choose a function for this gene call from the BLAST results below.</p>
+         <p><strong>Your function selection:</strong> {{ newFunction }}</p>
+         <button type="button" class="btn btn-light" @click="editCDS" v-if="newFunction!=='None'">
+            <strong>Update {{ $route.params.id }}</strong>
+         </button>
+      </div>
+      <div class="blast-results">
+         <BlastResults :blastResults="blastResults" @newFunction="setFunction" />
+      </div>
+      <div class="info-bottom">
+         <p><strong>Your function selection:</strong> {{ newFunction }}</p>
+         <button type="button" class="btn btn-light" @click="editCDS" v-if="newFunction!=='None'">
+            <strong>Update {{ $route.params.id }}</strong>
+         </button>
+      </div>
+   </div>
+</template>
+
+<script>
+import axios from 'axios';
+import BlastResults from '../components/BlastResults.vue'
+
+export default {
+   name: 'Pass',
+   components: {
+      BlastResults
+   },
+   data () {
+      return {
+         blastResults: [],
+         showFunction: false,
+         newFunction: 'None',
+         currentCDS: {
+            id: '',
+            start: '',
+            stop: '',
+            strand: '',
+            function: '',
+            status: '',
+         },
+         updatedCDS: {
+            id: '',
+            start: '',
+            stop: '',
+            strand: '',
+            function: '',
+            status: '',
+         },
+      }
+   },
+   created() {
+      this.getData(this.$route.params.id);
+   },
+   methods: {
+      getData(cdsID) {
+         axios.get(`http://localhost:5000/api/annotations/pass/${this.$route.params.currentUser}/${cdsID}`)
+         .then(response => {
+            this.currentCDS = response.data.cds;
+            this.blastResults = response.data.blast;
+         })
+         .catch(error => {
+            console.error(error);
+         });
+      },
+      setFunction(funct) {
+         this.newFunction = funct;
+      },
+      editCDS() {
+         this.updatedCDS = this.currentCDS;
+         this.updatedCDS.function = this.newFunction;
+         const payload = {
+            id: this.updatedCDS.id,
+            start: this.updatedCDS.start,
+            stop: this.updatedCDS.stop,
+            strand: this.updatedCDS.strand,
+            function: this.updatedCDS.function,
+            status: 'Pass',
+         };
+         this.updateCDS(payload, this.updatedCDS.id);
+      },
+      updateCDS(payload, cdsID) {
+         axios.put(`http://localhost:5000/api/annotations/pass/${this.$route.params.currentUser}/${cdsID}`, payload)
+         .then(() => {
+            this.$router.push(`/annotations/${this.$route.params.currentUser}`);
+         })
+         .catch(error => {
+            console.error(error);
+         });
+      },
+      keepOriginal() {
+         const payload = {
+            id: this.currentCDS.id,
+            start: this.currentCDS.start,
+            stop: this.currentCDS.stop,
+            strand: this.currentCDS.strand,
+            function: this.currentCDS.function,
+            status: this.currentCDS.status,
+         };
+         this.updateCDS(payload, this.currentCDS.id);
+      },
+   },
+}
+</script>
+
+<style scoped>
+/* ----- Title and Headers ----- */
+.headers {
+   margin: 40px auto;
+}
+
+.alert-primary {
+   text-align: left;
+   margin: 40px auto;
+}
+
+/* ----- ----- */
+.info-bottom {
+   margin: 50px auto;
+}
+</style>

@@ -9,8 +9,8 @@
          <b>add</b>, <b>update</b>, or <b>delete</b> the appropriate coding
          sequences.
       </p>
-      <p>Click `Next` when you are ready to annotate!</p>
-      <router-link to="/annotate">
+      <p>Click `Next` when you are ready to continue.</p>
+      <router-link :to="{ name: 'Blast', params: {currentUser: $route.params.currentUser} }">
          <button class="btn btn-light"><strong>Next</strong></button>
       </router-link>
    </div>
@@ -47,6 +47,9 @@
          </table>
       </div>
    </div>
+   <router-link :to="{ name: 'Blast', params: {currentUser: $route.params.currentUser} }">
+      <button class="btn btn-light btn-bottom"><strong>Next</strong></button>
+   </router-link>
    <b-modal ref="addCDSModal" id="add-modal" title="Add a new CDS" hide-footer>
       <b-form @submit="onSubmitAdd" @reset="onResetAdd" align="left">
          <b-form-group label="ID:" label-for="add-id-input">
@@ -125,8 +128,8 @@ export default {
          },
          strandOptions: [
             { value: null, text: 'Please select a direction' },
-            { value: '+', text: '+ (Forward)' },
-            { value: '-', text: '- (Reverse)' }
+            { value: '+', text: '+ (Direct)' },
+            { value: '-', text: '- (Complementary)' }
          ],
          message: '',
          showMessage: false,
@@ -134,7 +137,7 @@ export default {
    },
    methods: {
       getData() {
-         axios.get('http://localhost:5000/dnamaster')
+         axios.get(`http://localhost:5000/api/dnamaster/${this.$route.params.currentUser}`)
          .then(response => {
             this.dnamaster = response.data.dnamaster;
          })
@@ -143,7 +146,7 @@ export default {
          });
       },
       addData(payload) {
-         axios.post("http://localhost:5000/dnamaster", payload)
+         axios.post(`http://localhost:5000/api/dnamaster/${this.$route.params.currentUser}`, payload)
          .then(response => {
             this.message = response.data.message;
             this.showMessage = true;
@@ -154,7 +157,7 @@ export default {
          });
       },
       deleteData(cdsID) {
-         axios.delete(`http://localhost:5000/dnamaster/${cdsID}`)
+         axios.delete(`http://localhost:5000/api/dnamaster/${this.$route.params.currentUser}/${cdsID}`)
          .then(response => {
             this.message = response.data.message;
             this.showMessage = true;
@@ -165,7 +168,7 @@ export default {
          });
       },
       updateData(payload, cdsID) {
-         axios.put(`http://localhost:5000/dnamaster/${cdsID}`, payload)
+         axios.put(`http://localhost:5000/api/dnamaster/${this.$route.params.currentUser}/${cdsID}`, payload)
          .then(response => {
             this.message = response.data.message;
             this.showMessage = true;
@@ -269,6 +272,10 @@ h1 {
 .alert-primary {
    text-align: left;
    margin: 40px auto;
+}
+
+.btn-bottom {
+   margin-bottom: 50px;
 }
 
 #add-btn {

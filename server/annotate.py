@@ -70,7 +70,7 @@ def calculate_avg_prob(probabilities):
 		total += probability
 
 	average = total / len(probabilities)
-	return round(average, 8)
+	return round(average, 4)
 
 
 # Helper: Make dictionary {key: frame #, value: avg probability} (used by failed_genes)
@@ -90,6 +90,25 @@ def make_avg_prob_dict(df, start, stop):
 		current_frame = current_frame + 1
 
 	return avg_probs
+
+# Helper: Merge two lists into one list of lists (tuple in list form)
+def merge(list1, list2): 
+   merged_list = [] 
+   for i in range(max((len(list1), len(list2)))): 
+      while True: 
+         try: 
+            tup = [list1[i], list2[i]]
+         except IndexError: 
+            if len(list1) > len(list2): 
+               list2.append('') 
+               tup = [list1[i], list2[i]]
+            elif len(list1) < len(list2): 
+               list1.append('') 
+               tup = [list1[i], list2[i]]
+            continue
+         merged_list.append(tup) 
+         break
+   return merged_list 
 
 
 # Helper: Parse through BLAST file (used by translate_and_blast)
@@ -277,7 +296,7 @@ def create_fasta(fasta_file, genemark_gdata_file):
    genome = record.seq
    output = ""
 
-   for cds in DNAMaster.query.order_by(DNAMaster.start).all():
+   for cds in db.session.query(DNAMaster).order_by(DNAMaster.start):
       if cds.status == "Pass" or cds.status == "Need more information":
          output += f">{cds.id}, {cds.start}-{cds.stop}\n"
          output += f"{Seq.translate(sequence=get_sequence(genome, cds.strand, cds.start, cds.stop), table=11)}\n"

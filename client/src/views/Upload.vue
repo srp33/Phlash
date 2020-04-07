@@ -19,7 +19,7 @@
          <li v-if="ldata">ldata file from GeneMark <strong>(.ldata)</strong></li>
          <li v-if="!fasta && !genbank && !gdata && !ldata">You have not uploaded any files yet.</li>
       </ul>
-      <router-link  to="/dnamaster" v-if="fasta && genbank && gdata && ldata">
+      <router-link  :to="{ name: 'DNAMaster', params: {currentUser: $route.params.currentUser} }" v-if="fasta && genbank && gdata && ldata">
          <button class="btn btn-light" id="next-top"><strong>Next</strong></button>
       </router-link>
    </div>
@@ -99,6 +99,9 @@
       </div>
       <button class="btn btn-dark btn-upload-submit" v-if="showLdataFile" @click="uploadFile('ldata')"><strong>Upload</strong></button>
    </div>
+   <router-link  :to="{ name: 'DNAMaster', params: {currentUser: $route.params.currentUser} }" v-if="fasta && genbank && gdata && ldata">
+      <button class="btn btn-light" id="next-top"><strong>Next</strong></button>
+   </router-link>
 </div>
 </template>
 
@@ -154,7 +157,7 @@ export default {
          else if (fileType === "gdata") data.append('file', this.gdataFile);
          else if (fileType === "ldata") data.append('file', this.ldataFile);
          data.append('fileType', fileType)
-         axios.post('http://localhost:5000/api/upload',
+         axios.post(`http://localhost:5000/api/upload/${this.$route.params.currentUser}`,
             data,
             {
                headers: {
