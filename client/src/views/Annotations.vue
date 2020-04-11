@@ -8,6 +8,8 @@
          has been assigned to each gene call from DNA Master. To understand what
          each status means, please refer to the definitions below.
       </p>
+      <p>
+         When the 'Action' column only contains 'Done', you will be able to download your GenBank file. 
       <br/>
       <p><strong>Status Definitions</strong></p>
       <p>
@@ -110,10 +112,10 @@ export default {
          axios.post(`http://localhost:5000/api/annotations/${this.$route.params.currentUser}`)
          .then(response => {
             let data = response.data;
-            const blob = new Blob([data], { type: 'application/fasta' })
+            const blob = new Blob([data], { type: 'application/gb' })
             let link = document.createElement('a')
             link.href = window.URL.createObjectURL(blob)
-            link.download = 'sequences_to_blast.fasta'
+            link.download = `${this.$route.params.currentUser}.gb`
             link.click()
             this.fileDownloaded = true;
          });
@@ -123,8 +125,8 @@ export default {
 </script>
 
 <style scoped>
-h2 {
-   margin-bottom: 40px;
+h1 {
+   margin: 40px auto;
 }
 
 .alert-primary {

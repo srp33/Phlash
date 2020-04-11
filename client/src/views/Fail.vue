@@ -83,7 +83,7 @@
          </table>
       </div>
    </div>
-   <!-- <div class="columns">
+   <div class="columns">
       <div class="column direct">
          <div id="chart-wrapper">
             <div id="chart-line">
@@ -110,7 +110,7 @@
             </div>
          </div>
       </div>
-   </div> -->
+   </div>
    <hr/>
    <div class="blast-results">
       <h3 style="text-align: center; margin: 20px;">BLAST Results</h3>
@@ -176,64 +176,64 @@ export default {
          showStart: false,
          newFunction: 'None',
          newStart: 0,
-         // series1: [{ data: [] }],
-         // series2: [{ data: [] }],
-         // series3: [{ data: [] }],
-         // series4: [{ data: [] }],
-         // series5: [{ data: [] }],
-         // series6: [{ data: [] }],
-         // options1: {
-         //    chart: { id: '1', group: 'direct', type: 'line', height: 170 },
-         //    stroke: { width: 1.5 },
-         //    colors: ['#008FFB'],
-         //    noData: { text: 'Loading...' },
-         //    yaxis: { min: 0, max: 1, tickAmount: 5, labels: { minWidth: 40 } },
-         //    xaxis: { min: 1, max: 10, tickAmount: 10 }
-         // },
-         // options2: {
-         //    chart: { id: '2', group: 'direct', type: 'line', height: 170 },
-         //    stroke: { width: 1.5 },
-         //    colors: ['#008FFB'],
-         //    noData: { text: 'Loading...' },
-         //    yaxis: { min: 0, max: 1, tickAmount: 5, labels: { minWidth: 40 }, 
-         //             title: { text: 'Direct Sequences'} },
-         //    xaxis: { min: 1, max: 10, tickAmount: 10 }
-         // },
-         // options3: {
-         //    chart: { id: '3', group: 'direct', type: 'line', height: 193 },
-         //    stroke: { width: 1.5 },
-         //    colors: ['#008FFB'],
-         //    noData: { text: 'Loading...' },
-         //    yaxis: { min: 0, max: 1, tickAmount: 5, labels: { minWidth: 40 } },
-         //    xaxis: { min: 1, max: 10, tickAmount: 10,
-         //             title: { text: 'Nucleotide Position'} }
-         // },
-         // options4: {
-         //    chart: { id: '4', group: 'comp', type: 'line', height: 170 },
-         //    stroke: { width: 1.5 },
-         //    colors: ['#008FFB'],
-         //    noData: { text: 'Loading...' },
-         //    yaxis: { min: 0, max: 1, tickAmount: 5, labels: { minWidth: 40 } },
-         //    xaxis: { min: 1, max: 10, tickAmount: 10 }
-         // },
-         // options5: {
-         //    chart: { id: '5', group: 'comp', type: 'line', height: 170 },
-         //    stroke: { width: 1.5 },
-         //    colors: ['#008FFB'],
-         //    noData: { text: 'Loading...' },
-         //    yaxis: { min: 0, max: 1, tickAmount: 5, labels: { minWidth: 40 },
-         //             title: { text: 'Complementary Sequences'} },
-         //    xaxis: { min: 1, max: 10, tickAmount: 10 }
-         // },
-         // options6: {
-         //    chart: { id: '6', group: 'comp', type: 'line', height: 193 },
-         //    stroke: { width: 1.5 },
-         //    colors: ['#008FFB'],
-         //    noData: { text: 'Loading...' },
-         //    yaxis: { min: 0, max: 1, tickAmount: 5, labels: { minWidth: 40 } },
-         //    xaxis: { min: 1, max: 10, tickAmount: 10,
-         //             title: { text: 'Nucleotide Position'}}
-         // },
+         series1: [{ data: [] }],
+         series2: [{ data: [] }],
+         series3: [{ data: [] }],
+         series4: [{ data: [] }],
+         series5: [{ data: [] }],
+         series6: [{ data: [] }],
+         options1: {
+            chart: { id: '1', group: 'direct', type: 'line', height: 170 },
+            stroke: { width: 1.5 },
+            colors: ['#008FFB'],
+            noData: { text: 'Loading...' },
+            yaxis: { min: 0, max: 1, tickAmount: 5, labels: { minWidth: 40 } },
+            xaxis: { min: 1, max: 10, tickAmount: 10 }
+         },
+         options2: {
+            chart: { id: '2', group: 'direct', type: 'line', height: 170 },
+            stroke: { width: 1.5 },
+            colors: ['#008FFB'],
+            noData: { text: 'Loading...' },
+            yaxis: { min: 0, max: 1, tickAmount: 5, labels: { minWidth: 40 }, 
+                     title: { text: 'Direct Sequences'} },
+            xaxis: { min: 1, max: 10, tickAmount: 10 }
+         },
+         options3: {
+            chart: { id: '3', group: 'direct', type: 'line', height: 193 },
+            stroke: { width: 1.5 },
+            colors: ['#008FFB'],
+            noData: { text: 'Loading...' },
+            yaxis: { min: 0, max: 1, tickAmount: 5, labels: { minWidth: 40 } },
+            xaxis: { min: 1, max: 10, tickAmount: 10,
+                     title: { text: 'Nucleotide Position'} }
+         },
+         options4: {
+            chart: { id: '4', group: 'comp', type: 'line', height: 170 },
+            stroke: { width: 1.5 },
+            colors: ['#008FFB'],
+            noData: { text: 'Loading...' },
+            yaxis: { min: 0, max: 1, tickAmount: 5, labels: { minWidth: 40 } },
+            xaxis: { min: 1, max: 10, tickAmount: 10 }
+         },
+         options5: {
+            chart: { id: '5', group: 'comp', type: 'line', height: 170 },
+            stroke: { width: 1.5 },
+            colors: ['#008FFB'],
+            noData: { text: 'Loading...' },
+            yaxis: { min: 0, max: 1, tickAmount: 5, labels: { minWidth: 40 },
+                     title: { text: 'Complementary Sequences'} },
+            xaxis: { min: 1, max: 10, tickAmount: 10 }
+         },
+         options6: {
+            chart: { id: '6', group: 'comp', type: 'line', height: 193 },
+            stroke: { width: 1.5 },
+            colors: ['#008FFB'],
+            noData: { text: 'Loading...' },
+            yaxis: { min: 0, max: 1, tickAmount: 5, labels: { minWidth: 40 } },
+            xaxis: { min: 1, max: 10, tickAmount: 10,
+                     title: { text: 'Nucleotide Position'}}
+         },
       }
    },
    created() {
@@ -245,67 +245,67 @@ export default {
          .then(response => {
             this.currentCDS = response.data.cds;
             this.blastResults = response.data.blast;
-            // let xmin = this.currentCDS.start-50;
-            // let xmax = this.currentCDS.stop+50;
+            let xmin = this.currentCDS.start-50;
+            let xmax = this.currentCDS.stop+50;
             this.startOptions = response.data.start_options;
-            // this.series1 = [{ data: response.data.frame_1 }]
-            // this.series2 = [{ data: response.data.frame_2 }]
-            // this.series3 = [{ data: response.data.frame_3 }]
-            // this.series4 = [{ data: response.data.frame_4 }]
-            // this.series5 = [{ data: response.data.frame_5 }]
-            // this.series6 = [{ data: response.data.frame_6 }]
-            // this.options1 = {
-            //    chart: { id: '1', group: 'direct', type: 'line', height: 170 },
-            //    stroke: { width: 1.5 },
-            //    colors: ['#008FFB'],
-            //    noData: { text: 'Loading...' },
-            //    yaxis: { min: 0, max: 1, tickAmount: 5, labels: { minWidth: 40 } },
-            //    xaxis: { min: xmin, max: xmax, tickAmount: 10 }
-            // }
-            // this.options2 = {
-            //    chart: { id: '2', group: 'direct', type: 'line', height: 170 },
-            //    stroke: { width: 1.5 },
-            //    colors: ['#008FFB'],
-            //    noData: { text: 'Loading...' },
-            //    yaxis: { min: 0, max: 1, tickAmount: 5, labels: { minWidth: 40 },
-            //             title: { text: 'Direct Sequences'}  },
-            //    xaxis: { min: xmin, max: xmax, tickAmount: 10 }
-            // }
-            // this.options3 = {
-            //    chart: { id: '3', group: 'direct', type: 'line', height: 193 },
-            //    stroke: { width: 1.5 },
-            //    colors: ['#008FFB'],
-            //    noData: { text: 'Loading...' },
-            //    yaxis: { min: 0, max: 1, tickAmount: 5, labels: { minWidth: 40 } },
-            //    xaxis: { min: xmin, max: xmax, tickAmount: 10,
-            //             title: { text: 'Nucleotide Position'}  }
-            // }
-            // this.options4 = {
-            //    chart: { id: '4', group: 'comp', type: 'line', height: 170 },
-            //    stroke: { width: 1.5 },
-            //    colors: ['#008FFB'],
-            //    noData: { text: 'Loading...' },
-            //    yaxis: { min: 0, max: 1, tickAmount: 5, labels: { minWidth: 40 } },
-            //    xaxis: { min: xmin, max: xmax, tickAmount: 10 }
-            // }
-            // this.options5 = {
-            //    chart: { id: '5', group: 'comp', type: 'line', height: 170 },
-            //    stroke: { width: 1.5 },
-            //    colors: ['#008FFB'],
-            //    noData: { text: 'Loading...' },
-            //    yaxis: { min: 0, max: 1, tickAmount: 5, labels: { minWidth: 40 },
-            //             title: { text: 'Complementary Sequences'} },
-            //    xaxis: { min: xmin, max: xmax, tickAmount: 10 }
-            // }
-            // this.options6 = {
-            //    chart: { id: '6', group: 'comp', type: 'line', height: 193 },
-            //    stroke: { width: 1.5 },
-            //    colors: ['#008FFB'],
-            //    noData: { text: 'Loading...' },
-            //    yaxis: { min: 0, max: 1, tickAmount: 5, labels: { minWidth: 40 } },
-            //    xaxis: { min: xmin, max: xmax, tickAmount: 10,
-            //             title: { text: 'Nucleotide Position'} }
-            // }
+            this.series1 = [{ data: response.data.frame_1 }]
+            this.series2 = [{ data: response.data.frame_2 }]
+            this.series3 = [{ data: response.data.frame_3 }]
+            this.series4 = [{ data: response.data.frame_4 }]
+            this.series5 = [{ data: response.data.frame_5 }]
+            this.series6 = [{ data: response.data.frame_6 }]
+            this.options1 = {
+               chart: { id: '1', group: 'direct', type: 'line', height: 170 },
+               stroke: { width: 1.5 },
+               colors: ['#008FFB'],
+               noData: { text: 'Loading...' },
+               yaxis: { min: 0, max: 1, tickAmount: 5, labels: { minWidth: 40 } },
+               xaxis: { min: xmin, max: xmax, tickAmount: 10 }
+            }
+            this.options2 = {
+               chart: { id: '2', group: 'direct', type: 'line', height: 170 },
+               stroke: { width: 1.5 },
+               colors: ['#008FFB'],
+               noData: { text: 'Loading...' },
+               yaxis: { min: 0, max: 1, tickAmount: 5, labels: { minWidth: 40 },
+                        title: { text: 'Direct Sequences'}  },
+               xaxis: { min: xmin, max: xmax, tickAmount: 10 }
+            }
+            this.options3 = {
+               chart: { id: '3', group: 'direct', type: 'line', height: 193 },
+               stroke: { width: 1.5 },
+               colors: ['#008FFB'],
+               noData: { text: 'Loading...' },
+               yaxis: { min: 0, max: 1, tickAmount: 5, labels: { minWidth: 40 } },
+               xaxis: { min: xmin, max: xmax, tickAmount: 10,
+                        title: { text: 'Nucleotide Position'}  }
+            }
+            this.options4 = {
+               chart: { id: '4', group: 'comp', type: 'line', height: 170 },
+               stroke: { width: 1.5 },
+               colors: ['#008FFB'],
+               noData: { text: 'Loading...' },
+               yaxis: { min: 0, max: 1, tickAmount: 5, labels: { minWidth: 40 } },
+               xaxis: { min: xmin, max: xmax, tickAmount: 10 }
+            }
+            this.options5 = {
+               chart: { id: '5', group: 'comp', type: 'line', height: 170 },
+               stroke: { width: 1.5 },
+               colors: ['#008FFB'],
+               noData: { text: 'Loading...' },
+               yaxis: { min: 0, max: 1, tickAmount: 5, labels: { minWidth: 40 },
+                        title: { text: 'Complementary Sequences'} },
+               xaxis: { min: xmin, max: xmax, tickAmount: 10 }
+            }
+            this.options6 = {
+               chart: { id: '6', group: 'comp', type: 'line', height: 193 },
+               stroke: { width: 1.5 },
+               colors: ['#008FFB'],
+               noData: { text: 'Loading...' },
+               yaxis: { min: 0, max: 1, tickAmount: 5, labels: { minWidth: 40 } },
+               xaxis: { min: xmin, max: xmax, tickAmount: 10,
+                        title: { text: 'Nucleotide Position'} }
+            }
          })
          .catch(error => {
             console.error(error);

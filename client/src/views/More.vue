@@ -13,8 +13,11 @@
          call and choose a new function for it, or delete the gene call altogether.
       </p>
       <p><strong>Your selected function:</strong> {{ newFunction }}</p>
-      <button type="button" class="btn btn-light" @click="editCDS" v-if="newFunction !== 'None'">
+      <button type="button" class="btn btn-light btn-action" @click="editCDS" v-if="newFunction !== 'None'">
          <strong>Update {{ $route.params.id }}</strong>
+      </button>
+      <button type="button" class="btn btn-light btn-action" @click="deleteCDS($route.params.id)">
+         <strong>Delete {{ $route.params.id }}</strong>
       </button>
    </div>
    <div class="columns-wrapper">
@@ -26,12 +29,10 @@
    <div class="coding-potential-table">
       <div class="subheader">
          <p>
-            This table displays the average coding potential per
+            Average coding potential per
             frame between the specified start position and {{
-            currentCDS.stop }} (the graph above is a visual
-            representation of this data). Frames are counted 1-6
-            (direct 1-3 and complementary 4-6). Select a new start
-            position, if appropriate.
+            currentCDS.stop }}. Frames are counted 1-6
+            (direct 1-3 and complementary 4-6).
          </p>
       </div>
       <div class="table-responsive">
@@ -68,8 +69,11 @@
    </div>
    <div class="info-bottom">
       <p><strong>Your function selection:</strong> {{ newFunction }}</p>
-      <button type="button" class="btn btn-light" @click="editCDS" v-if="newFunction !== 'None'">
+      <button type="button" class="btn btn-light btn-action" @click="editCDS" v-if="newFunction !== 'None'">
          <strong>Update {{ $route.params.id }}</strong>
+      </button>
+      <button type="button" class="btn btn-light btn-action" @click="deleteCDS($route.params.id)">
+         <strong>Delete {{ $route.params.id }}</strong>
       </button>
    </div>
 </div>
@@ -148,6 +152,15 @@ export default {
             console.error(error);
          });
       },
+      deleteCDS(cdsID) {
+         axios.delete(`http://localhost:5000/api/annotations/more/${this.$route.params.currentUser}/${cdsID}`)
+         .then(() => {
+            this.$router.push(`/annotations/${this.$route.params.currentUser}`);
+         })
+         .catch(error => {
+            console.error(error);
+         });
+      },
       keepOriginal() {
          const payload = {
                id: this.currentCDS.id,
@@ -180,6 +193,10 @@ export default {
 
 .info-bottom {
    margin: 50px auto;
+}
+
+.btn-action {
+   margin: auto 10px;
 }
 
 /* ----- Column Styling ----- */
