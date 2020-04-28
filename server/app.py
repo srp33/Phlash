@@ -219,6 +219,7 @@ def upload_blast_file(current_user, file_method):
 
    if request.method == "POST":
       if file_method == "download":
+         # FIXME: annotate.compare() here so statuses are available!!! 
          record = SeqIO.read(get_file("Fasta", UPLOAD_FOLDER), "fasta")
          genome = record.seq
          output = ""
@@ -292,30 +293,10 @@ def annotate_data(current_user):
 
    if request.method == "POST":
       # -------for future reference: downloading GENBANK file----------
-      # gb_file = get_file("GenBank")
-      # out_file = annotate.modify_gb(gb_file)
-      # genemark_gdata_file = get_file("GeneMark_gdata", UPLOAD_FOLDER)
-      # outfile = annotate.create_fasta(fasta_file, genemark_gdata_file)
-      record = SeqIO.read(get_file("Fasta", UPLOAD_FOLDER), "fasta")
-      genome = record.seq
-      output = ""
-      for cds in db.session.query(DNAMaster).order_by(DNAMaster.start):
-         if cds.status == "Pass" or cds.status == "Need more information":
-            output += f">{cds.id}, {cds.start}-{cds.stop}\n"
-            output += f"{Seq.translate(sequence=annotate.get_sequence(genome, cds.strand, cds.start, cds.stop), table=11)}\n"
-         elif cds.status == "Fail":
-            output += f">{cds.id}, {cds.start}-{cds.stop}\n"
-            output += f"{Seq.translate(sequence=annotate.get_sequence(genome, cds.strand, cds.start, cds.stop), table=11)}\n"
-            starts = annotate.get_starts(cds.id, genome)
-            for i in range(len(starts)):
-               output += f">{cds.id}_{i + 1}, {starts[i]}-{cds.stop}\n"
-               output += f"{Seq.translate(sequence=annotate.get_sequence(genome, cds.strand, starts[i], cds.stop), table=11)}\n"
-
-      with open(os.path.join(ROOT, 'users', current_user, "sequences_to_blast.fasta"), "w") as out_handle:
-         out_handle.write(output)
-
-      f = open(os.path.join(ROOT, 'users', current_user, "sequences_to_blast.fasta"), "r")
-      return f.read()
+      gb_file = get_file("GenBank")
+      out_file = annotate.modify_gb(gb_file)
+      genemark_gdata_file = get_file("GeneMark_gdata", UPLOAD_FOLDER)
+      outfile = annotate.create_fasta(fasta_file, genemark_gdata_file)
       
    return jsonify(response_object)
 
@@ -400,10 +381,18 @@ def failed_annotation(current_user, cds_id):
       print("writing results to post response")
       response_object['blast'] = blast_results
 
-      # gdata_df = pd.read_csv(genemark_gdata_file, sep='\t', skiprows=16)
-      # gdata_df.columns = ['Base', '1', '2', '3', '4', '5', '6']
-      # gdata_df = gdata_df[gdata_df.Base.isin(range(cds.start-50, cds.stop+50))]
+      gdata_df = pd.read_csv(genemark_gdata_file, sep='\t', skiprows=16)
+      gdata_df.columns = ['Base', '1', '2', '3', '4', '5', '6']
+      gdata_df = gdata_df[gdata_df.Base.isin(range(cds.start-50, cds.stop+50))]
       # xaxis = gdata_df["Base"].to_list()
+      response_object['x_data'] = gdata_df["Base"].to_list()
+      response_object['y_data_1'] = gdata_df["1"].to_list()
+      response_object['y_data_2'] = gdata_df["2"].to_list()
+      response_object['y_data_3'] = gdata_df["3"].to_list()
+      response_object['y_data_4'] = gdata_df["4"].to_list()
+      response_object['y_data_5'] = gdata_df["5"].to_list()
+      response_object['y_data_6'] = gdata_df["6"].to_list()
+
       # response_object['frame_1'] = annotate.merge(xaxis, [round(x, 2) for x in gdata_df["1"].to_list()])
       # response_object['frame_2'] = annotate.merge(xaxis, [round(x, 2) for x in gdata_df["2"].to_list()])
       # response_object['frame_3'] = annotate.merge(xaxis, [round(x, 2) for x in gdata_df["3"].to_list()])
@@ -436,7 +425,7 @@ def failed_annotation(current_user, cds_id):
    return jsonify(response_object)
 
 
-@app.route('/api/annotations/more/<current_user>/<cds_id>', methods=['GET', 'PUT', 'POST'])
+@app.route('/api/annotations/more/<current_user>/<cds_id>', methods=['GET', 'PUT', 'POST', 'DELETE'])
 def do_more_annotation(current_user, cds_id):
    """
 
@@ -501,6 +490,14 @@ def do_more_annotation(current_user, cds_id):
          response_object['message'] = 'CDS updated!'
       else:
          response_object['message'] = 'CDS did not update.'
+
+   if request.method == "DELETE":
+      if DNAMaster.query.filter_by(id=cds_id).first():
+         DNAMaster.query.filter_by(id=cds_id).delete()
+         db.session.commit()
+         response_object['message'] = 'CDS removed!'
+      else:
+         response_object['message'] = 'Error: CDS could not be deleted.'
 
    return jsonify(response_object)
 

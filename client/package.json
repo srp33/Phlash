@@ -19,6 +19,7 @@
     "vega-lite": "^4.0.0-beta.10",
     "vue": "^2.6.10",
     "vue-apexcharts": "^1.5.1",
+    "vue-plotly": "^1.1.0",
     "vue-router": "^3.0.3"
   },
   "devDependencies": {

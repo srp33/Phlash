@@ -8,7 +8,6 @@ import Annotations from './views/Annotations.vue';
 import Fail from './views/Fail.vue';
 import More from './views/More.vue';
 import Pass from './views/Pass.vue';
-import GenBank from './views/GenBank.vue';
 
 
 Vue.use(Router);
@@ -56,11 +55,6 @@ export default new Router({
          path: '/annotations/more/:currentUser/:id',
          name: 'More',
          component: More,
-      },
-      {
-         path: '/genbank',
-         name: 'GenBank',
-         component: GenBank,
       },
    ],
 });

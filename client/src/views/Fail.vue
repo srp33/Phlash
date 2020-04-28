@@ -83,32 +83,12 @@
          </table>
       </div>
    </div>
-   <div class="columns">
-      <div class="column direct">
-         <div id="chart-wrapper">
-            <div id="chart-line">
-               <apexchart type="line" height="170" :options="options1" :series="series1"></apexchart>
-            </div>
-            <div id="chart-line2">
-               <apexchart type="line" height="170" :options="options2" :series="series2"></apexchart>
-            </div>
-            <div id="chart-area">
-               <apexchart type="line" height="193" :options="options3" :series="series3"></apexchart>
-            </div>
-         </div>
+   <div class="graphs">
+      <div v-if="dataExists">
+         <Graphs :data1="data1" :data2="data2" :data3="data3" :data4="data4" :data5="data5" :data6="data6" :start="currentCDS.start" :stop="currentCDS.stop"/>
       </div>
-      <div class="column complementary">
-         <div id="chart-wrapper">
-            <div id="chart-line">
-               <apexchart type="line" height="170" :options="options4" :series="series4"></apexchart>
-            </div>
-            <div id="chart-line2">
-               <apexchart type="line" height="170" :options="options5" :series="series5"></apexchart>
-            </div>
-            <div id="chart-area">
-               <apexchart type="line" height="193" :options="options6" :series="series6"></apexchart>
-            </div>
-         </div>
+      <div v-else>
+         <p>Loading graphs...</p>
       </div>
    </div>
    <hr/>
@@ -144,13 +124,17 @@
 
 <script>
 import BlastResults from '../components/BlastResults.vue'
+import Graphs from '../components/Graphs.vue'
 import axios from 'axios'
 import VueApexCharts from 'vue-apexcharts'
+import { Plotly } from 'vue-plotly';
 
 export default {
    name: 'Fail',
    components: {
-      BlastResults
+      BlastResults,
+      Graphs,
+      Plotly
    },
    data () {
       return {
@@ -176,64 +160,13 @@ export default {
          showStart: false,
          newFunction: 'None',
          newStart: 0,
-         series1: [{ data: [] }],
-         series2: [{ data: [] }],
-         series3: [{ data: [] }],
-         series4: [{ data: [] }],
-         series5: [{ data: [] }],
-         series6: [{ data: [] }],
-         options1: {
-            chart: { id: '1', group: 'direct', type: 'line', height: 170 },
-            stroke: { width: 1.5 },
-            colors: ['#008FFB'],
-            noData: { text: 'Loading...' },
-            yaxis: { min: 0, max: 1, tickAmount: 5, labels: { minWidth: 40 } },
-            xaxis: { min: 1, max: 10, tickAmount: 10 }
-         },
-         options2: {
-            chart: { id: '2', group: 'direct', type: 'line', height: 170 },
-            stroke: { width: 1.5 },
-            colors: ['#008FFB'],
-            noData: { text: 'Loading...' },
-            yaxis: { min: 0, max: 1, tickAmount: 5, labels: { minWidth: 40 }, 
-                     title: { text: 'Direct Sequences'} },
-            xaxis: { min: 1, max: 10, tickAmount: 10 }
-         },
-         options3: {
-            chart: { id: '3', group: 'direct', type: 'line', height: 193 },
-            stroke: { width: 1.5 },
-            colors: ['#008FFB'],
-            noData: { text: 'Loading...' },
-            yaxis: { min: 0, max: 1, tickAmount: 5, labels: { minWidth: 40 } },
-            xaxis: { min: 1, max: 10, tickAmount: 10,
-                     title: { text: 'Nucleotide Position'} }
-         },
-         options4: {
-            chart: { id: '4', group: 'comp', type: 'line', height: 170 },
-            stroke: { width: 1.5 },
-            colors: ['#008FFB'],
-            noData: { text: 'Loading...' },
-            yaxis: { min: 0, max: 1, tickAmount: 5, labels: { minWidth: 40 } },
-            xaxis: { min: 1, max: 10, tickAmount: 10 }
-         },
-         options5: {
-            chart: { id: '5', group: 'comp', type: 'line', height: 170 },
-            stroke: { width: 1.5 },
-            colors: ['#008FFB'],
-            noData: { text: 'Loading...' },
-            yaxis: { min: 0, max: 1, tickAmount: 5, labels: { minWidth: 40 },
-                     title: { text: 'Complementary Sequences'} },
-            xaxis: { min: 1, max: 10, tickAmount: 10 }
-         },
-         options6: {
-            chart: { id: '6', group: 'comp', type: 'line', height: 193 },
-            stroke: { width: 1.5 },
-            colors: ['#008FFB'],
-            noData: { text: 'Loading...' },
-            yaxis: { min: 0, max: 1, tickAmount: 5, labels: { minWidth: 40 } },
-            xaxis: { min: 1, max: 10, tickAmount: 10,
-                     title: { text: 'Nucleotide Position'}}
-         },
+         dataExists: false,
+         data1: [{ x:[], y:[] }],
+         data2: [{ x:[], y:[] }],
+         data3: [{ x:[], y:[] }],
+         data4: [{ x:[], y:[] }],
+         data5: [{ x:[], y:[] }],
+         data6: [{ x:[], y:[] }],
       }
    },
    created() {
@@ -245,67 +178,32 @@ export default {
          .then(response => {
             this.currentCDS = response.data.cds;
             this.blastResults = response.data.blast;
-            let xmin = this.currentCDS.start-50;
-            let xmax = this.currentCDS.stop+50;
             this.startOptions = response.data.start_options;
-            this.series1 = [{ data: response.data.frame_1 }]
-            this.series2 = [{ data: response.data.frame_2 }]
-            this.series3 = [{ data: response.data.frame_3 }]
-            this.series4 = [{ data: response.data.frame_4 }]
-            this.series5 = [{ data: response.data.frame_5 }]
-            this.series6 = [{ data: response.data.frame_6 }]
-            this.options1 = {
-               chart: { id: '1', group: 'direct', type: 'line', height: 170 },
-               stroke: { width: 1.5 },
-               colors: ['#008FFB'],
-               noData: { text: 'Loading...' },
-               yaxis: { min: 0, max: 1, tickAmount: 5, labels: { minWidth: 40 } },
-               xaxis: { min: xmin, max: xmax, tickAmount: 10 }
-            }
-            this.options2 = {
-               chart: { id: '2', group: 'direct', type: 'line', height: 170 },
-               stroke: { width: 1.5 },
-               colors: ['#008FFB'],
-               noData: { text: 'Loading...' },
-               yaxis: { min: 0, max: 1, tickAmount: 5, labels: { minWidth: 40 },
-                        title: { text: 'Direct Sequences'}  },
-               xaxis: { min: xmin, max: xmax, tickAmount: 10 }
-            }
-            this.options3 = {
-               chart: { id: '3', group: 'direct', type: 'line', height: 193 },
-               stroke: { width: 1.5 },
-               colors: ['#008FFB'],
-               noData: { text: 'Loading...' },
-               yaxis: { min: 0, max: 1, tickAmount: 5, labels: { minWidth: 40 } },
-               xaxis: { min: xmin, max: xmax, tickAmount: 10,
-                        title: { text: 'Nucleotide Position'}  }
-            }
-            this.options4 = {
-               chart: { id: '4', group: 'comp', type: 'line', height: 170 },
-               stroke: { width: 1.5 },
-               colors: ['#008FFB'],
-               noData: { text: 'Loading...' },
-               yaxis: { min: 0, max: 1, tickAmount: 5, labels: { minWidth: 40 } },
-               xaxis: { min: xmin, max: xmax, tickAmount: 10 }
-            }
-            this.options5 = {
-               chart: { id: '5', group: 'comp', type: 'line', height: 170 },
-               stroke: { width: 1.5 },
-               colors: ['#008FFB'],
-               noData: { text: 'Loading...' },
-               yaxis: { min: 0, max: 1, tickAmount: 5, labels: { minWidth: 40 },
-                        title: { text: 'Complementary Sequences'} },
-               xaxis: { min: xmin, max: xmax, tickAmount: 10 }
-            }
-            this.options6 = {
-               chart: { id: '6', group: 'comp', type: 'line', height: 193 },
-               stroke: { width: 1.5 },
-               colors: ['#008FFB'],
-               noData: { text: 'Loading...' },
-               yaxis: { min: 0, max: 1, tickAmount: 5, labels: { minWidth: 40 } },
-               xaxis: { min: xmin, max: xmax, tickAmount: 10,
-                        title: { text: 'Nucleotide Position'} }
-            }
+            this.data1 = [{ 
+               x: response.data.x_data,
+               y: response.data.y_data_1
+            }]
+            this.data2 = [{ 
+               x: response.data.x_data,
+               y: response.data.y_data_2
+            }]
+            this.data3 = [{ 
+               x: response.data.x_data,
+               y: response.data.y_data_3
+            }]
+            this.data4 = [{ 
+               x: response.data.x_data,
+               y: response.data.y_data_4
+            }]
+            this.data5 = [{ 
+               x: response.data.x_data,
+               y: response.data.y_data_5
+            }]
+            this.data6 = [{ 
+               x: response.data.x_data,
+               y: response.data.y_data_6
+            }]
+            this.dataExists = true;
          })
          .catch(error => {
             console.error(error);
@@ -375,7 +273,7 @@ export default {
 }
 
 /* ----- Column Styling ----- */
-.columns {
+/* .columns {
    display: flex;
    flex-direction: row;
    justify-content: space-between;
@@ -383,13 +281,10 @@ export default {
 
 .column {
    width: 100%;
-}
+   margin-left: 30px;
+} */
 
 /* ----- Coding Potential ----- */
-#comp-graph {
-   margin-bottom: 30px;
-}
-
 .table-responsive {
    max-height: 250px;
    overflow-y: auto;
@@ -412,17 +307,20 @@ tbody {
    width: 100%;
 }
 
+.graphs {
+   height: 670px;
+}
+
 /* ----- Blast Results ----- */
 .btn-blast {
    width: 100%;
 }
 
 /* --------------------- */
-/* Mobile Styles */
-@media only screen and (max-width: 1000px) {
-   .columns {
-      flex-direction: column;
+/* Responsive Design */
+@media only screen and (max-width: 1200px) {
+   .graphs {
+      height: 1300px;
    }
-
 }
 </style>
