@@ -13,14 +13,21 @@
          <button type="button" class="btn btn-light" @click="editCDS" v-if="newFunction!=='None'">
             <strong>Update {{ $route.params.id }}</strong>
          </button>
+         <button type="button" class="btn btn-light" @click="deleteCDS($route.params.id)" v-if="!blastResultsExist">
+            <strong>Delete {{ $route.params.id }}</strong>
+         </button>
       </div>
       <div class="blast-results">
-         <BlastResults :blastResults="blastResults" @newFunction="setFunction" />
+         <h3 style="text-align: center; margin: 20px;">BLAST Results</h3>
+         <BlastResults :blastResults="blastResults" :blastResultsExist="blastResultsExist" @newFunction="setFunction" />
       </div>
       <div class="info-bottom">
          <p><strong>Your function selection:</strong> {{ newFunction }}</p>
          <button type="button" class="btn btn-light" @click="editCDS" v-if="newFunction!=='None'">
             <strong>Update {{ $route.params.id }}</strong>
+         </button>
+         <button type="button" class="btn btn-light" @click="deleteCDS($route.params.id)" v-if="!blastResultsExist">
+            <strong>Delete {{ $route.params.id }}</strong>
          </button>
       </div>
    </div>
@@ -38,6 +45,7 @@ export default {
    data () {
       return {
          blastResults: [],
+         blastResultsExist: true,
          showFunction: false,
          newFunction: 'None',
          currentCDS: {
@@ -67,6 +75,7 @@ export default {
          .then(response => {
             this.currentCDS = response.data.cds;
             this.blastResults = response.data.blast;
+            if (this.blastResults.length === 0) this.blastResultsExist = false;
          })
          .catch(error => {
             console.error(error);
@@ -97,6 +106,15 @@ export default {
             console.error(error);
          });
       },
+      deleteCDS(cdsID) {
+         axios.delete(`http://localhost:5000/api/annotations/pass/${this.$route.params.currentUser}/${cdsID}`)
+         .then(() => {
+            this.$router.push(`/annotations/${this.$route.params.currentUser}`);
+         })
+         .catch(error => {
+            console.error(error);
+         });
+      },
       keepOriginal() {
          const payload = {
             id: this.currentCDS.id,
@@ -108,6 +126,14 @@ export default {
          };
          this.updateCDS(payload, this.currentCDS.id);
       },
+      checkBlastResults() {
+         if (this.blastResults) {
+            if (this.blastResults.length > 0) return true
+            else return false
+         } else {
+            return false
+         }
+      }
    },
 }
 </script>

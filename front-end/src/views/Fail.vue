@@ -1,5 +1,6 @@
 <template>
 <div class="container">
+   <loading loader="dots" :active.sync="isLoading" :is-full-page="true" :height=200 :width=200 color="#2279b6"></loading>
    <div class="headers">
       <h1>ID: {{ $route.params.id }}</h1>
       <h4>Start: {{ currentCDS.start }}</h4>
@@ -10,11 +11,7 @@
       <p><strong>Instructions</strong></p>
       <p>
          Choose a new start for this gene call based on the information given
-         below.<br/>Here are your other possible start positions: 
-         <span v-for="(curr, index) in startOptions" :key=index>
-            <span v-if="index===startOptions.length-1">{{ curr.start_position }}.</span>
-            <span v-else>{{ curr.start_position }}, </span>
-         </span>
+         below or keep the current start.
       </p>
       <p><strong>Your selected start position:</strong> {{ newStart }}</p>
       <p><strong>Your selected function:</strong> {{ newFunction }}</p>
@@ -23,35 +20,13 @@
       </button>
    </div>
    <div class="columns-wrapper">
-      <h3 style="text-align: center; margin: 20px;">Coding Potential</h3>
-      <div class="subheader">
-         <!-- <p>
-            The graph below displays the coding potential in each open
-            reading frame (ORF). The first three plots represent direct
-            sequences, and the latter three represent complementary
-            sequences. See the table below the graph for more information.
-         </p>
-         <p>
-            <strong>Instructions:</strong> Hover your mouse over the graph to
-            see the exact base positions. Then, scroll down to the table
-            below and <em>select a new start position, if
-            appropriate</em>.
-         </p> -->
-      </div>
+      <h3 style="text-align: center; margin: 40px;">GeneMark's Coding Potential</h3>
    </div>
    <div class="coding-potential-table">
-      <div class="subheader">
-         <p>
-            This table displays the average coding potential per
-            frame between the specified start position and {{
-            currentCDS.stop }} (the graph above is a visual
-            representation of this data). Frames are counted 1-6
-            (direct 1-3 and complementary 4-6). Select a new start
-            position, if appropriate.
-         </p>
-      </div>
+      <h5 style="text-align: center; margin: 20px;">Average Coding Potential Per Frame</h5>
       <div class="table-responsive">
          <table id="cp-table" class="table table-hover">
+            <caption>Frames are counted 1-6 (direct 1-3 and complementary 4-6).</caption>
             <thead>
                <tr>
                   <th scope="col">Start Position</th>
@@ -65,16 +40,17 @@
                </tr>
             </thead>
             <tbody>
-               <tr v-for="(curr, index) in startOptions" :key="index">
-                  <th>{{ curr.start_position }}</th>
-                  <td>{{ curr.frame_1 }}</td>
-                  <td>{{ curr.frame_2 }}</td>
-                  <td>{{ curr.frame_3 }}</td>
-                  <td>{{ curr.frame_4 }}</td>
-                  <td>{{ curr.frame_5 }}</td>
-                  <td>{{ curr.frame_6 }}</td>
+               <tr v-for="(data, start, index) in startOptions" :key="index">
+                  <th v-if="start===currentCDS.start.toString()">{{ start }} (current)</th>
+                  <th v-else>{{ start }}</th>
+                  <td>{{ data.frame_1 }}</td>
+                  <td>{{ data.frame_2 }}</td>
+                  <td>{{ data.frame_3 }}</td>
+                  <td>{{ data.frame_4 }}</td>
+                  <td>{{ data.frame_5 }}</td>
+                  <td>{{ data.frame_6 }}</td>
                   <td>
-                     <button class="btn btn-dark btn-sm" @click="setStart(curr.start_position)">
+                     <button class="btn btn-dark btn-sm" @click="setStart(start)">
                         <strong>Select</strong>
                      </button>
                   </td>
@@ -83,7 +59,8 @@
          </table>
       </div>
    </div>
-   <div class="graphs">
+   <div class="coding-potential-graphs">
+      <h5 style="text-align: center; margin: 20px;">Coding Potential Per Frame</h5>
       <div v-if="dataExists">
          <Graphs :data1="data1" :data2="data2" :data3="data3" :data4="data4" :data5="data5" :data6="data6" :start="currentCDS.start" :stop="currentCDS.stop"/>
       </div>
@@ -126,15 +103,15 @@
 import BlastResults from '../components/BlastResults.vue'
 import Graphs from '../components/Graphs.vue'
 import axios from 'axios'
-import VueApexCharts from 'vue-apexcharts'
-import { Plotly } from 'vue-plotly';
+import Loading from 'vue-loading-overlay'
+import 'vue-loading-overlay/dist/vue-loading.css';
 
 export default {
    name: 'Fail',
    components: {
       BlastResults,
       Graphs,
-      Plotly
+      Loading
    },
    data () {
       return {
@@ -161,6 +138,7 @@ export default {
          newFunction: 'None',
          newStart: 0,
          dataExists: false,
+         isLoading: true,
          data1: [{ x:[], y:[] }],
          data2: [{ x:[], y:[] }],
          data3: [{ x:[], y:[] }],
@@ -204,6 +182,7 @@ export default {
                y: response.data.y_data_6
             }]
             this.dataExists = true;
+            this.isLoading = false;
          })
          .catch(error => {
             console.error(error);
@@ -272,18 +251,6 @@ export default {
    margin: 50px auto;
 }
 
-/* ----- Column Styling ----- */
-/* .columns {
-   display: flex;
-   flex-direction: row;
-   justify-content: space-between;
-}
-
-.column {
-   width: 100%;
-   margin-left: 30px;
-} */
-
 /* ----- Coding Potential ----- */
 .table-responsive {
    max-height: 250px;
@@ -300,14 +267,14 @@ export default {
 
 caption {
   display: table-caption;
-  caption-side: top;
+  /* caption-side: top; */
 }
 
 tbody {
    width: 100%;
 }
 
-.graphs {
+.coding-potential-graphs {
    height: 670px;
 }
 
@@ -319,7 +286,7 @@ tbody {
 /* --------------------- */
 /* Responsive Design */
 @media only screen and (max-width: 1200px) {
-   .graphs {
+   .coding-potential-graphs {
       height: 1300px;
    }
 }

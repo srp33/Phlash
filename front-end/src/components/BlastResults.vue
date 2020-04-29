@@ -29,6 +29,9 @@
             </tr>
          </tbody>
       </table>
+      <div v-if="blastResultsExist===false">
+         <h4><em>No hits found.</em></h4>
+      </div>
    </div>
 </div>
 </template>
@@ -37,11 +40,12 @@
 export default {
    name: 'BlastResults',
    props: {
-      blastResults: Array
+      blastResults: Array,
+      blastResultsExist: Boolean
    },
    data() {
       return {
-         newFunction: '',
+         newFunction: ''
       }
    },
    methods: {

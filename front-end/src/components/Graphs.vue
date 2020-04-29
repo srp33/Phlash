@@ -38,7 +38,7 @@ export default {
             title: "<b>Direct Sequences</b>",
             titlefont: {
                family: 'Avenir, Helvetica, Arial, sans-serif',
-               size: 18
+               size: 16
             },
             autosize: false,
             width: 590,
@@ -300,7 +300,7 @@ export default {
             title: "<b>Complementary Sequences</b>",
             titlefont: {
                family: 'Avenir, Helvetica, Arial, sans-serif',
-               size: 18
+               size: 16
             },
             autosize: false,
             width: 590,

@@ -219,7 +219,8 @@ def upload_blast_file(current_user, file_method):
 
    if request.method == "POST":
       if file_method == "download":
-         # FIXME: annotate.compare() here so statuses are available!!! 
+         print("Starting comparisons")
+         annotate.compare()
          record = SeqIO.read(get_file("Fasta", UPLOAD_FOLDER), "fasta")
          genome = record.seq
          output = ""
@@ -279,8 +280,8 @@ def annotate_data(current_user):
    response_object = {'status': 'success'}
 
    if request.method == "GET":
-      print("Starting comparisons")
-      annotate.compare()
+      # print("Starting comparisons")
+      # annotate.compare()
       dnamaster = []
       for cds in db.session.query(DNAMaster).order_by(DNAMaster.start):
          dnamaster.append({'id': cds.id,
@@ -301,7 +302,7 @@ def annotate_data(current_user):
    return jsonify(response_object)
 
 
-@app.route('/api/annotations/pass/<current_user>/<cds_id>', methods=['GET', 'PUT'])
+@app.route('/api/annotations/pass/<current_user>/<cds_id>', methods=['GET', 'PUT', 'DELETE'])
 def blast_for_function(current_user, cds_id):
    """
 
@@ -336,6 +337,14 @@ def blast_for_function(current_user, cds_id):
          response_object['message'] = 'CDS updated!'
       else:
          response_object['message'] = 'CDS did not update.'
+   
+   if request.method == "DELETE":
+      if DNAMaster.query.filter_by(id=cds_id).first():
+         DNAMaster.query.filter_by(id=cds_id).delete()
+         db.session.commit()
+         response_object['message'] = 'CDS removed!'
+      else:
+         response_object['message'] = 'Error: CDS could not be deleted.'
     
    return jsonify(response_object)
 
@@ -364,15 +373,18 @@ def failed_annotation(current_user, cds_id):
       fasta_file = get_file("Fasta", UPLOAD_FOLDER)
       genemark_gdata_file = get_file("GeneMark_gdata", UPLOAD_FOLDER)
       starts = annotate.failed_gene(cds_id, fasta_file, genemark_gdata_file)
+      print(starts)
+      response_object['start_options'] = starts
 
-      start_options = []
-      lowest_start = 2**100
-      for start, frames in starts.items():
-         frames['start_position'] = start
-         if start < lowest_start:
-               lowest_start = start
-         start_options.append(frames)
-      response_object['start_options'] = start_options
+      # FIXME: why do i do this?? doesn't seem important to do.
+      # start_options = []
+      # lowest_start = 2**100
+      # for start, frames in starts.items():
+      #    frames['start_position'] = start
+      #    if start < lowest_start:
+      #          lowest_start = start
+      #    start_options.append(frames)
+      # response_object['start_options'] = start_options
 
       blast_file = get_file("Blast", UPLOAD_FOLDER)
       E_VALUE_THRESH = 1e-7
@@ -384,7 +396,6 @@ def failed_annotation(current_user, cds_id):
       gdata_df = pd.read_csv(genemark_gdata_file, sep='\t', skiprows=16)
       gdata_df.columns = ['Base', '1', '2', '3', '4', '5', '6']
       gdata_df = gdata_df[gdata_df.Base.isin(range(cds.start-50, cds.stop+50))]
-      # xaxis = gdata_df["Base"].to_list()
       response_object['x_data'] = gdata_df["Base"].to_list()
       response_object['y_data_1'] = gdata_df["1"].to_list()
       response_object['y_data_2'] = gdata_df["2"].to_list()
@@ -392,13 +403,6 @@ def failed_annotation(current_user, cds_id):
       response_object['y_data_4'] = gdata_df["4"].to_list()
       response_object['y_data_5'] = gdata_df["5"].to_list()
       response_object['y_data_6'] = gdata_df["6"].to_list()
-
-      # response_object['frame_1'] = annotate.merge(xaxis, [round(x, 2) for x in gdata_df["1"].to_list()])
-      # response_object['frame_2'] = annotate.merge(xaxis, [round(x, 2) for x in gdata_df["2"].to_list()])
-      # response_object['frame_3'] = annotate.merge(xaxis, [round(x, 2) for x in gdata_df["3"].to_list()])
-      # response_object['frame_4'] = annotate.merge(xaxis, [round(x, 2) for x in gdata_df["4"].to_list()])
-      # response_object['frame_5'] = annotate.merge(xaxis, [round(x, 2) for x in gdata_df["5"].to_list()])
-      # response_object['frame_6'] = annotate.merge(xaxis, [round(x, 2) for x in gdata_df["6"].to_list()])
 
    if request.method == "POST":
       print("In fail post")
@@ -412,7 +416,7 @@ def failed_annotation(current_user, cds_id):
 
    if request.method == "PUT":
       put_data = request.get_json()
-      cds = DNAMaster.query.filter_by(id=put_data.get('id')).first()
+      cds = DNAMaster.query.filter_by(id=cds_id).first()
       if cds:
          cds.start = put_data.get('start')
          cds.function = put_data.get('function')
@@ -467,6 +471,17 @@ def do_more_annotation(current_user, cds_id):
       blast_results = blast.parse_blast(blast_file, cds.id, E_VALUE_THRESH)
       print("writing results to post response")
       response_object['blast'] = blast_results
+
+      gdata_df = pd.read_csv(genemark_gdata_file, sep='\t', skiprows=16)
+      gdata_df.columns = ['Base', '1', '2', '3', '4', '5', '6']
+      gdata_df = gdata_df[gdata_df.Base.isin(range(cds.start-50, cds.stop+50))]
+      response_object['x_data'] = gdata_df["Base"].to_list()
+      response_object['y_data_1'] = gdata_df["1"].to_list()
+      response_object['y_data_2'] = gdata_df["2"].to_list()
+      response_object['y_data_3'] = gdata_df["3"].to_list()
+      response_object['y_data_4'] = gdata_df["4"].to_list()
+      response_object['y_data_5'] = gdata_df["5"].to_list()
+      response_object['y_data_6'] = gdata_df["6"].to_list()
 
    if request.method == "POST":
       print("In more post")

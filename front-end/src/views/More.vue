@@ -1,5 +1,6 @@
 <template>
 <div class="container">
+   <loading loader="dots" :active.sync="isLoading" :is-full-page="true" :height=200 :width=200 color="#2279b6"></loading>
    <div class="headers">
       <h1>ID: {{ $route.params.id }}</h1>
       <h4>Start: {{ currentCDS.start }}</h4>
@@ -21,22 +22,16 @@
       </button>
    </div>
    <div class="columns-wrapper">
-      <h3 style="text-align: center; margin: 20px;">Coding Potential</h3>
+      <h3 style="text-align: center; margin: 40px;">GeneMark's Coding Potential</h3>
       <div class="subheader">
 
       </div>
    </div>
    <div class="coding-potential-table">
-      <div class="subheader">
-         <p>
-            Average coding potential per
-            frame between the specified start position and {{
-            currentCDS.stop }}. Frames are counted 1-6
-            (direct 1-3 and complementary 4-6).
-         </p>
-      </div>
+      <h5 style="text-align: center; margin: 20px;">Average Coding Potential Per Frame</h5>
       <div class="table-responsive">
          <table id="cp-table" class="table table-hover">
+            <caption>Frames are counted 1-6 (direct 1-3 and complementary 4-6).</caption>
             <thead>
                <tr>
                   <th scope="col">Start Position</th>
@@ -62,10 +57,19 @@
          </table>
       </div>
    </div>
+   <div class="coding-potential-graphs">
+      <h5 style="text-align: center; margin: 20px;">Coding Potential Per Frame</h5>
+      <div v-if="dataExists">
+         <Graphs :data1="data1" :data2="data2" :data3="data3" :data4="data4" :data5="data5" :data6="data6" :start="currentCDS.start" :stop="currentCDS.stop"/>
+      </div>
+      <div v-else>
+         <p>Loading graphs...</p>
+      </div>
+   </div>
    <hr/>
    <div class="blast-results">
       <h3 style="text-align: center; margin: 20px;">BLAST Results</h3>
-      <BlastResults :blastResults="blastResults" @newFunction="setFunction" />
+      <BlastResults :blastResults="blastResults" :blastResultsExist="blastResultsExist" @newFunction="setFunction" />
    </div>
    <div class="info-bottom">
       <p><strong>Your function selection:</strong> {{ newFunction }}</p>
@@ -81,12 +85,16 @@
 
 <script>
 import BlastResults from '../components/BlastResults.vue'
+import Graphs from '../components/Graphs.vue'
 import axios from 'axios'
-// import VueApexCharts from 'vue-apexcharts'
+import Loading from 'vue-loading-overlay'
+import 'vue-loading-overlay/dist/vue-loading.css';
 
 export default {
    name: 'More',
    components: {
+      Loading,
+      Graphs,
       BlastResults
    },
    data() {
@@ -109,7 +117,16 @@ export default {
             status: '',
          },
          blastResults: [],
+         blastResultsExist: true,
          newFunction: 'None',
+         dataExists: false,
+         isLoading: true,
+         data1: [{ x:[], y:[] }],
+         data2: [{ x:[], y:[] }],
+         data3: [{ x:[], y:[] }],
+         data4: [{ x:[], y:[] }],
+         data5: [{ x:[], y:[] }],
+         data6: [{ x:[], y:[] }],
       }
    },
    created() {
@@ -121,7 +138,34 @@ export default {
          .then(response => {
             this.currentCDS = response.data.cds;
             this.blastResults = response.data.blast;
+            if (this.blastResults.length === 0) this.blastResultsExist = false;
             this.probabilities = response.data.probs;
+            this.data1 = [{ 
+               x: response.data.x_data,
+               y: response.data.y_data_1
+            }]
+            this.data2 = [{ 
+               x: response.data.x_data,
+               y: response.data.y_data_2
+            }]
+            this.data3 = [{ 
+               x: response.data.x_data,
+               y: response.data.y_data_3
+            }]
+            this.data4 = [{ 
+               x: response.data.x_data,
+               y: response.data.y_data_4
+            }]
+            this.data5 = [{ 
+               x: response.data.x_data,
+               y: response.data.y_data_5
+            }]
+            this.data6 = [{ 
+               x: response.data.x_data,
+               y: response.data.y_data_6
+            }]
+            this.dataExists = true;
+            this.isLoading = false;
          })
          .catch(error => {
             console.error(error);
@@ -199,17 +243,6 @@ export default {
    margin: auto 10px;
 }
 
-/* ----- Column Styling ----- */
-.columns {
-   display: flex;
-   flex-direction: row;
-   justify-content: space-between;
-}
-
-.column {
-   width: 100%;
-}
-
 /* ----- Coding Potential ----- */
 #comp-graph {
    margin-bottom: 30px;
@@ -230,11 +263,15 @@ export default {
 
 caption {
   display: table-caption;
-  caption-side: top;
+  /* caption-side: top; */
 }
 
 tbody {
    width: 100%;
+}
+
+.coding-potential-graphs {
+   height: 670px;
 }
 
 /* ----- Blast Results ----- */
@@ -244,10 +281,9 @@ tbody {
 
 /* --------------------- */
 /* Mobile Styles */
-@media only screen and (max-width: 1000px) {
-   .columns {
-      flex-direction: column;
+@media only screen and (max-width: 1200px) {
+   .coding-potential-graphs {
+      height: 1300px;
    }
-
 }
 </style>

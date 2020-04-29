@@ -226,31 +226,31 @@ def compare():
 
 # Deals with "failed" genes.
 def failed_gene(cds_id, fasta_file, genemark_gdata_file):
-	gdata_df = pd.read_csv(genemark_gdata_file, sep='\t', skiprows=16)
-	gdata_df.columns = ['Base', '1', '2', '3', '4', '5', '6']
-	gdata_df = gdata_df.set_index('Base')
+   gdata_df = pd.read_csv(genemark_gdata_file, sep='\t', skiprows=16)
+   gdata_df.columns = ['Base', '1', '2', '3', '4', '5', '6']
+   gdata_df = gdata_df.set_index('Base')
 
-	bacteria_start_codons = ["ATG", "GTG", "TTG"]
-	record = SeqIO.read(fasta_file, "fasta")
-	failed_gene = DNAMaster.query.filter_by(id=cds_id, status="Fail").first()
-	genemark_gene = GeneMark.query.filter_by(stop=failed_gene.stop).first()
+   bacteria_start_codons = ["ATG", "GTG", "TTG"]
+   record = SeqIO.read(fasta_file, "fasta")
+   failed_gene = DNAMaster.query.filter_by(id=cds_id, status="Fail").first()
+   genemark_gene = GeneMark.query.filter_by(stop=failed_gene.stop).first()
 
-	actual_start = failed_gene.start - 1  # Subtract 1 because indexing begins with 0.
-	next_start_position = actual_start - 3  # Subtract 3 to account for 3 bases in a codon.
-	start_positions = {}
-	while next_start_position >= genemark_gene.start-3:
-		if failed_gene.strand == '+':
-			previous_codon = record.seq[next_start_position:next_start_position + 3]
-		elif failed_gene.strand == '-':
-			previous_codon = record.seq.reverse_complement()[next_start_position:next_start_position + 3]
-		if previous_codon in bacteria_start_codons:
-			avg_dict = make_avg_prob_dict(gdata_df, next_start_position, failed_gene.stop)
-			start_positions[next_start_position+1] = avg_dict
-		next_start_position = next_start_position - 3
+   actual_start = failed_gene.start - 1  # Subtract 1 because indexing begins with 0.
+   next_start_position = actual_start - 3  # Subtract 3 to account for 3 bases in a codon.
+   start_positions = {}
+   first_avg_dict = make_avg_prob_dict(gdata_df, actual_start, failed_gene.stop)
+   start_positions[failed_gene.start] = first_avg_dict
+   while next_start_position >= genemark_gene.start-3:
+      if failed_gene.strand == '+':
+         previous_codon = record.seq[next_start_position:next_start_position + 3]
+      elif failed_gene.strand == '-':
+         previous_codon = record.seq.reverse_complement()[next_start_position:next_start_position + 3]
+      if previous_codon in bacteria_start_codons:
+         avg_dict = make_avg_prob_dict(gdata_df, next_start_position, failed_gene.stop)
+         start_positions[next_start_position+1] = avg_dict
+      next_start_position = next_start_position - 3
 
-	# plot.make_plot_direct(genemark_gdata_file, failed_gene.start, failed_gene.stop, list(start_positions.keys()))
-    # plot.make_plot_complementary(genemark_gdata_file, failed_gene.start, failed_gene.stop, list(start_positions.keys()))
-	return start_positions
+   return start_positions
 
 
 # Deals with 'Not called by GeneMark' genes.

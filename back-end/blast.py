@@ -15,22 +15,27 @@ def parse_blast(blast_file, cds_id, e_value_thresh):
             curr_id = title.group(1)
             cds_id_ = cds_id + "_"
             if cds_id == curr_id or cds_id_ in curr_id:
-               hits = search["hits"]
-               for hit in hits:
-                  hsps = hit["hsps"][0]
-                  if hsps["evalue"] <= e_value_thresh:
-                     alignment = {}
-                     description = hit["description"][0]
-                     alignment['accession'] = description["accession"]
-                     alignment["title"] = description["title"]
-                     alignment["sciname"] = description["sciname"]
-                     alignment["evalue"] = '{:0.2e}'.format(hsps["evalue"])
-                     alignment["query_from"] = hsps["query_from"]
-                     alignment["query_to"] = hsps["query_to"]
-                     alignment["hit_from"] = hsps["hit_from"]
-                     alignment["hit_to"] = hsps["hit_to"]
-                     alignment["percent_identity"] = round(hsps["identity"] / hsps["align_len"] * 100, 2)
-                     blast_results.append(alignment)
+               if "message" not in search:
+                  hits = search["hits"]
+                  for hit in hits:
+                     hsps = hit["hsps"][0]
+                     if hsps["evalue"] <= e_value_thresh:
+                        alignment = {}
+                        description = hit["description"][0]
+                        alignment['accession'] = description["accession"]
+                        alignment["title"] = description["title"]
+                        # alignment["sciname"] = description["sciname"]
+                        alignment["evalue"] = '{:0.2e}'.format(hsps["evalue"])
+                        alignment["query_from"] = hsps["query_from"]
+                        alignment["query_to"] = hsps["query_to"]
+                        alignment["hit_from"] = hsps["hit_from"]
+                        alignment["hit_to"] = hsps["hit_to"]
+                        alignment["percent_identity"] = round(hsps["identity"] / hsps["align_len"] * 100, 2)
+                        alignment["message"] = "Hits found"
+                        blast_results.append(alignment)
+               else:
+                  if search["message"] == "No hits found":
+                     return blast_results
 
    return blast_results
 
