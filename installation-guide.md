@@ -38,7 +38,7 @@ We can now run Flask because it has been installed in our virtual environment, a
 ~/Phlash/back-end
 ```
 #### Development
-Use the following commands to run the Flask server locally. Keep this running while you move on to the front end.
+Use the following commands to run the Flask server locally.
 ```bash
 (phlash-venv) $ export FLASK_ENV=development  # optional
 (phlash-venv) $ flask run
@@ -57,7 +57,7 @@ The front end uses [Vue.js](https://vuejs.org/v2/guide/), a JavaScript framework
 ### Running Vue.js
 
 #### Development
-While running the back end in your current terminal, open another terminal and run the front end by doing the following.
+While running the back end in one terminal, open another terminal and run the front end.
 ```bash
 $ cd front-end
 $ npm install
