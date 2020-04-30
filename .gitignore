@@ -19,12 +19,11 @@ yarn-error.log*
 *.sln
 *.sw?
 
-# Jupyter notebook
-.ipynb_checkpoints/
-
 # Back end
-back-end/users
 back-end/__pycache__
+back-end/users
+back-end/phlash-venv
+back-end/test
 
 # Front end
 front-end/node_modules
