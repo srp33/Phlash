@@ -1,0 +1,18 @@
+#!/bin/bash
+
+######################################################
+# This script has the logic for executing
+# Good Nomen within a Docker container after
+# the Docker image has been created.
+# It will run on port 8080.
+# It should be accessible from a browser at
+#   http://localhost:8080/GoodNomen
+# You must have an API key for BioPortal in
+#   this directory when you execute this script.
+#   This file should be called BioPortalApiKey.txt.
+#######################################################
+
+## This will execute the container in interactive mode.
+## Hit Ctrl-C when you want to close the container.
+docker run --rm -i -t --name phlash_b -p 5000:80 \
+    srp33/phlash_b:v1
