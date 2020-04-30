@@ -1,6 +1,6 @@
 # from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy.orm.attributes import QueryableAttribute
+# from sqlalchemy.orm.attributes import QueryableAttribute
 
 db = SQLAlchemy()
 

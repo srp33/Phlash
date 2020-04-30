@@ -4,16 +4,12 @@ from flask_cors import CORS
 from flask import *
 from models import *
 import annotate
-import graph
 import os, datetime, uuid
 import pandas as pd
 import blast
 
 # configuration
-DEBUG = True
 ROOT = os.path.dirname(os.path.abspath(__file__))
-# UPLOAD_FOLDER = "" #os.path.join(ROOT, 'uploads')
-# DATABASE = "sqlite:///{}".format(os.path.join(ROOT, "database.db"))
 FASTA_EXTENSIONS = set(['fasta', 'fna'])
 GENBANK_EXTENSIONS = set(['gb', 'gbk'])
 GDATA_EXTENSION = set(['gdata'])
@@ -518,7 +514,7 @@ def do_more_annotation(current_user, cds_id):
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run()
 
 
 # ---------- HELPER FUNCTIONS ----------
