@@ -1,12 +1,8 @@
 FROM tiangolo/meinheld-gunicorn-flask:python3.7
 
-# RUN apt-get update -y
-# RUN apt-get install -y python-pip python-dev
-# WORKDIR /app
-# COPY . /app
-# RUN pip install -r requirements.txt
+COPY requirements.txt /app/
 
-# CMD flask run
+RUN python -m pip install --upgrade pip \
+ && pip install -r requirements.txt
 
-COPY . /app
-RUN pip install -r requirements.txt
+COPY *.py /app/

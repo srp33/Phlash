@@ -40,7 +40,7 @@ def ping_pong():
 def check_username(username):
    """
    """
-   # global UPLOAD_FOLDER 
+   # global UPLOAD_FOLDER
    # global USERS
    # global CURRENT_USER
    response_object = {'status': 'success'}
@@ -64,7 +64,7 @@ def check_username(username):
             db.drop_all()
             db.create_all()
          response_object["message"] = "ID created. Please continue."
-   
+
    return jsonify(response_object)
 
 
@@ -81,7 +81,7 @@ def upload_file(current_user):
    response_object = {'status': 'success'}
 
    if request.method == "POST":
-      if 'file' not in request.files: 
+      if 'file' not in request.files:
          response_object["status"]: "'file' not in request.files"
          print("in fail")
       else:
@@ -94,7 +94,7 @@ def upload_file(current_user):
                (fileType == "genbank" and allowed_file(file_name, GENBANK_EXTENSIONS)) or \
                (fileType == "gdata" and allowed_file(file_name, GDATA_EXTENSION)) or \
                (fileType == "ldata" and allowed_file(file_name, LDATA_EXTENSION)):
-               
+
                file_ext = file_name.rsplit('.', 1)[1].lower()
                for existing_file in os.listdir(UPLOAD_FOLDER):
                   if existing_file.endswith(f".{file_ext}"):
@@ -163,8 +163,8 @@ def view_dnamaster(current_user):
       else:
          db.session.add(cds)
          db.session.commit()
-         response_object['message'] = 'CDS added!'       
-    
+         response_object['message'] = 'CDS added!'
+
    return jsonify(response_object)
 
 
@@ -198,7 +198,7 @@ def single_cds(current_user, cds_id):
          response_object['message'] = 'CDS removed!'
       else:
          response_object['message'] = 'Error: CDS could not be deleted.'
-   
+
    return jsonify(response_object)
 
 
@@ -238,7 +238,7 @@ def upload_blast_file(current_user, file_method):
          f = open(os.path.join(ROOT, 'users', current_user, f"{current_user}_blast.fasta"), "r")
          return f.read()
       elif file_method == "upload":
-         if 'file' not in request.files: 
+         if 'file' not in request.files:
             response_object["status"]: "'file' not in request.files"
             print("in fail")
          else:
@@ -247,7 +247,7 @@ def upload_blast_file(current_user, file_method):
             if file:
                file_name = secure_filename(file.filename)
                if allowed_file(file_name, set(['json'])):
-                  
+
                   file_ext = file_name.rsplit('.', 1)[1].lower()
                   for existing_file in os.listdir(UPLOAD_FOLDER):
                      if existing_file.endswith(f".{file_ext}"):
@@ -267,7 +267,7 @@ def upload_blast_file(current_user, file_method):
 @app.route('/api/annotations/<current_user>', methods=['GET', 'POST'])
 def annotate_data(current_user):
    """
-   Compares DNA Master's predictions against GeneMark's. 
+   Compares DNA Master's predictions against GeneMark's.
    GET method shows all the DNA Master predictions with a status and action item for each.
    """
    DATABASE = "sqlite:///{}".format(os.path.join(ROOT, 'users', current_user, f"{current_user}.db"))
@@ -294,7 +294,7 @@ def annotate_data(current_user):
       out_file = annotate.modify_gb(gb_file)
       genemark_gdata_file = get_file("GeneMark_gdata", UPLOAD_FOLDER)
       outfile = annotate.create_fasta(fasta_file, genemark_gdata_file)
-      
+
    return jsonify(response_object)
 
 
@@ -333,7 +333,7 @@ def blast_for_function(current_user, cds_id):
          response_object['message'] = 'CDS updated!'
       else:
          response_object['message'] = 'CDS did not update.'
-   
+
    if request.method == "DELETE":
       if DNAMaster.query.filter_by(id=cds_id).first():
          DNAMaster.query.filter_by(id=cds_id).delete()
@@ -341,7 +341,7 @@ def blast_for_function(current_user, cds_id):
          response_object['message'] = 'CDS removed!'
       else:
          response_object['message'] = 'Error: CDS could not be deleted.'
-    
+
    return jsonify(response_object)
 
 
@@ -365,7 +365,7 @@ def failed_annotation(current_user, cds_id):
                               'strand': cds.strand,
                               'function': cds.function,
                               'status': cds.status}
-      
+
       fasta_file = get_file("Fasta", UPLOAD_FOLDER)
       genemark_gdata_file = get_file("GeneMark_gdata", UPLOAD_FOLDER)
       starts = annotate.failed_gene(cds_id, fasta_file, genemark_gdata_file)
