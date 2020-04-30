@@ -37,7 +37,7 @@ We can now run Flask because it has been installed in our virtual environment, a
 (phlash-venv) $ pwd
 ~/Phlash/back-end
 ```
-#### Development server
+#### Development
 Use the following commands to run the Flask server locally. Keep this running while you move on to the front end.
 ```bash
 (phlash-venv) $ export FLASK_ENV=development  # optional
@@ -48,20 +48,30 @@ Use the following commands to run the Flask server locally. Keep this running wh
 ```
 > :information_source: If `FLASK_ENV` is set to `development`, the `flask` command will enable debug mode, and `flask run` will enable the interactive debugger and reloader.
 
-#### Deployment options
-To run in production, see [Deployment Options](https://flask.palletsprojects.com/en/1.1.x/deploying/#deployment).
+#### Production
+To run in production, see Flask's [deployment options](https://flask.palletsprojects.com/en/1.1.x/deploying/#deployment).
 
 ## Front end
 The front end uses [Vue.js](https://vuejs.org/v2/guide/), a JavaScript framework for building user interfaces.
 
 ### Running Vue.js
+
+#### Development
 While running the back end in your current terminal, open another terminal and run the front end by doing the following.
 ```bash
 $ cd front-end
 $ npm install
-$ npm run serve
 ```
 > :information_source: `npm install` downloads dependencies defined in the `package.json` file and generates a `node_modules` folder with the installed modules.
 
+Then, run a webserver on localhost using the [`serve` command](https://cli.vuejs.org/guide/cli-service.html#vue-cli-service-serve). 
+```bash
+$ npm run serve
+```
+
 You should now be able to browse to `localhost:5050` and navigate through Phlash.
 
+#### Production
+To run in production, see Vue CLI's [deployment guidelines](https://cli.vuejs.org/guide/deployment.html#general-guidelines). Generally, you would need to run `npm run build` instead `npm run serve` for deployment. The [`build` command](https://cli.vuejs.org/guide/cli-service.html#vue-cli-service-build) produces a production-ready bundle in the `dist/` directory.
+
+See [this](https://cli.vuejs.org/guide/deployment.html#docker-nginx) for deploying Phlash inside a docker container. 
