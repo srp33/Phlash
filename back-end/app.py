@@ -20,29 +20,16 @@ CURRENT_USER = ""
 # instantiate the app
 app = Flask(__name__)
 app.config.from_object(__name__)
-# app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE
 db.init_app(app)
-# with app.app_context():
-#    db.drop_all()
-#    db.create_all()
 
 # enable CORS
 CORS(app, resources={r'/*': {'origins': '*'}})
 
-
-# foo router check --------------------------------------------------------------
-@app.route('/ping', methods=['GET'])
-def ping_pong():
-    return jsonify('pong!')
-
-# real routers ------------------------------------------------------------------
+# routers ------------------------------------------------------------------
 @app.route('/api/home/<username>', methods=['POST'])
 def check_username(username):
    """
    """
-   # global UPLOAD_FOLDER
-   # global USERS
-   # global CURRENT_USER
    response_object = {'status': 'success'}
 
    if request.method == "POST":
