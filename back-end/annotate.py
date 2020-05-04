@@ -267,7 +267,13 @@ def failed_gene(cds_id, fasta_file, genemark_gdata_file):
     first_avg_dict = make_avg_prob_dict(
         gdata_df, actual_start, dnamaster_gene.stop)
     start_positions[dnamaster_gene.start] = first_avg_dict
-    while next_start_position >= genemark_gene.start-33:
+
+    if genemark_gene is None: 
+        gm_start = actual_start
+    else:
+        gm_start = genemark_gene.start
+    
+    while next_start_position >= gm_start-33:
         if dnamaster_gene.strand == '+':
             previous_codon = record.seq[next_start_position:next_start_position + 3]
         elif dnamaster_gene.strand == '-':

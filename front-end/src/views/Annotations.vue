@@ -48,24 +48,12 @@
               </td>
               <td>
                 <button class="btn btn-dark btn-sm" disabled style="width:100px"
-                  v-if="curr.function !== 'None' && curr.status == 'Pass'">
+                  v-if="curr.function !== 'None'">
                   <strong>Done</strong>
                 </button>
-                <router-link :to="{ name: 'Pass', params: {phageID: $route.params.phageID, cdsID: curr.id} }">
+                <router-link :to="{ name: 'CDS', params: {phageID: $route.params.phageID, cdsID: curr.id} }">
                   <button class="btn btn-dark btn-sm" style="width:100px"
-                    v-if="curr.function == 'None' && curr.status == 'Pass'">
-                    <strong>Go</strong>
-                  </button>
-                </router-link>
-                <router-link :to="{ name: 'Fail', params: {phageID: $route.params.phageID, cdsID: curr.id} }">
-                  <button class="btn btn-dark btn-sm" style="width:100px"
-                    v-if="curr.status == 'Fail'">
-                    <strong>Go</strong>
-                  </button>
-                </router-link>
-                <router-link :to="{ name: 'More', params: {phageID: $route.params.phageID, cdsID: curr.id} }">
-                  <button class="btn btn-dark btn-sm" style="width:100px"
-                    v-if="curr.status =='Need more information'">
+                    v-if="curr.function === 'None'">
                     <strong>Go</strong>
                   </button>
                 </router-link>

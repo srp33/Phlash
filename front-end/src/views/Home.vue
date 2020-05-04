@@ -4,7 +4,7 @@
 
     <div class="alert alert-primary" align="left">
       <p>
-        Welcome to<strong><i>Phlash</i>
+        Welcome to <strong><i>Phlash</i>
         </strong>! Enter an ID for your bacteriphage below to get started.
       </p>
       <div class="input-group mb-3">

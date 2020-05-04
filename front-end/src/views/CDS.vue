@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <loading loader="dots" :active.sync="isLoading" :is-full-page="true" :height="200" :width="200" color="#2279b6"></loading>
+    <loading :active.sync="isLoading" :is-full-page="true" :height="100" :width="100"></loading>
     <div class="headers">
       <h1>ID: {{ $route.params.cdsID }}</h1>
       <h4>Start: {{ currentCDS.start }}</h4>
@@ -19,7 +19,7 @@
         <strong>Update {{ $route.params.cdsID }}</strong>
       </button>
     </div>
-    <div class="columns-wrapper">
+    <div class="coding-potential">
       <h3 style="text-align: center; margin: 40px;">GeneMark's Coding Potential</h3>
     </div>
     <div class="coding-potential-table">
@@ -151,7 +151,7 @@ export default {
   },
   methods: {
     getData(cdsID) {
-      axios.get(`http://localhost:5000/api/annotations/fail/${this.$route.params.phageID}/${cdsID}`)
+      axios.get(`http://localhost:5000/api/annotations/cds/${this.$route.params.phageID}/${cdsID}`)
         .then(response => {
           this.currentCDS = response.data.cds;
           this.blastResults = response.data.blast;
@@ -202,7 +202,7 @@ export default {
       this.updateCDS(payload, this.updatedCDS.id);
     },
     updateCDS(payload, cdsID) {
-      axios.put(`http://localhost:5000/api/annotations/fail/${this.$route.params.phageID}/${cdsID}`,
+      axios.put(`http://localhost:5000/api/annotations/cds/${this.$route.params.phageID}/${cdsID}`,
           payload
         )
         .then(() => {

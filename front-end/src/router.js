@@ -5,9 +5,7 @@ import Upload from './views/Upload.vue';
 import DNAMaster from './views/DNAMaster.vue';
 import Blast from './views/Blast.vue';
 import Annotations from './views/Annotations.vue';
-import Pass from './views/Pass.vue';
-import Fail from './views/Fail.vue';
-import More from './views/More.vue';
+import CDS from './views/CDS.vue';
 
 Vue.use(Router);
 
@@ -41,19 +39,9 @@ export default new Router({
       component: Annotations,
     },
     {
-      path: '/annotations/pass/:phageID/:cdsID',
-      name: 'Pass',
-      component: Pass,
-    },
-    {
-      path: '/annotations/fail/:phageID/:cdsID',
-      name: 'Fail',
-      component: Fail,
-    },
-    {
-      path: '/annotations/more/:phageID/:cdsID',
-      name: 'More',
-      component: More,
-    },
+      path: '/annotations/cds/:phageID/:cdsID',
+      name: 'CDS',
+      component: CDS,
+    }
   ],
 });
