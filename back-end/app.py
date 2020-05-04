@@ -6,7 +6,7 @@ from models import *
 import annotate
 import os, datetime, uuid
 import pandas as pd
-import blast
+# import blast
 
 # configuration
 ROOT = os.path.dirname(os.path.abspath(__file__))
@@ -304,12 +304,30 @@ def blast_for_function(current_user, cds_id):
                               'function': cds.function,
                               'status': cds.status}
 
+      fasta_file = get_file("Fasta", UPLOAD_FOLDER)
+      genemark_gdata_file = get_file("GeneMark_gdata", UPLOAD_FOLDER)
+      starts = annotate.failed_gene(cds_id, fasta_file, genemark_gdata_file)
+      print(starts)
+      response_object['start_options'] = starts
+
       blast_file = get_file("Blast", UPLOAD_FOLDER)
       E_VALUE_THRESH = 1e-7
       print("parsing blast")
-      blast_results = blast.parse_blast(blast_file, cds.id, E_VALUE_THRESH)
+      blast_results = annotate.parse_blast(blast_file, cds.id, E_VALUE_THRESH)
       print("writing results to post response")
       response_object['blast'] = blast_results
+
+      genemark_gdata_file = get_file("GeneMark_gdata", UPLOAD_FOLDER)
+      gdata_df = pd.read_csv(genemark_gdata_file, sep='\t', skiprows=16)
+      gdata_df.columns = ['Base', '1', '2', '3', '4', '5', '6']
+      gdata_df = gdata_df[gdata_df.Base.isin(range(cds.start-50, cds.stop+50))]
+      response_object['x_data'] = gdata_df["Base"].to_list()
+      response_object['y_data_1'] = gdata_df["1"].to_list()
+      response_object['y_data_2'] = gdata_df["2"].to_list()
+      response_object['y_data_3'] = gdata_df["3"].to_list()
+      response_object['y_data_4'] = gdata_df["4"].to_list()
+      response_object['y_data_5'] = gdata_df["5"].to_list()
+      response_object['y_data_6'] = gdata_df["6"].to_list()
 
    if request.method == "PUT":
       put_data = request.get_json()
@@ -372,7 +390,7 @@ def failed_annotation(current_user, cds_id):
       blast_file = get_file("Blast", UPLOAD_FOLDER)
       E_VALUE_THRESH = 1e-7
       print("parsing blast")
-      blast_results = blast.parse_blast_multiple(blast_file, cds.id, E_VALUE_THRESH)
+      blast_results = annotate.parse_blast_multiple(blast_file, cds.id, E_VALUE_THRESH)
       print("writing results to post response")
       response_object['blast'] = blast_results
 
@@ -386,16 +404,6 @@ def failed_annotation(current_user, cds_id):
       response_object['y_data_4'] = gdata_df["4"].to_list()
       response_object['y_data_5'] = gdata_df["5"].to_list()
       response_object['y_data_6'] = gdata_df["6"].to_list()
-
-   if request.method == "POST":
-      print("In fail post")
-      cds = DNAMaster.query.filter_by(id=cds_id).first()
-      fasta_file = get_file("Fasta", UPLOAD_FOLDER)
-      E_VALUE_THRESH = 1e-35
-      print("starting blast")
-      blast_results = blast.run_blast(fasta_file, cds.start, cds.stop, E_VALUE_THRESH)
-      print("writing results to post response")
-      response_object['blast'] = blast_results
 
    if request.method == "PUT":
       put_data = request.get_json()
@@ -451,7 +459,7 @@ def do_more_annotation(current_user, cds_id):
       blast_file = get_file("Blast", UPLOAD_FOLDER)
       E_VALUE_THRESH = 1e-7
       print("parsing blast")
-      blast_results = blast.parse_blast(blast_file, cds.id, E_VALUE_THRESH)
+      blast_results = annotate.parse_blast(blast_file, cds.id, E_VALUE_THRESH)
       print("writing results to post response")
       response_object['blast'] = blast_results
 
