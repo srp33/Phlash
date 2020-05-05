@@ -1,5 +1,6 @@
 <template>
   <div class="container">
+    <loading :active.sync="pageLoading" :is-full-page="true" :height="100" :width="100"></loading>
     <h1>Annotate</h1>
     <div class="alert alert-primary">
       <p><strong>Instructions</strong></p>
@@ -10,8 +11,14 @@
       </p>
       <p>
         When the 'Action' column only contains 'Done', you will be able to
-        download your GenBank file.<br />
+        download your GenBank file.
       </p>
+      <button class="btn btn-light" style="margin-top: 0px;" @click="downloadGenBankFile">
+        <strong>Download GenBank file</strong>
+          <div v-if="downloadLoading" class="spinner-border spinner-border-sm" role="status">
+            <span class="sr-only"></span>
+          </div>
+      </button>
       <p><strong>Status Definitions</strong></p>
       <p>
         <strong style="color:green">Pass:</strong> DNA Master's gene call is the same as or longer than GeneMark's gene call.<br />
@@ -68,8 +75,14 @@
 
 <script>
 import axios from "axios";
+import Loading from "vue-loading-overlay";
+import "vue-loading-overlay/dist/vue-loading.css";
 
 export default {
+  name: "Annotations",
+  components: {
+    Loading
+  },
   data() {
     return {
       dnamaster: [],
@@ -82,6 +95,8 @@ export default {
         strand: ""
       },
       fileDownloaded: false,
+      pageLoading: true,
+      downloadLoading: false,
     };
   },
   created() {
@@ -92,21 +107,23 @@ export default {
       axios.get(`http://localhost:5000/api/annotations/${this.$route.params.phageID}`)
         .then(response => {
           this.dnamaster = response.data.dnamaster;
+          this.pageLoading = false;
         })
         .catch(error => {
           console.error(error);
         });
     },
-    downloadFile() {
-      // FIXME: already using post for downloading fasta file in BLAST component
+    downloadGenBankFile() {
+      this.downloadLoading = true;
       axios.post(`http://localhost:5000/api/annotations/${this.$route.params.phageID}`)
         .then(response => {
           let data = response.data;
-          const blob = new Blob([data], { type: "application/gb" });
+          const blob = new Blob([data]);
           let link = document.createElement("a");
           link.href = window.URL.createObjectURL(blob);
-          link.download = `${this.$route.params.phageID}.gb`;
+          link.download = `${this.$route.params.phageID}_modified.gb`;
           link.click();
+          this.downloadLoading = false;
           this.fileDownloaded = true;
         });
     }

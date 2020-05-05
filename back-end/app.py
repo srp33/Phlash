@@ -6,7 +6,6 @@ from models import *
 import annotate
 import os, datetime, uuid
 import pandas as pd
-# import blast
 
 # configuration
 ROOT = os.path.dirname(os.path.abspath(__file__))
@@ -204,20 +203,9 @@ def upload_blast_file(current_user, file_method):
       if file_method == "download":
          print("Starting comparisons")
          annotate.compare()
-         record = SeqIO.read(get_file("Fasta", UPLOAD_FOLDER), "fasta")
-         genome = record.seq
-         output = ""
-         for cds in db.session.query(DNAMaster).order_by(DNAMaster.start):
-            if cds.status == "Pass" or cds.status == "Need more information":
-               output += f">{cds.id}, {cds.start}-{cds.stop}\n"
-               output += f"{Seq.translate(sequence=annotate.get_sequence(genome, cds.strand, cds.start, cds.stop), table=11)}\n"
-            elif cds.status == "Fail":
-               output += f">{cds.id}, {cds.start}-{cds.stop}\n"
-               output += f"{Seq.translate(sequence=annotate.get_sequence(genome, cds.strand, cds.start, cds.stop), table=11)}\n"
-               starts = annotate.get_starts(cds.id, genome)
-               for i in range(len(starts)):
-                  output += f">{cds.id}_{i + 1}, {starts[i]}-{cds.stop}\n"
-                  output += f"{Seq.translate(sequence=annotate.get_sequence(genome, cds.strand, starts[i], cds.stop), table=11)}\n"
+         fasta_file = get_file("Fasta", UPLOAD_FOLDER)
+         genemark_gdata_file = get_file("GeneMark_gdata", UPLOAD_FOLDER)
+         output = annotate.create_fasta(fasta_file, genemark_gdata_file)
 
          with open(os.path.join(ROOT, 'users', current_user, f"{current_user}_blast.fasta"), "w") as out_handle:
             out_handle.write(output)
@@ -263,8 +251,6 @@ def annotate_data(current_user):
    response_object = {'status': 'success'}
 
    if request.method == "GET":
-      # print("Starting comparisons")
-      # annotate.compare()
       dnamaster = []
       for cds in db.session.query(DNAMaster).order_by(DNAMaster.start):
          dnamaster.append({'id': cds.id,
@@ -276,11 +262,12 @@ def annotate_data(current_user):
       response_object['dnamaster'] = dnamaster
 
    if request.method == "POST":
-      # -------for future reference: downloading GENBANK file----------
-      gb_file = get_file("GenBank")
-      out_file = annotate.modify_gb(gb_file)
-      genemark_gdata_file = get_file("GeneMark_gdata", UPLOAD_FOLDER)
-      outfile = annotate.create_fasta(fasta_file, genemark_gdata_file)
+      # -------downloading GENBANK file----------
+      gb_file = get_file("GenBank", UPLOAD_FOLDER)
+      fasta_file = get_file("Fasta", UPLOAD_FOLDER)
+      out_file = annotate.modify_genbank(gb_file, fasta_file)
+      f = open(out_file, "r")
+      return f.read()
 
    return jsonify(response_object)
 
@@ -288,11 +275,11 @@ def annotate_data(current_user):
 
 
 @app.route('/api/annotations/cds/<current_user>/<cds_id>', methods=['GET', 'POST', 'PUT'])
-def failed_annotation(current_user, cds_id):
+def cds_annotation(current_user, cds_id):
    """
-   Gives user new start options for CDSs with 'failed' status.
-   GET method parses through failed genes and finds new start options.
-   PUT method updates the start position if the user chooses to do so.
+   Annotation information for each CDS. 
+   GET method gets cds, its start options, blast results, and graph data.
+   PUT method updates the start position and function if the user chooses to do so.
    """
    DATABASE = "sqlite:///{}".format(os.path.join(ROOT, 'users', current_user, f"{current_user}.db"))
    app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE
@@ -308,21 +295,11 @@ def failed_annotation(current_user, cds_id):
                               'function': cds.function,
                               'status': cds.status}
 
-      fasta_file = get_file("Fasta", UPLOAD_FOLDER)
-      genemark_gdata_file = get_file("GeneMark_gdata", UPLOAD_FOLDER)
-      starts = annotate.failed_gene(cds_id, fasta_file, genemark_gdata_file)
+      # fasta_file = get_file("Fasta", UPLOAD_FOLDER)
+      starts = [int(start) for start in cds.start_options.split(",")]
       print(starts)
       response_object['start_options'] = starts
 
-      # FIXME: why do i do this?? doesn't seem important to do.
-      # start_options = []
-      # lowest_start = 2**100
-      # for start, frames in starts.items():
-      #    frames['start_position'] = start
-      #    if start < lowest_start:
-      #          lowest_start = start
-      #    start_options.append(frames)
-      # response_object['start_options'] = start_options
 
       blast_file = get_file("Blast", UPLOAD_FOLDER)
       E_VALUE_THRESH = 1e-7
@@ -331,9 +308,10 @@ def failed_annotation(current_user, cds_id):
       print("writing results to post response")
       response_object['blast'] = blast_results
 
+      genemark_gdata_file = get_file("GeneMark_gdata", UPLOAD_FOLDER)
       gdata_df = pd.read_csv(genemark_gdata_file, sep='\t', skiprows=16)
       gdata_df.columns = ['Base', '1', '2', '3', '4', '5', '6']
-      gdata_df = gdata_df[gdata_df.Base.isin(range(cds.start-50, cds.stop+50))]
+      gdata_df = gdata_df[gdata_df.Base.isin(range(min(starts) - 100, cds.stop + 100))]
       response_object['x_data'] = gdata_df["Base"].to_list()
       response_object['y_data_1'] = gdata_df["1"].to_list()
       response_object['y_data_2'] = gdata_df["2"].to_list()

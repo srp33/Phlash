@@ -16,7 +16,10 @@
         <li class="step">
           Download the FASTA file that will be used as input for BLAST.<br />
           <button class="btn btn-light" @click="downloadFile">
-            <strong>Download FASTA file</strong>
+            <strong>Download FASTA file     </strong>
+            <div v-if="downloadLoading" class="spinner-border spinner-border-sm" role="status">
+              <span class="sr-only"></span>
+            </div>
           </button>
         </li>
         <li class="step">
@@ -81,6 +84,7 @@ import Vue from "vue";
 export default {
   data() {
     return {
+      downloadLoading: false,
       fileDownloaded: false,
       clickedNCBI: false,
       blast: false,
@@ -92,6 +96,7 @@ export default {
   },
   methods: {
     downloadFile() {
+      this.downloadLoading = true;
       axios.post(`http://localhost:5000/api/blast/${this.$route.params.phageID}/download`)
         .then(response => {
           let data = response.data;
@@ -100,6 +105,7 @@ export default {
           link.href = window.URL.createObjectURL(blob);
           link.download = `${this.$route.params.phageID}_blast.fasta`;
           link.click();
+          this.downloadLoading = false;
           this.fileDownloaded = true;
         });
     },

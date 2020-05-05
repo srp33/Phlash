@@ -55,7 +55,7 @@ def get_keys_by_value(dict, value_to_find):
     return keys
 
 
-# Helper: add probabilities for each frame (used by make_avg_prob_dict)
+# Helper: add probabilities for each frame (used by avg_coding_potential_per_frame)
 def add_frame_probs(df, base_positions):
     one = []
     two = []
@@ -73,7 +73,7 @@ def add_frame_probs(df, base_positions):
     return [one, two, three, four, five, six]
 
 
-# Helper: Find average (used by make_avg_prob_dict)
+# Helper: Find average (used by avg_coding_potential_per_frame)
 def calculate_avg_prob(probabilities):
     total = 0
     for probability in probabilities:
@@ -84,7 +84,7 @@ def calculate_avg_prob(probabilities):
 
 
 # Helper: Make dictionary {key: frame #, value: avg probability} (used by failed_genes)
-def make_avg_prob_dict(df, start, stop):
+def avg_coding_potential_per_frame(df, start, stop):
     indexes = []
     for index, row in df.iterrows():
         if start <= index <= stop:
@@ -102,59 +102,16 @@ def make_avg_prob_dict(df, start, stop):
     return avg_probs
 
 
-# Helper: Merge two lists into one list of lists (tuple in list form) FIXME: NOT USED
-def merge(list1, list2):
-    merged_list = []
-    for i in range(max((len(list1), len(list2)))):
-        while True:
-            try:
-                tup = [list1[i], list2[i]]
-            except IndexError:
-                if len(list1) > len(list2):
-                    list2.append('')
-                    tup = [list1[i], list2[i]]
-                elif len(list1) < len(list2):
-                    list1.append('')
-                    tup = [list1[i], list2[i]]
-                continue
-            merged_list.append(tup)
-            break
-    return merged_list
-
-
-# Helper: Get start options for failed gene
-def get_starts(cds_id, genome):
-    bacteria_start_codons = ["ATG", "GTG", "TTG"]
-    dnamaster = DNAMaster.query.filter_by(id=cds_id, status="Fail").first()
-    genemark = GeneMark.query.filter_by(stop=dnamaster.stop).first()
-
-    # Subtract 1 because indexing begins with 0. Subtract 3 to account for 3 bases in a codon.
-    start = (dnamaster.start - 1) - 3
-    starts = []
-    while start >= genemark.start - 9:
-        if dnamaster.strand == '+':
-            codon = genome[start: start + 3]
-        elif dnamaster.strand == '-':
-            codon = genome.reverse_complement()[start: start + 3]
-        if codon in bacteria_start_codons:
-            starts.append(start + 1)
-        start = start - 3
-
-    return starts
-
-
 # Get forward or reverse sequence
 def get_sequence(genome, strand, start, stop):
     if strand == '-':
-        return genome.reverse_complement()[start - 1: stop]
+        return genome.reverse_complement()[start : stop]
     else:
-        return genome[start - 1: stop]
+        return genome[start : stop]
 
 # MAIN FUNCTIONS ------------------------------------------------------------------------------------------------------
 
 # Get all gene locations from GenBank file and add to sql database
-
-
 def parse_genbank(genbank_file):
     with open(genbank_file, "r") as handle:
         for record in SeqIO.parse(handle, "genbank"):
@@ -174,7 +131,6 @@ def parse_genbank(genbank_file):
                     if not exists:
                         db.session.add(cds)
                         db.session.commit()
-                        # id_number += 1
 
 
 # Parse through genemark ldata
@@ -200,7 +156,7 @@ def parse_genemark_ldata(gm_file):
                         if key != max_right:
                             del genemark_all_genes[key]
 
-    genemark_genes = dict()
+    genemark_cdss = dict()
     with open(gm_file, "r") as handle:
         for line in handle:
             if line == '\n':
@@ -218,9 +174,9 @@ def parse_genemark_ldata(gm_file):
                 for stop in genemark_all_genes:
                     min_start = min(genemark_all_genes[stop])
                     if min_start == curr_start and stop == curr_stop:
-                        if (min_start, stop) not in genemark_genes:
+                        if (min_start, stop) not in genemark_cdss:
                             id = "genemark_" + str(id_number)
-                            genemark_genes[(min_start, stop)] = curr_frame
+                            genemark_cdss[(min_start, stop)] = curr_frame
                             cds = GeneMark(id=id,
                                            start=min_start,
                                            stop=stop,
@@ -247,159 +203,104 @@ def compare():
         db.session.commit()
 
 
-# Deals with "failed" genes.
-def failed_gene(cds_id, fasta_file, genemark_gdata_file):
+def start_options(cds_id, genome, genemark_gdata_file):
+    """
+    Finds alternative, possible start positions for a given CDS. 
+    Calculates the average coding potential per frame for each start position.
+
+    @return start_options: dictionary of (key) start positions and (value) their
+        average coding potential per frame. 
+    """
     gdata_df = pd.read_csv(genemark_gdata_file, sep='\t', skiprows=16)
     gdata_df.columns = ['Base', '1', '2', '3', '4', '5', '6']
     gdata_df = gdata_df.set_index('Base')
 
     bacteria_start_codons = ["ATG", "GTG", "TTG"]
-    record = SeqIO.read(fasta_file, "fasta")
-    dnamaster_gene = DNAMaster.query.filter_by(id=cds_id).first()
-    genemark_gene = GeneMark.query.filter_by(stop=dnamaster_gene.stop).first()
+    dnamaster_cds = DNAMaster.query.filter_by(id=cds_id).first()
+    genemark_cds = GeneMark.query.filter_by(stop=dnamaster_cds.stop).first()
 
-    # Subtract 1 because indexing begins with 0.
-    actual_start = dnamaster_gene.start - 1
-    # Subtract 3 to account for 3 bases in a codon.
-    next_start_position = actual_start - 3
+    original_start = dnamaster_cds.start - 1  # Subtract 1 because python indexing begins with 0.
+    prev_start = original_start - 1  # Subtract 4 to account for 3 bases in a codon.
 
-    start_positions = {}
-    first_avg_dict = make_avg_prob_dict(
-        gdata_df, actual_start, dnamaster_gene.stop)
-    start_positions[dnamaster_gene.start] = first_avg_dict
+    start_options = []
+    start_options.append(dnamaster_cds.start)  # Add original start position info
 
-    if genemark_gene is None: 
-        gm_start = actual_start
-    else:
-        gm_start = genemark_gene.start
-    
-    while next_start_position >= gm_start-33:
-        if dnamaster_gene.strand == '+':
-            previous_codon = record.seq[next_start_position:next_start_position + 3]
-        elif dnamaster_gene.strand == '-':
-            previous_codon = record.seq.reverse_complement(
-            )[next_start_position:next_start_position + 3]
-        if previous_codon in bacteria_start_codons:
-            avg_dict = make_avg_prob_dict(
-                gdata_df, next_start_position, dnamaster_gene.stop)
-            start_positions[next_start_position+1] = avg_dict
-        next_start_position = next_start_position - 3
+    min_start = original_start if genemark_cds is None else genemark_cds.start - 1
+    num_nucleotides = min_start if min_start < 200 else 200   # Check 200 bp previous to original
 
-    return start_positions
+    while prev_start >= min_start - num_nucleotides:
+        prev_codon = get_sequence(genome, dnamaster_cds.strand, prev_start, prev_start + 3)
+        if prev_codon in bacteria_start_codons:
+            start_options.append(prev_start + 1)
+        prev_start = prev_start - 1
 
-
-# Deals with 'Not called by GeneMark' genes.
-def need_more_info_genes(cds_id, genemark_gdata_file):
-    gdata_df = pd.read_csv(genemark_gdata_file, sep='\t', skiprows=16)
-    gdata_df.columns = ['Base', '1', '2', '3', '4', '5', '6']
-    gdata_df = gdata_df.set_index('Base')
-    cds = DNAMaster.query.filter_by(
-        id=cds_id, status="Need more information").first()
-    probabilities = make_avg_prob_dict(gdata_df, cds.start, cds.stop)
-    return(probabilities)
+    return start_options
 
 
 # Create FASTA for input into BLAST
 def create_fasta(fasta_file, genemark_gdata_file):
-    record = SeqIO.read(fasta_file, "fasta")
-    genome = record.seq
+    genome = SeqIO.read(fasta_file, "fasta").seq
     output = ""
-
+    
     for cds in db.session.query(DNAMaster).order_by(DNAMaster.start):
-        if cds.status == "Pass" or cds.status == "Need more information":
-            output += f">{cds.id}, {cds.start}-{cds.stop}\n"
-            output += f"{Seq.translate(sequence=get_sequence(genome, cds.strand, cds.start, cds.stop), table=11)}\n"
-        elif cds.status == "Fail":
-            output += f">{cds.id}, {cds.start}-{cds.stop}\n"
-            output += f"{Seq.translate(sequence=get_sequence(genome, cds.strand, cds.start, cds.stop), table=11)}\n"
-            starts = get_starts(cds.id, genome)
-            for i in range(len(starts)):
-                output += f">{cds.id}_{i + 1}, {starts[i]}-{cds.stop}\n"
-                output += f"{Seq.translate(sequence=get_sequence(genome, cds.strand, starts[i], cds.stop), table=11)}\n"
+        starts = start_options(cds.id, genome, genemark_gdata_file)
+        cds.start_options = ", ".join([str(start) for start in starts])
+        db.session.commit()
+        for i in range(len(starts[:3])):
+            if starts[i] == cds.start:
+                output += f">{cds.id}, {starts[i]}-{cds.stop}\n"
+                output += f"{Seq.translate(sequence=get_sequence(genome, cds.strand, starts[i]-1, cds.stop), table=11)}\n"
+            else:
+                output += f">{cds.id}_{i}, {starts[i]}-{cds.stop}\n"
+                output += f"{Seq.translate(sequence=get_sequence(genome, cds.strand, starts[i]-1, cds.stop), table=11)}\n"
 
-    with open("sequences.fasta", "w") as out_handle:
-        out_handle.write(output)
-
-    return "sequences.fasta"
+    return output
 
 
 # Create modified GenBank file for input into Sequin
-def modify_gb(gb_file):
-    out_file_init = re.search(r'uploads/(.*).(\w*)', gb_file)
-    out_file = str(out_file_init.group(1)) + '_modified.' + \
-        str(out_file_init.group(2))
-    final_genes = create_final_dict()
+def modify_genbank(gb_file, fasta_file):
+    gb_filename = re.search(r'(.*/users/.*/uploads/.*).(\w*)', gb_file)
+    out_file = str(gb_filename.group(1)) + '_modified.' + str(gb_filename.group(2))
+
+    genome = SeqIO.read(fasta_file, "fasta").seq
+    final_annotations = final_annotations(genome)
     final_features = []
     for record in SeqIO.parse(open(gb_file, "r"), "genbank"):
         for feature in record.features:
             if feature.type == "gene" or feature.type == "CDS":
                 locus_tag = feature.qualifiers["locus_tag"][0]
-                if locus_tag in final_genes:
-                    new_start = final_genes[locus_tag]['start']
-                    if feature.location.strand == 1:
-                        feature.location = SeqFeature.FeatureLocation(SeqFeature.ExactPosition(new_start - 1),
-                                                                      SeqFeature.ExactPosition(
-                            feature.location.end.position),
-                            feature.location.strand)
-                    else:
-                        feature.location = SeqFeature.FeatureLocation(
-                            SeqFeature.ExactPosition(
-                                feature.location.start.position),
-                            SeqFeature.ExactPosition(new_start), feature.location.strand)
+                if locus_tag in final_annotations.keys():
+                    new_start = final_annotations[locus_tag]["start"]
+                    feature.location = SeqFeature.FeatureLocation(SeqFeature.ExactPosition(new_start - 1),
+                                                                    SeqFeature.ExactPosition(feature.location.end.position),
+                                                                    feature.location.strand)
+                    if feature.type == "CDS":
+                        feature.qualifiers["product"][0] = final_annotations[locus_tag]["function"]
+                        feature.qualifiers["translation"][0] = final_annotations[locus_tag]["translation"]
             final_features.append(feature)  # Append final features
         record.features = final_features
         with open(out_file, "w") as new_gb:
             SeqIO.write(record, new_gb, "genbank")
+    
     return out_file
 
 
-def create_final_dict():
-    final_genes = {}
-    row = {}
+def final_annotations(genome):
+    genome = SeqIO.read(fasta_file, "fasta").seq
+    
+    final_annotations = {}
     for cds in DNAMaster.query.order_by(DNAMaster.start).all():
-        row['start'] = cds.start
-        row['strand'] = cds.strand
-        final_genes[cds.id] = row
-    return final_genes
-
-
-def parse_blast(blast_file, cds_id, e_value_thresh):
-    blast_results = []
-    with open(blast_file) as f:
-        blasts = json.load(f)["BlastOutput2"]
-        for blast in blasts:
-            search = blast["report"]["results"]["search"]
-            title = re.search("([A-Z]+_\d+_*\d*), \d+-\d+",
-                              search["query_title"])
-            if title:
-                curr_id = title.group(1)
-                cds_id_ = cds_id + "_"
-                if cds_id == curr_id or cds_id_ in curr_id:
-                    if "message" not in search:
-                        hits = search["hits"]
-                        for hit in hits:
-                            hsps = hit["hsps"][0]
-                            if hsps["evalue"] <= e_value_thresh:
-                                alignment = {}
-                                description = hit["description"][0]
-                                alignment['accession'] = description["accession"]
-                                alignment["title"] = description["title"]
-                                # alignment["sciname"] = description["sciname"]
-                                alignment["evalue"] = '{:0.2e}'.format(
-                                    hsps["evalue"])
-                                alignment["query_from"] = hsps["query_from"]
-                                alignment["query_to"] = hsps["query_to"]
-                                alignment["hit_from"] = hsps["hit_from"]
-                                alignment["hit_to"] = hsps["hit_to"]
-                                alignment["percent_identity"] = round(
-                                    hsps["identity"] / hsps["align_len"] * 100, 2)
-                                alignment["message"] = "Hits found"
-                                blast_results.append(alignment)
-                    else:
-                        if search["message"] == "No hits found":
-                            return blast_results
-
-    return blast_results
+        annotation = {}
+        annotation['start'] = cds.start
+        annotation['strand'] = cds.strand
+        annotation['function'] = cds.function
+        annotation['translation'] = Seq.translate(sequence=get_sequence(genome, 
+                                                                        cds.strand, 
+                                                                        cds.start - 1,
+                                                                        cds.stop), 
+                                                                        table=11)
+        final_annotations[cds.id] = annotation
+    return final_annotations
 
 
 def parse_blast_multiple(blast_file, cds_id, e_value_thresh):

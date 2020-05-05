@@ -1,10 +1,11 @@
 <template>
   <div class="container">
-    <loading :active.sync="isLoading" :is-full-page="true" :height="100" :width="100"></loading>
+    <loading :active.sync="pageLoading" :is-full-page="true" :height="100" :width="100"></loading>
     <div class="headers">
       <h1>ID: {{ $route.params.cdsID }}</h1>
       <h4>Start: {{ currentCDS.start }}</h4>
       <h4>Stop: {{ currentCDS.stop }}</h4>
+      <h4>Strand: {{ currentCDS.strand }}</h4>
       <h4>Status: {{ currentCDS.status }}</h4>
     </div>
     <div class="alert alert-primary">
@@ -19,36 +20,20 @@
         <strong>Update {{ $route.params.cdsID }}</strong>
       </button>
     </div>
-    <div class="coding-potential">
-      <h3 style="text-align: center; margin: 40px;">GeneMark's Coding Potential</h3>
-    </div>
     <div class="coding-potential-table">
-      <h5 style="text-align: center; margin: 20px;">Average Coding Potential Per Frame</h5>
+      <h4 style="text-align: center; margin: 20px;">Alternative Start Positions</h4>
       <div class="table-responsive">
         <table id="cp-table" class="table table-hover">
-          <caption>Frames are counted 1-6 (direct 1-3 and complementary 4-6).</caption>
           <thead>
             <tr>
               <th scope="col">Start Position</th>
-              <th scope="col">Frame 1</th>
-              <th scope="col">Frame 2</th>
-              <th scope="col">Frame 3</th>
-              <th scope="col">Frame 4</th>
-              <th scope="col">Frame 5</th>
-              <th scope="col">Frame 6</th>
               <th scope="col">Action</th>
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(data, start, index) in startOptions" :key="index">
-              <th v-if="start===currentCDS.start.toString()">{{ start }} (current)</th>
+            <tr v-for="(start, index) in startOptions" :key="index">
+              <th v-if="start===currentCDS.start">{{ start }} (current)</th>
               <th v-else>{{ start }}</th>
-              <td>{{ data.frame_1 }}</td>
-              <td>{{ data.frame_2 }}</td>
-              <td>{{ data.frame_3 }}</td>
-              <td>{{ data.frame_4 }}</td>
-              <td>{{ data.frame_5 }}</td>
-              <td>{{ data.frame_6 }}</td>
               <td>
                 <button class="btn btn-dark btn-sm" @click="setStart(start)">
                   <strong>Select</strong>
@@ -59,24 +44,29 @@
         </table>
       </div>
     </div>
-    <div class="coding-potential-graphs">
-      <h5 style="text-align: center; margin: 20px;">Coding Potential Per Frame</h5>
-      <div v-if="dataExists">
-        <Graphs :data1="data1" :data2="data2" :data3="data3" :data4="data4" :data5="data5" :data6="data6" :start="currentCDS.start" :stop="currentCDS.stop" />
+    <hr />
+    <div class="coding-potential">
+      <h4 style="text-align: center; margin: 40px;">GeneMark's Coding Potential Per Frame</h4>
+      <div class="coding-potential-graphs">
+        <div v-if="dataExists">
+          <Graphs :data1="data1" :data2="data2" :data3="data3" :data4="data4" :data5="data5" :data6="data6" :start="currentCDS.start" :stop="currentCDS.stop" />
+        </div>
+        <div v-else>
+          <p>Loading graphs...</p>
+        </div>
       </div>
-      <div v-else>
-        <p>Loading graphs...</p>
-      </div>
+      <p class="graphs-caption"><em>Frames are counted 1-6 (direct 1-3 and complementary 4-6).</em></p>
     </div>
     <hr />
     <div class="blast-results">
-      <h3 style="text-align: center; margin: 20px;">BLAST Results</h3>
+      <h4 style="text-align: center; margin: 40px;">BLAST Results</h4>
       <div id="accordion">
         <div class="card" v-for="(item, key) in blastResults" :key="key">
           <div class="card-header">
             <h4 class="mb-0">
               <button class="btn btn-light btn-blast" data-toggle="collapse" aria-expanded="false" v-bind:data-target="'#'+key" v-bind:aria-controls="key">
-                <strong>{{ key }}</strong>
+                <strong v-if="key===currentCDS.start.toString()">{{ key }} (current)</strong>
+                <strong v-else>{{ key }}</strong>
               </button>
             </h4>
           </div>
@@ -106,7 +96,7 @@ import Loading from "vue-loading-overlay";
 import "vue-loading-overlay/dist/vue-loading.css";
 
 export default {
-  name: "Fail",
+  name: "CDS",
   components: {
     BlastResults,
     Graphs,
@@ -137,7 +127,7 @@ export default {
       newFunction: "None",
       newStart: 0,
       dataExists: false,
-      isLoading: true,
+      pageLoading: true,
       data1: [{ x: [], y: [] }],
       data2: [{ x: [], y: [] }],
       data3: [{ x: [], y: [] }],
@@ -181,7 +171,7 @@ export default {
             y: response.data.y_data_6
           }];
           this.dataExists = true;
-          this.isLoading = false;
+          this.pageLoading = false;
         })
         .catch(error => {
           console.error(error);
@@ -253,6 +243,11 @@ export default {
 }
 
 /* ----- Coding Potential ----- */
+.coding-potential-table {
+  margin: 50px auto;
+  width: 40%;
+}
+
 .table-responsive {
   max-height: 250px;
   overflow-y: auto;
@@ -276,7 +271,13 @@ tbody {
 }
 
 .coding-potential-graphs {
-  height: 670px;
+  height: 650px;
+}
+
+.graphs-caption {
+  margin-top: 15px;
+  text-align: left;
+  color: grey;
 }
 
 /* ----- Blast Results ----- */

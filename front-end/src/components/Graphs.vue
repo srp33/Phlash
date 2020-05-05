@@ -50,6 +50,8 @@ export default {
           t: 30,
           pad: 4
         },
+        spikedistance: 200,
+        hoverdistance: 100,
         xaxis: {
           showgrid: false,
           showline: true,
@@ -62,7 +64,12 @@ export default {
             size: 12,
             color: "black"
           },
-          dtick: 200
+          dtick: 200,
+          showcrossline: true,
+          spikemode: "across",
+          spikecolor: "green",
+          spikedash: "solid",
+          spikethickness: 2
         },
         yaxis: {
           title: "Frame 1",
@@ -159,6 +166,8 @@ export default {
           t: 30,
           pad: 4
         },
+        spikedistance: 200,
+        hoverdistance: 100,
         xaxis: {
           showgrid: false,
           showline: true,
@@ -171,7 +180,12 @@ export default {
             size: 12,
             color: "black"
           },
-          dtick: 200
+          dtick: 200,
+          showcrossline: true,
+          spikemode: "across",
+          spikecolor: "green",
+          spikedash: "solid",
+          spikethickness: 2
         },
         yaxis: {
           title: "Frame 2",
@@ -236,6 +250,8 @@ export default {
           t: 30,
           pad: 4
         },
+        spikedistance: 200,
+        hoverdistance: 100,
         xaxis: {
           title: "Nucleotide Position",
           titlefont: {
@@ -254,7 +270,12 @@ export default {
           },
           ticklen: 7,
           tickwidth: 2,
-          dtick: 200
+          dtick: 200,
+          showcrossline: true,
+          spikemode: "across",
+          spikecolor: "green",
+          spikedash: "solid",
+          spikethickness: 2
         },
         yaxis: {
           title: "Frame 3",
@@ -324,6 +345,8 @@ export default {
           t: 30,
           pad: 4
         },
+        spikedistance: 200,
+        hoverdistance: 100,
         xaxis: {
           showgrid: false,
           showline: true,
@@ -336,7 +359,12 @@ export default {
             family: "Avenir, Helvetica, Arial, sans-serif",
             size: 12,
             color: "black"
-          }
+          },
+          showcrossline: true,
+          spikemode: "across",
+          spikecolor: "green",
+          spikedash: "solid",
+          spikethickness: 2
         },
         yaxis: {
           title: "Frame 4",
@@ -433,6 +461,8 @@ export default {
           t: 30,
           pad: 4
         },
+        spikedistance: 200,
+        hoverdistance: 100,
         xaxis: {
           showgrid: false,
           showline: true,
@@ -445,7 +475,12 @@ export default {
             family: "Avenir, Helvetica, Arial, sans-serif",
             size: 12,
             color: "black"
-          }
+          },
+          showcrossline: true,
+          spikemode: "across",
+          spikecolor: "green",
+          spikedash: "solid",
+          spikethickness: 2
         },
         yaxis: {
           title: "Frame 5",
@@ -510,6 +545,8 @@ export default {
           t: 30,
           pad: 4
         },
+        spikedistance: 200,
+        hoverdistance: 100,
         xaxis: {
           title: "Nucleotide Position",
           titlefont: {
@@ -528,7 +565,12 @@ export default {
             family: "Avenir, Helvetica, Arial, sans-serif",
             size: 12,
             color: "black"
-          }
+          },
+          showcrossline: true,
+          spikemode: "across",
+          spikecolor: "green",
+          spikedash: "solid",
+          spikethickness: 2
         },
         yaxis: {
           title: "Frame 6",
