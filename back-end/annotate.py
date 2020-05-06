@@ -257,37 +257,7 @@ def create_fasta(fasta_file, genemark_gdata_file):
     return output
 
 
-# Create modified GenBank file for input into Sequin
-def modify_genbank(gb_file, fasta_file):
-    gb_filename = re.search(r'(.*/users/.*/uploads/.*).(\w*)', gb_file)
-    out_file = str(gb_filename.group(1)) + '_modified.' + str(gb_filename.group(2))
-
-    genome = SeqIO.read(fasta_file, "fasta").seq
-    final_annotations = final_annotations(genome)
-    final_features = []
-    for record in SeqIO.parse(open(gb_file, "r"), "genbank"):
-        for feature in record.features:
-            if feature.type == "gene" or feature.type == "CDS":
-                locus_tag = feature.qualifiers["locus_tag"][0]
-                if locus_tag in final_annotations.keys():
-                    new_start = final_annotations[locus_tag]["start"]
-                    feature.location = SeqFeature.FeatureLocation(SeqFeature.ExactPosition(new_start - 1),
-                                                                    SeqFeature.ExactPosition(feature.location.end.position),
-                                                                    feature.location.strand)
-                    if feature.type == "CDS":
-                        feature.qualifiers["product"][0] = final_annotations[locus_tag]["function"]
-                        feature.qualifiers["translation"][0] = final_annotations[locus_tag]["translation"]
-            final_features.append(feature)  # Append final features
-        record.features = final_features
-        with open(out_file, "w") as new_gb:
-            SeqIO.write(record, new_gb, "genbank")
-    
-    return out_file
-
-
-def final_annotations(genome):
-    genome = SeqIO.read(fasta_file, "fasta").seq
-    
+def get_final_annotations(genome):
     final_annotations = {}
     for cds in DNAMaster.query.order_by(DNAMaster.start).all():
         annotation = {}
@@ -301,6 +271,36 @@ def final_annotations(genome):
                                                                         table=11)
         final_annotations[cds.id] = annotation
     return final_annotations
+
+
+# Create modified GenBank file for input into Sequin
+def modify_genbank(gb_file, fasta_file):
+    gb_filename = re.search(r'(.*/users/.*/uploads/.*).(\w*)', gb_file)
+    out_file = str(gb_filename.group(1)) + '_modified.' + str(gb_filename.group(2))
+
+    genome = SeqIO.read(fasta_file, "fasta").seq
+    final_annotations = get_final_annotations(genome)
+    final_features = []
+    for record in SeqIO.parse(open(gb_file, "r"), "genbank"):
+        for feature in record.features:
+            if feature.type == "gene" or feature.type == "CDS":
+                locus_tag = feature.qualifiers["locus_tag"][0]
+                if locus_tag in final_annotations.keys():
+                    new_start = final_annotations[locus_tag]["start"]
+                    feature.location = SeqFeature.FeatureLocation(SeqFeature.ExactPosition(new_start - 1),
+                                                                    SeqFeature.ExactPosition(feature.location.end.position),
+                                                                    feature.location.strand)
+                    if feature.type == "CDS":
+                        feature.qualifiers["product"][0] = final_annotations[locus_tag]["function"]
+                        feature.qualifiers["translation"][0] = final_annotations[locus_tag]["translation"]
+                else:
+                    continue
+            final_features.append(feature)  # Append final features
+        record.features = final_features
+        with open(out_file, "w") as new_gb:
+            SeqIO.write(record, new_gb, "genbank")
+    
+    return out_file
 
 
 def parse_blast_multiple(blast_file, cds_id, e_value_thresh):

@@ -274,7 +274,7 @@ def annotate_data(current_user):
 
 
 
-@app.route('/api/annotations/cds/<current_user>/<cds_id>', methods=['GET', 'POST', 'PUT'])
+@app.route('/api/annotations/cds/<current_user>/<cds_id>', methods=['GET', 'POST', 'PUT', 'DELETE'])
 def cds_annotation(current_user, cds_id):
    """
    Annotation information for each CDS. 
@@ -331,6 +331,14 @@ def cds_annotation(current_user, cds_id):
          response_object['message'] = 'CDS updated!'
       else:
          response_object['message'] = 'CDS did not update.'
+
+   if request.method == "DELETE":
+      if DNAMaster.query.filter_by(id=cds_id).first():
+         DNAMaster.query.filter_by(id=cds_id).delete()
+         db.session.commit()
+         response_object['message'] = 'CDS removed!'
+      else:
+         response_object['message'] = 'Error: CDS could not be deleted.'
 
    return jsonify(response_object)
 

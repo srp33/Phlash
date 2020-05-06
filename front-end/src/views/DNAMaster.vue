@@ -22,9 +22,9 @@
     </div>
 
     <div id="dnamaster">
-      <button class="btn btn-dark btn-sm" id="add-btn" align="center" v-b-modal.add-modal>
+      <!-- <button class="btn btn-dark btn-sm" id="add-btn" align="center" v-b-modal.add-modal>
         <strong>Add a new CDS</strong>
-      </button>
+      </button> -->
       <div class="table-responsive">
         <table class="table table-hover" align="center">
           <thead>

@@ -16,8 +16,11 @@
       </p>
       <p><strong>Your selected start position:</strong> {{ newStart }}</p>
       <p><strong>Your selected function:</strong> {{ newFunction }}</p>
-      <button type="button" class="btn btn-light" @click="editCDS" v-if="newFunction !== 'None' && newStart !== 0">
+      <button type="button" class="btn btn-light btn-action" @click="editCDS" v-if="newFunction !== 'None' && newStart !== 0">
         <strong>Update {{ $route.params.cdsID }}</strong>
+      </button>
+      <button type="button" class="btn btn-light btn-action" @click="deleteCDS($route.params.cdsID)">
+        <strong>Delete {{ $route.params.cdsID }}</strong>
       </button>
     </div>
     <div class="coding-potential-table">
@@ -81,8 +84,11 @@
     <div class="info-bottom">
       <p><strong>Your selected start position:</strong> {{ newStart }}</p>
       <p><strong>Your function selection:</strong> {{ newFunction }}</p>
-      <button type="button" class="btn btn-light" @click="editCDS" v-if="newFunction !== 'None' && newStart !== 0">
+      <button type="button" class="btn btn-light btn-action" @click="editCDS" v-if="newFunction !== 'None' && newStart !== 0">
         <strong>Update {{ $route.params.cdsID }}</strong>
+      </button>
+      <button type="button" class="btn btn-light btn-action" @click="deleteCDS($route.params.cdsID)">
+        <strong>Delete {{ $route.params.cdsID }}</strong>
       </button>
     </div>
   </div>
@@ -202,6 +208,15 @@ export default {
           console.error(error);
         });
     },
+    deleteCDS(cdsID) {
+      axios.delete(`http://localhost:5000/api/annotations/cds/${this.$route.params.phageID}/${cdsID}`)
+        .then(() => {
+          this.$router.push(`/annotations/${this.$route.params.phageID}`);
+        })
+        .catch(error => {
+          console.error(error);
+        });
+    },
     keepOriginal() {
       const payload = {
         id: this.currentCDS.id,
@@ -240,6 +255,10 @@ export default {
 
 .info-bottom {
   margin: 50px auto;
+}
+
+.btn-action {
+  margin: 7px;
 }
 
 /* ----- Coding Potential ----- */

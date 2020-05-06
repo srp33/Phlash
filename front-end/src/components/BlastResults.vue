@@ -29,7 +29,7 @@
           </tr>
         </tbody>
       </table>
-      <div v-if="blastResultsExist===false">
+      <div v-if="blastResults.length===0">
         <h4>
           <em>No hits found.</em>
         </h4>
@@ -42,17 +42,16 @@
 export default {
   name: "BlastResults",
   props: {
-    blastResults: Array,
-    blastResultsExist: Boolean
+    blastResults: Array
   },
   data() {
     return {
-      newFunction: ""
     };
   },
   methods: {
     setFunction(funct) {
-      this.$emit("newFunction", funct);
+      let result = funct.match(/(.*)\[.*\]/);
+      this.$emit("newFunction", result[1]);
     }
   }
 };
