@@ -1,49 +1,21 @@
 """
-Contains functions that are called in app.py.
-Functions parse through user's uploaded files, does comparison analysis between files, 
-creates files, etc.
+Contains functions that are called in main.py, the Flask application.
+Functions parse through user's uploaded files, does comparison analysis 
+between files, creates files, etc.
 """
 from Bio import SeqIO, Seq, SeqFeature
 from models import *
+import json
 import os
 import pandas as pd
 import re
-import json
+import subprocess
 
 
-# HELPER FUNCTIONS -----------------------------------------------------------------------------------------------------
-
-def parse_location(location_stg):
-    """Parses through GenBank's gene location string. Used by `parse_genbank`.
-
-    @param location_stg: 
-    """
-    start = ""
-    stop = ""
-    frame = ""
-    parsed = []
-    location_stg = str(location_stg)
-    for char in location_stg:
-        if char is "[" or char is "]":
-            parsed.append(char)
-        elif char is ":":
-            parsed.append(char)
-        elif char is "(" or char is ")":
-            parsed.append(char)
-        elif char.isdigit() and ":" not in parsed:
-            start = start + char
-        elif char.isdigit() and ":" in parsed:
-            stop = stop + char
-        elif "(" in parsed:
-            frame = char
-    start = int(start) + 1
-    stop = int(stop)
-    return [start, stop, frame]
-
-
+# HELPER FUNCTIONS ---------------------------------------------------------
 def get_keys_by_value(dict, value_to_find):
-    """Parses through GeneMark ldata. Used by `parse_genemark_ldata`.
-
+    """
+    Parses through GeneMark ldata. Used by `parse_genemark_ldata`.
     @param dict:
     @param value_to_find: 
     """
@@ -55,78 +27,52 @@ def get_keys_by_value(dict, value_to_find):
     return keys
 
 
-# Helper: add probabilities for each frame (used by avg_coding_potential_per_frame)
-def add_frame_probs(df, base_positions):
-    one = []
-    two = []
-    three = []
-    four = []
-    five = []
-    six = []
-    for base in base_positions:
-        one.append(df.loc[base, '1'])
-        two.append(df.loc[base, '2'])
-        three.append(df.loc[base, '3'])
-        four.append(df.loc[base, '4'])
-        five.append(df.loc[base, '5'])
-        six.append(df.loc[base, '6'])
-    return [one, two, three, four, five, six]
-
-
-# Helper: Find average (used by avg_coding_potential_per_frame)
-def calculate_avg_prob(probabilities):
-    total = 0
-    for probability in probabilities:
-        total += probability
-
-    average = total / len(probabilities)
-    return round(average, 4)
-
-
-# Helper: Make dictionary {key: frame #, value: avg probability} (used by failed_genes)
-def avg_coding_potential_per_frame(df, start, stop):
-    indexes = []
-    for index, row in df.iterrows():
-        if start <= index <= stop:
-            indexes.append(index)
-
-    frames = add_frame_probs(df, indexes)
-    avg_probs = {}
-    current_frame = 1
-    for frame in frames:
-        avg_prob = calculate_avg_prob(frame)
-        frame_label = "frame_{}".format(current_frame)
-        avg_probs[frame_label] = avg_prob
-        current_frame = current_frame + 1
-
-    return avg_probs
-
-
-# Get forward or reverse sequence
 def get_sequence(genome, strand, start, stop):
+    """
+    Gets sequence (ranging from start to stop) of the direct or 
+    complementary strand of genome.
+    * Remember that python indexing starts at 0, so make sure the start 
+        value accomadates that when passed in to this function. 
+    """
     if strand == '-':
         return genome.reverse_complement()[start : stop]
     else:
         return genome[start : stop]
 
-# MAIN FUNCTIONS ------------------------------------------------------------------------------------------------------
 
-# Get all gene locations from GenBank file and add to sql database
-def parse_genbank(genbank_file):
+# MAIN FUNCTIONS ---------------------------------------------------------
+def parse_dnamaster_genbank(genbank_file):
+    """
+    Parses through DNA Master GenBank file to gather DNA Master's CDS calls. 
+    Adds each CDS to DNA Master table in user's database. 
+    """
+    print("in parse_dnamaster_genbank")
+    DNAMaster.query.delete()
     with open(genbank_file, "r") as handle:
         for record in SeqIO.parse(handle, "genbank"):
-            # id_number = 1
+            num = 1
             for feature in record.features:
                 if feature.type == "CDS":
-                    # id = "dnamaster_" + str(id_number)
-                    id = feature.qualifiers["locus_tag"][0]
-                    gene_info = parse_location(feature.location)
-                    cds = DNAMaster(id=id,
-                                    start=gene_info[0],
-                                    stop=gene_info[1],
-                                    strand=gene_info[2],
-                                    function="None",
-                                    status="None")
+                    if "locus_tag" in feature.qualifiers:
+                        id = feature.qualifiers["locus_tag"][0]
+                    elif "protein_id" in feature.qualifiers:
+                        id = feature.qualifiers["protein_id"][0]
+                    else:
+                        id = f"cds_{num}"
+                        num += 1
+                    
+                    if isinstance(feature.location, SeqFeature.CompoundLocation):
+                        # FIXME: do something for compound locations, e.g. join(1..218,166710..167034)
+                        print(f"{feature.location} is a compoundlocation")
+                    
+                    strand = "+" if feature.location.strand == 1 else "-"
+                    cds = DNAMaster(id = id,
+                                    start = feature.location.start.position + 1,
+                                    stop = feature.location.end.position,
+                                    strand = strand,
+                                    function = "None",
+                                    status = "None")
+                    
                     exists = DNAMaster.query.filter_by(id=id).first()
                     if not exists:
                         db.session.add(cds)

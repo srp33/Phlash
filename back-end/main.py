@@ -77,7 +77,7 @@ def check_phage_id(phage_id):
     return jsonify(response_object)
 
 
-@app.route('/api/upload/<current_user>', methods=['POST'])
+@app.route('/api/upload/<current_user>', methods=['GET', 'POST'])
 def upload_files(current_user):
     """
     API endpoint for '/upload/:current_user'.
@@ -87,6 +87,11 @@ def upload_files(current_user):
     DATABASE = "sqlite:///{}".format(os.path.join(ROOT, 'users', current_user, f"{current_user}.db"))
     app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE
     response_object = {}
+
+    if request.method == "GET":
+        fasta_file = get_file("Fasta", UPLOAD_FOLDER)
+        genemark.run_genemark(fasta_file)
+        print("ran genemark")
 
     if request.method == "POST":
         if 'file' not in request.files:
@@ -120,7 +125,7 @@ def upload_files(current_user):
                     file_ext = os.path.splitext(file_name)[1].lower()
                     if file_ext in GENBANK_EXTENSIONS:
                         genbank_file = get_file("GenBank", UPLOAD_FOLDER)
-                        annotate.parse_genbank(genbank_file)
+                        annotate.parse_dnamaster_genbank(genbank_file)
                     elif file_ext in LDATA_EXTENSION:
                         genemark_ldata_file = get_file("GeneMark_ldata", UPLOAD_FOLDER)
                         annotate.parse_genemark_ldata(genemark_ldata_file)

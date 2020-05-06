@@ -153,7 +153,19 @@ export default {
       showLdataSuccessAlert: false
     };
   },
+  created() {
+    this.runGeneMark();
+  },
   methods: {
+    runGeneMark() {
+      axios.get(`http://localhost:5000/api/upload/${this.$route.params.phageID}`)
+        .then(response => {
+          console.log("successfully ran genemark")
+        })
+        .catch(error => {
+          console.error(error);
+        });
+    },
     handleFileUpload(fileType) {
       if (fileType === "fasta") {
         this.fastaFile = document.querySelector(`#${fileType}-upload-form`).file.files[0];
