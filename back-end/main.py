@@ -14,6 +14,7 @@ import uuid
 import pandas as pd
 import arrow
 import annotate
+import genemark
 
 # configuration
 ROOT = os.path.dirname(os.path.abspath(__file__))
