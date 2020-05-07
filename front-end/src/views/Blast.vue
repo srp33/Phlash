@@ -1,77 +1,80 @@
 <template>
-  <div class="container">
-    <h1>BLAST</h1>
-    <div class="alert alert-primary">
-      <p><strong>Instructions</strong></p>
-      <p>Follow the steps below. Continue when all steps have been completed.</p>
-      <router-link :to="{ name: 'Annotations', params: {phageID: $route.params.phageID} }"
-        v-show="showBlastSuccessAlert">
-        <button class="btn btn-light">
-          <strong>Next</strong>
-        </button>
-      </router-link>
-    </div>
-    <div class="steps">
-      <ol>
-        <li class="step">
-          Download the FASTA file that will be used as input for BLAST.<br />
-            <button class="btn btn-light" style="position: relative;" @click="downloadFile">
-              <loading :active.sync="downloadLoading" :is-full-page="false" :height="20" :width="20"></loading>
-              <strong>Download FASTA file</strong>
-            </button>
-        </li>
-        <li class="step">
-          Go to BLASTp's website. <i>At the website, make sure to upload
-            your file and set the appropriate parameters, as show in the list
-            and screenshot below.</i><br />
-          <ul>
-            <li><strong>Upload File:</strong> Upload the FASTA file from step 1.</li>
-            <li><strong>Database:</strong> Non-redundant protein sequences (nr)</li>
-            <li><strong>Algorithm:</strong> blastp (protein-protein BLAST)</li>
-          </ul>
-          <button class="btn btn-light" @click="goToNCBI">
-            <strong>Go to NCBI's BLASTp</strong>
+  <div class="wrapper">
+    <Navbar :upload="navUpload" :dnamaster="navDNAMaster" :blast="navBlast" :annotations="navAnnotations" />
+    <div class="container">
+      <h1>BLAST</h1>
+      <div class="alert alert-primary">
+        <p><strong>Instructions</strong></p>
+        <p>Follow the steps below. Continue when all steps have been completed.</p>
+        <router-link :to="{ name: 'Annotations', params: {phageID: $route.params.phageID} }"
+          v-show="showBlastSuccessAlert">
+          <button class="btn btn-light">
+            <strong>Next</strong>
           </button>
-          <img id="step-two" src="/images/blast_step2.png" />
-        </li>
-        <li class="step">
-          In the top left table on the results page, click on
-          <i>"Download All."</i> This will show you file formatting options for
-          downloading your results. Choose <strong>Single-file JSON</strong>. 
-          Continue when you have your downloaded file ready for upload.<br />
-          <img id="step-three" src="/images/blast_step3.png" />
-        </li>
-        <li class="step">
-          Upload your BLAST results.
-          <div class="upload-wrapper">
-            <div class="alert alert-success" id="blast-success-alert" role="alert" v-if="showBlastSuccessAlert"></div>
-            <div class="alert alert-danger" id="blast-danger-alert" role="alert" v-if="showBlastDangerAlert"></div>
-            <div class="upload">
-              <form id="blast-upload-form" role="form" enctype="multipart/form-data">
-                <div class="upload-btn-wrapper">
-                  <button class="btn btn-upload">
-                    <loading :active.sync="blastLoading" :is-full-page="false" :height="80" :width="80"></loading>
-                    Drag files here or click to browse <br />
-                    <div class="selected-file" v-if="showBlastFile">
-                      <strong>Selected file: {{ this.blastFile.name }}</strong>
-                    </div>
-                  </button>
-                  <input class="form-control" id="file" type="file" ref="file" name="file" v-on:change="handleFileUpload()" />
-                </div>
-              </form>
+        </router-link>
+      </div>
+      <div class="steps">
+        <ol>
+          <li class="step">
+            Download the FASTA file that will be used as input for BLAST.<br />
+              <button class="btn btn-light" style="position: relative;" @click="downloadFile">
+                <loading :active.sync="downloadLoading" :is-full-page="false" :height="20" :width="20"></loading>
+                <strong>Download FASTA file</strong>
+              </button>
+          </li>
+          <li class="step">
+            Go to BLASTp's website. <i>At the website, make sure to upload
+              your file and set the appropriate parameters, as show in the list
+              and screenshot below.</i><br />
+            <ul>
+              <li><strong>Upload File:</strong> Upload the FASTA file from step 1.</li>
+              <li><strong>Database:</strong> Non-redundant protein sequences (nr)</li>
+              <li><strong>Algorithm:</strong> blastp (protein-protein BLAST)</li>
+            </ul>
+            <button class="btn btn-light" @click="goToNCBI">
+              <strong>Go to NCBI's BLASTp</strong>
+            </button>
+            <img id="step-two" src="/images/blast_step2.png" />
+          </li>
+          <li class="step">
+            In the top left table on the results page, click on
+            <i>"Download All."</i> This will show you file formatting options for
+            downloading your results. Choose <strong>Single-file JSON</strong>. 
+            Continue when you have your downloaded file ready for upload.<br />
+            <img id="step-three" src="/images/blast_step3.png" />
+          </li>
+          <li class="step">
+            Upload your BLAST results.
+            <div class="upload-wrapper">
+              <div class="alert alert-success" id="blast-success-alert" role="alert" v-if="showBlastSuccessAlert"></div>
+              <div class="alert alert-danger" id="blast-danger-alert" role="alert" v-if="showBlastDangerAlert"></div>
+              <div class="upload">
+                <form id="blast-upload-form" role="form" enctype="multipart/form-data">
+                  <div class="upload-btn-wrapper">
+                    <button class="btn btn-upload">
+                      <loading :active.sync="blastLoading" :is-full-page="false" :height="80" :width="80"></loading>
+                      Drag files here or click to browse <br />
+                      <div class="selected-file" v-if="showBlastFile">
+                        <strong>Selected file: {{ this.blastFile.name }}</strong>
+                      </div>
+                    </button>
+                    <input class="form-control" id="file" type="file" ref="file" name="file" v-on:change="handleFileUpload()" />
+                  </div>
+                </form>
+              </div>
+              <button class="btn btn-dark btn-upload-submit" v-if="showBlastFile" @click="uploadFile()">
+                <strong>Upload</strong>
+              </button>
             </div>
-            <button class="btn btn-dark btn-upload-submit" v-if="showBlastFile" @click="uploadFile()">
-              <strong>Upload</strong>
-            </button>
-          </div>
-          <router-link :to="{ name: 'Annotations', params: {phageID: $route.params.phageID} }"
-            v-show="showBlastSuccessAlert">
-            <button class="btn btn-light" v-show="showBlastSuccessAlert">
-              <strong>Next</strong>
-            </button>
-          </router-link>
-        </li>
-      </ol>
+            <router-link :to="{ name: 'Annotations', params: {phageID: $route.params.phageID} }"
+              v-show="showBlastSuccessAlert">
+              <button class="btn btn-light" v-show="showBlastSuccessAlert">
+                <strong>Next</strong>
+              </button>
+            </router-link>
+          </li>
+        </ol>
+      </div>
     </div>
   </div>
 </template>
@@ -79,13 +82,15 @@
 <script>
 import axios from "axios";
 import Vue from "vue";
+import Navbar from "../components/Navbar.vue";
 import Loading from "vue-loading-overlay";
 import "vue-loading-overlay/dist/vue-loading.css";
 
 export default {
   name: "Blast",
   components: {
-    Loading
+    Loading,
+    Navbar
   },
   data() {
     return {
@@ -99,6 +104,22 @@ export default {
       showBlastDangerAlert: false,
       showBlastSuccessAlert: false
     };
+  },
+  computed: {
+    navUpload: function() {
+      return true;
+    },
+    navDNAMaster: function() {
+      return true;
+    },
+    navBlast: function() {
+      return true;
+    },
+    navAnnotations: function() {
+      if (this.showBlastSuccessAlert) return true;
+      else return false;
+      // return true;
+    },
   },
   methods: {
     downloadFile() {
@@ -176,6 +197,10 @@ export default {
 </script>
 
 <style scoped>
+.wrapper {
+  margin: 0;
+}
+
 /* ----- Title and Alerts ----- */
 h1 {
   margin: 40px auto;

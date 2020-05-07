@@ -57,12 +57,28 @@ def check_phage_id(phage_id):
             USERS.append(dir)
         print(USERS)
 
-        # check if user-inputted phage id exists or not
+        # check if user-inputted phage_id exists or not
         if phage_id in USERS:
             DATABASE = "sqlite:///{}".format(os.path.join(
                 ROOT, 'users', phage_id, f"{phage_id}.db"))
             app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE
-            response_object['message'] = "ID already exists. If this is your ID, please continue. If not, enter a new one."
+            response_object['id_status'] = "ID already exists. If this is your ID, please continue. If not, enter a new one."
+
+            # check if all required files for phage_id are uploaded
+            required_files = ["fasta", "genbank", "gdata", "ldata"]
+            for filename in os.listdir(os.path.join(ROOT, 'users', phage_id, 'uploads')):
+                ext = os.path.splitext(filename)[1].lower()
+                if ext in FASTA_EXTENSIONS:
+                    required_files.remove("fasta")
+                elif ext in GENBANK_EXTENSIONS:
+                    required_files.remove("genbank")
+                elif ext in GDATA_EXTENSIONS:
+                    required_files.remove("gdata")
+                elif ext in LDATA_EXTENSIONS:
+                    required_files.remove("ldata")
+            
+            response_object['uploaded_all_files'] = True if len(required_files) == 0 else False
+        
         else:
             create_directory(os.path.join(ROOT, 'users', phage_id))
             create_directory(os.path.join(ROOT, 'users', phage_id, 'uploads'))
@@ -72,7 +88,8 @@ def check_phage_id(phage_id):
             with app.app_context():
                 db.drop_all()
                 db.create_all()
-            response_object["message"] = "ID created. Please continue."
+            response_object["id_status"] = "ID created. Please continue."
+            response_object["uploaded_all_files"] = False
 
     return jsonify(response_object)
 

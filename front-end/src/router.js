@@ -16,12 +16,12 @@ export default new Router({
     {
       path: '/',
       name: 'Home',
-      component: Home,
+      component: Home
     },
     {
       path: '/upload/:phageID',
       name: 'Upload',
-      component: Upload,
+      component: Upload
     },
     {
       path: '/dnamaster/:phageID',
