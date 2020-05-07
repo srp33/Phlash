@@ -6,12 +6,27 @@
       <div class="alert alert-primary">
         <p><strong>Instructions</strong></p>
         <p>Follow the steps below. Continue when all steps have been completed.</p>
-        <router-link :to="{ name: 'Annotations', params: {phageID: $route.params.phageID} }"
-          v-show="showBlastSuccessAlert">
-          <button class="btn btn-light">
-            <strong>Next</strong>
-          </button>
-        </router-link>
+        <div class="nav-btns-wrapper">
+          <router-link :to="{ name: 'DNAMaster', params: {phageID: $route.params.phageID} }">
+            <button class="btn btn-light btn-nav">
+              <svg class="bi bi-arrow-left" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd" d="M5.854 4.646a.5.5 0 010 .708L3.207 8l2.647 2.646a.5.5 0 01-.708.708l-3-3a.5.5 0 010-.708l3-3a.5.5 0 01.708 0z" clip-rule="evenodd"/>
+                <path fill-rule="evenodd" d="M2.5 8a.5.5 0 01.5-.5h10.5a.5.5 0 010 1H3a.5.5 0 01-.5-.5z" clip-rule="evenodd"/>
+              </svg>
+              <strong>Back</strong>
+            </button>
+          </router-link>
+          <router-link :to="{ name: 'Annotations', params: {phageID: $route.params.phageID} }"
+                       :event="blast ? 'click' : ''">
+            <button class="btn btn-light btn-nav disabled" id="next-top">
+              <strong>Next</strong>
+              <svg class="bi bi-arrow-right" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd" d="M10.146 4.646a.5.5 0 01.708 0l3 3a.5.5 0 010 .708l-3 3a.5.5 0 01-.708-.708L12.793 8l-2.647-2.646a.5.5 0 010-.708z" clip-rule="evenodd"/>
+                <path fill-rule="evenodd" d="M2 8a.5.5 0 01.5-.5H13a.5.5 0 010 1H2.5A.5.5 0 012 8z" clip-rule="evenodd"/>
+              </svg>
+            </button>
+          </router-link>
+        </div>
       </div>
       <div class="steps">
         <ol>
@@ -31,7 +46,7 @@
               <li><strong>Database:</strong> Non-redundant protein sequences (nr)</li>
               <li><strong>Algorithm:</strong> blastp (protein-protein BLAST)</li>
             </ul>
-            <button class="btn btn-light" @click="goToNCBI">
+            <button class="btn btn-light btn-step" @click="goToNCBI">
               <strong>Go to NCBI's BLASTp</strong>
             </button>
             <img id="step-two" src="/images/blast_step2.png" />
@@ -51,7 +66,7 @@
               <div class="upload">
                 <form id="blast-upload-form" role="form" enctype="multipart/form-data">
                   <div class="upload-btn-wrapper">
-                    <button class="btn btn-upload">
+                    <button class="btn btn-upload btn-step">
                       <loading :active.sync="blastLoading" :is-full-page="false" :height="80" :width="80"></loading>
                       Drag files here or click to browse <br />
                       <div class="selected-file" v-if="showBlastFile">
@@ -66,14 +81,29 @@
                 <strong>Upload</strong>
               </button>
             </div>
-            <router-link :to="{ name: 'Annotations', params: {phageID: $route.params.phageID} }"
-              v-show="showBlastSuccessAlert">
-              <button class="btn btn-light" v-show="showBlastSuccessAlert">
-                <strong>Next</strong>
-              </button>
-            </router-link>
           </li>
         </ol>
+      </div>
+      <div class="nav-btns-wrapper">
+        <router-link :to="{ name: 'DNAMaster', params: {phageID: $route.params.phageID} }">
+          <button class="btn btn-light btn-nav">
+            <svg class="bi bi-arrow-left" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+              <path fill-rule="evenodd" d="M5.854 4.646a.5.5 0 010 .708L3.207 8l2.647 2.646a.5.5 0 01-.708.708l-3-3a.5.5 0 010-.708l3-3a.5.5 0 01.708 0z" clip-rule="evenodd"/>
+              <path fill-rule="evenodd" d="M2.5 8a.5.5 0 01.5-.5h10.5a.5.5 0 010 1H3a.5.5 0 01-.5-.5z" clip-rule="evenodd"/>
+            </svg>
+            <strong>Back</strong>
+          </button>
+        </router-link>
+        <router-link :to="{ name: 'Annotations', params: {phageID: $route.params.phageID} }"
+                      :event="blast ? 'click' : ''">
+          <button class="btn btn-light btn-nav disabled" id="next-bottom">
+            <strong>Next</strong>
+            <svg class="bi bi-arrow-right" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+              <path fill-rule="evenodd" d="M10.146 4.646a.5.5 0 01.708 0l3 3a.5.5 0 010 .708l-3 3a.5.5 0 01-.708-.708L12.793 8l-2.647-2.646a.5.5 0 010-.708z" clip-rule="evenodd"/>
+              <path fill-rule="evenodd" d="M2 8a.5.5 0 01.5-.5H13a.5.5 0 010 1H2.5A.5.5 0 012 8z" clip-rule="evenodd"/>
+            </svg>
+          </button>
+        </router-link>
       </div>
     </div>
   </div>
@@ -105,6 +135,9 @@ export default {
       showBlastSuccessAlert: false
     };
   },
+  created() {
+    this.checkIfFileUploaded();
+  },
   computed: {
     navUpload: function() {
       return true;
@@ -116,12 +149,28 @@ export default {
       return true;
     },
     navAnnotations: function() {
-      if (this.showBlastSuccessAlert) return true;
+      if (this.blast) return true;
       else return false;
-      // return true;
+    },
+  },
+  watch: {
+    blast: function() {
+      if (this.blast) {
+        document.getElementById("next-top").classList.remove("disabled");
+        document.getElementById("next-bottom").classList.remove("disabled");
+      }
     },
   },
   methods: {
+    checkIfFileUploaded() {
+      axios.get(`http://localhost:5000/api/blast/${this.$route.params.phageID}/none`)
+        .then(response => {
+          this.blast = response.data.blast;
+        })
+        .catch(error => {
+          console.log(error);
+        })
+    },
     downloadFile() {
       this.downloadLoading = true;
       axios.post(`http://localhost:5000/api/blast/${this.$route.params.phageID}/download`)
@@ -226,8 +275,26 @@ h1 {
   margin: 10px;
 }
 
-.btn-light {
+.btn-step {
   margin: 15px auto;
+}
+
+.nav-btns-wrapper {
+  text-align: center;
+}
+
+.btn-nav {
+  margin: 5px;
+}
+
+.bi-arrow-left {
+  margin-right: 5px;
+  margin-left: 0px;
+}
+
+.bi-arrow-right {
+  margin-right: 0px;
+  margin-left: 5px;
 }
 
 /* ----- Upload ----- */

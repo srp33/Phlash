@@ -13,7 +13,7 @@
             You have uploaded all required files. Thank you!
           </li>
         </ul>
-        <div class="alert alert-info">
+        <div class="alert alert-warning">
           <svg class="bi bi-info-circle-fill" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
             <path fill-rule="evenodd" d="M8 16A8 8 0 108 0a8 8 0 000 16zm.93-9.412l-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM8 5.5a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"/>
           </svg>
@@ -23,12 +23,27 @@
           </svg>
           Files are read and parsed as they are uploaded. Keep this in mind if uploading files take a moment.
         </div>
-        <router-link :to="{ name: 'DNAMaster', params: {phageID: $route.params.phageID} }"
-          v-if="fasta && genbank">
-          <button class="btn btn-light" id="next-top">
-            <strong>Next</strong>
-          </button>
-        </router-link>
+        <div class="nav-btns-wrapper">
+          <router-link :to="{ name: 'Home' }">
+            <button class="btn btn-light btn-nav">
+              <svg class="bi bi-arrow-left" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd" d="M5.854 4.646a.5.5 0 010 .708L3.207 8l2.647 2.646a.5.5 0 01-.708.708l-3-3a.5.5 0 010-.708l3-3a.5.5 0 01.708 0z" clip-rule="evenodd"/>
+                <path fill-rule="evenodd" d="M2.5 8a.5.5 0 01.5-.5h10.5a.5.5 0 010 1H3a.5.5 0 01-.5-.5z" clip-rule="evenodd"/>
+              </svg>
+              <strong>Back</strong>
+            </button>
+          </router-link>
+          <router-link :to="{ name: 'DNAMaster', params: {phageID: $route.params.phageID} }"
+                       :event="fasta && genbank ? 'click' : ''">
+            <button class="btn btn-light btn-nav disabled" id="next-top">
+              <strong>Next</strong>
+              <svg class="bi bi-arrow-right" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd" d="M10.146 4.646a.5.5 0 01.708 0l3 3a.5.5 0 010 .708l-3 3a.5.5 0 01-.708-.708L12.793 8l-2.647-2.646a.5.5 0 010-.708z" clip-rule="evenodd"/>
+                <path fill-rule="evenodd" d="M2 8a.5.5 0 01.5-.5H13a.5.5 0 010 1H2.5A.5.5 0 012 8z" clip-rule="evenodd"/>
+              </svg>
+            </button>
+          </router-link>
+        </div>
       </div>
 
       <div class="upload-wrapper">
@@ -77,11 +92,27 @@
         </button>
       </div>
       
-      <router-link :to="{ name: 'DNAMaster', params: {phageID: $route.params.phageID} }" v-if="fasta && genbank">
-        <button class="btn btn-light" id="next-bottom">
-          <strong>Next</strong>
-        </button>
-      </router-link>
+      <div class="nav-btns-wrapper">
+        <router-link :to="{ name: 'Home' }">
+          <button class="btn btn-light btn-nav">
+            <svg class="bi bi-arrow-left" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+              <path fill-rule="evenodd" d="M5.854 4.646a.5.5 0 010 .708L3.207 8l2.647 2.646a.5.5 0 01-.708.708l-3-3a.5.5 0 010-.708l3-3a.5.5 0 01.708 0z" clip-rule="evenodd"/>
+              <path fill-rule="evenodd" d="M2.5 8a.5.5 0 01.5-.5h10.5a.5.5 0 010 1H3a.5.5 0 01-.5-.5z" clip-rule="evenodd"/>
+            </svg>
+            <strong>Back</strong>
+          </button>
+        </router-link>
+        <router-link :to="{ name: 'DNAMaster', params: {phageID: $route.params.phageID} }"
+                      :event="fasta && genbank ? 'click' : ''">
+          <button class="btn btn-light btn-nav disabled" id="next-bottom">
+            <strong>Next</strong>
+            <svg class="bi bi-arrow-right" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+              <path fill-rule="evenodd" d="M10.146 4.646a.5.5 0 01.708 0l3 3a.5.5 0 010 .708l-3 3a.5.5 0 01-.708-.708L12.793 8l-2.647-2.646a.5.5 0 010-.708z" clip-rule="evenodd"/>
+              <path fill-rule="evenodd" d="M2 8a.5.5 0 01.5-.5H13a.5.5 0 010 1H2.5A.5.5 0 012 8z" clip-rule="evenodd"/>
+            </svg>
+          </button>
+        </router-link>
+      </div>
     </div>
   </div>
 </template>
@@ -115,6 +146,9 @@ export default {
       showGenBankSuccessAlert: false,
     };
   },
+  created() {
+    this.checkIfFilesUploaded();
+  },
   computed: {
     navUpload: function() {
       return true;
@@ -130,7 +164,31 @@ export default {
       return false;
     },
   },
+  watch: {
+    fasta: function() {
+      if (this.fasta && this.genbank) {
+        document.getElementById("next-top").classList.remove("disabled");
+        document.getElementById("next-bottom").classList.remove("disabled");
+      }
+    },
+    genbank: function() {
+      if (this.fasta && this.genbank) {
+        document.getElementById("next-top").classList.remove("disabled");
+        document.getElementById("next-bottom").classList.remove("disabled");
+      }
+    }
+  },
   methods: {
+    checkIfFilesUploaded() {
+      axios.get(`http://localhost:5000//api/upload/${this.$route.params.phageID}`)
+        .then(response => {
+          this.fasta = response.data.fasta;
+          this.genbank = response.data.genbank;
+        })
+        .catch(error => {
+          console.log(error)
+        })
+    },
     handleFileUpload(fileType) {
       if (fileType === "fasta") {
         this.fastaFile = document.querySelector(`#${fileType}-upload-form`).file.files[0];
@@ -213,6 +271,7 @@ export default {
 .wrapper {
   margin: 0;
 }
+
 /* ----- Title and Alerts ----- */
 h1 {
   margin: 40px auto;
@@ -227,7 +286,25 @@ h1 {
   margin-right: 3px;
 }
 
-/* ----- Upload ----- */
+.nav-btns-wrapper {
+  text-align: center;
+}
+
+.btn-nav {
+  margin: 5px;
+}
+
+.bi-arrow-left {
+  margin-right: 5px;
+  margin-left: 0px;
+}
+
+.bi-arrow-right {
+  margin-right: 0px;
+  margin-left: 5px;
+}
+
+/* ----- Upload Files ----- */
 .upload-wrapper {
   margin: 50px auto;
 }
@@ -290,8 +367,6 @@ h1 {
 .genbank {
   margin-bottom: 15px;
 }
+
 /* ----- Rest of Page ----- */
-#next-top, #next-bottom {
-  margin: 10px auto;
-}
 </style>

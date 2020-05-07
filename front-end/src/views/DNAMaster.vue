@@ -12,11 +12,26 @@
           appropriate coding sequences.
         </p>
         <p>Click `Next` when you are ready to continue.</p>
-        <router-link :to="{ name: 'Blast', params: {phageID: $route.params.phageID} }">
-          <button class="btn btn-light">
-            <strong>Next</strong>
-          </button>
-        </router-link>
+        <div class="nav-btns-wrapper">
+          <router-link :to="{ name: 'Upload', params: {phageID: $route.params.phageID} }">
+            <button class="btn btn-light btn-nav">
+              <svg class="bi bi-arrow-left" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd" d="M5.854 4.646a.5.5 0 010 .708L3.207 8l2.647 2.646a.5.5 0 01-.708.708l-3-3a.5.5 0 010-.708l3-3a.5.5 0 01.708 0z" clip-rule="evenodd"/>
+                <path fill-rule="evenodd" d="M2.5 8a.5.5 0 01.5-.5h10.5a.5.5 0 010 1H3a.5.5 0 01-.5-.5z" clip-rule="evenodd"/>
+              </svg>
+              <strong>Back</strong>
+            </button>
+          </router-link>
+          <router-link :to="{ name: 'Blast', params: {phageID: $route.params.phageID} }">
+            <button class="btn btn-light btn-nav">
+              <strong>Next</strong>
+              <svg class="bi bi-arrow-right" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd" d="M10.146 4.646a.5.5 0 01.708 0l3 3a.5.5 0 010 .708l-3 3a.5.5 0 01-.708-.708L12.793 8l-2.647-2.646a.5.5 0 010-.708z" clip-rule="evenodd"/>
+                <path fill-rule="evenodd" d="M2 8a.5.5 0 01.5-.5H13a.5.5 0 010 1H2.5A.5.5 0 012 8z" clip-rule="evenodd"/>
+              </svg>
+            </button>
+          </router-link>
+        </div>
       </div>
 
       <div class="alert alert-success" id="success-alert" role="alert" v-if="showMessage">
@@ -24,9 +39,6 @@
       </div>
 
       <div id="dnamaster">
-        <!-- <button class="btn btn-dark btn-sm" id="add-btn" align="center" v-b-modal.add-modal>
-          <strong>Add a new CDS</strong>
-        </button> -->
         <div class="table-responsive">
           <table class="table table-hover" align="center">
             <thead>
@@ -59,51 +71,28 @@
           </table>
         </div>
       </div>
-      <router-link :to="{ name: 'Blast', params: {phageID: $route.params.phageID} }">
-        <button class="btn btn-light btn-bottom">
-          <strong>Next</strong>
-        </button>
-      </router-link>
-      <b-modal ref="addCDSModal" id="add-modal" title="Add a new CDS" hide-footer>
-        <b-form @submit="onSubmitAdd" @reset="onResetAdd" align="left">
-          <b-form-group label="ID:" label-for="add-id-input">
-            <b-form-input
-              id="add-id-input"
-              type="text"
-              v-model="newCDS.id"
-              required
-              placeholder="Enter ID"
-            ></b-form-input>
-          </b-form-group>
-          <b-form-group label="Start:" label-for="add-start-input">
-            <b-form-input
-              id="add-start-input"
-              type="number"
-              v-model="newCDS.start"
-              required
-              placeholder="Enter start"
-            ></b-form-input>
-          </b-form-group>
-          <b-form-group label="Stop:" label-for="add-stop-input">
-            <b-form-input
-              id="add-stop-input"
-              type="number"
-              v-model="newCDS.stop"
-              required
-              placeholder="Enter stop"
-            ></b-form-input>
-          </b-form-group>
-          <b-form-group label="Strand:">
-            <b-form-select v-model="newCDS.strand" :options="strandOptions"></b-form-select>
-          </b-form-group>
-          <b-button class="modal-btn" type="submit" variant="success">
-            <strong>Submit</strong>
-          </b-button>
-          <b-button class="modal-btn" type="reset" variant="danger">
-            <strong>Cancel</strong>
-          </b-button>
-        </b-form>
-      </b-modal>
+      
+      <div class="nav-btns-wrapper">
+        <router-link :to="{ name: 'Upload', params: {phageID: $route.params.phageID} }">
+          <button class="btn btn-light btn-nav">
+            <svg class="bi bi-arrow-left" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+              <path fill-rule="evenodd" d="M5.854 4.646a.5.5 0 010 .708L3.207 8l2.647 2.646a.5.5 0 01-.708.708l-3-3a.5.5 0 010-.708l3-3a.5.5 0 01.708 0z" clip-rule="evenodd"/>
+              <path fill-rule="evenodd" d="M2.5 8a.5.5 0 01.5-.5h10.5a.5.5 0 010 1H3a.5.5 0 01-.5-.5z" clip-rule="evenodd"/>
+            </svg>
+            <strong>Back</strong>
+          </button>
+        </router-link>
+        <router-link :to="{ name: 'Blast', params: {phageID: $route.params.phageID} }">
+          <button class="btn btn-light btn-nav">
+            <strong>Next</strong>
+            <svg class="bi bi-arrow-right" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+              <path fill-rule="evenodd" d="M10.146 4.646a.5.5 0 01.708 0l3 3a.5.5 0 010 .708l-3 3a.5.5 0 01-.708-.708L12.793 8l-2.647-2.646a.5.5 0 010-.708z" clip-rule="evenodd"/>
+              <path fill-rule="evenodd" d="M2 8a.5.5 0 01.5-.5H13a.5.5 0 010 1H2.5A.5.5 0 012 8z" clip-rule="evenodd"/>
+            </svg>
+          </button>
+        </router-link>
+      </div>
+
       <b-modal ref="updateCDSModal" id="update-modal" title="Update CDS" hide-footer>
         <b-form @submit="onSubmitUpdate" @reset="onResetUpdate" align="left">
           <b-form-group label="Start:" label-for="update-start-input">
@@ -127,6 +116,7 @@
           <b-form-group label="Strand:">
             <b-form-select v-model="updatedCDS.strand" :options="strandOptions"></b-form-select>
           </b-form-group>
+          <hr />
           <b-button class="modal-btn" type="submit" variant="success">
             <strong>Submit</strong>
           </b-button>
@@ -144,6 +134,7 @@
             <li><strong>Stop:</strong> {{ deletedCDS.stop }}</li>
             <li><strong>Strand:</strong> {{ deletedCDS.strand }}</li>
           </ul>
+          <hr />
           <b-button class="modal-btn" type="submit" variant="success">
             <strong>Yes, delete it</strong>
           </b-button>
@@ -168,13 +159,6 @@ export default {
   data() {
     return {
       dnamaster: [],
-      newCDS: {
-        id: "",
-        start: "",
-        stop: "",
-        strand: null,
-        read: []
-      },
       updatedCDS: {
         id: "",
         start: "",
@@ -224,19 +208,6 @@ export default {
           console.error(error);
         });
     },
-    addData(payload) {
-      axios.post(`http://localhost:5000/api/dnamaster/${this.$route.params.phageID}`,
-          payload
-        )
-        .then(response => {
-          this.message = response.data.message;
-          this.showMessage = true;
-          this.getData();
-        })
-        .catch(error => {
-          console.log(error);
-        });
-    },
     deleteData(cdsID) {
       axios.delete(`http://localhost:5000/api/dnamaster/${this.$route.params.phageID}/${cdsID}`)
         .then(response => {
@@ -274,10 +245,6 @@ export default {
       this.deletedCDS.strand = cds.strand;
     },
     initForm() {
-      this.newCDS.id = "";
-      this.newCDS.start = "";
-      this.newCDS.stop = "";
-      this.newCDS.strand = "";
       this.updatedCDS.id = "";
       this.updatedCDS.start = "";
       this.updatedCDS.stop = "";
@@ -286,27 +253,6 @@ export default {
       this.deletedCDS.start = "";
       this.deletedCDS.stop = "";
       this.deletedCDS.strand = "";
-    },
-    onSubmitAdd(evt) {
-      evt.preventDefault();
-      this.$refs.addCDSModal.hide();
-      let read = false;
-      if (this.newCDS.read[0]) read = true;
-      const payload = {
-        id: this.newCDS.id,
-        start: this.newCDS.start,
-        stop: this.newCDS.stop,
-        strand: this.newCDS.strand,
-        read // property shorthand
-      };
-      this.addData(payload);
-      this.initForm();
-    },
-    onResetAdd(evt) {
-      evt.preventDefault();
-      this.$refs.addCDSModal.hide();
-      this.initForm();
-      this.getData();
     },
     onSubmitUpdate(evt) {
       evt.preventDefault();
@@ -358,12 +304,22 @@ h1 {
   margin: 40px auto;
 }
 
-.btn-bottom {
-  margin-bottom: 50px;
+.nav-btns-wrapper {
+  text-align: center;
 }
 
-#add-btn {
-  margin: 15px auto;
+.btn-nav {
+  margin: 5px;
+}
+
+.bi-arrow-left {
+  margin-right: 5px;
+  margin-left: 0px;
+}
+
+.bi-arrow-right {
+  margin-right: 0px;
+  margin-left: 5px;
 }
 
 #update-btn,
@@ -373,7 +329,7 @@ h1 {
 
 /* ----- Modals ----- */
 .modal-btn {
-  margin: 5px;
+  margin: 3px;
 }
 
 .strand-dropdown {

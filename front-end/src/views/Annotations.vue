@@ -15,7 +15,7 @@
           When the 'Action' column only contains 'Done', you will be able to
           download your GenBank file.
         </p>
-        <button class="btn btn-light" style="margin-top: 0px;" @click="downloadGenBankFile">
+        <button class="btn btn-light btn-gb" style="margin-top: 0px;" @click="downloadGenBankFile">
           <strong>Download GenBank file</strong>
             <div v-if="downloadLoading" class="spinner-border spinner-border-sm" role="status">
               <span class="sr-only"></span>
@@ -27,7 +27,19 @@
           <strong style="color:red">Fail:</strong> DNA Master's gene call is shorter than GeneMark's gene call.<br />
           <strong style="color:orange">Need more information:</strong> DNA Master's gene call has not been called at all in GeneMark.<br />
         </p>
+        <div class="nav-btns-wrapper">
+          <router-link :to="{ name: 'Blast', params: {phageID: $route.params.phageID} }">
+            <button class="btn btn-light btn-nav">
+              <svg class="bi bi-arrow-left" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd" d="M5.854 4.646a.5.5 0 010 .708L3.207 8l2.647 2.646a.5.5 0 01-.708.708l-3-3a.5.5 0 010-.708l3-3a.5.5 0 01.708 0z" clip-rule="evenodd"/>
+                <path fill-rule="evenodd" d="M2.5 8a.5.5 0 01.5-.5h10.5a.5.5 0 010 1H3a.5.5 0 01-.5-.5z" clip-rule="evenodd"/>
+              </svg>
+              <strong>Back</strong>
+            </button>
+          </router-link>
+        </div>
       </div>
+
       <div id="annotations" align="center">
         <div class="table-responsive">
           <table class="table table-hover" align="center">
@@ -72,6 +84,18 @@
           </table>
         </div>
       </div>
+      
+      <div class="nav-btns-wrapper">
+          <router-link :to="{ name: 'Blast', params: {phageID: $route.params.phageID} }">
+            <button class="btn btn-light btn-nav">
+              <svg class="bi bi-arrow-left" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd" d="M5.854 4.646a.5.5 0 010 .708L3.207 8l2.647 2.646a.5.5 0 01-.708.708l-3-3a.5.5 0 010-.708l3-3a.5.5 0 01.708 0z" clip-rule="evenodd"/>
+                <path fill-rule="evenodd" d="M2.5 8a.5.5 0 01.5-.5h10.5a.5.5 0 010 1H3a.5.5 0 01-.5-.5z" clip-rule="evenodd"/>
+              </svg>
+              <strong>Back</strong>
+            </button>
+          </router-link>
+        </div>
     </div>
   </div>
 </template>
@@ -164,8 +188,21 @@ h1 {
   margin: 40px auto;
 }
 
-.btn-light {
+.btn-gb {
   margin: 15px auto;
+}
+
+.nav-btns-wrapper {
+  text-align: center;
+}
+
+.btn-nav {
+  margin: 10px;
+}
+
+.bi-arrow-left {
+  margin-right: 5px;
+  margin-left: 0px;
 }
 
 .status-btn {

@@ -91,10 +91,17 @@ def check_phage_id(phage_id):
             response_object["id_status"] = "ID created. Please continue."
             response_object["uploaded_all_files"] = False
 
+        # get date that ID will be deleted
+        critical_time = arrow.now().shift(days=-90)
+        for user in Path(os.path.join(ROOT, 'users')).glob('*'):
+            if phage_id in str(user):
+                user_time = arrow.get(user.stat().st_mtime).shift(days=+90)
+                response_object["delete_time"] = str(user_time)
+
     return jsonify(response_object)
 
 
-@app.route('/api/upload/<current_user>', methods=['POST'])
+@app.route('/api/upload/<current_user>', methods=['GET', 'POST'])
 def upload_files(current_user):
     """
     API endpoint for '/upload/:current_user'.
@@ -105,6 +112,25 @@ def upload_files(current_user):
     app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE
     response_object = {}
 
+    if request.method == "GET":
+        # check if respective files for fasta and genbank are uploaded
+        existing_files = []
+        for filename in os.listdir(os.path.join(ROOT, 'users', current_user, 'uploads')):
+            ext = os.path.splitext(filename)[1].lower()
+            if ext in FASTA_EXTENSIONS:
+                existing_files.append("fasta")
+            elif ext in GENBANK_EXTENSIONS:
+                existing_files.append("genbank")
+            elif ext in GDATA_EXTENSIONS:
+                existing_files.append("gdata")
+            elif ext in LDATA_EXTENSIONS:
+                existing_files.append("ldata")
+        
+        response_object["fasta"] = True if "fasta" in existing_files and \
+                                           "gdata" in existing_files and \
+                                           "ldata" in existing_files else False
+        response_object["genbank"] = True if "genbank" in existing_files else False
+            
     if request.method == "POST":
         if 'file' not in request.files:
             response_object["status"]: "'file' not in request.files"
@@ -228,8 +254,8 @@ def dnamaster_cds(current_user, cds_id):
     return jsonify(response_object)
 
 # TODO: Continue checking code from here.
-@app.route('/api/blast/<current_user>/<file_method>', methods=['POST'])
-def upload_blast_file(current_user, file_method):
+@app.route('/api/blast/<current_user>/<file_method>', methods=['GET', 'POST'])
+def blast(current_user, file_method):
     """
     API endpoint for '/blast/:current_user'.
     POST method downloads fasta file for BLAST input or 
@@ -238,7 +264,17 @@ def upload_blast_file(current_user, file_method):
     UPLOAD_FOLDER = os.path.join(ROOT, 'users', current_user, 'uploads')
     DATABASE = "sqlite:///{}".format(os.path.join(ROOT, 'users', current_user, f"{current_user}.db"))
     app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE
-    response_object = {'status': 'success'}
+    response_object = {}
+
+    if request.method == "GET":
+        # check if respective file(s) for blast are uploaded
+        existing_files = []
+        for filename in os.listdir(os.path.join(ROOT, 'users', current_user, 'uploads')):
+            ext = os.path.splitext(filename)[1].lower()
+            if ext in BLAST_EXTENSIONS:
+                existing_files.append("blast")
+        
+        response_object["blast"] = True if "blast" in existing_files else False
 
     if request.method == "POST":
         if file_method == "download":
@@ -392,13 +428,17 @@ if __name__ == '__main__':
 
 
 # ---------- HELPER FUNCTIONS ----------
-
-# check file extension. only allow specific ones
 def allowed_file(filename, allowed_extensions):
+    """
+    Check if file extension is acceptable.
+    """
     return '.' in filename and os.path.splitext(filename)[1].lower() in allowed_extensions
 
-# create directory
+
 def create_directory(directory):
+    """
+    Create specified directory. 
+    """
     try:
         os.mkdir(directory)
         print("Directory \'" + directory + "\' created.")

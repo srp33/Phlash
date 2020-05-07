@@ -49,7 +49,20 @@ export default {
     blast: Boolean,
     annotations: Boolean,
   },
-  methods: {
-  }
+  data() {
+    return {
+      activeCLass: 'active'
+    }
+  },
 };
 </script>
+
+<style scoped>
+.active {
+  opacity: 1;
+  visibility: visible;
+  border-left-color: #4DB6AC;
+  margin: 10px;
+  transition: all 0.25s;
+}
+</style>
