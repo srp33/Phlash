@@ -14,16 +14,16 @@ import uuid
 import pandas as pd
 import arrow
 import annotate
-import genemark
 
 # configuration
 ROOT = os.path.dirname(os.path.abspath(__file__))
 FASTA_EXTENSIONS = set(['.fasta', '.fna'])
 GENBANK_EXTENSIONS = set(['.gb', '.gbk'])
-GDATA_EXTENSION = set(['.gdata'])
-LDATA_EXTENSION = set(['.ldata'])
-USERS = []
-CURRENT_USER = ""
+GDATA_EXTENSIONS = set(['.gdata'])
+LDATA_EXTENSIONS = set(['.ldata'])
+BLAST_EXTENSIONS = set(['.json'])
+# USERS = []
+# CURRENT_USER = ""
 
 # instantiate the app
 app = Flask(__name__)
@@ -77,7 +77,7 @@ def check_phage_id(phage_id):
     return jsonify(response_object)
 
 
-@app.route('/api/upload/<current_user>', methods=['GET', 'POST'])
+@app.route('/api/upload/<current_user>', methods=['POST'])
 def upload_files(current_user):
     """
     API endpoint for '/upload/:current_user'.
@@ -88,11 +88,6 @@ def upload_files(current_user):
     app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE
     response_object = {}
 
-    if request.method == "GET":
-        fasta_file = get_file("Fasta", UPLOAD_FOLDER)
-        genemark.run_genemark(fasta_file)
-        print("ran genemark")
-
     if request.method == "POST":
         if 'file' not in request.files:
             response_object["status"]: "'file' not in request.files"
@@ -102,17 +97,13 @@ def upload_files(current_user):
             if file:
                 file_name = secure_filename(file.filename)
                 if (fileType == "fasta" and allowed_file(file_name, FASTA_EXTENSIONS)) or \
-                   (fileType == "genbank" and allowed_file(file_name, GENBANK_EXTENSIONS)) or \
-                   (fileType == "gdata" and allowed_file(file_name, GDATA_EXTENSION)) or \
-                   (fileType == "ldata" and allowed_file(file_name, LDATA_EXTENSION)):
+                   (fileType == "genbank" and allowed_file(file_name, GENBANK_EXTENSIONS)):
 
-                    # overwrite existing with similar extension with newly uploaded file
+                    # overwrite existing files with specific extension with newly uploaded files
                     for existing_file in os.listdir(UPLOAD_FOLDER):
                         ext = os.path.splitext(existing_file)[1].lower()
-                        if (fileType == "fasta" and ext in FASTA_EXTENSIONS) or \
-                           (fileType == "genbank" and ext in GENBANK_EXTENSIONS) or \
-                           (fileType == "gdata" and ext in GDATA_EXTENSION) or \
-                           (fileType == "ldata" and ext in LDATA_EXTENSION):
+                        if (fileType == "fasta" and ext in ['.fasta', '.fna', '.ldata', '.gdata', '.lst', '.ps']) or \
+                           (fileType == "genbank" and ext in GENBANK_EXTENSIONS):
                             os.remove(os.path.join(UPLOAD_FOLDER, existing_file))
                             print(f" * removed {existing_file}")
 
@@ -123,12 +114,14 @@ def upload_files(current_user):
                     # parse appropriate files as soon as uploaded
                     # FIXME: check file conent before parsing. 
                     file_ext = os.path.splitext(file_name)[1].lower()
-                    if file_ext in GENBANK_EXTENSIONS:
-                        genbank_file = get_file("GenBank", UPLOAD_FOLDER)
+                    if file_ext in FASTA_EXTENSIONS:  # run genemark and parse ldata
+                        fasta_file = get_file_path("fasta", UPLOAD_FOLDER)
+                        annotate.run_genemark(fasta_file)
+                        ldata_file = get_file_path("ldata", UPLOAD_FOLDER)
+                        annotate.parse_genemark_ldata(ldata_file)
+                    elif file_ext in GENBANK_EXTENSIONS:  # parse genbank
+                        genbank_file = get_file_path("genbank", UPLOAD_FOLDER)
                         annotate.parse_dnamaster_genbank(genbank_file)
-                    elif file_ext in LDATA_EXTENSION:
-                        genemark_ldata_file = get_file("GeneMark_ldata", UPLOAD_FOLDER)
-                        annotate.parse_genemark_ldata(genemark_ldata_file)
                 else:
                     response_object["not_allowed"] = file.filename
             else:
@@ -234,8 +227,8 @@ def upload_blast_file(current_user, file_method):
         if file_method == "download":
             print("Starting comparisons")
             annotate.compare()
-            fasta_file = get_file("Fasta", UPLOAD_FOLDER)
-            genemark_gdata_file = get_file("GeneMark_gdata", UPLOAD_FOLDER)
+            fasta_file = get_file_path("fasta", UPLOAD_FOLDER)
+            genemark_gdata_file = get_file_path("gdata", UPLOAD_FOLDER)
             output = annotate.create_fasta(fasta_file, genemark_gdata_file)
 
             with open(os.path.join(ROOT, 'users', current_user, f"{current_user}_blast.fasta"), "w") as out_handle:
@@ -297,8 +290,8 @@ def annotate_data(current_user):
 
     if request.method == "POST":
         # -------downloading GENBANK file----------
-        gb_file = get_file("GenBank", UPLOAD_FOLDER)
-        fasta_file = get_file("Fasta", UPLOAD_FOLDER)
+        gb_file = get_file_path("genbank", UPLOAD_FOLDER)
+        fasta_file = get_file_path("fasta", UPLOAD_FOLDER)
         out_file = annotate.modify_genbank(gb_file, fasta_file)
         f = open(out_file, "r")
         return f.read()
@@ -328,12 +321,12 @@ def cds_annotation(current_user, cds_id):
                                   'function': cds.function,
                                   'status': cds.status}
 
-        # fasta_file = get_file("Fasta", UPLOAD_FOLDER)
+        # fasta_file = get_file_path("fasta", UPLOAD_FOLDER)
         starts = [int(start) for start in cds.start_options.split(",")]
         print(starts)
         response_object['start_options'] = starts
 
-        blast_file = get_file("Blast", UPLOAD_FOLDER)
+        blast_file = get_file_path("blast", UPLOAD_FOLDER)
         E_VALUE_THRESH = 1e-7
         print("parsing blast")
         blast_results = annotate.parse_blast_multiple(
@@ -341,7 +334,7 @@ def cds_annotation(current_user, cds_id):
         print("writing results to post response")
         response_object['blast'] = blast_results
 
-        genemark_gdata_file = get_file("GeneMark_gdata", UPLOAD_FOLDER)
+        genemark_gdata_file = get_file_path("gdata", UPLOAD_FOLDER)
         gdata_df = pd.read_csv(genemark_gdata_file, sep='\t', skiprows=16)
         gdata_df.columns = ['Base', '1', '2', '3', '4', '5', '6']
         gdata_df = gdata_df[gdata_df.Base.isin(
@@ -395,23 +388,27 @@ def create_directory(directory):
     except FileExistsError:
         print("Directory \'" + directory + "\' already exists.")
 
-# Get necessary file from uploads dir depending on preference
-def get_file(preference, upload_directory):
+
+def get_file_path(preference, upload_directory):
+    """
+    Gets path of required file.
+    """
     for filename in os.listdir(upload_directory):
-        if preference == "GenBank":
-            if filename.endswith(".gb") or filename.endswith(".genbank"):
+        file_ext = os.path.splitext(filename)[1].lower()
+        if preference == "fasta":
+            if file_ext in FASTA_EXTENSIONS:
                 return os.path.join(upload_directory, filename)
-        elif preference == "GeneMark_ldata":
-            if filename.endswith(".ldata"):
+        elif preference == "genbank":
+            if file_ext in GENBANK_EXTENSIONS:
                 return os.path.join(upload_directory, filename)
-        elif preference == "GeneMark_gdata":
-            if filename.endswith(".gdata"):
+        elif preference == "ldata":
+            if file_ext in LDATA_EXTENSIONS:
                 return os.path.join(upload_directory, filename)
-        elif preference == "Fasta":
-            if filename.endswith(".fasta"):
+        elif preference == "gdata":
+            if file_ext in GDATA_EXTENSIONS:
                 return os.path.join(upload_directory, filename)
-        elif preference == "Blast":
-            if filename.endswith(".json"):
+        elif preference == "blast":
+            if file_ext in BLAST_EXTENSIONS:
                 return os.path.join(upload_directory, filename)
         else:
             return("Couldn't find file.")

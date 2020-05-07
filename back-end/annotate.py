@@ -41,6 +41,20 @@ def get_sequence(genome, strand, start, stop):
 
 
 # MAIN FUNCTIONS ---------------------------------------------------------
+def run_genemark(fasta_file_path):
+    """
+    Invokes the GeneMarkS utilities and returns .gdata and .ldata files.
+    """
+    result = subprocess.run(["/genemark_suite_linux_64/gmsuite/gc", fasta_file_path], stdout=subprocess.PIPE)
+    gc_percent = result.stdout.decode("utf-8").split(" ")[3]
+    gc_percent = "{:d}".format(round(float(gc_percent)))
+
+    subprocess.run(["/genemark_suite_linux_64/gmsuite/gm", "-D", "-g", "0", "-s", "1", "-m", "/genemark_suite_linux_64/gmsuite/heuristic_mat/heu_11_{}.mat".format(gc_percent), "-v", fasta_file_path])
+
+    gdata_file_path = "{}.gdata".format(fasta_file_path)
+    ldata_file_path = "{}.ldata".format(fasta_file_path)
+
+
 def parse_dnamaster_genbank(genbank_file):
     """
     Parses through DNA Master GenBank file to gather DNA Master's CDS calls. 
@@ -60,10 +74,10 @@ def parse_dnamaster_genbank(genbank_file):
                     else:
                         id = f"cds_{num}"
                         num += 1
-                    
-                    if isinstance(feature.location, SeqFeature.CompoundLocation):
-                        # FIXME: do something for compound locations, e.g. join(1..218,166710..167034)
-                        print(f"{feature.location} is a compoundlocation")
+
+                    # FIXME: do something for compound locations, e.g. join(1..218,166710..167034)
+                    # if isinstance(feature.location, SeqFeature.CompoundLocation):
+                    #     print(f"{feature.location} is a compoundlocation")
                     
                     strand = "+" if feature.location.strand == 1 else "-"
                     cds = DNAMaster(id = id,

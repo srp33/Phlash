@@ -15,12 +15,10 @@
       <ol>
         <li class="step">
           Download the FASTA file that will be used as input for BLAST.<br />
-          <button class="btn btn-light" @click="downloadFile">
-            <strong>Download FASTA file     </strong>
-            <div v-if="downloadLoading" class="spinner-border spinner-border-sm" role="status">
-              <span class="sr-only"></span>
-            </div>
-          </button>
+            <button class="btn btn-light" style="position: relative;" @click="downloadFile">
+              <loading :active.sync="downloadLoading" :is-full-page="false" :height="20" :width="20"></loading>
+              <strong>Download FASTA file</strong>
+            </button>
         </li>
         <li class="step">
           Go to BLASTp's website. <i>At the website, make sure to upload
@@ -52,6 +50,7 @@
               <form id="blast-upload-form" role="form" enctype="multipart/form-data">
                 <div class="upload-btn-wrapper">
                   <button class="btn btn-upload">
+                    <loading :active.sync="blastLoading" :is-full-page="false" :height="80" :width="80"></loading>
                     Drag files here or click to browse <br />
                     <div class="selected-file" v-if="showBlastFile">
                       <strong>Selected file: {{ this.blastFile.name }}</strong>
@@ -80,11 +79,18 @@
 <script>
 import axios from "axios";
 import Vue from "vue";
+import Loading from "vue-loading-overlay";
+import "vue-loading-overlay/dist/vue-loading.css";
 
 export default {
+  name: "Blast",
+  components: {
+    Loading
+  },
   data() {
     return {
       downloadLoading: false,
+      blastLoading: false,
       fileDownloaded: false,
       clickedNCBI: false,
       blast: false,
@@ -123,6 +129,7 @@ export default {
       this.showBlastFile = true;
     },
     uploadFile(e) {
+      this.blastLoading = true;
       var data = new FormData();
       data.append("file", this.blastFile);
       axios.post(`http://localhost:5000/api/blast/${this.$route.params.phageID}/upload`,
@@ -137,6 +144,7 @@ export default {
           console.log(response);
           if (typeof response.data.uploaded !== "undefined") {
             let fileExt = response.data.uploaded.split(".").pop();
+            this.blastLoading = false;
             this.showBlastSuccessAlert = true;
             this.showBlastDangerAlert = false;
             this.blast = true;
@@ -148,7 +156,7 @@ export default {
             });
           } else if (typeof response.data.not_allowed !== "undefined") {
             let fileExt = response.data.not_allowed.split(".").pop();
-            console.log(fileExt);
+            this.blastLoading = false;
             this.showBlastDangerAlert = true;
             this.showBlastSuccessAlert = false;
             let dangerMessage = `<strong>${fileExt}</strong> is an unacceptable JSON file extension.`;
