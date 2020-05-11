@@ -200,7 +200,7 @@ export default {
   },
   methods: {
     getData() {
-      axios.get(`http://localhost:5000/api/dnamaster/${this.$route.params.phageID}`)
+      axios.get(process.env.VUE_APP_BASE_URL + `/dnamaster/${this.$route.params.phageID}`)
         .then(response => {
           this.dnamaster = response.data.dnamaster;
         })
@@ -209,7 +209,7 @@ export default {
         });
     },
     deleteData(cdsID) {
-      axios.delete(`http://localhost:5000/api/dnamaster/${this.$route.params.phageID}/${cdsID}`)
+      axios.delete(process.env.VUE_APP_BASE_URL + `/dnamaster/${this.$route.params.phageID}/${cdsID}`)
         .then(response => {
           this.message = response.data.message;
           this.showMessage = true;
@@ -220,7 +220,7 @@ export default {
         });
     },
     updateData(payload, cdsID) {
-      axios.put(`http://localhost:5000/api/dnamaster/${this.$route.params.phageID}/${cdsID}`,
+      axios.put(process.env.VUE_APP_BASE_URL + `/dnamaster/${this.$route.params.phageID}/${cdsID}`,
           payload
         )
         .then(response => {

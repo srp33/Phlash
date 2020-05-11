@@ -163,7 +163,7 @@ export default {
   },
   methods: {
     checkIfFileUploaded() {
-      axios.get(`http://localhost:5000/api/blast/${this.$route.params.phageID}/none`)
+      axios.get(process.env.VUE_APP_BASE_URL + `/blast/${this.$route.params.phageID}/none`)
         .then(response => {
           this.blast = response.data.blast;
         })
@@ -173,7 +173,7 @@ export default {
     },
     downloadFile() {
       this.downloadLoading = true;
-      axios.post(`http://localhost:5000/api/blast/${this.$route.params.phageID}/download`)
+      axios.post(process.env.VUE_APP_BASE_URL + `/blast/${this.$route.params.phageID}/download`)
         .then(response => {
           let data = response.data;
           const blob = new Blob([data], { type: "application/fasta" });
@@ -202,7 +202,7 @@ export default {
       this.blastLoading = true;
       var data = new FormData();
       data.append("file", this.blastFile);
-      axios.post(`http://localhost:5000/api/blast/${this.$route.params.phageID}/upload`,
+      axios.post(process.env.VUE_APP_BASE_URL + `/blast/${this.$route.params.phageID}/upload`,
           data,
           {
             headers: {

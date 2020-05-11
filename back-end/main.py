@@ -1,5 +1,5 @@
 """
-Main back-end script of Flask web application. 
+Main back-end script of Flask web application.
 """
 from flask_cors import CORS
 from flask import *
@@ -34,12 +34,16 @@ db.init_app(app)
 CORS(app, resources={r'/*': {'origins': '*'}})
 
 # routers ------------------------------------------------------------------
-@app.route('/api/home/<phage_id>', methods=['POST'])
+@app.route('/test', methods=['GET'])
+def test():
+    return jsonify("Hello, world!")
+
+@app.route('/phlash_api/home/<phage_id>', methods=['POST'])
 def check_phage_id(phage_id):
     """
     API endpoint for '/'.
     POST method removes users that have existed for more than 90 days, creates a new
-        user if it doesn't exist, else gets informations for existing user. 
+        user if it doesn't exist, else gets informations for existing user.
     """
     response_object = {}
 
@@ -76,9 +80,9 @@ def check_phage_id(phage_id):
                     required_files.remove("gdata")
                 elif ext in LDATA_EXTENSIONS:
                     required_files.remove("ldata")
-            
+
             response_object['uploaded_all_files'] = True if len(required_files) == 0 else False
-        
+
         else:
             create_directory(os.path.join(ROOT, 'users', phage_id))
             create_directory(os.path.join(ROOT, 'users', phage_id, 'uploads'))
@@ -101,7 +105,7 @@ def check_phage_id(phage_id):
     return jsonify(response_object)
 
 
-@app.route('/api/upload/<current_user>', methods=['GET', 'POST'])
+@app.route('/phlash_api/upload/<current_user>', methods=['GET', 'POST'])
 def upload_files(current_user):
     """
     API endpoint for '/upload/:current_user'.
@@ -125,12 +129,12 @@ def upload_files(current_user):
                 existing_files.append("gdata")
             elif ext in LDATA_EXTENSIONS:
                 existing_files.append("ldata")
-        
+
         response_object["fasta"] = True if "fasta" in existing_files and \
                                            "gdata" in existing_files and \
                                            "ldata" in existing_files else False
         response_object["genbank"] = True if "genbank" in existing_files else False
-            
+
     if request.method == "POST":
         if 'file' not in request.files:
             response_object["status"]: "'file' not in request.files"
@@ -155,7 +159,7 @@ def upload_files(current_user):
                     print(' * uploaded', file_name)
 
                     # parse appropriate files as soon as uploaded
-                    # FIXME: check file conent before parsing. 
+                    # FIXME: check file conent before parsing.
                     file_ext = os.path.splitext(file_name)[1].lower()
                     if file_ext in FASTA_EXTENSIONS:  # run genemark and parse ldata
                         fasta_file = get_file_path("fasta", UPLOAD_FOLDER)
@@ -173,7 +177,7 @@ def upload_files(current_user):
     return jsonify(response_object)
 
 
-@app.route('/api/dnamaster/<current_user>', methods=['GET', 'POST'])
+@app.route('/phlash_api/dnamaster/<current_user>', methods=['GET', 'POST'])
 def dnamaster(current_user):
     """
     API endpoint for '/dnamaster/:current_user'.
@@ -220,7 +224,7 @@ def dnamaster(current_user):
     return jsonify(response_object)
 
 
-@app.route('/api/dnamaster/<current_user>/<cds_id>', methods=['PUT', 'DELETE'])
+@app.route('/phlash_api/dnamaster/<current_user>/<cds_id>', methods=['PUT', 'DELETE'])
 def dnamaster_cds(current_user, cds_id):
     """
     API endpoint for '/dnamaster/:current_user/:cds_id'.
@@ -254,11 +258,11 @@ def dnamaster_cds(current_user, cds_id):
     return jsonify(response_object)
 
 # TODO: Continue checking code from here.
-@app.route('/api/blast/<current_user>/<file_method>', methods=['GET', 'POST'])
+@app.route('/phlash_api/blast/<current_user>/<file_method>', methods=['GET', 'POST'])
 def blast(current_user, file_method):
     """
     API endpoint for '/blast/:current_user'.
-    POST method downloads fasta file for BLAST input or 
+    POST method downloads fasta file for BLAST input or
         uploads json file of BLAST output
     """
     UPLOAD_FOLDER = os.path.join(ROOT, 'users', current_user, 'uploads')
@@ -273,7 +277,7 @@ def blast(current_user, file_method):
             ext = os.path.splitext(filename)[1].lower()
             if ext in BLAST_EXTENSIONS:
                 existing_files.append("blast")
-        
+
         response_object["blast"] = True if "blast" in existing_files else False
 
     if request.method == "POST":
@@ -318,7 +322,7 @@ def blast(current_user, file_method):
     return jsonify(response_object)
 
 
-@app.route('/api/annotations/<current_user>', methods=['GET', 'POST'])
+@app.route('/phlash_api/annotations/<current_user>', methods=['GET', 'POST'])
 def annotate_data(current_user):
     """
     Compares DNA Master's predictions against GeneMark's.
@@ -352,10 +356,10 @@ def annotate_data(current_user):
     return jsonify(response_object)
 
 
-@app.route('/api/annotations/cds/<current_user>/<cds_id>', methods=['GET', 'POST', 'PUT', 'DELETE'])
+@app.route('/phlash_api/annotations/cds/<current_user>/<cds_id>', methods=['GET', 'POST', 'PUT', 'DELETE'])
 def cds_annotation(current_user, cds_id):
     """
-    Annotation information for each CDS. 
+    Annotation information for each CDS.
     GET method gets cds, its start options, blast results, and graph data.
     PUT method updates the start position and function if the user chooses to do so.
     """
@@ -437,7 +441,7 @@ def allowed_file(filename, allowed_extensions):
 
 def create_directory(directory):
     """
-    Create specified directory. 
+    Create specified directory.
     """
     try:
         os.mkdir(directory)

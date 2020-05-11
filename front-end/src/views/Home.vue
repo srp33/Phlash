@@ -99,7 +99,7 @@ export default {
   },
   methods: {
     checkPhageID(phageID) {
-      axios.post(`http://localhost:5000/api/home/${phageID}`)
+      axios.post(process.env.VUE_APP_BASE_URL + `/home/${phageID}`)
         .then(response => {
           this.allFilesUploaded = response.data.uploaded_all_files;
           this.idStatus = response.data.id_status;

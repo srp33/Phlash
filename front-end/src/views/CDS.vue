@@ -147,7 +147,7 @@ export default {
   },
   methods: {
     getData(cdsID) {
-      axios.get(`http://localhost:5000/api/annotations/cds/${this.$route.params.phageID}/${cdsID}`)
+      axios.get(process.env.VUE_APP_BASE_URL + `/annotations/cds/${this.$route.params.phageID}/${cdsID}`)
         .then(response => {
           this.currentCDS = response.data.cds;
           this.blastResults = response.data.blast;
@@ -198,7 +198,7 @@ export default {
       this.updateCDS(payload, this.updatedCDS.id);
     },
     updateCDS(payload, cdsID) {
-      axios.put(`http://localhost:5000/api/annotations/cds/${this.$route.params.phageID}/${cdsID}`,
+      axios.put(process.env.VUE_APP_BASE_URL + `/annotations/cds/${this.$route.params.phageID}/${cdsID}`,
           payload
         )
         .then(() => {
@@ -209,7 +209,7 @@ export default {
         });
     },
     deleteCDS(cdsID) {
-      axios.delete(`http://localhost:5000/api/annotations/cds/${this.$route.params.phageID}/${cdsID}`)
+      axios.delete(process.env.VUE_APP_BASE_URL + `/annotations/cds/${this.$route.params.phageID}/${cdsID}`)
         .then(() => {
           this.$router.push(`/annotations/${this.$route.params.phageID}`);
         })

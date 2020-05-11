@@ -180,7 +180,7 @@ export default {
   },
   methods: {
     checkIfFilesUploaded() {
-      axios.get(`http://localhost:5000//api/upload/${this.$route.params.phageID}`)
+      axios.get(process.env.VUE_APP_BASE_URL + `/upload/${this.$route.params.phageID}`)
         .then(response => {
           this.fasta = response.data.fasta;
           this.genbank = response.data.genbank;
@@ -209,7 +209,7 @@ export default {
         data.append("file", this.genbankFile);
       }
       data.append("fileType", fileType);
-      axios.post(`http://localhost:5000/api/upload/${this.$route.params.phageID}`,
+      axios.post(process.env.VUE_APP_BASE_URL + `/upload/${this.$route.params.phageID}`,
           data,
           {
             headers: {

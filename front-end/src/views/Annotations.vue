@@ -147,7 +147,7 @@ export default {
   },
   methods: {
     getData() {
-      axios.get(`http://localhost:5000/api/annotations/${this.$route.params.phageID}`)
+      axios.get(process.env.VUE_APP_BASE_URL + `/annotations/${this.$route.params.phageID}`)
         .then(response => {
           this.dnamaster = response.data.dnamaster;
           this.pageLoading = false;
@@ -158,7 +158,7 @@ export default {
     },
     downloadGenBankFile() {
       this.downloadLoading = true;
-      axios.post(`http://localhost:5000/api/annotations/${this.$route.params.phageID}`)
+      axios.post(process.env.VUE_APP_BASE_URL + `/annotations/${this.$route.params.phageID}`)
         .then(response => {
           let data = response.data;
           const blob = new Blob([data]);
