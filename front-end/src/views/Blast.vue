@@ -49,14 +49,14 @@
             <button class="btn btn-light btn-step" @click="goToNCBI">
               <strong>Go to NCBI's BLASTp</strong>
             </button>
-            <img id="step-two" src="/images/blast_step2.png" />
+            <img id="step-two" src="<%= BASE_URL %>/images/blast_step2.png" />
           </li>
           <li class="step">
             In the top left table on the results page, click on
             <i>"Download All."</i> This will show you file formatting options for
             downloading your results. Choose <strong>Single-file JSON</strong>. 
             Continue when you have your downloaded file ready for upload.<br />
-            <img id="step-three" src="/images/blast_step3.png" />
+            <img id="step-three" src="<%= BASE_URL %>/images/blast_step3.png" />
           </li>
           <li class="step">
             Upload your BLAST results.
