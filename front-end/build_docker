@@ -5,4 +5,4 @@
 # Docker image based on the Dockerfile.
 ############################################
 
-docker build -t srp33/phlash_f:v1 .
+docker build -t srp33/phlash_f:v$(cat ../VERSION) .

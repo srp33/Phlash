@@ -2,7 +2,8 @@
 
 ## This will execute the container in interactive mode.
 ## Hit Ctrl-C when you want to close the container.
-#docker run --rm -i -t --name phlash_f -p 5050:80 --network host \
 docker run --rm -i -t --name phlash_f -p 5050:80 \
-    srp33/phlash_f:v1
-#docker run --rm -i -t --name phlash_f srp33/phlash_f:v1 /bin/bash
+  srp33/phlash_f:v$(cat ../VERSION)
+
+# This is just for testing...
+#docker run --rm -i -t --name phlash_f srp33/phlash_f:v$(cat ../VERSION) /bin/bash
