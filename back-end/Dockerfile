@@ -11,3 +11,5 @@ ADD gm_key_64.gz /
 
 RUN gunzip /gm_key_64.gz \
  && mv /gm_key_64 ~/.gm_key
+
+USER 1000
