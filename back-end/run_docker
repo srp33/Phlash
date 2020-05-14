@@ -8,4 +8,4 @@ chmod 777 users
 docker run --rm -i -t --name phlash_b -p 5000:80 -v $(pwd)/users:/app/users  \
     srp33/phlash_b:v$(cat ../VERSION)
 
-# docker run --rm -i -t --name phlash_b -p 5000:5000 srp33/phlash_b:v$(cat ../VERSION) /bin/bash
+#docker run --rm -i -t --name phlash_b -p 5000:5000 srp33/phlash_b:v$(cat ../VERSION) /bin/bash

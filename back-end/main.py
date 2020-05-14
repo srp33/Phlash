@@ -34,7 +34,7 @@ db.init_app(app)
 CORS(app, resources={r'/*': {'origins': '*'}})
 
 # routers ------------------------------------------------------------------
-@app.route('/test', methods=['GET'])
+@app.route('/phlash_api/test', methods=['GET'])
 def test():
     return jsonify("Hello, world!")
 
