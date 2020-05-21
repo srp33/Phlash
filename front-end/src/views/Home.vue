@@ -2,11 +2,15 @@
   <div class="wrapper">
     <Navbar :upload="navUpload" :dnamaster="navDNAMaster" :blast="navBlast" :annotations="navAnnotations" />
     <div class="container">
-      <h1><strong>Phlash</strong></h1>
+      <!--<h1><strong>Phlash</strong></h1>-->
+      <p>
+        <img id="logo" src="/phlash/images/Logo.png" width="250" />
+      </p>
       <div class="alert alert-primary" align="left">
         <p>
-          Welcome to <strong><i>Phlash</i>
-          </strong>! Enter an ID for your bacteriphage below to get started.
+          Welcome to <strong><i>Phlash</i></strong>!
+        </p>
+        <p>Enter an ID for your bacteriphage below to get started.
           <em>Please note that your ID will be removed after 90 days.</em>
         </p>
         <div class="input-group mb-3">
