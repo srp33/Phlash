@@ -17,7 +17,7 @@
             </button>
           </router-link>
           <router-link :to="{ name: 'Annotations', params: {phageID: $route.params.phageID} }"
-                       :event="blast ? 'click' : ''">
+                       :event="(blastDownloaded && blastUploaded) ? 'click' : ''">
             <button class="btn btn-light btn-nav disabled" id="next-top">
               <strong>Next</strong>
               <svg class="bi bi-arrow-right" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
@@ -31,11 +31,17 @@
       <div class="steps">
         <ol>
           <li class="step">
-            Download the FASTA file that will be used as input for BLAST.<br />
-              <button class="btn btn-light" style="position: relative;" @click="downloadFile">
-                <loading :active.sync="downloadLoading" :is-full-page="false" :height="20" :width="20"></loading>
-                <strong>Download FASTA file</strong>
-              </button>
+            Download the zipped FASTA file(s) that will be used as input for BLAST.
+            <p class="zipfile-tip">
+              <svg class="bi bi-info-circle-fill" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd" d="M8 16A8 8 0 108 0a8 8 0 000 16zm.93-9.412l-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM8 5.5a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"/>
+              </svg> If you can't open your zip file, try using <a target="_blank" rel="noopener noreferrer" href="https://www.7-zip.org/">7-Zip</a>.
+            </p>
+            <button class="btn btn-light btn-step" style="position: relative;" @click="downloadFile">
+              <loading :active.sync="downloadLoading" :is-full-page="false" :height="20" :width="20"></loading>
+              <strong>Download FASTA file</strong>
+            </button>
+            <p v-if="downloadLoading">Downloading...</p>
           </li>
           <li class="step">
             Go to BLASTp's website. <i>At the website, make sure to upload
@@ -61,7 +67,7 @@
             <img id="step-three" src="/phlash/images/blast_step3.png" />
           </li>
           <li class="step">
-            Upload your BLAST results.
+            Upload your <strong>{{ numBlastFilesDownloaded }} single-file JSON</strong> BLAST results.
             <div class="upload-wrapper">
               <div class="alert alert-success" id="blast-success-alert" role="alert" v-if="showBlastSuccessAlert"></div>
               <div class="alert alert-danger" id="blast-danger-alert" role="alert" v-if="showBlastDangerAlert"></div>
@@ -71,15 +77,20 @@
                     <button class="btn btn-upload btn-step">
                       <loading :active.sync="blastLoading" :is-full-page="false" :height="80" :width="80"></loading>
                       Drag files here or click to browse <br />
-                      <div class="selected-file" v-if="showBlastFile">
-                        <strong>Selected file: {{ this.blastFile.name }}</strong>
+                      <div class="selected-files" v-if="showBlastFiles">
+                        <strong>Selected file(s):</strong>
+                        <ul>
+                          <li v-for="file in blastFiles" :key="file.name">
+                            {{ file.name }}
+                          </li>
+                        </ul>
                       </div>
                     </button>
-                    <input class="form-control" id="file" type="file" ref="file" name="file" v-on:change="handleFileUpload()" />
+                    <input class="form-control" id="files" type="file" ref="files" name="files" multiple v-on:change="handleFilesUpload()" />
                   </div>
                 </form>
               </div>
-              <button class="btn btn-dark btn-upload-submit" v-if="showBlastFile" @click="uploadFile()">
+              <button class="btn btn-dark btn-upload-submit" v-if="showBlastFiles" @click="uploadFiles()">
                 <strong>Upload</strong>
               </button>
             </div>
@@ -97,7 +108,7 @@
           </button>
         </router-link>
         <router-link :to="{ name: 'Annotations', params: {phageID: $route.params.phageID} }"
-                      :event="blast ? 'click' : ''">
+                      :event="(blastDownloaded && blastUploaded) ? 'click' : ''">
           <button class="btn btn-light btn-nav disabled" id="next-bottom">
             <strong>Next</strong>
             <svg class="bi bi-arrow-right" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
@@ -128,17 +139,18 @@ export default {
     return {
       downloadLoading: false,
       blastLoading: false,
-      fileDownloaded: false,
       clickedNCBI: false,
-      blast: false,
-      blastFile: null,
-      showBlastFile: false,
+      blastDownloaded: false,
+      blastUploaded: false,
+      blastFiles: null,
+      numBlastFilesDownloaded: null,
+      showBlastFiles: false,
       showBlastDangerAlert: false,
       showBlastSuccessAlert: false
     };
   },
   created() {
-    this.checkIfFileUploaded();
+    this.checkFiles();
   },
   computed: {
     navUpload: function() {
@@ -151,13 +163,19 @@ export default {
       return true;
     },
     navAnnotations: function() {
-      if (this.blast) return true;
+      if (this.blastDownloaded && this.blastUploaded) return true;
       else return false;
     },
   },
   watch: {
-    blast: function() {
-      if (this.blast) {
+    blastDownloaded: function() {
+      if (this.blastDownloaded && this.blastUploaded) {
+        document.getElementById("next-top").classList.remove("disabled");
+        document.getElementById("next-bottom").classList.remove("disabled");
+      }
+    },
+    blastUploaded: function() {
+      if (this.blastDownloaded && this.blastUploaded) {
         document.getElementById("next-top").classList.remove("disabled");
         document.getElementById("next-bottom").classList.remove("disabled");
       }
@@ -167,7 +185,9 @@ export default {
     checkIfFileUploaded() {
       axios.get(process.env.VUE_APP_BASE_URL + `/blast/${this.$route.params.phageID}/none`)
         .then(response => {
-          this.blast = response.data.blast;
+          this.blastDownloaded = response.data.blast_downloaded;
+          this.blastUploaded = response.data.blast_uploaded;
+          if (!this.blastDownloaded) this.downloadFile();
         })
         .catch(error => {
           console.log(error);
@@ -177,14 +197,19 @@ export default {
       this.downloadLoading = true;
       axios.post(process.env.VUE_APP_BASE_URL + `/blast/${this.$route.params.phageID}/download`)
         .then(response => {
-          let data = response.data;
-          const blob = new Blob([data], { type: "application/fasta" });
+          console.log(response.data)
+          // this.numBlastFilesDownloaded = response.data[0];
+          let file_data = response.data;
+          const blob = new Blob([file_data], { type: "application/zip" });
           let link = document.createElement("a");
           link.href = window.URL.createObjectURL(blob);
-          link.download = `${this.$route.params.phageID}_blast.fasta`;
+          link.download = `${this.$route.params.phageID}_blast.zip`;
           link.click();
           this.downloadLoading = false;
-          this.fileDownloaded = true;
+          this.blastDownloaded = true;
+        })
+        .catch(error => {
+          console.log(error)
         });
     },
     goToNCBI() {
@@ -194,13 +219,11 @@ export default {
       );
       this.clickedNCBI = true;
     },
-    handleFileUpload() {
-      this.blastFile = document.querySelector(
-        "#blast-upload-form"
-      ).file.files[0];
-      this.showBlastFile = true;
+    handleFilesUpload() {
+      this.blastFiles = document.querySelector('#blast-upload-form').files.files
+      this.showBlastFiles = true;
     },
-    uploadFile(e) {
+    uploadFiles(e) {
       this.blastLoading = true;
       var data = new FormData();
       data.append("file", this.blastFile);
@@ -214,28 +237,30 @@ export default {
         )
         .then(response => {
           console.log(response);
-          if (typeof response.data.uploaded !== "undefined") {
-            let fileExt = response.data.uploaded.split(".").pop();
+          if (response.data.uploaded.length > 0) {
             this.blastLoading = false;
             this.showBlastSuccessAlert = true;
-            this.showBlastDangerAlert = false;
-            this.blast = true;
-            let successMessage = `<strong>${response.data.uploaded}</strong> uploaded successfully!`;
-            Vue.nextTick(() => {
-              document.getElementById(
-                "blast-success-alert"
-              ).innerHTML = successMessage;
+            this.blastUploaded = true;
+            let successMessage = `<strong>Files uploaded successfully: </strong>`;
+            response.data.uploaded.forEach((filename, index) => {
+              if (index === response.data.uploaded.length - 1) successMessage += filename;
+              else successMessage += filename + ", ";
             });
-          } else if (typeof response.data.not_allowed !== "undefined") {
-            let fileExt = response.data.not_allowed.split(".").pop();
+            Vue.nextTick(() => {
+              document.getElementById("blast-success-alert").innerHTML = successMessage;
+            });
+          }
+          
+          if (response.data.not_allowed.length > 0) {
             this.blastLoading = false;
             this.showBlastDangerAlert = true;
-            this.showBlastSuccessAlert = false;
-            let dangerMessage = `<strong>${fileExt}</strong> is an unacceptable JSON file extension.`;
+            let dangerMessage = `<strong>Unacceptable files: </strong>`;
+            response.data.not_allowed.forEach((filename, index) => {
+              if (index === response.data.not_allowed.length - 1) dangerMessage += filename;
+              else dangerMessage += filename + ", ";
+            });
             Vue.nextTick(() => {
-              document.getElementById(
-                "blast-danger-alert"
-              ).innerHTML = dangerMessage;
+              document.getElementById("blast-danger-alert").innerHTML = dangerMessage;
             });
           }
         })
@@ -275,6 +300,11 @@ h1 {
   max-width: 100%;
   height: auto;
   margin: 10px;
+}
+
+.zipfile-tip {
+  font-size: 0.9em;
+  margin-bottom: 0;
 }
 
 .btn-step {
@@ -331,18 +361,23 @@ h1 {
   opacity: 0;
 }
 
-.selected-file {
+.selected-files {
   display: inline-block;
   margin: 10px;
 }
 
-.selected-file strong {
+.selected-files strong, 
+.selected-files ul{
   color: #474747;
   font-size: 16px;
   text-align: center;
 }
 
-.selected-file span {
+.selected-files ul {
+  padding-left: 0;
+}
+
+.selected-files span {
   margin: 0;
   color: #474747;
   font-size: 16px;

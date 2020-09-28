@@ -2,6 +2,7 @@
   <div class="wrapper">
     <Navbar :upload="navUpload" :dnamaster="navDNAMaster" :blast="navBlast" :annotations="navAnnotations" />
     <div class="container">
+      <loading :active.sync="pageLoading" :is-full-page="true" :height="100" :width="100"></loading>
       <h1>DNA Master</h1>
       <div class="alert alert-primary">
         <p><strong>Instructions</strong></p>
@@ -150,14 +151,18 @@
 <script>
 import axios from "axios";
 import Navbar from "../components/Navbar.vue";
+import Loading from "vue-loading-overlay";
+import "vue-loading-overlay/dist/vue-loading.css";
 
 export default {
   name: "DNAMaster",
   components: {
+    Loading,
     Navbar
   },
   data() {
     return {
+      pageLoading: true,
       dnamaster: [],
       updatedCDS: {
         id: "",
@@ -203,6 +208,7 @@ export default {
       axios.get(process.env.VUE_APP_BASE_URL + `/dnamaster/${this.$route.params.phageID}`)
         .then(response => {
           this.dnamaster = response.data.dnamaster;
+          this.pageLoading = false;
         })
         .catch(error => {
           console.error(error);

@@ -1,11 +1,13 @@
 """
 Main back-end script of Flask web application.
 """
-from flask_cors import CORS
-from flask import *
 from werkzeug.utils import secure_filename
 from Bio import SeqIO, Seq
 from pathlib import Path
+from contextlib import closing
+from zipfile import ZipFile
+from flask_cors import CORS
+from flask import *
 from models import *
 import os
 import shutil
@@ -54,6 +56,8 @@ def check_phage_id(phage_id):
             user_time = arrow.get(user.stat().st_mtime)
             if user_time < critical_time:
                 shutil.rmtree(user)
+        
+        # if phage_id is None or phage_id == "" or !phage_id.replace(/\s/g, '').length
 
         # get list of existing users
         USERS = []
@@ -271,52 +275,53 @@ def blast(current_user, file_method):
     response_object = {}
 
     if request.method == "GET":
-        # check if respective file(s) for blast are uploaded
-        existing_files = []
-        for filename in os.listdir(os.path.join(ROOT, 'users', current_user, 'uploads')):
-            ext = os.path.splitext(filename)[1].lower()
-            if ext in BLAST_EXTENSIONS:
-                existing_files.append("blast")
+        response_object["blast_uploaded"] = False
+        response_object["blast_downloaded"] = False
 
-        response_object["blast"] = True if "blast" in existing_files else False
+        # check if respective file(s) for blast are uploaded
+        for filename in os.listdir(os.path.join(ROOT, 'users', current_user, 'uploads')):
+            if os.path.splitext(filename)[1].lower() in BLAST_EXTENSIONS:
+                response_object["blast_uploaded"] = True
+
+        # check if blast input file(s) downloaded
+        for filename in os.listdir(os.path.join(ROOT, 'users', current_user)):
+            if filename.endswith('.zip'):
+                response_object["blast_downloaded"] = True
 
     if request.method == "POST":
         if file_method == "download":
+            # FIXME: Change where we do annotate.compare()
             print("Starting comparisons")
             annotate.compare()
             fasta_file = get_file_path("fasta", UPLOAD_FOLDER)
             genemark_gdata_file = get_file_path("gdata", UPLOAD_FOLDER)
-            output = annotate.create_fasta(fasta_file, genemark_gdata_file)
+            
+            num_files_downloaded = annotate.create_blast_fasta(current_user, fasta_file, genemark_gdata_file)
 
-            with open(os.path.join(ROOT, 'users', current_user, f"{current_user}_blast.fasta"), "w") as out_handle:
-                out_handle.write(output)
-
-            f = open(os.path.join(ROOT, 'users', current_user,
-                                  f"{current_user}_blast.fasta"), "r")
+            f = open(os.path.join(ROOT, 'users', current_user, f"{current_user}_blast.zip"), "rb")
+            # return {'num_files_downloaded': num_files_downloaded, 'zipfile': f.read()}
             return f.read()
         elif file_method == "upload":
-            if 'file' not in request.files:
-                response_object["status"]: "'file' not in request.files"
-                print("in fail")
+            for filename in os.listdir(os.path.join(ROOT, 'users', current_user)):
+                if filename.endswith('.zip'):
+                    with closing(ZipFile(os.path.join(ROOT, 'users', current_user, filename))) as archive:
+                        num_blast_files = len(archive.infolist())
+            print("num blast files: " + str(num_blast_files))
+            response_object["num_blast_files"] = num_blast_files
+            if request.files.getlist('files') is None: 
+                response_object["status"]: "request.files.getlist('files') is None"
             else:
-                print("in success")
-                file = request.files['file']
-                if file:
-                    file_name = secure_filename(file.filename)
-                    if allowed_file(file_name, set(['.json'])):
-
-                        file_ext = file_name.rsplit('.', 1)[1].lower()
-                        for existing_file in os.listdir(UPLOAD_FOLDER):
-                            if existing_file.endswith(f".{file_ext}"):
-                                os.remove(os.path.join(
-                                    UPLOAD_FOLDER, existing_file))
-
-                        file.save(os.path.join(UPLOAD_FOLDER, file_name))
-                        response_object["uploaded"] = file_name
-                        print(' * uploaded', file_name)
-                    else:
-                        response_object["not_allowed"] = file.filename
-                else:
+                response_object["uploaded"] = []
+                response_object["not_allowed"] = []
+                try:
+                    for file in request.files.getlist('files'):
+                        if file and allowed_file(file.filename, BLAST_EXTENSIONS):
+                            file.save(os.path.join(UPLOAD_FOLDER, file.filename))
+                            response_object["uploaded"].append(file.filename)
+                            print(' * uploaded', file.filename)
+                        else:
+                            response_object["not_allowed"].append(file.filename)
+                except:
                     response_object["status"] = "error"
 
     return jsonify(response_object)
@@ -383,12 +388,10 @@ def cds_annotation(current_user, cds_id):
         print(starts)
         response_object['start_options'] = starts
 
-        blast_file = get_file_path("blast", UPLOAD_FOLDER)
+        blast_files = get_file_path("blast", UPLOAD_FOLDER)
         E_VALUE_THRESH = 1e-7
         print("parsing blast")
-        blast_results = annotate.parse_blast_multiple(
-            blast_file, cds.id, E_VALUE_THRESH)
-        print("writing results to post response")
+        blast_results = annotate.parse_blast_results(blast_files, cds.id, E_VALUE_THRESH)
         response_object['blast'] = blast_results
 
         genemark_gdata_file = get_file_path("gdata", UPLOAD_FOLDER)
@@ -454,6 +457,7 @@ def get_file_path(preference, upload_directory):
     """
     Gets path of required file.
     """
+    blast_files = []
     for filename in os.listdir(upload_directory):
         file_ext = os.path.splitext(filename)[1].lower()
         if preference == "fasta":
@@ -470,6 +474,7 @@ def get_file_path(preference, upload_directory):
                 return os.path.join(upload_directory, filename)
         elif preference == "blast":
             if file_ext in BLAST_EXTENSIONS:
-                return os.path.join(upload_directory, filename)
+                blast_files.append(os.path.join(upload_directory, filename))
         else:
             return("Couldn't find file.")
+    return blast_files

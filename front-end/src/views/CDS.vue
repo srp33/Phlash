@@ -17,10 +17,10 @@
       <p><strong>Your selected start position:</strong> {{ newStart }}</p>
       <p><strong>Your selected function:</strong> {{ newFunction }}</p>
       <button type="button" class="btn btn-light btn-action" @click="editCDS" v-if="newFunction !== 'None' && newStart !== 0">
-        <strong>Update {{ $route.params.cdsID }}</strong>
+        <strong>Update</strong>
       </button>
       <button type="button" class="btn btn-light btn-action" @click="deleteCDS($route.params.cdsID)">
-        <strong>Delete {{ $route.params.cdsID }}</strong>
+        <strong>Delete</strong>
       </button>
     </div>
     <div class="coding-potential-table">
@@ -64,7 +64,7 @@
     <div class="blast-results">
       <h4 style="text-align: center; margin: 40px;">BLAST Results</h4>
       <div id="accordion">
-        <div class="card" v-for="(item, key) in blastResults" :key="key">
+        <div class="card" v-for="key in sortedBlastKeys" :key="key">
           <div class="card-header">
             <h4 class="mb-0">
               <button class="btn btn-light btn-blast" data-toggle="collapse" aria-expanded="false" v-bind:data-target="'#'+key" v-bind:aria-controls="key">
@@ -75,7 +75,7 @@
           </div>
           <div v-bind:id="key" class="collapse" data-parent="#accordion">
             <div class="card-body">
-              <BlastResults :blastResults="item" @newFunction="setFunction" />
+              <BlastResults :blastResults="blastResults[key]" @newFunction="setFunction" />
             </div>
           </div>
         </div>
@@ -85,10 +85,10 @@
       <p><strong>Your selected start position:</strong> {{ newStart }}</p>
       <p><strong>Your function selection:</strong> {{ newFunction }}</p>
       <button type="button" class="btn btn-light btn-action" @click="editCDS" v-if="newFunction !== 'None' && newStart !== 0">
-        <strong>Update {{ $route.params.cdsID }}</strong>
+        <strong>Update</strong>
       </button>
       <button type="button" class="btn btn-light btn-action" @click="deleteCDS($route.params.cdsID)">
-        <strong>Delete {{ $route.params.cdsID }}</strong>
+        <strong>Delete</strong>
       </button>
     </div>
   </div>
@@ -144,6 +144,11 @@ export default {
   },
   created() {
     this.getData(this.$route.params.cdsID);
+  },
+  computed: {
+    sortedBlastKeys: function() {
+      return Object.keys(this.blastResults).sort((a, b) => b - a);
+    }
   },
   methods: {
     getData(cdsID) {

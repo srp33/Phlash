@@ -4,12 +4,14 @@ Functions parse through user's uploaded files, does comparison analysis
 between files, creates files, etc.
 """
 from Bio import SeqIO, Seq, SeqFeature
+from collections import OrderedDict
 from models import *
 import json
 import os
 import pandas as pd
 import re
 import subprocess
+import zipfile
 
 
 # HELPER FUNCTIONS ---------------------------------------------------------
@@ -38,6 +40,11 @@ def get_sequence(genome, strand, start, stop):
         return genome.reverse_complement()[start : stop]
     else:
         return genome[start : stop]
+
+
+def zip_files(files, zip_handle):
+    for file in files:
+        zip_handle.write(file)
 
 
 # MAIN FUNCTIONS ---------------------------------------------------------
@@ -197,24 +204,55 @@ def start_options(cds_id, genome, genemark_gdata_file):
     return start_options
 
 
-# Create FASTA for input into BLAST
-def create_fasta(fasta_file, genemark_gdata_file):
+def create_blast_fasta(current_user, fasta_file, gdata_file):
+    """
+    Creates fasta file(s) for BLAST input.
+    If more than one file is created, then each file should have
+    100 sequences max (200 lines).
+
+    @return blast_file_count: number of blast fasta files created.
+    """
+    filename = re.search('(.*/users/.*)/uploads/.*.\w*', fasta_file)
     genome = SeqIO.read(fasta_file, "fasta").seq
     output = ""
     
+    cds_count = 1  # keep track of num CDSs that goes in each file
+    blast_file_count = 1  # keep track of num blast files created
+    out_file = f"{str(filename.group(1))}/{current_user}_blast_{blast_file_count}.fasta"
+    files_to_zip = [out_file]
     for cds in db.session.query(DNAMaster).order_by(DNAMaster.start):
-        starts = start_options(cds.id, genome, genemark_gdata_file)
+        starts = start_options(cds.id, genome, gdata_file)
         cds.start_options = ", ".join([str(start) for start in starts])
         db.session.commit()
-        for i in range(len(starts[:3])):
+        for i in range(len(starts[:5])):
             if starts[i] == cds.start:
                 output += f">{cds.id}, {starts[i]}-{cds.stop}\n"
                 output += f"{Seq.translate(sequence=get_sequence(genome, cds.strand, starts[i]-1, cds.stop), table=11)}\n"
             else:
                 output += f">{cds.id}_{i}, {starts[i]}-{cds.stop}\n"
                 output += f"{Seq.translate(sequence=get_sequence(genome, cds.strand, starts[i]-1, cds.stop), table=11)}\n"
+            cds_count += 1
+            if cds_count == 101:  # only include 100 query sequences in each file, else you get a CPU limit from NCBI blast
+                with open(out_file, "w") as f:
+                    f.write(output)
+                output = ""
+                cds_count = 1
+                blast_file_count += 1
+                out_file = f"{str(filename.group(1))}/{current_user}_blast_{blast_file_count}.fasta"
+                files_to_zip.append(out_file)
 
-    return output
+    if cds_count < 101:
+        with open(out_file, "w") as f:
+            f.write(output)
+    
+    # zip all out_files together
+    zip_file = zipfile.ZipFile(f"{str(filename.group(1))}/{current_user}_blast.zip", 'w', zipfile.ZIP_DEFLATED)
+    for filename in files_to_zip:
+        arcname = filename.rsplit('/', 1)[-1].lower()
+        zip_file.write(filename, arcname)
+    zip_file.close()
+    
+    return blast_file_count
 
 
 def get_final_annotations(genome):
@@ -263,37 +301,36 @@ def modify_genbank(gb_file, fasta_file):
     return out_file
 
 
-def parse_blast_multiple(blast_file, cds_id, e_value_thresh):
+def parse_blast_results(blast_files, cds_id, e_value_thresh):
     blast_results = {}
-    with open(blast_file) as f:
-        blasts = json.load(f)["BlastOutput2"]
-        for blast in blasts:
-            search = blast["report"]["results"]["search"]
-            title = re.search(
-                "([A-Z]+_\d+_*\d*), (\d+)-\d+", search["query_title"])
-            if title:
-                curr_id = title.group(1)
-                curr_start = int(title.group(2))
-                cds_id_ = cds_id + "_"
-                if cds_id == curr_id or cds_id_ in curr_id:
-                    blast_results[curr_start] = []
-                    hits = search["hits"]
-                    for hit in hits:
-                        hsps = hit["hsps"][0]
-                        if hsps["evalue"] <= e_value_thresh:
-                            alignment = {}
-                            description = hit["description"][0]
-                            alignment['accession'] = description["accession"]
-                            alignment["title"] = description["title"]
-                            alignment["sciname"] = description["sciname"]
-                            alignment["evalue"] = '{:0.2e}'.format(
-                                hsps["evalue"])
-                            alignment["query_from"] = hsps["query_from"]
-                            alignment["query_to"] = hsps["query_to"]
-                            alignment["hit_from"] = hsps["hit_from"]
-                            alignment["hit_to"] = hsps["hit_to"]
-                            alignment["percent_identity"] = round(
-                                hsps["identity"] / hsps["align_len"] * 100, 2)
-                            blast_results[curr_start].append(alignment)
-
+    for blast_file in blast_files:
+        with open(blast_file) as f:
+            blasts = json.load(f)["BlastOutput2"]
+            for blast in blasts:
+                search = blast["report"]["results"]["search"]
+                title = re.search(
+                    "([A-Z]+_\d+_*\d*), (\d+)-\d+", search["query_title"])
+                if title:
+                    curr_id = title.group(1)
+                    curr_start = int(title.group(2))
+                    cds_id_ = cds_id + "_"
+                    if cds_id == curr_id or cds_id_ in curr_id:
+                        blast_results[curr_start] = []
+                        hits = search["hits"]
+                        for hit in hits:
+                            hsps = hit["hsps"][0]
+                            if hsps["evalue"] <= e_value_thresh:
+                                alignment = {}
+                                description = hit["description"][0]
+                                alignment['accession'] = description["accession"]
+                                alignment["title"] = description["title"]
+                                alignment["evalue"] = '{:0.2e}'.format(
+                                    hsps["evalue"])
+                                alignment["query_from"] = hsps["query_from"]
+                                alignment["query_to"] = hsps["query_to"]
+                                alignment["hit_from"] = hsps["hit_from"]
+                                alignment["hit_to"] = hsps["hit_to"]
+                                alignment["percent_identity"] = round(
+                                    hsps["identity"] / hsps["align_len"] * 100, 2)
+                                blast_results[curr_start].append(alignment)
     return blast_results
