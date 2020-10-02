@@ -19,7 +19,7 @@
             type="text"
             v-model="phageID"
             v-on:keyup.enter="checkPhageID(phageID)"
-            placeholder="Enter a unique bacteriophage ID"
+            placeholder="Enter a unique bacteriophage ID containing letters and numbers only"
             aria-label="Enter a unique bacteriophage ID"
             aria-describedby="basic-addon2"
           />
@@ -71,7 +71,6 @@
 <script>
 import axios from "axios";
 import Navbar from "../components/Navbar.vue"
-
 export default {
   name: "Home",
   components: {
@@ -84,6 +83,11 @@ export default {
       allFilesUploaded: false,
       dateToBeDeleted: null
     };
+  },
+  watch: {
+    phageID() {
+      this.phageID = this.phageID.replace(/[^a-zA-Z0-9_]/g, '');
+    }
   },
   computed: {
     navUpload: function() {

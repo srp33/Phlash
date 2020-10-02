@@ -10,6 +10,6 @@ ADD genemark_suite_linux_64.tar.gz /
 ADD gm_key_64.gz /
 
 RUN gunzip /gm_key_64.gz \
- && mv /gm_key_64 ~/.gm_key
+ && mv /gm_key_64 /.gm_key
 
 USER 1000

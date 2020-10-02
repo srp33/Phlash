@@ -109,8 +109,8 @@ def check_phage_id(phage_id):
     return jsonify(response_object)
 
 
-@app.route('/phlash_api/upload/<current_user>', methods=['GET', 'POST'])
-def upload_files(current_user):
+@app.route('/phlash_api/check_upload/<current_user>', methods=['GET'])
+def check_upload(current_user):
     """
     API endpoint for '/upload/:current_user'.
     POST method uploads files accordingly and removes files if necessary.
@@ -120,67 +120,80 @@ def upload_files(current_user):
     app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE
     response_object = {}
 
-    if request.method == "GET":
-        # check if respective files for fasta and genbank are uploaded
-        existing_files = []
-        for filename in os.listdir(os.path.join(ROOT, 'users', current_user, 'uploads')):
-            ext = os.path.splitext(filename)[1].lower()
-            if ext in FASTA_EXTENSIONS:
-                existing_files.append("fasta")
-            elif ext in GENBANK_EXTENSIONS:
-                existing_files.append("genbank")
-            elif ext in GDATA_EXTENSIONS:
-                existing_files.append("gdata")
-            elif ext in LDATA_EXTENSIONS:
-                existing_files.append("ldata")
+    # check if respective files for fasta and genbank are uploaded
+    existing_files = []
+    for filename in os.listdir(os.path.join(ROOT, 'users', current_user, 'uploads')):
+        ext = os.path.splitext(filename)[1].lower()
+        if ext in FASTA_EXTENSIONS:
+            existing_files.append("fasta")
+        elif ext in GENBANK_EXTENSIONS:
+            existing_files.append("genbank")
+        elif ext in GDATA_EXTENSIONS:
+            existing_files.append("gdata")
+        elif ext in LDATA_EXTENSIONS:
+            existing_files.append("ldata")
 
-        response_object["fasta"] = True if "fasta" in existing_files and \
-                                           "gdata" in existing_files and \
-                                           "ldata" in existing_files else False
-        response_object["genbank"] = True if "genbank" in existing_files else False
-
-    if request.method == "POST":
-        if 'file' not in request.files:
-            response_object["status"]: "'file' not in request.files"
-        else:
-            file = request.files['file']
-            fileType = request.form['fileType']
-            if file:
-                file_name = secure_filename(file.filename)
-                if (fileType == "fasta" and allowed_file(file_name, FASTA_EXTENSIONS)) or \
-                   (fileType == "genbank" and allowed_file(file_name, GENBANK_EXTENSIONS)):
-
-                    # overwrite existing files with specific extension with newly uploaded files
-                    for existing_file in os.listdir(UPLOAD_FOLDER):
-                        ext = os.path.splitext(existing_file)[1].lower()
-                        if (fileType == "fasta" and ext in ['.fasta', '.fna', '.ldata', '.gdata', '.lst', '.ps']) or \
-                           (fileType == "genbank" and ext in GENBANK_EXTENSIONS):
-                            os.remove(os.path.join(UPLOAD_FOLDER, existing_file))
-                            print(f" * removed {existing_file}")
-
-                    file.save(os.path.join(UPLOAD_FOLDER, file_name))
-                    response_object["uploaded"] = file_name
-                    print(' * uploaded', file_name)
-
-                    # parse appropriate files as soon as uploaded
-                    # FIXME: check file conent before parsing.
-                    file_ext = os.path.splitext(file_name)[1].lower()
-                    if file_ext in FASTA_EXTENSIONS:  # run genemark and parse ldata
-                        fasta_file = get_file_path("fasta", UPLOAD_FOLDER)
-                        annotate.run_genemark(fasta_file)
-                        ldata_file = get_file_path("ldata", UPLOAD_FOLDER)
-                        annotate.parse_genemark_ldata(ldata_file)
-                    elif file_ext in GENBANK_EXTENSIONS:  # parse genbank
-                        genbank_file = get_file_path("genbank", UPLOAD_FOLDER)
-                        annotate.parse_dnamaster_genbank(genbank_file)
-                else:
-                    response_object["not_allowed"] = file.filename
-            else:
-                response_object["status"] = "error"
+    response_object["fasta"] = True if "fasta" in existing_files and \
+                                        "gdata" in existing_files and \
+                                        "ldata" in existing_files else False
+    response_object["genbank"] = True if "genbank" in existing_files else False
 
     return jsonify(response_object)
 
+@app.route('/phlash_api/upload/<current_user>', methods=['POST'])
+def upload(current_user):
+    """
+    API endpoint for '/upload/:current_user'.
+    POST method uploads files accordingly and removes files if necessary.
+    """
+    UPLOAD_FOLDER = os.path.join(ROOT, 'users', current_user, 'uploads')
+    DATABASE = "sqlite:///{}".format(os.path.join(ROOT, 'users', current_user, f"{current_user}.db"))
+    app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE
+    response_object = {}
+    
+    if 'file' not in request.files:
+        response_object["status"]: "'file' not in request.files"
+    else:
+        file = request.files['file']
+        fileType = request.form['fileType']
+        if file:
+            file_name = secure_filename(file.filename)
+            if (fileType == "fasta" and allowed_file(file_name, FASTA_EXTENSIONS)) or \
+                (fileType == "genbank" and allowed_file(file_name, GENBANK_EXTENSIONS)):
 
+                # overwrite existing files with specific extension with newly uploaded files
+                for existing_file in os.listdir(UPLOAD_FOLDER):
+                    ext = os.path.splitext(existing_file)[1].lower()
+                    if (fileType == "fasta" and ext in ['.fasta', '.fna', '.ldata', '.gdata', '.lst', '.ps']) or \
+                        (fileType == "genbank" and ext in GENBANK_EXTENSIONS):
+                        os.remove(os.path.join(UPLOAD_FOLDER, existing_file))
+                        print(f" * removed {existing_file}")
+
+                file.save(os.path.join(UPLOAD_FOLDER, file_name))
+                response_object["uploaded"] = file_name
+                print(' * uploaded', file_name)
+
+                # parse appropriate files as soon as uploaded
+                # FIXME: check file conent before parsing.
+                file_ext = os.path.splitext(file_name)[1].lower()
+                if file_ext in FASTA_EXTENSIONS:  # run genemark and parse ldata
+                    fasta_file = get_file_path("fasta", UPLOAD_FOLDER)
+                    annotate.run_genemark(fasta_file)
+                    try:
+                        ldata_file = get_file_path("ldata", UPLOAD_FOLDER)
+                    except FileNotFoundError:
+                        print("GeneMark did not save ldata file properly")
+                        return("error")
+                    annotate.parse_genemark_ldata(ldata_file)
+                elif file_ext in GENBANK_EXTENSIONS:  # parse genbank
+                    genbank_file = get_file_path("genbank", UPLOAD_FOLDER)
+                    annotate.parse_dnamaster_genbank(genbank_file)
+            else:
+                response_object["not_allowed"] = file.filename
+        else:
+            response_object["status"] = "error"
+
+    return jsonify(response_object)
 @app.route('/phlash_api/dnamaster/<current_user>', methods=['GET', 'POST'])
 def dnamaster(current_user):
     """
@@ -262,8 +275,8 @@ def dnamaster_cds(current_user, cds_id):
     return jsonify(response_object)
 
 # TODO: Continue checking code from here.
-@app.route('/phlash_api/blast/<current_user>/<file_method>', methods=['GET', 'POST'])
-def blast(current_user, file_method):
+@app.route('/phlash_api/blast/<current_user>/<file_method>/<file_path>', methods=['GET', 'POST'])
+def blast(current_user, file_method, file_path):
     """
     API endpoint for '/blast/:current_user'.
     POST method downloads fasta file for BLAST input or
@@ -289,40 +302,100 @@ def blast(current_user, file_method):
                 response_object["blast_downloaded"] = True
 
     if request.method == "POST":
-        if file_method == "download":
-            # FIXME: Change where we do annotate.compare()
+        if file_method == "downloadInput":
             print("Starting comparisons")
             annotate.compare()
             fasta_file = get_file_path("fasta", UPLOAD_FOLDER)
             genemark_gdata_file = get_file_path("gdata", UPLOAD_FOLDER)
             
             num_files_downloaded = annotate.create_blast_fasta(current_user, fasta_file, genemark_gdata_file)
-
             f = open(os.path.join(ROOT, 'users', current_user, f"{current_user}_blast.zip"), "rb")
-            # return {'num_files_downloaded': num_files_downloaded, 'zipfile': f.read()}
+            #return {'num_files_downloaded': num_files_downloaded, 'zipfile': f.read()}
             return f.read()
-        elif file_method == "upload":
+        elif file_method == "displayOutput":
+            file_names = []
+            for file in os.listdir(UPLOAD_FOLDER):
+                if file.endswith(".json"):
+                    file_names.append(file)
+            print(file_names)
+            response_object["file_names"] = file_names
+        elif file_method == "downloadOutput":
+            try:
+                response_object["file_data"] = open(os.path.join(UPLOAD_FOLDER, file_path)).read()
+                response_object["status"] = "success"
+            except:
+                print("error")
+                response_object["status"] = "error"
+        elif file_method == "deleteOutput":
+            try:
+                os.remove(os.path.join(UPLOAD_FOLDER, file_path))
+                response_object["status"] = "success"
+            except:
+                print("error")
+                response_object["status"] = "error"
+        elif file_method == "uploadOutput":
+            if 'file' not in request.files:
+                print(request.files)
+                response_object["status"]: "'file' not in request.files"
+                print("in fail")
+            else:
+                print("in success")
+                file = request.files['file']
+                if file:
+                    file_name = secure_filename(file.filename)
+                    if allowed_file(file_name, set(['.json'])):
+
+                        file_ext = file_name.rsplit('.', 1)[1].lower()
+                        for existing_file in os.listdir(UPLOAD_FOLDER):
+                            if existing_file.endswith(file_name):
+                                os.remove(os.path.join(
+                                    UPLOAD_FOLDER, existing_file))
+
+                        file.save(os.path.join(UPLOAD_FOLDER, file_name))
+                        response_object["uploaded"] = file_name
+                        print(' * uploaded', file_name)
+                    else:
+                        response_object["not_allowed"] = file.filename
+                else:
+                    response_object["status"] = "error"               
+        elif file_method == "numFiles":
             for filename in os.listdir(os.path.join(ROOT, 'users', current_user)):
                 if filename.endswith('.zip'):
                     with closing(ZipFile(os.path.join(ROOT, 'users', current_user, filename))) as archive:
                         num_blast_files = len(archive.infolist())
-            print("num blast files: " + str(num_blast_files))
-            response_object["num_blast_files"] = num_blast_files
-            if request.files.getlist('files') is None: 
-                response_object["status"]: "request.files.getlist('files') is None"
-            else:
-                response_object["uploaded"] = []
-                response_object["not_allowed"] = []
-                try:
-                    for file in request.files.getlist('files'):
-                        if file and allowed_file(file.filename, BLAST_EXTENSIONS):
-                            file.save(os.path.join(UPLOAD_FOLDER, file.filename))
-                            response_object["uploaded"].append(file.filename)
-                            print(' * uploaded', file.filename)
-                        else:
-                            response_object["not_allowed"].append(file.filename)
-                except:
-                    response_object["status"] = "error"
+                        return str(num_blast_files)
+        # elif file_method == "upload":
+        #     for filename in os.listdir(os.path.join(ROOT, 'users', current_user)):
+        #         if filename.endswith('.zip'):
+        #             with closing(ZipFile(os.path.join(ROOT, 'users', current_user, filename))) as archive:
+        #                 num_blast_files = len(archive.infolist())
+        #     print("num blast files: " + str(num_blast_files))
+        #     response_object["num_blast_files"] = num_blast_files
+        #     if request.files.getlist('File') is None:
+        #         response_object["status"]: "request.files.getlist('files') is None"
+        #     else:
+        #         response_object["uploaded"] = []
+        #         response_object["not_allowed"] = []
+        #         try:
+        #             # file = request.files['file']
+        #             # file.save(os.path.join(UPLOAD_FOLDER, file_name))
+        #             print (request.files.getlist('File[]'))
+        #             print (request.files.getlist('File'))
+        #             print (request.files.getlist('file'))
+        #             print (request.files.getlist('files'))
+        #             print (request.files.getlist('FileList'))
+        #             print (request.files.getlist('FileList[]'))
+        #             print (request.files)
+        #             for file in request.files.getlist('File'):
+        #                 if file and allowed_file(file.filename, BLAST_EXTENSIONS):
+        #                     file.save(os.path.join(UPLOAD_FOLDER, file.filename))
+        #                     response_object["uploaded"].append(file.filename)
+        #                     print(' * uploaded', file.filename)
+        #                 else:
+        #                     response_object["not_allowed"].append(file.filename)
+        #         except:
+        #             print("error")
+        #             response_object["status"] = "error"
 
     return jsonify(response_object)
 

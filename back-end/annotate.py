@@ -12,6 +12,7 @@ import pandas as pd
 import re
 import subprocess
 import zipfile
+from sys import getsizeof
 
 
 # HELPER FUNCTIONS ---------------------------------------------------------
@@ -209,14 +210,11 @@ def create_blast_fasta(current_user, fasta_file, gdata_file):
     Creates fasta file(s) for BLAST input.
     If more than one file is created, then each file should have
     100 sequences max (200 lines).
-
     @return blast_file_count: number of blast fasta files created.
     """
     filename = re.search('(.*/users/.*)/uploads/.*.\w*', fasta_file)
     genome = SeqIO.read(fasta_file, "fasta").seq
     output = ""
-    
-    cds_count = 1  # keep track of num CDSs that goes in each file
     blast_file_count = 1  # keep track of num blast files created
     out_file = f"{str(filename.group(1))}/{current_user}_blast_{blast_file_count}.fasta"
     files_to_zip = [out_file]
@@ -231,19 +229,16 @@ def create_blast_fasta(current_user, fasta_file, gdata_file):
             else:
                 output += f">{cds.id}_{i}, {starts[i]}-{cds.stop}\n"
                 output += f"{Seq.translate(sequence=get_sequence(genome, cds.strand, starts[i]-1, cds.stop), table=11)}\n"
-            cds_count += 1
-            if cds_count == 101:  # only include 100 query sequences in each file, else you get a CPU limit from NCBI blast
+            if getsizeof(output) > 33000:  # only file size to reach 33 kb, else you get a CPU limit from NCBI blast
                 with open(out_file, "w") as f:
                     f.write(output)
                 output = ""
-                cds_count = 1
                 blast_file_count += 1
                 out_file = f"{str(filename.group(1))}/{current_user}_blast_{blast_file_count}.fasta"
                 files_to_zip.append(out_file)
 
-    if cds_count < 101:
-        with open(out_file, "w") as f:
-            f.write(output)
+    with open(out_file, "w") as f:
+        f.write(output)
     
     # zip all out_files together
     zip_file = zipfile.ZipFile(f"{str(filename.group(1))}/{current_user}_blast.zip", 'w', zipfile.ZIP_DEFLATED)

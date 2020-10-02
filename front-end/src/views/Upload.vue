@@ -180,7 +180,7 @@ export default {
   },
   methods: {
     checkIfFilesUploaded() {
-      axios.get(process.env.VUE_APP_BASE_URL + `/upload/${this.$route.params.phageID}`)
+      axios.get(process.env.VUE_APP_BASE_URL + `/check_upload/${this.$route.params.phageID}`)
         .then(response => {
           this.fasta = response.data.fasta;
           this.genbank = response.data.genbank;
