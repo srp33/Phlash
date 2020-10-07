@@ -291,10 +291,10 @@ def blast(current_user, file_method, file_path):
         response_object["blast_uploaded"] = False
         response_object["blast_downloaded"] = False
 
-        # check if respective file(s) for blast are uploaded
-        for filename in os.listdir(os.path.join(ROOT, 'users', current_user, 'uploads')):
-            if os.path.splitext(filename)[1].lower() in BLAST_EXTENSIONS:
-                response_object["blast_uploaded"] = True
+        # # check if respective file(s) for blast are uploaded
+        # for filename in os.listdir(os.path.join(ROOT, 'users', current_user, 'uploads')):
+        #     if os.path.splitext(filename)[1].lower() in BLAST_EXTENSIONS:
+        #         response_object["blast_uploaded"] = True
 
         # check if blast input file(s) downloaded
         for filename in os.listdir(os.path.join(ROOT, 'users', current_user)):
@@ -449,6 +449,12 @@ def cds_annotation(current_user, cds_id):
 
     if request.method == "GET":
         cds = DNAMaster.query.filter_by(id=cds_id).first()
+        print(cds.id)
+        print(cds.start)
+        print(cds.stop)
+        print(cds.strand)
+        print(cds.function)
+        print(cds.status)
         response_object['cds'] = {'id': cds.id,
                                   'start': cds.start,
                                   'stop': cds.stop,
@@ -457,6 +463,7 @@ def cds_annotation(current_user, cds_id):
                                   'status': cds.status}
 
         # fasta_file = get_file_path("fasta", UPLOAD_FOLDER)
+        print(cds)
         starts = [int(start) for start in cds.start_options.split(",")]
         print(starts)
         response_object['start_options'] = starts

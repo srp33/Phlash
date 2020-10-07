@@ -33,6 +33,9 @@
         <h4>
           <em>No hits found.</em>
         </h4>
+        <button class="btn btn-dark btn-sm" @click="setNone()">
+          <strong>Set function as "None"</strong>
+        </button>
       </div>
     </div>
   </div>
@@ -52,6 +55,9 @@ export default {
     setFunction(funct) {
       let result = funct.match(/(.*)\[.*\]/);
       this.$emit("newFunction", result[1]);
+    },
+    setNone() {
+      this.$emit("newFunction", "None");
     }
   }
 };

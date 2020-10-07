@@ -92,7 +92,7 @@ def parse_dnamaster_genbank(genbank_file):
                                     start = feature.location.start.position + 1,
                                     stop = feature.location.end.position,
                                     strand = strand,
-                                    function = "None",
+                                    function = "None selected",
                                     status = "None")
                     
                     exists = DNAMaster.query.filter_by(id=id).first()
@@ -167,7 +167,7 @@ def compare():
             else:
                 dnamaster_cds.status = "Fail"
         elif not genemark_cds:
-            dnamaster_cds.status = "Need more information"
+            dnamaster_cds.status = "Undetermined"
         db.session.commit()
 
 
@@ -201,7 +201,7 @@ def start_options(cds_id, genome, genemark_gdata_file):
         if prev_codon in bacteria_start_codons:
             start_options.append(prev_start + 1)
         prev_start = prev_start - 1
-
+    print(start_options)
     return start_options
 
 
@@ -229,7 +229,7 @@ def create_blast_fasta(current_user, fasta_file, gdata_file):
             else:
                 output += f">{cds.id}_{i}, {starts[i]}-{cds.stop}\n"
                 output += f"{Seq.translate(sequence=get_sequence(genome, cds.strand, starts[i]-1, cds.stop), table=11)}\n"
-            if getsizeof(output) > 33000:  # only file size to reach 33 kb, else you get a CPU limit from NCBI blast
+            if getsizeof(output) > 30000:  # only file size to reach 30 kb, else you get a CPU limit from NCBI blast
                 with open(out_file, "w") as f:
                     f.write(output)
                 output = ""
@@ -299,6 +299,15 @@ def modify_genbank(gb_file, fasta_file):
 def parse_blast_results(blast_files, cds_id, e_value_thresh):
     blast_results = {}
     for blast_file in blast_files:
+        newLines = []
+        with open(blast_file, 'r') as f:
+            lines = f.readlines()
+            for line in lines:
+                if line != "CREATE_VIEW\n":
+                    newLines.append(line)
+        with open(blast_file, 'w') as f:
+            f.writelines(newLines)    
+            
         with open(blast_file) as f:
             blasts = json.load(f)["BlastOutput2"]
             for blast in blasts:

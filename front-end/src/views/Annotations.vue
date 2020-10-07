@@ -8,24 +8,17 @@
         <p><strong>Instructions</strong></p>
         <p>
           Gene calls from DNA Master and GeneMark have been compared. A status
-          has been assigned to each gene call from DNA Master. To understand what
-          each status means, please refer to the definitions below.
+          has been assigned to each gene call from DNA Master.
         </p>
         <p>
           When the 'Action' column only contains 'Done', you will be able to
           download your GenBank file.
         </p>
-        <button class="btn btn-light btn-gb" style="margin-top: 0px;" @click="downloadGenBankFile">
-          <strong>Download GenBank file</strong>
-            <div v-if="downloadLoading" class="spinner-border spinner-border-sm" role="status">
-              <span class="sr-only"></span>
-            </div>
-        </button>
         <p><strong>Status Definitions</strong></p>
         <p>
           <strong style="color:green">Pass:</strong> DNA Master's gene call is the same as or longer than GeneMark's gene call.<br />
           <strong style="color:red">Fail:</strong> DNA Master's gene call is shorter than GeneMark's gene call.<br />
-          <strong style="color:orange">Need more information:</strong> DNA Master's gene call has not been called at all in GeneMark.<br />
+          <strong style="color:orange">Undetermined:</strong> DNA Master's gene call has not been called at all in GeneMark.<br />
         </p>
         <div class="nav-btns-wrapper">
           <router-link :to="{ name: 'Blast', params: {phageID: $route.params.phageID} }">
@@ -39,7 +32,12 @@
           </router-link>
         </div>
       </div>
-
+      <div class="alert alert-warning" v-if="completed != dnamaster.length">
+        You have <strong>{{ dnamaster.length - completed }}/{{ dnamaster.length }}</strong> genes remaining.
+      </div>
+      <div class="alert alert-success" v-if="completed == dnamaster.length">
+        <strong> Congratulations! You can now download your GenBank file below. </strong>
+      </div>
       <div id="annotations" align="center">
         <div class="table-responsive">
           <table class="table table-hover" align="center">
@@ -56,35 +54,52 @@
             </thead>
             <tbody>
               <tr v-for="(curr, index) in dnamaster" :key="index">
-                <td>{{ curr.id }}</td>
-                <td>{{ curr.start }}</td>
-                <td>{{ curr.stop }}</td>
-                <td>{{ curr.strand }}</td>
-                <td v-if="curr.function.length<30">{{ curr.function }}</td>
-                <td v-else>{{ curr.function.substring(0,30) }}...</td>
-                <td v-if="curr.status == 'Pass'" style="color: green">{{ curr.status }}</td>
-                <td v-if="curr.status == 'Fail'" style="color: red">{{ curr.status }}</td>
-                <td v-if="curr.status == 'Need more information'" style="color: orange">
-                  {{ curr.status }}
-                </td>
-                <td>
-                  <button class="btn btn-dark btn-sm" disabled style="width:100px"
-                    v-if="curr.function !== 'None'">
-                    <strong>Done</strong>
-                  </button>
-                  <router-link :to="{ name: 'CDS', params: {phageID: $route.params.phageID, cdsID: curr.id} }">
-                    <button class="btn btn-dark btn-sm" style="width:100px"
-                      v-if="curr.function === 'None'">
-                      <strong>Go</strong>
-                    </button>
-                  </router-link>
-                </td>
+                  <td v-if="curr.function == 'DELETED'">{{ curr.id }}</td>
+                  <td v-else>{{ curr.id }}</td>
+                  <td v-if="curr.function == 'DELETED'"></td>
+                  <td v-else>{{ curr.start }}</td>
+                  <td v-if="curr.function == 'DELETED'"></td>
+                  <td v-else>{{ curr.stop }}</td>
+                  <td v-if="curr.function == 'DELETED'"></td>
+                  <td v-else>{{ curr.strand }}</td>
+                  <td v-if="curr.function == 'DELETED'"></td>
+                  <td v-else-if="curr.function.length<30">{{ curr.function }}</td>
+                  <td v-else>{{ curr.function.substring(0,30) }}...</td>
+                  <td v-if="curr.function == 'DELETED'"></td>
+                  <td v-else-if="curr.status == 'Pass'" style="color: green">{{ curr.status }}</td>
+                  <td v-else-if="curr.status == 'Fail'" style="color: red">{{ curr.status }}</td>
+                  <td v-else-if="curr.status == 'Undetermined'" style="color: orange">{{ curr.status }}</td>
+                  <td v-if="curr.function == 'DELETED'">
+                    <router-link :to="{ name: 'CDS', params: {phageID: $route.params.phageID, cdsID: curr.id} }">
+                      <button class="btn btn-dark btn-sm" style="width:100px">
+                        <strong>Reinstate</strong>
+                      </button>
+                    </router-link>
+                  </td>
+                  <td v-else>
+                    <router-link :to="{ name: 'CDS', params: {phageID: $route.params.phageID, cdsID: curr.id} }">
+                      <button class="btn btn-dark btn-sm" disabled style="width:100px"
+                        v-if="curr.function !== 'None selected'">
+                        <strong>Done</strong>
+                      </button>
+                    <router-link :to="{ name: 'CDS', params: {phageID: $route.params.phageID, cdsID: curr.id} }">
+                      <button class="btn btn-dark btn-sm" style="width:100px"
+                        v-if="curr.function === 'None selected'">
+                        <strong>Go</strong>
+                      </button>
+                    </router-link>
+                  </td> 
               </tr>
             </tbody>
           </table>
         </div>
       </div>
-      
+      <button class="btn btn-light btn-gb" v-if="completed == dnamaster.length" style="margin-top: 0px;" @click="downloadGenBankFile">
+        <strong>Download GenBank file</strong>
+          <div v-if="downloadLoading" class="spinner-border spinner-border-sm" role="status">
+            <span class="sr-only"></span>
+          </div>
+      </button>
       <div class="nav-btns-wrapper">
           <router-link :to="{ name: 'Blast', params: {phageID: $route.params.phageID} }">
             <button class="btn btn-light btn-nav">
@@ -126,6 +141,7 @@ export default {
       fileDownloaded: false,
       pageLoading: true,
       downloadLoading: false,
+      completed: 0,
     };
   },
   created() {
@@ -151,6 +167,9 @@ export default {
         .then(response => {
           this.dnamaster = response.data.dnamaster;
           this.pageLoading = false;
+          for (var i = 0; i < this.dnamaster.length; i++) {
+            if (this.dnamaster[i].function != "None selected") ++this.completed;
+          }
         })
         .catch(error => {
           console.error(error);
@@ -158,6 +177,17 @@ export default {
     },
     downloadGenBankFile() {
       this.downloadLoading = true;
+      for (var i = 0; i < this.dnamaster.length; i++) {
+            if (this.dnamaster[i].function == "DELETED") {
+              axios.delete(process.env.VUE_APP_BASE_URL + `/annotations/cds/${this.$route.params.phageID}/${this.dnamaster[i].id}`)
+                .then(() => {
+                  this.$router.push(`/annotations/${this.$route.params.phageID}`);
+                })
+                .catch(error => {
+                  console.error(error);
+                });
+            }
+      }
       axios.post(process.env.VUE_APP_BASE_URL + `/annotations/${this.$route.params.phageID}`)
         .then(response => {
           let data = response.data;

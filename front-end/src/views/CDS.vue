@@ -16,7 +16,7 @@
       </p>
       <p><strong>Your selected start position:</strong> {{ newStart }}</p>
       <p><strong>Your selected function:</strong> {{ newFunction }}</p>
-      <button type="button" class="btn btn-light btn-action" @click="editCDS" v-if="newFunction !== 'None' && newStart !== 0">
+      <button type="button" v-if="newFunction != ''" class="btn btn-light btn-action" @click="editCDS">
         <strong>Update</strong>
       </button>
       <button type="button" class="btn btn-light btn-action" @click="deleteCDS($route.params.cdsID)">
@@ -49,10 +49,18 @@
     </div>
     <hr />
     <div class="coding-potential">
-      <h4 style="text-align: center; margin: 40px;">GeneMark's Coding Potential Per Frame</h4>
+      <h4 style="text-align: center; margin: 40px; height: 100%;">GeneMark's Coding Potential Per Frame</h4>
+      <div style="display: inline">
+        <div style="width:52%; display: inline-block; float:left; margin-right: 10px;">
+          <strong>Direct Sequences</strong>
+          </div>
+        <div style="width: 19%; display: inline-block;">
+          <strong>Complementary Sequences</strong>
+        </div>
+      </div>
       <div class="coding-potential-graphs">
         <div v-if="dataExists">
-          <Graphs :data1="data1" :data2="data2" :data3="data3" :data4="data4" :data5="data5" :data6="data6" :start="currentCDS.start" :stop="currentCDS.stop" />
+          <Graphs :data1="data1" :data2="data2" :data3="data3" :data4="data4" :data5="data5" :data6="data6" :start="currentCDS.start" :stop="currentCDS.stop" :frame="frame" />
         </div>
         <div v-else>
           <p>Loading graphs...</p>
@@ -75,7 +83,7 @@
           </div>
           <div v-bind:id="key" class="collapse" data-parent="#accordion">
             <div class="card-body">
-              <BlastResults :blastResults="blastResults[key]" @newFunction="setFunction" />
+              <BlastResults :blastResults="blastResults[key]" v-if="key===currentCDS.start.toString()" @newFunction="setFunction" />
             </div>
           </div>
         </div>
@@ -84,7 +92,7 @@
     <div class="info-bottom">
       <p><strong>Your selected start position:</strong> {{ newStart }}</p>
       <p><strong>Your function selection:</strong> {{ newFunction }}</p>
-      <button type="button" class="btn btn-light btn-action" @click="editCDS" v-if="newFunction !== 'None' && newStart !== 0">
+      <button type="button" v-if="newFunction != ''" class="btn btn-light btn-action" @click="editCDS">
         <strong>Update</strong>
       </button>
       <button type="button" class="btn btn-light btn-action" @click="deleteCDS($route.params.cdsID)">
@@ -127,11 +135,12 @@ export default {
         function: "",
         status: ""
       },
+      frame: null,
       blastResults: [],
       showFunction: false,
       showStart: false,
-      newFunction: "None",
-      newStart: 0,
+      newFunction: "",
+      newStart: null,
       dataExists: false,
       pageLoading: true,
       data1: [{ x: [], y: [] }],
@@ -157,6 +166,7 @@ export default {
           this.currentCDS = response.data.cds;
           this.blastResults = response.data.blast;
           this.startOptions = response.data.start_options;
+          this.newStart = this.currentCDS.start;
           this.data1 = [{
             x: response.data.x_data,
             y: response.data.y_data_1
@@ -183,6 +193,8 @@ export default {
           }];
           this.dataExists = true;
           this.pageLoading = false;
+          this.frame = (this.currentCDS.start + 2) % 3 + 1;
+          if (this.currentCDS.strand == '-') this.frame += 3;
         })
         .catch(error => {
           console.error(error);
@@ -214,13 +226,8 @@ export default {
         });
     },
     deleteCDS(cdsID) {
-      axios.delete(process.env.VUE_APP_BASE_URL + `/annotations/cds/${this.$route.params.phageID}/${cdsID}`)
-        .then(() => {
-          this.$router.push(`/annotations/${this.$route.params.phageID}`);
-        })
-        .catch(error => {
-          console.error(error);
-        });
+      this.newFunction = "DELETED";
+      this.editCDS();
     },
     keepOriginal() {
       const payload = {
@@ -237,7 +244,14 @@ export default {
       this.newFunction = funct;
     },
     setStart(strt) {
+      this.dataExists = false;
       this.newStart = strt;
+      this.currentCDS.start = strt;
+      this.frame = (strt + 2) % 3 + 1;
+      if (this.currentCDS.strand == '-') this.frame += 3;
+      this.$nextTick().then(() => {
+        this.dataExists = true;
+      });
     }
   }
 };

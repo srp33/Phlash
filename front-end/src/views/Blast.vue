@@ -371,14 +371,12 @@ export default {
       showBlastSuccessAlert: false,
       numFiles: null,
       fileNames: [],
-      blastDownloaded: false,
-      blastUploaded: false,
     };
   },
   created() {
-    this.checkFiles();
     this.setNumFiles();
     this.displayOutputFiles();
+    this.checkFiles();
   },
   computed: {
     navUpload: function () {
@@ -401,11 +399,19 @@ export default {
         document.getElementById("next-top").classList.remove("disabled");
         document.getElementById("next-bottom").classList.remove("disabled");
       }
+      else {
+        document.getElementById("next-top").classList.add("disabled");
+        document.getElementById("next-bottom").classList.add("disabled");
+      }
     },
     blastUploaded: function () {
       if (this.blastDownloaded && this.blastUploaded) {
         document.getElementById("next-top").classList.remove("disabled");
         document.getElementById("next-bottom").classList.remove("disabled");
+      }
+      else {
+        document.getElementById("next-top").classList.add("disabled");
+        document.getElementById("next-bottom").classList.add("disabled");
       }
     },
   },
@@ -424,7 +430,7 @@ export default {
         )
         .then((response) => {
           this.blastDownloaded = response.data.blast_downloaded;
-          this.blastUploaded = response.data.blast_uploaded;
+          if (this.fileNames.length == this.numFiles) this.blastUploaded = true;
           if (!this.blastDownloaded) this.downloadInputFiles();
         })
         .catch((error) => {
@@ -452,6 +458,7 @@ export default {
           link.click();
           this.downloadLoading = false;
           this.blastDownloaded = true;
+          this.setNumFiles();
         })
         .catch((error) => {
           console.log(error);
@@ -465,7 +472,6 @@ export default {
         )
         .then((response) => {
           this.numFiles = Number(response.data);
-          console.log(this.numFiles);
         });
     },
     goToNCBI() {
@@ -506,6 +512,7 @@ export default {
         .then((response) => {
           var index = this.fileNames.indexOf(fileName);
           this.fileNames.splice(index, 1);
+          if (this.fileNames != this.numFiles) this.blastUploaded = false;
           console.log(response);
         })
         .catch((error) => {
@@ -590,6 +597,7 @@ export default {
             this.showBlastSuccessAlert = true;
             this.showBlastDangerAlert = false;
             this.blast = true;
+            if (this.fileNames.length == this.numFiles) this.blastUploaded = true;
             let successMessage = `<strong>${response.data.uploaded}</strong> uploaded successfully!`;
             Vue.nextTick(() => {
               document.getElementById(
@@ -612,9 +620,9 @@ export default {
         .catch((error) => {
           console.log(error);
         });
-      this.blastFiles.splice(this.blastFiles.length - 1, 1);
-      if (this.blastFiles.length > 0) {
-        this.uploadOutputFiles();
+        this.blastFiles.splice(this.blastFiles.length - 1, 1);
+        if (this.blastFiles.length > 0) {
+          this.uploadOutputFiles();
       }
     },
   },
