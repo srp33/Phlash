@@ -38,6 +38,7 @@ def get_sequence(genome, strand, start, stop):
         value accomadates that when passed in to this function. 
     """
     if strand == '-':
+        #print(genome.complement()[start : stop])
         return genome.reverse_complement()[start : stop]
     else:
         return genome[start : stop]
@@ -170,46 +171,79 @@ def compare():
             dnamaster_cds.status = "Undetermined"
         db.session.commit()
 
+def get_stop_options(genome, start, strand):
+    bacteria_stop_codons = ["TAG", "TAA", "TGA"]
+    start -= 1
+    gene = ""
+    if (strand != "-"):
+        gene = genome[start:]
+    else:
+        gene = genome.reverse_complement()[start:]
+    for index in range(0, len(gene), 3):
+        codon = gene[index:index + 3]
+        if codon in bacteria_stop_codons:
+            return (start + index + 3)
 
-def start_options(cds_id, genome, genemark_gdata_file):
+def get_start_options(genome, start, strand, minimum):
+    bacteria_start_codons = ["ATG", "GTG", "TTG"]
+    start_options = []
+    newStart = start + 3
+    gene = ""
+    if (strand != "-"):
+        gene = genome[minimum:newStart]
+    else:
+        gene = genome.reverse_complement()[minimum:newStart]
+    for index in range(len(gene), 0, -1):
+        codon = gene[index:index + 3]
+        if codon in bacteria_start_codons:
+            start_options.append(minimum + index + 1)
+    return start_options
+
+def get_starts_stops(cds_id, genome, genemark_gdata_file):
     """
     Finds alternative, possible start positions for a given CDS. 
-    Calculates the average coding potential per frame for each start position.
 
-    @return start_options: dictionary of (key) start positions and (value) their
-        average coding potential per frame. 
+    @return start_options, stop_options: list of alternative starts and an associated list of alternative stops
     """
     gdata_df = pd.read_csv(genemark_gdata_file, sep='\t', skiprows=16)
     gdata_df.columns = ['Base', '1', '2', '3', '4', '5', '6']
     gdata_df = gdata_df.set_index('Base')
 
     bacteria_start_codons = ["ATG", "GTG", "TTG"]
+    bacteria_stop_codons = ["TAG", "TAA", "TGA"]
     dnamaster_cds = DNAMaster.query.filter_by(id=cds_id).first()
     genemark_cds = GeneMark.query.filter_by(stop=dnamaster_cds.stop).first()
 
     original_start = dnamaster_cds.start - 1  # Subtract 1 because python indexing begins with 0.
     prev_start = original_start - 1  # Subtract 4 to account for 3 bases in a codon.
 
-    start_options = []
-    start_options.append(dnamaster_cds.start)  # Add original start position info
+    possible_start_options = []
+    possible_start_options.append(dnamaster_cds.start)  # Add original start position info
 
     min_start = original_start if genemark_cds is None else genemark_cds.start - 1
     num_nucleotides = min_start if min_start < 200 else 200   # Check 200 bp previous to original
+    minimum = min_start - num_nucleotides
+    possible_start_options.extend(get_start_options(genome, prev_start, dnamaster_cds.strand, minimum))
 
-    while prev_start >= min_start - num_nucleotides:
-        prev_codon = get_sequence(genome, dnamaster_cds.strand, prev_start, prev_start + 3)
-        if prev_codon in bacteria_start_codons:
-            start_options.append(prev_start + 1)
-        prev_start = prev_start - 1
-    print(start_options)
-    return start_options
+    start_options = []
+    stop_options = []
+    for start in possible_start_options:
+        stop_options.append(get_stop_options(genome, start, dnamaster_cds.strand))
+        if (stop_options[-1] - start < 100 and start != dnamaster_cds.start): #FIXME
+            stop_options.pop()
+        else:
+            start_options.append(start)
+
+    dnamaster_cds.start_options = str(start_options)[1:-1]
+    dnamaster_cds.stop_options = str(stop_options)[1:-1]
+
+    return start_options, stop_options
 
 
 def create_blast_fasta(current_user, fasta_file, gdata_file):
     """
     Creates fasta file(s) for BLAST input.
-    If more than one file is created, then each file should have
-    100 sequences max (200 lines).
+    If more than one file is created, then each file should be 30 kb.
     @return blast_file_count: number of blast fasta files created.
     """
     filename = re.search('(.*/users/.*)/uploads/.*.\w*', fasta_file)
@@ -219,17 +253,17 @@ def create_blast_fasta(current_user, fasta_file, gdata_file):
     out_file = f"{str(filename.group(1))}/{current_user}_blast_{blast_file_count}.fasta"
     files_to_zip = [out_file]
     for cds in db.session.query(DNAMaster).order_by(DNAMaster.start):
-        starts = start_options(cds.id, genome, gdata_file)
+        starts, stops = get_starts_stops(cds.id, genome, gdata_file)
         cds.start_options = ", ".join([str(start) for start in starts])
         db.session.commit()
-        for i in range(len(starts[:5])):
+        for i in range(len(starts)):
             if starts[i] == cds.start:
-                output += f">{cds.id}, {starts[i]}-{cds.stop}\n"
-                output += f"{Seq.translate(sequence=get_sequence(genome, cds.strand, starts[i]-1, cds.stop), table=11)}\n"
+                output += f">{cds.id}, {starts[i]}-{stops[i]}\n"
+                output += f"{Seq.translate(sequence=get_sequence(genome, cds.strand, starts[i]-1, stops[i]), table=11)}\n"
             else:
-                output += f">{cds.id}_{i}, {starts[i]}-{cds.stop}\n"
-                output += f"{Seq.translate(sequence=get_sequence(genome, cds.strand, starts[i]-1, cds.stop), table=11)}\n"
-            if getsizeof(output) > 30000:  # only file size to reach 30 kb, else you get a CPU limit from NCBI blast
+                output += f">{cds.id}_{i}, {starts[i]}-{stops[i]}\n"
+                output += f"{Seq.translate(sequence=get_sequence(genome, cds.strand, starts[i]-1, stops[i]), table=11)}\n"
+            if getsizeof(output) > 15000:  # only file size to reach 30 kb, else you get a CPU limit from NCBI blast
                 with open(out_file, "w") as f:
                     f.write(output)
                 output = ""
@@ -285,6 +319,9 @@ def modify_genbank(gb_file, fasta_file):
                                                                     feature.location.strand)
                     if feature.type == "CDS":
                         feature.qualifiers["product"][0] = final_annotations[locus_tag]["function"]
+                        if feature.qualifiers["product"][0] == "DELETED":
+                            final_features.pop()
+                            continue
                         feature.qualifiers["translation"][0] = final_annotations[locus_tag]["translation"]
                 else:
                     continue
@@ -292,7 +329,7 @@ def modify_genbank(gb_file, fasta_file):
         record.features = final_features
         with open(out_file, "w") as new_gb:
             SeqIO.write(record, new_gb, "genbank")
-    
+            
     return out_file
 
 

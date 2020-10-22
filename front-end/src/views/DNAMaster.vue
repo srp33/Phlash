@@ -12,7 +12,7 @@
           process</em>, please <b>add</b>, <b>update</b>, or <b>delete</b> the
           appropriate coding sequences.
         </p>
-        <p>Click `Next` when you are ready to continue.</p>
+        <p>Click 'Next' when you are ready to continue.</p>
         <div class="nav-btns-wrapper">
           <router-link :to="{ name: 'Upload', params: {phageID: $route.params.phageID} }">
             <button class="btn btn-light btn-nav">

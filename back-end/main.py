@@ -16,6 +16,8 @@ import uuid
 import pandas as pd
 import arrow
 import annotate
+from datetime import datetime
+import services.home as home
 
 # configuration
 ROOT = os.path.dirname(os.path.abspath(__file__))
@@ -40,74 +42,18 @@ CORS(app, resources={r'/*': {'origins': '*'}})
 def test():
     return jsonify("Hello, world!")
 
+
+"""
+API endpoint for '/home/:phage_id'.
+POST method removes users that have existed for more than 90 days,
+            creates a new user if it doesn't exist,
+            else gets informations for existing user.
+"""
 @app.route('/phlash_api/home/<phage_id>', methods=['POST'])
 def check_phage_id(phage_id):
-    """
-    API endpoint for '/'.
-    POST method removes users that have existed for more than 90 days, creates a new
-        user if it doesn't exist, else gets informations for existing user.
-    """
-    response_object = {}
-
-    if request.method == "POST":
-        # remove 90 day yo users
-        critical_time = arrow.now().shift(days=-90)
-        for user in Path(os.path.join(ROOT, 'users')).glob('*'):
-            user_time = arrow.get(user.stat().st_mtime)
-            if user_time < critical_time:
-                shutil.rmtree(user)
-        
-        # if phage_id is None or phage_id == "" or !phage_id.replace(/\s/g, '').length
-
-        # get list of existing users
-        USERS = []
-        for dir in os.listdir(os.path.join(ROOT, 'users')):
-            USERS.append(dir)
-        print(USERS)
-
-        # check if user-inputted phage_id exists or not
-        if phage_id in USERS:
-            DATABASE = "sqlite:///{}".format(os.path.join(
-                ROOT, 'users', phage_id, f"{phage_id}.db"))
-            app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE
-            response_object['id_status'] = "ID already exists. If this is your ID, please continue. If not, enter a new one."
-
-            # check if all required files for phage_id are uploaded
-            required_files = ["fasta", "genbank", "gdata", "ldata"]
-            for filename in os.listdir(os.path.join(ROOT, 'users', phage_id, 'uploads')):
-                ext = os.path.splitext(filename)[1].lower()
-                if ext in FASTA_EXTENSIONS:
-                    required_files.remove("fasta")
-                elif ext in GENBANK_EXTENSIONS:
-                    required_files.remove("genbank")
-                elif ext in GDATA_EXTENSIONS:
-                    required_files.remove("gdata")
-                elif ext in LDATA_EXTENSIONS:
-                    required_files.remove("ldata")
-
-            response_object['uploaded_all_files'] = True if len(required_files) == 0 else False
-
-        else:
-            create_directory(os.path.join(ROOT, 'users', phage_id))
-            create_directory(os.path.join(ROOT, 'users', phage_id, 'uploads'))
-            DATABASE = "sqlite:///{}".format(os.path.join(
-                ROOT, 'users', phage_id, f"{phage_id}.db"))
-            app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE
-            with app.app_context():
-                db.drop_all()
-                db.create_all()
-            response_object["id_status"] = "ID created. Please continue."
-            response_object["uploaded_all_files"] = False
-
-        # get date that ID will be deleted
-        critical_time = arrow.now().shift(days=-90)
-        for user in Path(os.path.join(ROOT, 'users')).glob('*'):
-            if phage_id in str(user):
-                user_time = arrow.get(user.stat().st_mtime).shift(days=+90)
-                response_object["delete_time"] = str(user_time)
-
-    return jsonify(response_object)
-
+    DATABASE = "sqlite:///{}".format(os.path.join(ROOT, 'users', phage_id, f"{phage_id}.db"))
+    app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE
+    return jsonify(home.check_phage_id(phage_id, app))
 
 @app.route('/phlash_api/check_upload/<current_user>', methods=['GET'])
 def check_upload(current_user):
@@ -140,8 +86,8 @@ def check_upload(current_user):
 
     return jsonify(response_object)
 
-@app.route('/phlash_api/upload/<current_user>', methods=['POST'])
-def upload(current_user):
+@app.route('/phlash_api/upload/<current_user>/<file_method>/<file_path>', methods=['POST'])
+def upload(current_user, file_method, file_path):
     """
     API endpoint for '/upload/:current_user'.
     POST method uploads files accordingly and removes files if necessary.
@@ -150,49 +96,93 @@ def upload(current_user):
     DATABASE = "sqlite:///{}".format(os.path.join(ROOT, 'users', current_user, f"{current_user}.db"))
     app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE
     response_object = {}
-    
-    if 'file' not in request.files:
-        response_object["status"]: "'file' not in request.files"
-    else:
-        file = request.files['file']
-        fileType = request.form['fileType']
-        if file:
-            file_name = secure_filename(file.filename)
-            if (fileType == "fasta" and allowed_file(file_name, FASTA_EXTENSIONS)) or \
-                (fileType == "genbank" and allowed_file(file_name, GENBANK_EXTENSIONS)):
-
-                # overwrite existing files with specific extension with newly uploaded files
-                for existing_file in os.listdir(UPLOAD_FOLDER):
-                    ext = os.path.splitext(existing_file)[1].lower()
-                    if (fileType == "fasta" and ext in ['.fasta', '.fna', '.ldata', '.gdata', '.lst', '.ps']) or \
-                        (fileType == "genbank" and ext in GENBANK_EXTENSIONS):
-                        os.remove(os.path.join(UPLOAD_FOLDER, existing_file))
-                        print(f" * removed {existing_file}")
-
-                file.save(os.path.join(UPLOAD_FOLDER, file_name))
-                response_object["uploaded"] = file_name
-                print(' * uploaded', file_name)
-
-                # parse appropriate files as soon as uploaded
-                # FIXME: check file conent before parsing.
-                file_ext = os.path.splitext(file_name)[1].lower()
-                if file_ext in FASTA_EXTENSIONS:  # run genemark and parse ldata
-                    fasta_file = get_file_path("fasta", UPLOAD_FOLDER)
-                    annotate.run_genemark(fasta_file)
-                    try:
-                        ldata_file = get_file_path("ldata", UPLOAD_FOLDER)
-                    except FileNotFoundError:
-                        print("GeneMark did not save ldata file properly")
-                        return("error")
-                    annotate.parse_genemark_ldata(ldata_file)
-                elif file_ext in GENBANK_EXTENSIONS:  # parse genbank
-                    genbank_file = get_file_path("genbank", UPLOAD_FOLDER)
-                    annotate.parse_dnamaster_genbank(genbank_file)
-            else:
-                response_object["not_allowed"] = file.filename
+    if file_method == "upload":
+        if 'file' not in request.files:
+            response_object["status"] = "'file' not in request.files"
         else:
+            file = request.files['file']
+            fileType = request.form['fileType']
+            if file:
+                file_name = secure_filename(file.filename)
+                if (fileType == "fasta" and allowed_file(file_name, FASTA_EXTENSIONS)) or \
+                    (fileType == "genbank" and allowed_file(file_name, GENBANK_EXTENSIONS)):
+
+                    # overwrite existing files with specific extension with newly uploaded files
+                    for existing_file in os.listdir(UPLOAD_FOLDER):
+                        ext = os.path.splitext(existing_file)[1].lower()
+                        if (fileType == "fasta" and ext in ['.fasta', '.fna', '.ldata', '.gdata', '.lst', '.ps']) or \
+                            (fileType == "genbank" and ext in GENBANK_EXTENSIONS):
+                            os.remove(os.path.join(UPLOAD_FOLDER, existing_file))
+                            print(f" * removed {existing_file}")
+
+                    file.save(os.path.join(UPLOAD_FOLDER, file_name))
+                    response_object["uploaded"] = file_name
+                    print(' * uploaded', file_name)
+#Below is create your own fasta file stuff
+                    # if fileType == "genbank":
+                    #     with open(os.path.join(UPLOAD_FOLDER, file_name), 'r') as gFile:
+                    #         name = os.path.join(UPLOAD_FOLDER, current_user+".fasta")
+                    #         with open (name, 'w') as fFile:
+                    #             fFile.write(">" + current_user)
+                    #             startWriting = False
+                    #             content = []
+                    #             for line in gFile:
+                    #                 if line.startswith("ORIGIN"):
+                    #                     startWriting = True
+                    #                     continue
+                    #                 if startWriting:
+                    #                     content.append("".join(line[10:-1].strip().split()))
+                    #             print(content)
+                    #             fFile.writelines(content)
+                    #             file.save(name)
+                    # parse appropriate files as soon as uploaded
+                    # FIXME: check file conent before parsing.
+                    file_ext = os.path.splitext(file_name)[1].lower()
+                    if file_ext in FASTA_EXTENSIONS:  # run genemark and parse ldata
+                        fasta_file = get_file_path("fasta", UPLOAD_FOLDER)
+                        annotate.run_genemark(fasta_file)
+                        try:
+                            ldata_file = get_file_path("ldata", UPLOAD_FOLDER)
+                        except FileNotFoundError:
+                            print("GeneMark did not save ldata file properly")
+                            return("error")
+                        annotate.parse_genemark_ldata(ldata_file)
+                    elif file_ext in GENBANK_EXTENSIONS:  # parse genbank
+                        genbank_file = get_file_path("genbank", UPLOAD_FOLDER)
+                        annotate.parse_dnamaster_genbank(genbank_file)
+                else:
+                    response_object["not_allowed"] = file.filename
+            else:
+                response_object["status"] = "error"
+
+    elif file_method == "display":
+        response_object["fasta_file"] = "Not found"
+        response_object["genbank_file"] = "Not found"
+        for file in os.listdir(UPLOAD_FOLDER):
+            if (file.endswith(".fasta") or file.endswith(".fna") or file.endswith(".txt")):
+                response_object["fasta_file"] = file
+                print(response_object["fasta_file"])
+            elif (file.endswith(".gb") or file.endswith(".gbk")):
+                response_object["genbank_file"] = file
+
+    elif file_method == "download":
+        try:
+            response_object["file_data"] = open(os.path.join(UPLOAD_FOLDER, file_path)).read()
+            response_object["status"] = "success"
+        except:
+            print("error")
             response_object["status"] = "error"
 
+    elif file_method == "delete":
+        try:
+            os.remove(os.path.join(UPLOAD_FOLDER, file_path))
+            DNAMaster.query.delete()
+            GeneMark.query.delete()
+            Files.query.delete()
+            response_object["status"] = "success"
+        except:
+            print("error")
+            response_object["status"] = "error"
     return jsonify(response_object)
 @app.route('/phlash_api/dnamaster/<current_user>', methods=['GET', 'POST'])
 def dnamaster(current_user):
@@ -307,8 +297,9 @@ def blast(current_user, file_method, file_path):
             annotate.compare()
             fasta_file = get_file_path("fasta", UPLOAD_FOLDER)
             genemark_gdata_file = get_file_path("gdata", UPLOAD_FOLDER)
-            
+            print(datetime.now())
             num_files_downloaded = annotate.create_blast_fasta(current_user, fasta_file, genemark_gdata_file)
+            print(datetime.now())
             f = open(os.path.join(ROOT, 'users', current_user, f"{current_user}_blast.zip"), "rb")
             #return {'num_files_downloaded': num_files_downloaded, 'zipfile': f.read()}
             return f.read()
@@ -336,7 +327,7 @@ def blast(current_user, file_method, file_path):
         elif file_method == "uploadOutput":
             if 'file' not in request.files:
                 print(request.files)
-                response_object["status"]: "'file' not in request.files"
+                response_object["status"] = "'file' not in request.files"
                 print("in fail")
             else:
                 print("in success")
@@ -364,38 +355,6 @@ def blast(current_user, file_method, file_path):
                     with closing(ZipFile(os.path.join(ROOT, 'users', current_user, filename))) as archive:
                         num_blast_files = len(archive.infolist())
                         return str(num_blast_files)
-        # elif file_method == "upload":
-        #     for filename in os.listdir(os.path.join(ROOT, 'users', current_user)):
-        #         if filename.endswith('.zip'):
-        #             with closing(ZipFile(os.path.join(ROOT, 'users', current_user, filename))) as archive:
-        #                 num_blast_files = len(archive.infolist())
-        #     print("num blast files: " + str(num_blast_files))
-        #     response_object["num_blast_files"] = num_blast_files
-        #     if request.files.getlist('File') is None:
-        #         response_object["status"]: "request.files.getlist('files') is None"
-        #     else:
-        #         response_object["uploaded"] = []
-        #         response_object["not_allowed"] = []
-        #         try:
-        #             # file = request.files['file']
-        #             # file.save(os.path.join(UPLOAD_FOLDER, file_name))
-        #             print (request.files.getlist('File[]'))
-        #             print (request.files.getlist('File'))
-        #             print (request.files.getlist('file'))
-        #             print (request.files.getlist('files'))
-        #             print (request.files.getlist('FileList'))
-        #             print (request.files.getlist('FileList[]'))
-        #             print (request.files)
-        #             for file in request.files.getlist('File'):
-        #                 if file and allowed_file(file.filename, BLAST_EXTENSIONS):
-        #                     file.save(os.path.join(UPLOAD_FOLDER, file.filename))
-        #                     response_object["uploaded"].append(file.filename)
-        #                     print(' * uploaded', file.filename)
-        #                 else:
-        #                     response_object["not_allowed"].append(file.filename)
-        #         except:
-        #             print("error")
-        #             response_object["status"] = "error"
 
     return jsonify(response_object)
 
@@ -449,12 +408,6 @@ def cds_annotation(current_user, cds_id):
 
     if request.method == "GET":
         cds = DNAMaster.query.filter_by(id=cds_id).first()
-        print(cds.id)
-        print(cds.start)
-        print(cds.stop)
-        print(cds.strand)
-        print(cds.function)
-        print(cds.status)
         response_object['cds'] = {'id': cds.id,
                                   'start': cds.start,
                                   'stop': cds.stop,
@@ -464,10 +417,13 @@ def cds_annotation(current_user, cds_id):
 
         # fasta_file = get_file_path("fasta", UPLOAD_FOLDER)
         print(cds)
+        
         starts = [int(start) for start in cds.start_options.split(",")]
+        stops = [int(stop) for stop in cds.stop_options.split(",")]
         print(starts)
+        print(stops)
         response_object['start_options'] = starts
-
+        response_object['stop_options'] = stops
         blast_files = get_file_path("blast", UPLOAD_FOLDER)
         E_VALUE_THRESH = 1e-7
         print("parsing blast")
@@ -487,6 +443,16 @@ def cds_annotation(current_user, cds_id):
         response_object['y_data_5'] = gdata_df["5"].to_list()
         response_object['y_data_6'] = gdata_df["6"].to_list()
 
+        dnamaster = []
+        reachedCDS = False
+        for cds in db.session.query(DNAMaster).order_by(DNAMaster.start):
+            if reachedCDS and cds.function == "None selected":
+                response_object['nextCDS'] = cds.id
+                print(cds.id)
+                break
+            elif cds.id == cds_id:
+                reachedCDS = True
+                
     if request.method == "PUT":
         put_data = request.get_json()
         cds = DNAMaster.query.filter_by(id=cds_id).first()
@@ -520,18 +486,6 @@ def allowed_file(filename, allowed_extensions):
     Check if file extension is acceptable.
     """
     return '.' in filename and os.path.splitext(filename)[1].lower() in allowed_extensions
-
-
-def create_directory(directory):
-    """
-    Create specified directory.
-    """
-    try:
-        os.mkdir(directory)
-        print("Directory \'" + directory + "\' created.")
-    except FileExistsError:
-        print("Directory \'" + directory + "\' already exists.")
-
 
 def get_file_path(preference, upload_directory):
     """

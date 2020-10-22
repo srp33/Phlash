@@ -11,7 +11,8 @@
       <div class="alert alert-primary">
         <p><strong>Instructions</strong></p>
         <p>
-          Follow the steps below. Continue when all steps have been completed.
+          Follow the steps below. Click 'Next' when all the steps have been
+          completed.
         </p>
         <div class="nav-btns-wrapper">
           <router-link
@@ -78,8 +79,16 @@
       <div class="steps">
         <ol>
           <li class="step">
-            Download the zipped FASTA file(s) that will be used as input for
-            BLAST.
+            <a href="#" @click="downloadInputFiles" class="alert-link"
+              >Download the zipped FASTA file(s)</a
+            >
+            that will be used as input for BLAST.
+            <loading
+              :active.sync="downloadLoading"
+              :is-full-page="false"
+              :height="20"
+              :width="20"
+            ></loading>
             <p class="zipfile-tip">
               <svg
                 class="bi bi-info-circle-fill"
@@ -103,7 +112,7 @@
                 >7-Zip</a
               >.
             </p>
-            <button
+            <!-- <button
               class="btn btn-light btn-step"
               style="position: relative"
               @click="downloadInputFiles"
@@ -115,16 +124,24 @@
                 :width="20"
               ></loading>
               <strong>Download FASTA file</strong>
-            </button>
+            </button> -->
             <p v-if="downloadLoading">Downloading...</p>
           </li>
           <li class="step">
-            Go to BLASTp's website.
+            <a href="#" @click="goToNCBI" class="alert-link"
+              >Go to BLASTp's website.
+            </a>
             <i
               >At the website, make sure to upload your file and set the
               appropriate parameters, as show in the list and screenshot
               below.</i
             ><br />
+            <div class="alert alert-warning" v-if="clickedNCBI">
+              This will take several minutes. If it seems to be taking a long
+              time, it is still probably working correctly. For help
+              troubleshooting, 
+              <a href="#" @click="goToHelp" class="alert-link">visit the FAQ</a>.
+            </div>
             <ul>
               <li>
                 <strong>Upload File:</strong> Upload the FASTA file from step 1.
@@ -136,18 +153,6 @@
                 <strong>Algorithm:</strong> blastp (protein-protein BLAST)
               </li>
             </ul>
-            <div class="alert alert-warning" v-if="clickedNCBI">
-              This will take several minutes. If it seems to be taking a long
-              time, it is still probably working correctly. For help
-              troubleshooting, visit the FAQ.
-              <button class="btn btn-light btn-step" @click="goToHelp">
-                <strong>Go to BLAST help page</strong>
-              </button>
-            </div>
-            <button class="btn btn-light btn-step" @click="goToNCBI">
-              <strong>Go to NCBI's BLASTp</strong>
-            </button>
-            <!--<img id="step-two" src="<%= BASE_URL %>/images/blast_step2.png" />-->
             <img id="step-two" src="/phlash/images/blast_step2.png" />
           </li>
           <li class="step">
@@ -156,7 +161,6 @@
             for downloading your results. Choose
             <strong>Single-file JSON</strong>. Continue when you have your
             downloaded file ready for upload.<br />
-            <!--<img id="step-three" src="<%= BASE_URL %>/images/blast_step3.png" />-->
             <img id="step-three" src="/phlash/images/blast_step3.png" />
           </li>
           <li class="step">
@@ -375,8 +379,6 @@ export default {
   },
   created() {
     this.setNumFiles();
-    this.displayOutputFiles();
-    this.checkFiles();
   },
   computed: {
     navUpload: function () {
@@ -398,8 +400,7 @@ export default {
       if (this.blastDownloaded && this.blastUploaded) {
         document.getElementById("next-top").classList.remove("disabled");
         document.getElementById("next-bottom").classList.remove("disabled");
-      }
-      else {
+      } else {
         document.getElementById("next-top").classList.add("disabled");
         document.getElementById("next-bottom").classList.add("disabled");
       }
@@ -408,8 +409,7 @@ export default {
       if (this.blastDownloaded && this.blastUploaded) {
         document.getElementById("next-top").classList.remove("disabled");
         document.getElementById("next-bottom").classList.remove("disabled");
-      }
-      else {
+      } else {
         document.getElementById("next-top").classList.add("disabled");
         document.getElementById("next-bottom").classList.add("disabled");
       }
@@ -472,6 +472,7 @@ export default {
         )
         .then((response) => {
           this.numFiles = Number(response.data);
+          this.displayOutputFiles();
         });
     },
     goToNCBI() {
@@ -497,6 +498,7 @@ export default {
         .then((response) => {
           console.log(response);
           this.fileNames = response.data.file_names;
+          this.checkFiles();
         })
         .catch((error) => {
           console.log(error);
@@ -573,8 +575,8 @@ export default {
             document.getElementById(
               "blast-warning-alert"
             ).innerHTML = warningMessage;
-        });
-        return;
+          });
+          return;
         }
       }
       data.append("file", uploadFile);
@@ -597,7 +599,8 @@ export default {
             this.showBlastSuccessAlert = true;
             this.showBlastDangerAlert = false;
             this.blast = true;
-            if (this.fileNames.length == this.numFiles) this.blastUploaded = true;
+            if (this.fileNames.length == this.numFiles)
+              this.blastUploaded = true;
             let successMessage = `<strong>${response.data.uploaded}</strong> uploaded successfully!`;
             Vue.nextTick(() => {
               document.getElementById(
@@ -620,9 +623,9 @@ export default {
         .catch((error) => {
           console.log(error);
         });
-        this.blastFiles.splice(this.blastFiles.length - 1, 1);
-        if (this.blastFiles.length > 0) {
-          this.uploadOutputFiles();
+      this.blastFiles.splice(this.blastFiles.length - 1, 1);
+      if (this.blastFiles.length > 0) {
+        this.uploadOutputFiles();
       }
     },
   },
@@ -642,6 +645,10 @@ h1 {
 .alert-primary {
   text-align: left;
   margin: 40px auto;
+}
+
+.alert-warning {
+  margin-top: 20px;
 }
 
 /* ----- Steps ----- */
@@ -769,7 +776,4 @@ h1 {
   padding-top: 20px;
 }
 
-.alert-warning {
-  margin-top: 20px;
-}
 </style>

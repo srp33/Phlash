@@ -1,6 +1,9 @@
 <template>
   <div id="wrapper">
     <div class="table-responsive">
+      <div v-if="showWarning" class="alert alert-warning">
+        <strong>This function does not correspond to the selected start position.</strong>
+      </div>
       <table id="blast-table" class="table table-hover">
         <thead>
           <tr>
@@ -22,7 +25,10 @@
             <td>{{ alignment.query_from }} - {{ alignment.query_to }}</td>
             <td>{{ alignment.hit_from }} - {{ alignment.hit_to }}</td>
             <td>
-              <button class="btn btn-dark btn-sm" @click="setFunction(alignment.title)">
+              <button v-if="allowSelect" class="btn btn-dark btn-sm" @click="setFunction(alignment.title)">
+                <strong>Select</strong>
+              </button>
+              <button v-if="!allowSelect" class="btn btn-dark btn-sm" @click="showWarning=true">
                 <strong>Select</strong>
               </button>
             </td>
@@ -33,7 +39,10 @@
         <h4>
           <em>No hits found.</em>
         </h4>
-        <button class="btn btn-dark btn-sm" @click="setNone()">
+        <button v-if="allowSelect" class="btn btn-dark btn-sm" @click="setNone()">
+          <strong>Set function as "None"</strong>
+        </button>
+        <button v-if="!allowSelect" class="btn btn-dark btn-sm" @click="showWarning">
           <strong>Set function as "None"</strong>
         </button>
       </div>
@@ -45,7 +54,9 @@
 export default {
   name: "BlastResults",
   props: {
-    blastResults: Array
+    blastResults: Array,
+    allowSelect: false,
+    showWarning: false,
   },
   data() {
     return {

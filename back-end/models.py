@@ -23,6 +23,7 @@ class DNAMaster(db.Model):
     status = db.Column(db.Text,
                        nullable=False)
     start_options = db.Column(db.Text)
+    stop_options = db.Column(db.Text)
 
 
 class GeneMark(db.Model):

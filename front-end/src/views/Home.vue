@@ -19,7 +19,7 @@
             type="text"
             v-model="phageID"
             v-on:keyup.enter="checkPhageID(phageID)"
-            placeholder="Enter a unique bacteriophage ID containing letters and numbers only"
+            placeholder="Enter a unique bacteriophage ID containing letters, numbers, and underscores only"
             aria-label="Enter a unique bacteriophage ID"
             aria-describedby="basic-addon2"
           />

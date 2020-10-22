@@ -14,31 +14,36 @@
         Choose a new start for this gene call based on the information given
         below or keep the current start.
       </p>
-      <p><strong>Your selected start position:</strong> {{ newStart }}</p>
+      <p><strong>Your selected gene span:</strong> {{ newStart }}-{{ newStop }}</p>
       <p><strong>Your selected function:</strong> {{ newFunction }}</p>
-      <button type="button" v-if="newFunction != ''" class="btn btn-light btn-action" @click="editCDS">
-        <strong>Update</strong>
-      </button>
+      <router-link :to="{name: 'Annotations', params: { phageID: $route.params.phageID },}">
+        <button class="btn btn-light btn-action">
+          <strong>Return</strong>
+        </button>
+      </router-link>
       <button type="button" class="btn btn-light btn-action" @click="deleteCDS($route.params.cdsID)">
         <strong>Delete</strong>
       </button>
+      <button type="button" v-if="newFunction != ''" class="btn btn-light btn-action" @click="editCDS">
+        <strong>Update</strong>
+      </button>
     </div>
     <div class="coding-potential-table">
-      <h4 style="text-align: center; margin: 20px;">Alternative Start Positions</h4>
+      <h4 style="text-align: center; margin: 20px;">Alternative Gene Spans</h4>
       <div class="table-responsive">
         <table id="cp-table" class="table table-hover">
           <thead>
             <tr>
-              <th scope="col">Start Position</th>
+              <th scope="col">Gene Span</th>
               <th scope="col">Action</th>
             </tr>
           </thead>
           <tbody>
             <tr v-for="(start, index) in startOptions" :key="index">
-              <th v-if="start===currentCDS.start">{{ start }} (current)</th>
-              <th v-else>{{ start }}</th>
+              <th v-if="start===currentCDS.start">{{ start }}-{{stopOptions[index]}} (current)</th>
+              <th v-else>{{ start }}-{{stopOptions[index]}}</th>
               <td>
-                <button class="btn btn-dark btn-sm" @click="setStart(start)">
+                <button class="btn btn-dark btn-sm" @click="setGeneSpan(start, stopOptions[index])">
                   <strong>Select</strong>
                 </button>
               </td>
@@ -71,7 +76,7 @@
     <hr />
     <div class="blast-results">
       <h4 style="text-align: center; margin: 40px;">BLAST Results</h4>
-      <div id="accordion">
+      <div v-if="dataExists" id="accordion">
         <div class="card" v-for="key in sortedBlastKeys" :key="key">
           <div class="card-header">
             <h4 class="mb-0">
@@ -83,20 +88,26 @@
           </div>
           <div v-bind:id="key" class="collapse" data-parent="#accordion">
             <div class="card-body">
-              <BlastResults :blastResults="blastResults[key]" v-if="key===currentCDS.start.toString()" @newFunction="setFunction" />
+              <BlastResults v-if="key===currentCDS.start.toString()" :blastResults="blastResults[key]" :allowSelect="true" @newFunction="setFunction" />
+              <BlastResults v-if="key!=currentCDS.start.toString()" :blastResults="blastResults[key]" :allowSelect="false" @newFunction="setFunction" />
             </div>
           </div>
         </div>
       </div>
     </div>
     <div class="info-bottom">
-      <p><strong>Your selected start position:</strong> {{ newStart }}</p>
+      <p><strong>Your selected gene span:</strong> {{ newStart }}-{{ newStop }}</p>
       <p><strong>Your function selection:</strong> {{ newFunction }}</p>
-      <button type="button" v-if="newFunction != ''" class="btn btn-light btn-action" @click="editCDS">
-        <strong>Update</strong>
-      </button>
+      <router-link :to="{name: 'Annotations', params: { phageID: $route.params.phageID },}">
+        <button class="btn btn-light btn-action">
+          <strong>Return</strong>
+        </button>
+      </router-link>
       <button type="button" class="btn btn-light btn-action" @click="deleteCDS($route.params.cdsID)">
         <strong>Delete</strong>
+      </button>
+      <button type="button" v-if="newFunction != ''" class="btn btn-light btn-action" @click="editCDS">
+        <strong>Update</strong>
       </button>
     </div>
   </div>
@@ -118,6 +129,7 @@ export default {
   },
   data() {
     return {
+      stopOptions: [],
       startOptions: [],
       currentCDS: {
         id: "",
@@ -141,6 +153,7 @@ export default {
       showStart: false,
       newFunction: "",
       newStart: null,
+      newStop: null,
       dataExists: false,
       pageLoading: true,
       data1: [{ x: [], y: [] }],
@@ -148,7 +161,8 @@ export default {
       data3: [{ x: [], y: [] }],
       data4: [{ x: [], y: [] }],
       data5: [{ x: [], y: [] }],
-      data6: [{ x: [], y: [] }]
+      data6: [{ x: [], y: [] }],
+      nextCDS: null,
     };
   },
   created() {
@@ -166,7 +180,9 @@ export default {
           this.currentCDS = response.data.cds;
           this.blastResults = response.data.blast;
           this.startOptions = response.data.start_options;
+          this.stopOptions = response.data.stop_options;
           this.newStart = this.currentCDS.start;
+          this.newStop = this.currentCDS.stop;
           this.data1 = [{
             x: response.data.x_data,
             y: response.data.y_data_1
@@ -195,6 +211,9 @@ export default {
           this.pageLoading = false;
           this.frame = (this.currentCDS.start + 2) % 3 + 1;
           if (this.currentCDS.strand == '-') this.frame += 3;
+
+          this.nextCDS = response.data.nextCDS;
+          console.log(this.nextCDS);
         })
         .catch(error => {
           console.error(error);
@@ -203,6 +222,7 @@ export default {
     editCDS() {
       this.updatedCDS = this.currentCDS;
       this.updatedCDS.start = this.newStart;
+      this.updatedCDS.stop = this.newStop;
       this.updatedCDS.function = this.newFunction;
       const payload = {
         id: this.updatedCDS.id,
@@ -210,7 +230,7 @@ export default {
         stop: this.updatedCDS.stop,
         strand: this.updatedCDS.strand,
         function: this.updatedCDS.function,
-        status: "Pass"
+        status: this.currentCDS.status,
       };
       this.updateCDS(payload, this.updatedCDS.id);
     },
@@ -219,7 +239,14 @@ export default {
           payload
         )
         .then(() => {
-          this.$router.push(`/annotations/${this.$route.params.phageID}`);
+          if (this.nextCDS != undefined) {
+            this.$route.params.cdsID = this.nextCDS;
+            this.$router.push(`/annotations/cds/${this.$route.params.phageID}/${this.$route.params.cdsID}`);
+            window.location.reload();
+          }
+          else {
+            this.$router.push(`/annotations/${this.$route.params.phageID}`);
+          }
         })
         .catch(error => {
           console.error(error);
@@ -236,22 +263,27 @@ export default {
         stop: this.currentCDS.stop,
         strand: this.currentCDS.strand,
         function: "None",
-        status: "Pass"
+        status: this.currentCDS.status,
       };
       this.updateCDS(payload, this.currentCDS.id);
     },
     setFunction(funct) {
       this.newFunction = funct;
     },
-    setStart(strt) {
-      this.dataExists = false;
-      this.newStart = strt;
-      this.currentCDS.start = strt;
-      this.frame = (strt + 2) % 3 + 1;
-      if (this.currentCDS.strand == '-') this.frame += 3;
-      this.$nextTick().then(() => {
-        this.dataExists = true;
-      });
+    setGeneSpan(start, stop) {
+      if (start != this.newStart) {
+        this.dataExists = false;
+        this.newFunction= "";
+        this.newStop = stop;
+        this.currentCDS.stop = stop;
+        this.newStart = start;
+        this.currentCDS.start = start;
+        this.frame = (start + 2) % 3 + 1;
+        if (this.currentCDS.strand == '-') this.frame += 3;
+        this.$nextTick().then(() => {
+          this.dataExists = true;
+        });
+      }
     }
   }
 };
