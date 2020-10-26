@@ -1,20 +1,92 @@
 <template>
   <div id="columns">
     <div class="column">
-      <Plotly class="graph" v-if="frame == 1" :data="data1" :layout="layout1b" :display-mode-bar="false"></Plotly>
-      <Plotly class="graph" v-if="frame != 1" :data="data1" :layout="layout1" :display-mode-bar="false"></Plotly>
-      <Plotly class="graph" v-if="frame == 2" :data="data2" :layout="layout2b" :display-mode-bar="false"></Plotly>
-      <Plotly class="graph" v-if="frame != 2" :data="data2" :layout="layout2" :display-mode-bar="false"></Plotly>
-      <Plotly class="graph" v-if="frame == 3" :data="data3" :layout="layout3b" :display-mode-bar="false"></Plotly>
-      <Plotly class="graph" v-if="frame != 3" :data="data3" :layout="layout3" :display-mode-bar="false"></Plotly>
+      <Plotly
+        class="graph"
+        v-if="frame == 1"
+        :data="data1"
+        :layout="layout1b"
+        :display-mode-bar="false"
+      ></Plotly>
+      <Plotly
+        class="graph"
+        v-if="frame != 1"
+        :data="data1"
+        :layout="layout1"
+        :display-mode-bar="false"
+      ></Plotly>
+      <Plotly
+        class="graph"
+        v-if="frame == 2"
+        :data="data2"
+        :layout="layout2b"
+        :display-mode-bar="false"
+      ></Plotly>
+      <Plotly
+        class="graph"
+        v-if="frame != 2"
+        :data="data2"
+        :layout="layout2"
+        :display-mode-bar="false"
+      ></Plotly>
+      <Plotly
+        class="graph"
+        v-if="frame == 3"
+        :data="data3"
+        :layout="layout3b"
+        :display-mode-bar="false"
+      ></Plotly>
+      <Plotly
+        class="graph"
+        v-if="frame != 3"
+        :data="data3"
+        :layout="layout3"
+        :display-mode-bar="false"
+      ></Plotly>
     </div>
     <div class="column">
-      <Plotly class="graph" v-if="frame == 4" :data="data4" :layout="layout4b" :display-mode-bar="false"></Plotly>
-      <Plotly class="graph" v-if="frame != 4" :data="data4" :layout="layout4" :display-mode-bar="false"></Plotly>
-      <Plotly class="graph" v-if="frame == 5" :data="data5" :layout="layout5b" :display-mode-bar="false"></Plotly>
-      <Plotly class="graph" v-if="frame != 5" :data="data5" :layout="layout5" :display-mode-bar="false"></Plotly>
-      <Plotly class="graph" v-if="frame == 6" :data="data6" :layout="layout6b" :display-mode-bar="false"></Plotly>
-      <Plotly class="graph" v-if="frame != 6" :data="data6" :layout="layout6" :display-mode-bar="false"></Plotly>
+      <Plotly
+        class="graph"
+        v-if="frame == 4"
+        :data="data4"
+        :layout="layout4b"
+        :display-mode-bar="false"
+      ></Plotly>
+      <Plotly
+        class="graph"
+        v-if="frame != 4"
+        :data="data4"
+        :layout="layout4"
+        :display-mode-bar="false"
+      ></Plotly>
+      <Plotly
+        class="graph"
+        v-if="frame == 5"
+        :data="data5"
+        :layout="layout5b"
+        :display-mode-bar="false"
+      ></Plotly>
+      <Plotly
+        class="graph"
+        v-if="frame != 5"
+        :data="data5"
+        :layout="layout5"
+        :display-mode-bar="false"
+      ></Plotly>
+      <Plotly
+        class="graph"
+        v-if="frame == 6"
+        :data="data6"
+        :layout="layout6b"
+        :display-mode-bar="false"
+      ></Plotly>
+      <Plotly
+        class="graph"
+        v-if="frame != 6"
+        :data="data6"
+        :layout="layout6"
+        :display-mode-bar="false"
+      ></Plotly>
     </div>
   </div>
 </template>
@@ -24,7 +96,7 @@ import { Plotly } from "vue-plotly";
 export default {
   name: "Graphs",
   components: {
-    Plotly
+    Plotly,
   },
   props: {
     frame: Number,
@@ -35,7 +107,7 @@ export default {
     data3: Array,
     data4: Array,
     data5: Array,
-    data6: Array
+    data6: Array,
   },
 
   data() {
@@ -51,9 +123,8 @@ export default {
           r: 50,
           b: 30,
           t: 30,
-          pad: 4
+          pad: 4,
         },
-        
         spikedistance: 200,
         hoverdistance: 100,
         xaxis: {
@@ -66,21 +137,21 @@ export default {
           tickfont: {
             family: "Avenir, Helvetica, Arial, sans-serif",
             size: 12,
-            color: "black"
+            color: "black",
           },
           dtick: 200,
           showcrossline: true,
           spikemode: "across",
           spikecolor: "green",
           spikedash: "solid",
-          spikethickness: 2
+          spikethickness: 2,
         },
         yaxis: {
           title: "Frame 1",
           titlefont: {
             family: "Avenir, Helvetica, Arial, sans-serif",
             size: 14,
-            color: "grey"
+            color: "grey",
           },
           showgrid: false,
           showline: true,
@@ -91,11 +162,11 @@ export default {
           tickfont: {
             family: "Avenir, Helvetica, Arial, sans-serif",
             size: 12,
-            color: "black"
+            color: "black",
           },
           range: [0, 1],
           dtick: 0.5,
-          tickformat: ".1f"
+          tickformat: ".1f",
         },
         shapes: [
           {
@@ -108,8 +179,8 @@ export default {
             line: {
               color: "red",
               width: 1.5,
-              dash: "dot"
-            }
+              dash: "dot",
+            },
           },
           {
             type: "line",
@@ -121,9 +192,9 @@ export default {
             line: {
               color: "red",
               width: 1.5,
-              dash: "dot"
-            }
-          }
+              dash: "dot",
+            },
+          },
         ],
         annotations: [
           {
@@ -135,11 +206,11 @@ export default {
             font: {
               family: "Avenir, Helvetica, Arial, sans-serif",
               size: 11,
-              color: "black"
+              color: "black",
             },
             showarrow: true,
             ax: 0,
-            ay: -20
+            ay: -20,
           },
           {
             x: this.stop,
@@ -150,13 +221,13 @@ export default {
             font: {
               family: "Avenir, Helvetica, Arial, sans-serif",
               size: 11,
-              color: "black"
+              color: "black",
             },
             showarrow: true,
             ax: 0,
-            ay: -20
-          }
-        ]
+            ay: -20,
+          },
+        ],
       },
       // ----- LAYOUT 2 -----
       layout2: {
@@ -168,7 +239,7 @@ export default {
           r: 50,
           b: 30,
           t: 30,
-          pad: 4
+          pad: 4,
         },
         spikedistance: 200,
         hoverdistance: 100,
@@ -182,21 +253,21 @@ export default {
           tickfont: {
             family: "Avenir, Helvetica, Arial, sans-serif",
             size: 12,
-            color: "black"
+            color: "black",
           },
           dtick: 200,
           showcrossline: true,
           spikemode: "across",
           spikecolor: "green",
           spikedash: "solid",
-          spikethickness: 2
+          spikethickness: 2,
         },
         yaxis: {
           title: "Frame 2",
           titlefont: {
             family: "Avenir, Helvetica, Arial, sans-serif",
             size: 14,
-            color: "grey"
+            color: "grey",
           },
           showgrid: false,
           showline: true,
@@ -207,11 +278,11 @@ export default {
           tickfont: {
             family: "Avenir, Helvetica, Arial, sans-serif",
             size: 12,
-            color: "black"
+            color: "black",
           },
           range: [0, 1],
           dtick: 0.5,
-          tickformat: ".1f"
+          tickformat: ".1f",
         },
         shapes: [
           {
@@ -224,8 +295,8 @@ export default {
             line: {
               color: "red",
               width: 1.5,
-              dash: "dot"
-            }
+              dash: "dot",
+            },
           },
           {
             type: "line",
@@ -237,10 +308,10 @@ export default {
             line: {
               color: "red",
               width: 1.5,
-              dash: "dot"
-            }
-          }
-        ]
+              dash: "dot",
+            },
+          },
+        ],
       },
       // ----- LAYOUT 3 -----
       layout3: {
@@ -252,7 +323,7 @@ export default {
           r: 50,
           b: 60,
           t: 30,
-          pad: 4
+          pad: 4,
         },
         spikedistance: 200,
         hoverdistance: 100,
@@ -261,7 +332,7 @@ export default {
           titlefont: {
             family: "Avenir, Helvetica, Arial, sans-serif",
             size: 14,
-            color: "grey"
+            color: "grey",
           },
           showgrid: false,
           showline: true,
@@ -270,7 +341,7 @@ export default {
           tickfont: {
             family: "Avenir, Helvetica, Arial, sans-serif",
             size: 12,
-            color: "black"
+            color: "black",
           },
           ticklen: 7,
           tickwidth: 2,
@@ -279,14 +350,14 @@ export default {
           spikemode: "across",
           spikecolor: "green",
           spikedash: "solid",
-          spikethickness: 2
+          spikethickness: 2,
         },
         yaxis: {
           title: "Frame 3",
           titlefont: {
             family: "Avenir, Helvetica, Arial, sans-serif",
             size: 14,
-            color: "grey"
+            color: "grey",
           },
           showgrid: false,
           showline: true,
@@ -295,13 +366,13 @@ export default {
           tickfont: {
             family: "Avenir, Helvetica, Arial, sans-serif",
             size: 12,
-            color: "black"
+            color: "black",
           },
           ticklen: 7,
           tickwidth: 2,
           range: [0, 1],
           dtick: 0.5,
-          tickformat: ".1f"
+          tickformat: ".1f",
         },
         shapes: [
           {
@@ -314,8 +385,8 @@ export default {
             line: {
               color: "red",
               width: 1.5,
-              dash: "dot"
-            }
+              dash: "dot",
+            },
           },
           {
             type: "line",
@@ -327,10 +398,10 @@ export default {
             line: {
               color: "red",
               width: 1.5,
-              dash: "dot"
-            }
-          }
-        ]
+              dash: "dot",
+            },
+          },
+        ],
       },
       // ----- LAYOUT 4 -----
       layout4: {
@@ -342,7 +413,7 @@ export default {
           r: 50,
           b: 30,
           t: 30,
-          pad: 4
+          pad: 4,
         },
         spikedistance: 200,
         hoverdistance: 100,
@@ -357,20 +428,20 @@ export default {
           tickfont: {
             family: "Avenir, Helvetica, Arial, sans-serif",
             size: 12,
-            color: "black"
+            color: "black",
           },
           showcrossline: true,
           spikemode: "across",
           spikecolor: "green",
           spikedash: "solid",
-          spikethickness: 2
+          spikethickness: 2,
         },
         yaxis: {
           title: "Frame 4",
           titlefont: {
             family: "Avenir, Helvetica, Arial, sans-serif",
             size: 14,
-            color: "grey"
+            color: "grey",
           },
           showgrid: false,
           showline: true,
@@ -384,8 +455,8 @@ export default {
           tickfont: {
             family: "Avenir, Helvetica, Arial, sans-serif",
             size: 12,
-            color: "black"
-          }
+            color: "black",
+          },
         },
         shapes: [
           {
@@ -398,8 +469,8 @@ export default {
             line: {
               color: "red",
               width: 1.5,
-              dash: "dot"
-            }
+              dash: "dot",
+            },
           },
           {
             type: "line",
@@ -411,9 +482,9 @@ export default {
             line: {
               color: "red",
               width: 1.5,
-              dash: "dot"
-            }
-          }
+              dash: "dot",
+            },
+          },
         ],
         annotations: [
           {
@@ -425,11 +496,11 @@ export default {
             font: {
               family: "Avenir, Helvetica, Arial, sans-serif",
               size: 11,
-              color: "black"
+              color: "black",
             },
             showarrow: true,
             ax: 0,
-            ay: -20
+            ay: -20,
           },
           {
             x: this.stop,
@@ -440,13 +511,13 @@ export default {
             font: {
               family: "Avenir, Helvetica, Arial, sans-serif",
               size: 11,
-              color: "black"
+              color: "black",
             },
             showarrow: true,
             ax: 0,
-            ay: -20
-          }
-        ]
+            ay: -20,
+          },
+        ],
       },
       // ----- LAYOUT 5 -----
       layout5: {
@@ -458,7 +529,7 @@ export default {
           r: 50,
           b: 30,
           t: 30,
-          pad: 4
+          pad: 4,
         },
         spikedistance: 200,
         hoverdistance: 100,
@@ -473,20 +544,20 @@ export default {
           tickfont: {
             family: "Avenir, Helvetica, Arial, sans-serif",
             size: 12,
-            color: "black"
+            color: "black",
           },
           showcrossline: true,
           spikemode: "across",
           spikecolor: "green",
           spikedash: "solid",
-          spikethickness: 2
+          spikethickness: 2,
         },
         yaxis: {
           title: "Frame 5",
           titlefont: {
             family: "Avenir, Helvetica, Arial, sans-serif",
             size: 14,
-            color: "grey"
+            color: "grey",
           },
           showgrid: false,
           showline: true,
@@ -500,8 +571,8 @@ export default {
           tickfont: {
             family: "Avenir, Helvetica, Arial, sans-serif",
             size: 12,
-            color: "black"
-          }
+            color: "black",
+          },
         },
         shapes: [
           {
@@ -514,8 +585,8 @@ export default {
             line: {
               color: "red",
               width: 1.5,
-              dash: "dot"
-            }
+              dash: "dot",
+            },
           },
           {
             type: "line",
@@ -527,10 +598,10 @@ export default {
             line: {
               color: "red",
               width: 1.5,
-              dash: "dot"
-            }
-          }
-        ]
+              dash: "dot",
+            },
+          },
+        ],
       },
       // ----- LAYOUT 6 -----
       layout6: {
@@ -542,7 +613,7 @@ export default {
           r: 50,
           b: 60,
           t: 30,
-          pad: 4
+          pad: 4,
         },
         spikedistance: 200,
         hoverdistance: 100,
@@ -551,7 +622,7 @@ export default {
           titlefont: {
             family: "Avenir, Helvetica, Arial, sans-serif",
             size: 14,
-            color: "grey"
+            color: "grey",
           },
           showgrid: false,
           showline: true,
@@ -563,20 +634,20 @@ export default {
           tickfont: {
             family: "Avenir, Helvetica, Arial, sans-serif",
             size: 12,
-            color: "black"
+            color: "black",
           },
           showcrossline: true,
           spikemode: "across",
           spikecolor: "green",
           spikedash: "solid",
-          spikethickness: 2
+          spikethickness: 2,
         },
         yaxis: {
           title: "Frame 6",
           titlefont: {
             family: "Avenir, Helvetica, Arial, sans-serif",
             size: 14,
-            color: "grey"
+            color: "grey",
           },
           showgrid: false,
           showline: true,
@@ -590,8 +661,8 @@ export default {
           tickfont: {
             family: "Avenir, Helvetica, Arial, sans-serif",
             size: 12,
-            color: "black"
-          }
+            color: "black",
+          },
         },
         shapes: [
           {
@@ -604,8 +675,8 @@ export default {
             line: {
               color: "red",
               width: 1.5,
-              dash: "dot"
-            }
+              dash: "dot",
+            },
           },
           {
             type: "line",
@@ -617,10 +688,10 @@ export default {
             line: {
               color: "red",
               width: 1.5,
-              dash: "dot"
-            }
-          }
-        ]
+              dash: "dot",
+            },
+          },
+        ],
       },
       // ----- LAYOUT 1b -----
       layout1b: {
@@ -634,9 +705,9 @@ export default {
           r: 50,
           b: 30,
           t: 30,
-          pad: 4
+          pad: 4,
         },
-        
+
         spikedistance: 200,
         hoverdistance: 100,
         xaxis: {
@@ -649,21 +720,21 @@ export default {
           tickfont: {
             family: "Avenir, Helvetica, Arial, sans-serif",
             size: 12,
-            color: "black"
+            color: "black",
           },
           dtick: 200,
           showcrossline: true,
           spikemode: "across",
           spikecolor: "green",
           spikedash: "solid",
-          spikethickness: 2
+          spikethickness: 2,
         },
         yaxis: {
           title: "Frame 1",
           titlefont: {
             family: "Avenir, Helvetica, Arial, sans-serif",
             size: 14,
-            color: "grey"
+            color: "grey",
           },
           showgrid: false,
           showline: true,
@@ -674,11 +745,11 @@ export default {
           tickfont: {
             family: "Avenir, Helvetica, Arial, sans-serif",
             size: 12,
-            color: "black"
+            color: "black",
           },
           range: [0, 1],
           dtick: 0.5,
-          tickformat: ".1f"
+          tickformat: ".1f",
         },
         shapes: [
           {
@@ -691,8 +762,8 @@ export default {
             line: {
               color: "red",
               width: 1.5,
-              dash: "dot"
-            }
+              dash: "dot",
+            },
           },
           {
             type: "line",
@@ -704,9 +775,9 @@ export default {
             line: {
               color: "red",
               width: 1.5,
-              dash: "dot"
-            }
-          }
+              dash: "dot",
+            },
+          },
         ],
         annotations: [
           {
@@ -718,11 +789,11 @@ export default {
             font: {
               family: "Avenir, Helvetica, Arial, sans-serif",
               size: 11,
-              color: "black"
+              color: "black",
             },
             showarrow: true,
             ax: 0,
-            ay: -20
+            ay: -20,
           },
           {
             x: this.stop,
@@ -733,13 +804,13 @@ export default {
             font: {
               family: "Avenir, Helvetica, Arial, sans-serif",
               size: 11,
-              color: "black"
+              color: "black",
             },
             showarrow: true,
             ax: 0,
-            ay: -20
-          }
-        ]
+            ay: -20,
+          },
+        ],
       },
       // ----- LAYOUT 2b -----
       layout2b: {
@@ -752,7 +823,7 @@ export default {
           r: 50,
           b: 30,
           t: 30,
-          pad: 4
+          pad: 4,
         },
         spikedistance: 200,
         hoverdistance: 100,
@@ -766,21 +837,21 @@ export default {
           tickfont: {
             family: "Avenir, Helvetica, Arial, sans-serif",
             size: 12,
-            color: "black"
+            color: "black",
           },
           dtick: 200,
           showcrossline: true,
           spikemode: "across",
           spikecolor: "green",
           spikedash: "solid",
-          spikethickness: 2
+          spikethickness: 2,
         },
         yaxis: {
           title: "Frame 2",
           titlefont: {
             family: "Avenir, Helvetica, Arial, sans-serif",
             size: 14,
-            color: "grey"
+            color: "grey",
           },
           showgrid: false,
           showline: true,
@@ -791,11 +862,11 @@ export default {
           tickfont: {
             family: "Avenir, Helvetica, Arial, sans-serif",
             size: 12,
-            color: "black"
+            color: "black",
           },
           range: [0, 1],
           dtick: 0.5,
-          tickformat: ".1f"
+          tickformat: ".1f",
         },
         shapes: [
           {
@@ -808,8 +879,8 @@ export default {
             line: {
               color: "red",
               width: 1.5,
-              dash: "dot"
-            }
+              dash: "dot",
+            },
           },
           {
             type: "line",
@@ -821,10 +892,10 @@ export default {
             line: {
               color: "red",
               width: 1.5,
-              dash: "dot"
-            }
-          }
-        ]
+              dash: "dot",
+            },
+          },
+        ],
       },
       // ----- LAYOUT 3b -----
       layout3b: {
@@ -837,7 +908,7 @@ export default {
           r: 50,
           b: 60,
           t: 30,
-          pad: 4
+          pad: 4,
         },
         spikedistance: 200,
         hoverdistance: 100,
@@ -846,7 +917,7 @@ export default {
           titlefont: {
             family: "Avenir, Helvetica, Arial, sans-serif",
             size: 14,
-            color: "grey"
+            color: "grey",
           },
           showgrid: false,
           showline: true,
@@ -855,7 +926,7 @@ export default {
           tickfont: {
             family: "Avenir, Helvetica, Arial, sans-serif",
             size: 12,
-            color: "black"
+            color: "black",
           },
           ticklen: 7,
           tickwidth: 2,
@@ -864,14 +935,14 @@ export default {
           spikemode: "across",
           spikecolor: "green",
           spikedash: "solid",
-          spikethickness: 2
+          spikethickness: 2,
         },
         yaxis: {
           title: "Frame 3",
           titlefont: {
             family: "Avenir, Helvetica, Arial, sans-serif",
             size: 14,
-            color: "grey"
+            color: "grey",
           },
           showgrid: false,
           showline: true,
@@ -880,13 +951,13 @@ export default {
           tickfont: {
             family: "Avenir, Helvetica, Arial, sans-serif",
             size: 12,
-            color: "black"
+            color: "black",
           },
           ticklen: 7,
           tickwidth: 2,
           range: [0, 1],
           dtick: 0.5,
-          tickformat: ".1f"
+          tickformat: ".1f",
         },
         shapes: [
           {
@@ -899,8 +970,8 @@ export default {
             line: {
               color: "red",
               width: 1.5,
-              dash: "dot"
-            }
+              dash: "dot",
+            },
           },
           {
             type: "line",
@@ -912,10 +983,10 @@ export default {
             line: {
               color: "red",
               width: 1.5,
-              dash: "dot"
-            }
-          }
-        ]
+              dash: "dot",
+            },
+          },
+        ],
       },
       // ----- LAYOUT 4b -----
       layout4b: {
@@ -928,7 +999,7 @@ export default {
           r: 50,
           b: 30,
           t: 30,
-          pad: 4
+          pad: 4,
         },
         spikedistance: 200,
         hoverdistance: 100,
@@ -943,20 +1014,20 @@ export default {
           tickfont: {
             family: "Avenir, Helvetica, Arial, sans-serif",
             size: 12,
-            color: "black"
+            color: "black",
           },
           showcrossline: true,
           spikemode: "across",
           spikecolor: "green",
           spikedash: "solid",
-          spikethickness: 2
+          spikethickness: 2,
         },
         yaxis: {
           title: "Frame 4",
           titlefont: {
             family: "Avenir, Helvetica, Arial, sans-serif",
             size: 14,
-            color: "grey"
+            color: "grey",
           },
           showgrid: false,
           showline: true,
@@ -970,8 +1041,8 @@ export default {
           tickfont: {
             family: "Avenir, Helvetica, Arial, sans-serif",
             size: 12,
-            color: "black"
-          }
+            color: "black",
+          },
         },
         shapes: [
           {
@@ -984,8 +1055,8 @@ export default {
             line: {
               color: "red",
               width: 1.5,
-              dash: "dot"
-            }
+              dash: "dot",
+            },
           },
           {
             type: "line",
@@ -997,9 +1068,9 @@ export default {
             line: {
               color: "red",
               width: 1.5,
-              dash: "dot"
-            }
-          }
+              dash: "dot",
+            },
+          },
         ],
         annotations: [
           {
@@ -1011,11 +1082,11 @@ export default {
             font: {
               family: "Avenir, Helvetica, Arial, sans-serif",
               size: 11,
-              color: "black"
+              color: "black",
             },
             showarrow: true,
             ax: 0,
-            ay: -20
+            ay: -20,
           },
           {
             x: this.stop,
@@ -1026,13 +1097,13 @@ export default {
             font: {
               family: "Avenir, Helvetica, Arial, sans-serif",
               size: 11,
-              color: "black"
+              color: "black",
             },
             showarrow: true,
             ax: 0,
-            ay: -20
-          }
-        ]
+            ay: -20,
+          },
+        ],
       },
       // ----- LAYOUT 5b -----
       layout5b: {
@@ -1045,7 +1116,7 @@ export default {
           r: 50,
           b: 30,
           t: 30,
-          pad: 4
+          pad: 4,
         },
         spikedistance: 200,
         hoverdistance: 100,
@@ -1060,20 +1131,20 @@ export default {
           tickfont: {
             family: "Avenir, Helvetica, Arial, sans-serif",
             size: 12,
-            color: "black"
+            color: "black",
           },
           showcrossline: true,
           spikemode: "across",
           spikecolor: "green",
           spikedash: "solid",
-          spikethickness: 2
+          spikethickness: 2,
         },
         yaxis: {
           title: "Frame 5",
           titlefont: {
             family: "Avenir, Helvetica, Arial, sans-serif",
             size: 14,
-            color: "grey"
+            color: "grey",
           },
           showgrid: false,
           showline: true,
@@ -1087,8 +1158,8 @@ export default {
           tickfont: {
             family: "Avenir, Helvetica, Arial, sans-serif",
             size: 12,
-            color: "black"
-          }
+            color: "black",
+          },
         },
         shapes: [
           {
@@ -1101,8 +1172,8 @@ export default {
             line: {
               color: "red",
               width: 1.5,
-              dash: "dot"
-            }
+              dash: "dot",
+            },
           },
           {
             type: "line",
@@ -1114,10 +1185,10 @@ export default {
             line: {
               color: "red",
               width: 1.5,
-              dash: "dot"
-            }
-          }
-        ]
+              dash: "dot",
+            },
+          },
+        ],
       },
       // ----- LAYOUT 6b -----
       layout6b: {
@@ -1130,7 +1201,7 @@ export default {
           r: 50,
           b: 60,
           t: 30,
-          pad: 4
+          pad: 4,
         },
         spikedistance: 200,
         hoverdistance: 100,
@@ -1139,7 +1210,7 @@ export default {
           titlefont: {
             family: "Avenir, Helvetica, Arial, sans-serif",
             size: 14,
-            color: "grey"
+            color: "grey",
           },
           showgrid: false,
           showline: true,
@@ -1151,20 +1222,20 @@ export default {
           tickfont: {
             family: "Avenir, Helvetica, Arial, sans-serif",
             size: 12,
-            color: "black"
+            color: "black",
           },
           showcrossline: true,
           spikemode: "across",
           spikecolor: "green",
           spikedash: "solid",
-          spikethickness: 2
+          spikethickness: 2,
         },
         yaxis: {
           title: "Frame 6",
           titlefont: {
             family: "Avenir, Helvetica, Arial, sans-serif",
             size: 14,
-            color: "grey"
+            color: "grey",
           },
           showgrid: false,
           showline: true,
@@ -1178,8 +1249,8 @@ export default {
           tickfont: {
             family: "Avenir, Helvetica, Arial, sans-serif",
             size: 12,
-            color: "black"
-          }
+            color: "black",
+          },
         },
         shapes: [
           {
@@ -1192,8 +1263,8 @@ export default {
             line: {
               color: "red",
               width: 1.5,
-              dash: "dot"
-            }
+              dash: "dot",
+            },
           },
           {
             type: "line",
@@ -1205,13 +1276,13 @@ export default {
             line: {
               color: "red",
               width: 1.5,
-              dash: "dot"
-            }
-          }
-        ]
+              dash: "dot",
+            },
+          },
+        ],
       },
     };
-  }
+  },
 };
 </script>
 

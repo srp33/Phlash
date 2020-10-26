@@ -112,19 +112,6 @@
                 >7-Zip</a
               >.
             </p>
-            <!-- <button
-              class="btn btn-light btn-step"
-              style="position: relative"
-              @click="downloadInputFiles"
-            >
-              <loading
-                :active.sync="downloadLoading"
-                :is-full-page="false"
-                :height="20"
-                :width="20"
-              ></loading>
-              <strong>Download FASTA file</strong>
-            </button> -->
             <p v-if="downloadLoading">Downloading...</p>
           </li>
           <li class="step">
@@ -139,8 +126,9 @@
             <div class="alert alert-warning" v-if="clickedNCBI">
               This will take several minutes. If it seems to be taking a long
               time, it is still probably working correctly. For help
-              troubleshooting, 
-              <a href="#" @click="goToHelp" class="alert-link">visit the FAQ</a>.
+              troubleshooting,
+              <a href="#" @click="goToHelp" class="alert-link">visit the FAQ</a
+              >.
             </div>
             <ul>
               <li>
@@ -264,7 +252,7 @@
                         height="2em"
                         viewBox="0 0 16 16"
                         class="bi bi-trash"
-                        fill="this.backgroundColor"
+                        fill="currentColor"
                         xmlns="http://www.w3.org/2000/svg"
                       >
                         <path
@@ -361,7 +349,9 @@ export default {
     Loading,
     Navbar,
   },
+
   data() {
+
     return {
       downloadLoading: false,
       blastLoading: false,
@@ -376,26 +366,36 @@ export default {
       numFiles: null,
       fileNames: [],
     };
+
   },
+
   created() {
     this.setNumFiles();
   },
+
   computed: {
+
     navUpload: function () {
       return true;
     },
+
     navDNAMaster: function () {
       return true;
     },
+
     navBlast: function () {
       return true;
     },
+
     navAnnotations: function () {
       if (this.blastDownloaded && this.blastUploaded) return true;
       else return false;
     },
+
   },
+
   watch: {
+
     blastDownloaded: function () {
       if (this.blastDownloaded && this.blastUploaded) {
         document.getElementById("next-top").classList.remove("disabled");
@@ -405,6 +405,7 @@ export default {
         document.getElementById("next-bottom").classList.add("disabled");
       }
     },
+
     blastUploaded: function () {
       if (this.blastDownloaded && this.blastUploaded) {
         document.getElementById("next-top").classList.remove("disabled");
@@ -414,8 +415,11 @@ export default {
         document.getElementById("next-bottom").classList.add("disabled");
       }
     },
+
   },
+
   methods: {
+
     clearNotifications() {
       this.showBlastDangerAlert = false;
       this.showBlastSuccessAlert = false;
@@ -437,6 +441,7 @@ export default {
           console.log(error);
         });
     },
+
     downloadInputFiles() {
       this.downloadLoading = true;
       axios
@@ -464,6 +469,7 @@ export default {
           console.log(error);
         });
     },
+
     setNumFiles() {
       axios
         .post(
@@ -475,6 +481,7 @@ export default {
           this.displayOutputFiles();
         });
     },
+
     goToNCBI() {
       window.open(
         "https://blast.ncbi.nlm.nih.gov/Blast.cgi?PAGE=Proteins",
@@ -482,6 +489,7 @@ export default {
       );
       this.clickedNCBI = true;
     },
+
     goToHelp() {
       window.open(
         "https://blast.ncbi.nlm.nih.gov/Blast.cgi?CMD=Web&PAGE_TYPE=Blastdocs",
@@ -521,6 +529,7 @@ export default {
           console.log(error);
         });
     },
+
     handleFilesUpload() {
       this.blastFile = document.querySelector("#blast-upload-form").files.files;
       for (var i = 0; i < this.blastFile.length; i++) {
@@ -529,6 +538,7 @@ export default {
       this.showBlastFiles = true;
       console.log(this.blastFiles);
     },
+
     downloadOutputFile(fileName) {
       axios
         .post(
@@ -546,6 +556,7 @@ export default {
           this.fileDownloaded = true;
         });
     },
+
     uploadOutputFiles(e) {
       this.blastLoading = true;
       var data = new FormData();
@@ -628,6 +639,7 @@ export default {
         this.uploadOutputFiles();
       }
     },
+
   },
 };
 </script>
@@ -775,5 +787,4 @@ h1 {
 .file-list {
   padding-top: 20px;
 }
-
 </style>

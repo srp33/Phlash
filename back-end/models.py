@@ -3,9 +3,7 @@ Declaring models (tables) using Flask-SQLAlchemy for use in each phage's databas
 """
 from flask_sqlalchemy import SQLAlchemy
 
-
 db = SQLAlchemy()
-
 
 class DNAMaster(db.Model):
     __tablename__ = "dnamaster"

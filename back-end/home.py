@@ -1,3 +1,6 @@
+"""
+Contains the methods for the Home page.
+"""
 import main
 from pathlib import Path
 from flask import *
@@ -6,6 +9,7 @@ import os
 import shutil
 import arrow
 from builtins import FileExistsError
+import models
 
 response_object = {}
 USERS = []

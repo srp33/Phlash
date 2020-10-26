@@ -1,45 +1,113 @@
 <template>
   <div class="wrapper" @click="clearNotifications()">
-    <Navbar :upload="navUpload" :dnamaster="navDNAMaster" :blast="navBlast" :annotations="navAnnotations" />
+    <Navbar
+      :upload="navUpload"
+      :dnamaster="navDNAMaster"
+      :blast="navBlast"
+      :annotations="navAnnotations"
+    />
     <div class="container">
       <h1>Upload Files</h1>
       <div class="alert alert-primary">
         <p><strong>Instructions</strong></p>
         <p>Please upload the following files:</p>
         <ul>
-          <li v-if="!fasta">FASTA file containing the full genome* <strong>(.fasta, .fna)</strong></li>
-          <li v-if="!genbank">GenBank file from DNA Master <strong>(.gb, .gbk)</strong></li>
+          <li v-if="!fasta">
+            FASTA file containing the full genome*
+            <strong>(.fasta, .fna)</strong>
+          </li>
+          <li v-if="!genbank">
+            GenBank file from DNA Master <strong>(.gb, .gbk)</strong>
+          </li>
           <li v-if="fasta && genbank">
             You have uploaded all required files. Click 'Next' to continue.
           </li>
         </ul>
         <div class="alert alert-warning" v-if="showDelayMessage">
-          <svg class="bi bi-info-circle-fill" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-            <path fill-rule="evenodd" d="M8 16A8 8 0 108 0a8 8 0 000 16zm.93-9.412l-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM8 5.5a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"/>
+          <svg
+            class="bi bi-info-circle-fill"
+            width="1em"
+            height="1em"
+            viewBox="0 0 16 16"
+            fill="currentColor"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              fill-rule="evenodd"
+              d="M8 16A8 8 0 108 0a8 8 0 000 16zm.93-9.412l-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM8 5.5a1 1 0 100-2 1 1 0 000 2z"
+              clip-rule="evenodd"
+            />
           </svg>
           GeneMark is automatically executed once you upload your FASTA file.<br />
-          <svg class="bi bi-info-circle-fill" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-            <path fill-rule="evenodd" d="M8 16A8 8 0 108 0a8 8 0 000 16zm.93-9.412l-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM8 5.5a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"/>
+          <svg
+            class="bi bi-info-circle-fill"
+            width="1em"
+            height="1em"
+            viewBox="0 0 16 16"
+            fill="currentColor"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              fill-rule="evenodd"
+              d="M8 16A8 8 0 108 0a8 8 0 000 16zm.93-9.412l-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM8 5.5a1 1 0 100-2 1 1 0 000 2z"
+              clip-rule="evenodd"
+            />
           </svg>
-          Files are read and parsed as they are uploaded. Keep this in mind if uploading files take a moment.
+          Files are read and parsed as they are uploaded. Keep this in mind if
+          uploading files take a moment.
         </div>
         <div class="nav-btns-wrapper">
           <router-link :to="{ name: 'Home' }">
             <button class="btn btn-light btn-nav">
-              <svg class="bi bi-arrow-left" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                <path fill-rule="evenodd" d="M5.854 4.646a.5.5 0 010 .708L3.207 8l2.647 2.646a.5.5 0 01-.708.708l-3-3a.5.5 0 010-.708l3-3a.5.5 0 01.708 0z" clip-rule="evenodd"/>
-                <path fill-rule="evenodd" d="M2.5 8a.5.5 0 01.5-.5h10.5a.5.5 0 010 1H3a.5.5 0 01-.5-.5z" clip-rule="evenodd"/>
+              <svg
+                class="bi bi-arrow-left"
+                width="1em"
+                height="1em"
+                viewBox="0 0 16 16"
+                fill="currentColor"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  fill-rule="evenodd"
+                  d="M5.854 4.646a.5.5 0 010 .708L3.207 8l2.647 2.646a.5.5 0 01-.708.708l-3-3a.5.5 0 010-.708l3-3a.5.5 0 01.708 0z"
+                  clip-rule="evenodd"
+                />
+                <path
+                  fill-rule="evenodd"
+                  d="M2.5 8a.5.5 0 01.5-.5h10.5a.5.5 0 010 1H3a.5.5 0 01-.5-.5z"
+                  clip-rule="evenodd"
+                />
               </svg>
               <strong>Back</strong>
             </button>
           </router-link>
-          <router-link :to="{ name: 'DNAMaster', params: {phageID: $route.params.phageID} }"
-                       :event="fasta && genbank ? 'click' : ''">
+          <router-link
+            :to="{
+              name: 'DNAMaster',
+              params: { phageID: $route.params.phageID },
+            }"
+            :event="fasta && genbank ? 'click' : ''"
+          >
             <button class="btn btn-light btn-nav disabled" id="next-top">
               <strong>Next</strong>
-              <svg class="bi bi-arrow-right" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                <path fill-rule="evenodd" d="M10.146 4.646a.5.5 0 01.708 0l3 3a.5.5 0 010 .708l-3 3a.5.5 0 01-.708-.708L12.793 8l-2.647-2.646a.5.5 0 010-.708z" clip-rule="evenodd"/>
-                <path fill-rule="evenodd" d="M2 8a.5.5 0 01.5-.5H13a.5.5 0 010 1H2.5A.5.5 0 012 8z" clip-rule="evenodd"/>
+              <svg
+                class="bi bi-arrow-right"
+                width="1em"
+                height="1em"
+                viewBox="0 0 16 16"
+                fill="currentColor"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  fill-rule="evenodd"
+                  d="M10.146 4.646a.5.5 0 01.708 0l3 3a.5.5 0 010 .708l-3 3a.5.5 0 01-.708-.708L12.793 8l-2.647-2.646a.5.5 0 010-.708z"
+                  clip-rule="evenodd"
+                />
+                <path
+                  fill-rule="evenodd"
+                  d="M2 8a.5.5 0 01.5-.5H13a.5.5 0 010 1H2.5A.5.5 0 012 8z"
+                  clip-rule="evenodd"
+                />
               </svg>
             </button>
           </router-link>
@@ -48,24 +116,59 @@
 
       <div class="upload-wrapper">
         <h5 class="upload-title">Fasta file</h5>
-        <div class="alert alert-warning" id="fasta-warning-alert" role="alert" v-if="showNoMoreFastaFiles"></div>
-        <div class="alert alert-success" id="fasta-success-alert" role="alert" v-if="showFastaSuccessAlert"></div>
-        <div class="alert alert-danger" id="fasta-danger-alert" role="alert" v-if="showFastaDangerAlert"></div>
+        <div
+          class="alert alert-warning"
+          id="fasta-warning-alert"
+          role="alert"
+          v-if="showNoMoreFastaFiles"
+        ></div>
+        <div
+          class="alert alert-success"
+          id="fasta-success-alert"
+          role="alert"
+          v-if="showFastaSuccessAlert"
+        ></div>
+        <div
+          class="alert alert-danger"
+          id="fasta-danger-alert"
+          role="alert"
+          v-if="showFastaDangerAlert"
+        ></div>
         <div class="upload">
-          <form id="fasta-upload-form" role="form" enctype="multipart/form-data">
+          <form
+            id="fasta-upload-form"
+            role="form"
+            enctype="multipart/form-data"
+          >
             <div class="upload-btn-wrapper">
               <button class="btn btn-upload">
-                <loading :active.sync="fastaLoading" :is-full-page="false" :height="80" :width="80"></loading>
+                <loading
+                  :active.sync="fastaLoading"
+                  :is-full-page="false"
+                  :height="80"
+                  :width="80"
+                ></loading>
                 Drag files here or click to browse <br />
                 <div class="selected-file" v-if="showFastaFile">
                   <strong>Selected file: {{ this.fastaFile.name }}</strong>
                 </div>
               </button>
-              <input class="form-control" id="file" type="file" ref="file" name="file" v-on:change="handleFileUpload('fasta')" />
+              <input
+                class="form-control"
+                id="file"
+                type="file"
+                ref="file"
+                name="file"
+                v-on:change="handleFileUpload('fasta')"
+              />
             </div>
           </form>
         </div>
-        <button class="btn btn-dark btn-upload-submit" v-if="showFastaFile" @click="uploadFile('fasta')" >
+        <button
+          class="btn btn-dark btn-upload-submit"
+          v-if="showFastaFile"
+          @click="uploadFile('fasta')"
+        >
           <strong>Upload</strong>
         </button>
         <div class="file-list" v-if="fasta">
@@ -94,7 +197,7 @@
           </button>
           <button
             class="btn btn-light btn-trash"
-            @click="deleteFile(fastaFileName, 'fasta')"
+            @click="showFastaModal = true"
           >
             <strong>Delete</strong> {{ fastaFileName }}
             <svg
@@ -119,24 +222,59 @@
 
       <div class="upload-wrapper genbank">
         <h5 class="upload-title">GenBank file</h5>
-        <div class="alert alert-warning" id="genbank-warning-alert" role="alert" v-if="showNoMoreGenbankFiles"></div>
-        <div class="alert alert-success" id="genbank-success-alert" role="alert" v-if="showGenBankSuccessAlert" ></div>
-        <div class="alert alert-danger" id="genbank-danger-alert" role="alert" v-if="showGenBankDangerAlert"></div>
+        <div
+          class="alert alert-warning"
+          id="genbank-warning-alert"
+          role="alert"
+          v-if="showNoMoreGenbankFiles"
+        ></div>
+        <div
+          class="alert alert-success"
+          id="genbank-success-alert"
+          role="alert"
+          v-if="showGenBankSuccessAlert"
+        ></div>
+        <div
+          class="alert alert-danger"
+          id="genbank-danger-alert"
+          role="alert"
+          v-if="showGenBankDangerAlert"
+        ></div>
         <div class="upload">
-          <form id="genbank-upload-form" role="form" enctype="multipart/form-data">
+          <form
+            id="genbank-upload-form"
+            role="form"
+            enctype="multipart/form-data"
+          >
             <div class="upload-btn-wrapper">
               <button class="btn btn-upload">
-                <loading :active.sync="genbankLoading" :is-full-page="false" :height="80" :width="80"></loading>
+                <loading
+                  :active.sync="genbankLoading"
+                  :is-full-page="false"
+                  :height="80"
+                  :width="80"
+                ></loading>
                 Drag files here or click to browse <br />
                 <div class="selected-file" v-if="showGenBankFile">
                   <strong>Selected file: {{ this.genbankFile.name }}</strong>
                 </div>
               </button>
-              <input class="form-control" id="file" type="file" ref="file" name="file" v-on:change="handleFileUpload('genbank')" />
+              <input
+                class="form-control"
+                id="file"
+                type="file"
+                ref="file"
+                name="file"
+                v-on:change="handleFileUpload('genbank')"
+              />
             </div>
           </form>
         </div>
-        <button class="btn btn-dark btn-upload-submit" v-if="showGenBankFile" @click="uploadFile('genbank')">
+        <button
+          class="btn btn-dark btn-upload-submit"
+          v-if="showGenBankFile"
+          @click="uploadFile('genbank')"
+        >
           <strong>Upload</strong>
         </button>
         <div class="file-list" v-if="genbank">
@@ -165,7 +303,7 @@
           </button>
           <button
             class="btn btn-light btn-trash"
-            @click="deleteFile(genbankFileName, 'gb')"
+            @click="showGenBankModal = true"
           >
             <strong>Delete</strong> {{ genbankFileName }}
             <svg
@@ -187,29 +325,103 @@
           </button>
         </div>
       </div>
-      
       <div class="nav-btns-wrapper">
         <router-link :to="{ name: 'Home' }">
           <button class="btn btn-light btn-nav">
-            <svg class="bi bi-arrow-left" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-              <path fill-rule="evenodd" d="M5.854 4.646a.5.5 0 010 .708L3.207 8l2.647 2.646a.5.5 0 01-.708.708l-3-3a.5.5 0 010-.708l3-3a.5.5 0 01.708 0z" clip-rule="evenodd"/>
-              <path fill-rule="evenodd" d="M2.5 8a.5.5 0 01.5-.5h10.5a.5.5 0 010 1H3a.5.5 0 01-.5-.5z" clip-rule="evenodd"/>
+            <svg
+              class="bi bi-arrow-left"
+              width="1em"
+              height="1em"
+              viewBox="0 0 16 16"
+              fill="currentColor"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M5.854 4.646a.5.5 0 010 .708L3.207 8l2.647 2.646a.5.5 0 01-.708.708l-3-3a.5.5 0 010-.708l3-3a.5.5 0 01.708 0z"
+                clip-rule="evenodd"
+              />
+              <path
+                fill-rule="evenodd"
+                d="M2.5 8a.5.5 0 01.5-.5h10.5a.5.5 0 010 1H3a.5.5 0 01-.5-.5z"
+                clip-rule="evenodd"
+              />
             </svg>
             <strong>Back</strong>
           </button>
         </router-link>
-        <router-link :to="{ name: 'DNAMaster', params: {phageID: $route.params.phageID} }"
-                      :event="fasta && genbank ? 'click' : ''">
+        <router-link
+          :to="{
+            name: 'DNAMaster',
+            params: { phageID: $route.params.phageID },
+          }"
+          :event="fasta && genbank ? 'click' : ''"
+        >
           <button class="btn btn-light btn-nav disabled" id="next-bottom">
             <strong>Next</strong>
-            <svg class="bi bi-arrow-right" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-              <path fill-rule="evenodd" d="M10.146 4.646a.5.5 0 01.708 0l3 3a.5.5 0 010 .708l-3 3a.5.5 0 01-.708-.708L12.793 8l-2.647-2.646a.5.5 0 010-.708z" clip-rule="evenodd"/>
-              <path fill-rule="evenodd" d="M2 8a.5.5 0 01.5-.5H13a.5.5 0 010 1H2.5A.5.5 0 012 8z" clip-rule="evenodd"/>
+            <svg
+              class="bi bi-arrow-right"
+              width="1em"
+              height="1em"
+              viewBox="0 0 16 16"
+              fill="currentColor"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M10.146 4.646a.5.5 0 01.708 0l3 3a.5.5 0 010 .708l-3 3a.5.5 0 01-.708-.708L12.793 8l-2.647-2.646a.5.5 0 010-.708z"
+                clip-rule="evenodd"
+              />
+              <path
+                fill-rule="evenodd"
+                d="M2 8a.5.5 0 01.5-.5H13a.5.5 0 010 1H2.5A.5.5 0 012 8z"
+                clip-rule="evenodd"
+              />
             </svg>
           </button>
         </router-link>
       </div>
     </div>
+    <b-modal
+      v-model="showGenBankModal"
+      ref="GBModal"
+      title="Warning!"
+      hide-footer
+    >
+      <p>
+        Deleting this file will remove all progress that you have made on this
+        phage.
+      </p>
+      <hr />
+      <b-button
+        class="mt-3"
+        block
+        style="margin-top: 0px"
+        @click="deleteFile(genbankFileName, 'gb')"
+      >
+        <strong>Delete GenBank file</strong>
+      </b-button>
+    </b-modal>
+    <b-modal
+      v-model="showFastaModal"
+      ref="FastaModal"
+      title="Warning!"
+      hide-footer
+    >
+      <p>
+        Deleting this file will remove all progress that you have made on this
+        phage.
+      </p>
+      <hr />
+      <b-button
+        class="mt-3"
+        block
+        style="margin-top: 0px"
+        @click="deleteFile(fastaFileName, 'fasta')"
+      >
+        <strong>Delete Fasta file</strong>
+      </b-button>
+    </b-modal>
   </div>
 </template>
 
@@ -224,9 +436,11 @@ export default {
   name: "Upload",
   components: {
     Loading,
-    Navbar
+    Navbar,
   },
+
   data() {
+
     return {
       fasta: false,
       fastaFile: null,
@@ -245,41 +459,56 @@ export default {
       showDelayMessage: false,
       showNoMoreFastaFiles: false,
       showNoMoreGenbankFiles: false,
+      showFastaModal: false,
+      showGenBankModal: false,
     };
+
   },
+
   created() {
     this.checkIfFilesUploaded();
     this.displayFiles();
   },
+
   computed: {
-    navUpload: function() {
+
+    navUpload: function () {
       return true;
     },
-    navDNAMaster: function() {
+
+    navDNAMaster: function () {
       if (this.fasta && this.genbank) return true;
       else return false;
     },
-    navBlast: function() {
+
+    navBlast: function () {
       return false;
     },
-    navAnnotations: function() {
+
+    navAnnotations: function () {
       return false;
     },
+
   },
+
   watch: {
-    fasta: function() {
+
+    fasta: function () {
       if (this.fasta && this.genbank) {
         document.getElementById("next-top").classList.remove("disabled");
         document.getElementById("next-bottom").classList.remove("disabled");
       }
     },
-    genbank: function() {
+
+    genbank: function () {
       if (this.fasta && this.genbank) {
         document.getElementById("next-top").classList.remove("disabled");
         document.getElementById("next-bottom").classList.remove("disabled");
       }
-    }
+    },
+
   },
+
   methods: {
     clearNotifications() {
       this.showFastaDangerAlert = false;
@@ -287,25 +516,36 @@ export default {
       this.showGenBankDangerAlert = false;
       this.showGenBankSuccessAlert = false;
     },
+
     checkIfFilesUploaded() {
-      axios.get(process.env.VUE_APP_BASE_URL + `/check_upload/${this.$route.params.phageID}`)
-        .then(response => {
+      axios
+        .get(
+          process.env.VUE_APP_BASE_URL +
+            `/check_upload/${this.$route.params.phageID}`
+        )
+        .then((response) => {
           this.fasta = response.data.fasta;
           this.genbank = response.data.genbank;
         })
-        .catch(error => {
-          console.log(error)
-        })
+        .catch((error) => {
+          console.log(error);
+        });
     },
+
     handleFileUpload(fileType) {
       if (fileType === "fasta") {
-        this.fastaFile = document.querySelector(`#${fileType}-upload-form`).file.files[0];
+        this.fastaFile = document.querySelector(
+          `#${fileType}-upload-form`
+        ).file.files[0];
         this.showFastaFile = true;
       } else if (fileType === "genbank") {
-        this.genbankFile = document.querySelector(`#${fileType}-upload-form`).file.files[0];
+        this.genbankFile = document.querySelector(
+          `#${fileType}-upload-form`
+        ).file.files[0];
         this.showGenBankFile = true;
       }
     },
+
     uploadFile(fileType, e) {
       var data = new FormData();
       this.showFastaDangerAlert = false;
@@ -315,7 +555,8 @@ export default {
       if (fileType === "fasta") {
         if (this.fastaFileName != null) {
           this.showNoMoreFastaFiles = true;
-          let warningMessage = "You must remove a file before uploading another.";
+          let warningMessage =
+            "You must remove a file before uploading another.";
           Vue.nextTick(() => {
             document.getElementById(
               "fasta-warning-alert"
@@ -325,11 +566,11 @@ export default {
         }
         this.fastaLoading = true;
         data.append("file", this.fastaFile);
-      }
-      else if (fileType === "genbank") {
+      } else if (fileType === "genbank") {
         if (this.genbankFileName != null) {
           this.showNoMoreGenbankFiles = true;
-          let warningMessage = "You must remove a file before uploading another.";
+          let warningMessage =
+            "You must remove a file before uploading another.";
           Vue.nextTick(() => {
             document.getElementById(
               "genbank-warning-alert"
@@ -344,15 +585,18 @@ export default {
       this.showNoMoreGenbankFiles = false;
       this.showDelayMessage = true;
       data.append("fileType", fileType);
-      axios.post(process.env.VUE_APP_BASE_URL + `/upload/${this.$route.params.phageID}/upload/none`,
+      axios
+        .post(
+          process.env.VUE_APP_BASE_URL +
+            `/upload/${this.$route.params.phageID}/upload/none`,
           data,
           {
             headers: {
-              "Content-Type": "multipart/form-data"
-            }
+              "Content-Type": "multipart/form-data",
+            },
           }
         )
-        .then(response => {
+        .then((response) => {
           if (typeof response.data.uploaded !== "undefined") {
             let fileExt = response.data.uploaded.split(".").pop();
             if (fileExt === "fasta" || fileExt === "fna") {
@@ -389,14 +633,14 @@ export default {
                 `${fileType}-danger-alert`
               ).innerHTML = dangerMessage;
             });
-        }
-        this.showDelayMessage = false;
-      })
-      .catch(error => {
-        console.log(error);
-      });
+          }
+          this.showDelayMessage = false;
+        })
+        .catch((error) => {
+          console.log(error);
+        });
     },
-    
+
     displayFiles() {
       axios
         .post(
@@ -405,10 +649,11 @@ export default {
         )
         .then((response) => {
           console.log(response);
-          if (response.data.fasta_file != "Not found") this.fastaFileName = response.data.fasta_file;
-          this.fasta = true;
+          if (response.data.fasta_file != "Not found")
+            this.fastaFileName = response.data.fasta_file;
           console.log(this.fastaFileName);
-          if (response.data.genbank_file != "Not found") this.genbankFileName = response.data.genbank_file;
+          if (response.data.genbank_file != "Not found")
+            this.genbankFileName = response.data.genbank_file;
         })
         .catch((error) => {
           console.log(error);
@@ -423,10 +668,11 @@ export default {
         )
         .then((response) => {
           if (type == "gb") {
+            this.$refs.GBModal.hide();
             this.genbank = false;
             this.genbankFileName = null;
-          }
-          else {
+          } else {
+            this.$refs.FastaModal.hide();
             this.fasta = false;
             this.fastaFileName = null;
           }
@@ -436,6 +682,7 @@ export default {
           console.log(error);
         });
     },
+
     downloadFile(fileName) {
       axios
         .post(
@@ -453,7 +700,8 @@ export default {
           this.fileDownloaded = true;
         });
     },
-  }
+
+  },
 };
 </script>
 
@@ -583,5 +831,4 @@ h1 {
 .alert-warning {
   margin-top: 20px;
 }
-/* ----- Rest of Page ----- */
 </style>
