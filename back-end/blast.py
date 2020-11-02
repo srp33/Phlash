@@ -86,7 +86,6 @@ def get_blast_output_names(UPLOAD_FOLDER):
     for file in os.listdir(UPLOAD_FOLDER):
         if file.endswith(".json"):
             file_names.append(file)
-    print(file_names)
     response_object["file_names"] = file_names
 
     return response_object
@@ -157,15 +156,26 @@ def create_blast_fasta(current_user, fasta_file, gdata_file):
     for cds in db.session.query(DNAMaster).order_by(DNAMaster.start):
         starts, stops = get_starts_stops(cds.id, genome, gdata_file)
         cds.start_options = ", ".join([str(start) for start in starts])
+        cds.stop_options = ", ".join([str(stop) for stop in stops])
         db.session.commit()
         for i in range(len(starts)):
-            if starts[i] == cds.start:
-                output += f">{cds.id}, {starts[i]}-{stops[i]}\n"
+            if cds.strand == '+':
+                # if starts[i] == cds.start:
+                #     output += f">{cds.id}, {starts[i]}-{stops[i]}\n"
+                #     output += f"{Seq.translate(sequence=helper.get_sequence(genome, cds.strand, starts[i]-1, stops[i]), table=11)}\n"
+                # else:
+                output += f">{cds.id}_{i + 1}, {starts[i]}-{stops[i]}\n"
                 output += f"{Seq.translate(sequence=helper.get_sequence(genome, cds.strand, starts[i]-1, stops[i]), table=11)}\n"
             else:
-                output += f">{cds.id}_{i}, {starts[i]}-{stops[i]}\n"
-                output += f"{Seq.translate(sequence=helper.get_sequence(genome, cds.strand, starts[i]-1, stops[i]), table=11)}\n"
-            if getsizeof(output) > 15000:  # only file size to reach 30 kb, else you get a CPU limit from NCBI blast
+                # if starts[i] == cds.start:
+                #     output += f">{cds.id}, {starts[i]}-{stops[i]}\n"
+                #     output += f"{Seq.translate(sequence=helper.get_sequence(genome, cds.strand, stops[i], starts[i]-1, table=11)}\n"
+                # else:
+                output += f">{cds.id}_{i + 1}, {starts[i]}-{stops[i]}\n"
+                start = len(genome) - stops[i]
+                stop = len(genome) - starts[i] + 1
+                output += f"{Seq.translate(sequence=helper.get_sequence(genome, cds.strand, start, stop), table=11)}\n"
+            if getsizeof(output) > 15000:  # only file size to reach 15 kb, else you get a CPU limit from NCBI blast
                 with open(out_file, "w") as f:
                     f.write(output)
                 output = ""
@@ -202,19 +212,19 @@ def get_stop_options(genome, start, strand):
         if codon in bacteria_stop_codons:
             return (start + index + 3)
 
-def get_start_options(genome, start, strand, minimum):
+def get_start_options(genome, maximum, strand, minimum):
     '''
-    Finds all the start codons within a range of DNA indicated by the minimum and start parameters.
+    Finds all the start codons within a range of DNA indicated by the minimum and maximum parameters.
     '''
     bacteria_start_codons = ["ATG", "GTG", "TTG"]
     start_options = []
-    newStart = start + 3
+    maximum += 3
     gene = ""
     if (strand != "-"):
-        gene = genome[minimum:newStart]
+        gene = genome[minimum:maximum]
     else:
-        gene = genome.reverse_complement()[minimum:newStart]
-    for index in range(len(gene), 0, -1):
+        gene = genome.reverse_complement()[minimum:maximum]
+    for index in range(0, len(gene)):
         codon = gene[index:index + 3]
         if codon in bacteria_start_codons:
             start_options.append(minimum + index + 1)
@@ -229,33 +239,88 @@ def get_starts_stops(cds_id, genome, genemark_gdata_file):
     gdata_df.columns = ['Base', '1', '2', '3', '4', '5', '6']
     gdata_df = gdata_df.set_index('Base')
 
-    bacteria_start_codons = ["ATG", "GTG", "TTG"]
-    bacteria_stop_codons = ["TAG", "TAA", "TGA"]
     dnamaster_cds = DNAMaster.query.filter_by(id=cds_id).first()
     genemark_cds = GeneMark.query.filter_by(stop=dnamaster_cds.stop).first()
+    print(dnamaster_cds)
+    print(genemark_cds)
 
-    original_start = dnamaster_cds.start - 1  # Subtract 1 because python indexing begins with 0.
-    start = original_start - 1  # Subtract 1 to start one behind the original start.
+    minimum = -100 # 100 base pairs lower than the start position
+    maximum = 100 # 100 base pairs higher than the start position
+    genome_length = len(genome)
+    if dnamaster_cds.strand == '+':
+        if genemark_cds is not None:
+            if (genemark_cds.start < dnamaster_cds.start):
+                minimum += genemark_cds.start
+                if minimum < 0:
+                    minimum = 0
+                maximum += dnamaster_cds.start
+                if maximum >= genome_length:
+                    maximum = genome_length - 1
+            else:
+                minimum += dnamaster_cds.start
+                if minimum < 0:
+                    minimum = 0
+                maximum += genemark_cds.start
+                if maximum >= genome_length:
+                    maximum = genome_length - 1
+        else:
+            minimum += dnamaster_cds.start
+            if minimum < 0:
+                minimum = 0
+            maximum += dnamaster_cds.start
+            if maximum >= genome_length:
+                maximum = genome_length - 1
+    else:
+        d_start = genome_length - dnamaster_cds.stop
+        if genemark_cds is not None:
+            g_start = genome_length - genemark_cds.stop
+            if (g_start < d_start):
+                minimum += g_start
+                if minimum < 0:
+                    minimum = 0
+                maximum += d_start
+                if maximum >= genome_length:
+                    maximum = genome_length - 1
+            else:
+                minimum += d_start
+                if minimum < 0:
+                    minimum = 0
+                maximum += g_start
+                if maximum >= genome_length:
+                    maximum = genome_length - 1
+        else:
+            minimum += d_start
+            if minimum < 0:
+                minimum = 0
+            maximum += d_start
+            if maximum >= genome_length:
+                maximum = genome_length - 1
 
-    possible_start_options = []
-    possible_start_options.append(dnamaster_cds.start)  # Add original start position info
-
-    min_start = original_start if genemark_cds is None else genemark_cds.start - 1
-    num_nucleotides = min_start if min_start < 200 else 200   # Check 200 bp previous to original
-    minimum = min_start - num_nucleotides
-    possible_start_options.extend(get_start_options(genome, start, dnamaster_cds.strand, minimum))
+    possible_start_options = get_start_options(genome, maximum, dnamaster_cds.strand, minimum)
 
     start_options = []
     stop_options = []
     for start in possible_start_options:
         stop_options.append(get_stop_options(genome, start, dnamaster_cds.strand))
-        if (stop_options[-1] - start < 100 and start != dnamaster_cds.start): #FIXME
+        if (stop_options[-1] - start < 75 and start != dnamaster_cds.start):
             stop_options.pop()
         else:
-            start_options.append(start)
+            if dnamaster_cds.strand == '+':
+                start_options.append(start)
+            else:
+                start_options.append(genome_length - start + 1)
+                stop = stop_options.pop()
+                stop_options.append(genome_length - stop + 1)
 
-    dnamaster_cds.start_options = str(start_options)[1:-1]
-    dnamaster_cds.stop_options = str(stop_options)[1:-1]
+    if len(start_options) == 0:
+        start_options.append(dnamaster_cds.start)
+        stop_options.append(dnamaster_cds.stop)
+    
+    # dnamaster_cds.start_options = str(start_options)[1:-1]
+    # dnamaster_cds.stop_options = str(stop_options)[1:-1]
 
-    return start_options, stop_options
+    if dnamaster_cds.strand == '+':
+        return start_options, stop_options
+    else:
+        return stop_options, start_options
 

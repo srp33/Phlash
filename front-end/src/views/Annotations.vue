@@ -26,12 +26,27 @@
         </p>
         <p><strong>Status Definitions</strong></p>
         <p>
-          <strong style="color: green">Pass:</strong> DNA Master's gene call is
+          <strong style="color: green">Green:</strong> Pass, the open reading frame is
           the same as or longer than GeneMark's gene call.<br />
-          <strong style="color: red">Fail:</strong> DNA Master's gene call is
+          <strong style="color: red">Red:</strong> Fail, the open reading frame is
           shorter than GeneMark's gene call.<br />
-          <strong style="color: orange">Undetermined:</strong> DNA Master's gene
-          call has not been called at all in GeneMark.<br />
+          <strong style="color: orange">Orange:</strong> Undetermined, the open reading frame
+          has not been called at all in GeneMark or the stop position differs from GeneMark's gene call.<br />
+          <strong>S: </strong>Short, the open reading frame is less than 
+          200 base pairs.<br />
+          <strong>LLG: </strong>Long leading gap, there is a large gap between this 
+          and the previous gene<br />
+          <strong>LLO: </strong>Long leading overlap, the gene overlaps the previous 
+          gene by more than 10 base pairs.<br />
+          <strong>LTG: </strong>Long tailing gap, the gene overlaps the next 
+          gene by more than 10 base pairs.<br />
+          <strong>LTO: </strong>Long tailing overlap, the gene overlaps the next  
+          gene by more than 10 base pairs.<br />
+          <strong>STG: </strong>Short tailing gap, the gene is on a different strand 
+          than the previous gene and has a gap less than 50 base pairs in length.<br />
+          <strong>SLG: </strong>Short leading gap, the gene is on a different strand 
+          than the next gene and has a gap less than 50 base pairs in length.<br />
+          <strong>GOOD: </strong>The gene has a reasonable length and overlap.     
         </p>
         <div class="nav-btns-wrapper">
           <router-link
@@ -111,12 +126,14 @@
                 <td v-else>{{ curr.function.substring(0, 13) }}...</td>
                 <td v-if="curr.function == 'DELETED'"></td>
                 <td v-else-if="curr.status == 'Pass'" style="color: green">
-                  {{ curr.status }}
+                  {{ getStatus(index) }}
                 </td>
                 <td v-else-if="curr.status == 'Fail'" style="color: red">
-                  {{ curr.status }}
+                  {{ getStatus(index) }}
                 </td>
-                <td v-else style="color: orange">Undetermined</td>
+                <td v-else style="color: orange">
+                  {{ getStatus(index) }}
+                </td>
                 <td v-if="curr.function == 'DELETED'">
                   <button
                     class="btn btn-outline-dark btn-sm"
@@ -325,7 +342,59 @@ export default {
       this.completedGenes -= 1;
       this.dnamaster[index].function = "None selected";
     },
-    
+
+    getStatus(index) {
+      var status = "";
+      if (this.dnamaster[index].stop - this.dnamaster[index].start < 200) {
+        status += "S | ";
+      }
+      if (index == 0) {
+        status += this.getTailingOverlap(index);
+      }
+      else if (index == this.dnamaster.length - 1) {
+        status += this.getLeadingOverlap(index);
+      }
+      else {
+        status += this.getLeadingOverlap(index);
+        status += this.getTailingOverlap(index);
+      }
+      if (status == "") { return "GOOD"; }
+      return status.substring(0, status.length - 3);
+    },
+
+    getTailingOverlap(index) {
+      var status = "";
+      var overlap = this.dnamaster[index].stop - this.dnamaster[index + 1].start
+      if (this.dnamaster[index].strand == this.dnamaster[index + 1].strand) {
+        if (overlap < -10) {
+          status += "LTG | ";
+        }
+        else if (overlap > 10) {
+          status += "LTO | ";
+        }
+      }
+      else if (overlap > -50) {
+        status += "STG | "
+      }
+      return status;
+    },
+
+    getLeadingOverlap(index) {
+      var status = "";
+      var leadingOverlap = this.dnamaster[index - 1].stop - this.dnamaster[index].start
+      if (this.dnamaster[index].strand == this.dnamaster[index - 1].strand) {
+        if (leadingOverlap < -10) {
+          status += "LLG | ";
+        }
+        else if (leadingOverlap > 10) {
+          status += "LLO | ";
+        }
+      }
+      else if (leadingOverlap > -50) {
+      status += "SLG | "
+      }
+      return status;
+    }  
   },
 };
 </script>

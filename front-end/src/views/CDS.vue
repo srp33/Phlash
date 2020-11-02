@@ -19,8 +19,16 @@
         Choose a new start for this gene call based on the information given
         below or keep the current start.
       </p>
+      <p><strong>Key</strong></p>
       <p>
-        <strong>Your selected gene span:</strong> {{ newStart }}-{{ newStop }}
+        <strong class="red-text">Red:</strong> selected start and stop positions.<br />
+        <strong class="blue-text">Blue:</strong> coding potential in relation to base number.<br />
+        <strong class="green-text">Light green:</strong> 0.75 coding potential reference line.<br />
+        <strong class="grey-text">Light grey:</strong> The previous gene's stop position and the next
+        gene's start position.
+      </p>
+      <p>
+        <strong>Your selected open reading frame:</strong> {{ newStart }}-{{ newStop }}
       </p>
       <p><strong>Your selected function:</strong> {{ newFunction }}</p>
       <router-link
@@ -50,25 +58,25 @@
       </button>
     </div>
     <div class="coding-potential-table">
-      <h4 style="text-align: center; margin: 20px">Alternative Gene Spans</h4>
+      <h4 style="text-align: center; margin: 20px">Alternative Open Reading Frames</h4>
       <div class="table-responsive">
         <table id="cp-table" class="table table-hover">
           <thead>
             <tr>
-              <th scope="col">Gene Span</th>
+              <th scope="col">Open Reading Frame</th>
               <th scope="col">Action</th>
             </tr>
           </thead>
           <tbody>
             <tr v-for="(start, index) in startOptions" :key="index">
-              <th v-if="start === currentCDS.start">
+              <th v-if="start + stopOptions[index] === currentCDS.start + currentCDS.stop">
                 {{ start }}-{{ stopOptions[index] }} (current)
               </th>
               <th v-else>{{ start }}-{{ stopOptions[index] }}</th>
               <td>
                 <button
                   class="btn btn-dark btn-sm"
-                  @click="setGeneSpan(start, stopOptions[index])"
+                  @click="setORF(start, stopOptions[index])"
                 >
                   <strong>Select</strong>
                 </button>
@@ -110,6 +118,8 @@
             :start="currentCDS.start"
             :stop="currentCDS.stop"
             :frame="frame"
+            :prevStop="prevStop"
+            :nextStart="nextStart"
           />
         </div>
         <div v-else>
@@ -124,7 +134,7 @@
     <div class="blast-results">
       <h4 style="text-align: center; margin: 40px">BLAST Results</h4>
       <div v-if="dataExists" id="accordion">
-        <div class="card" v-for="key in sortedBlastKeys" :key="key">
+        <div class="card" v-for="key in blastKeys" :key="key">
           <div class="card-header">
             <h4 class="mb-0">
               <button
@@ -134,7 +144,7 @@
                 v-bind:data-target="'#' + key"
                 v-bind:aria-controls="key"
               >
-                <strong v-if="key === currentCDS.start.toString()"
+                <strong v-if="key === currentCDS.start.toString() + '-' + currentCDS.stop.toString()"
                   >{{ key }} (current)</strong
                 >
                 <strong v-else>{{ key }}</strong>
@@ -144,13 +154,13 @@
           <div v-bind:id="key" class="collapse" data-parent="#accordion">
             <div class="card-body">
               <BlastResults
-                v-if="key === currentCDS.start.toString()"
+                v-if="key === currentCDS.start.toString() + '-' + currentCDS.stop.toString()"
                 :blastResults="blastResults[key]"
                 :allowSelect="true"
                 @newFunction="setFunction"
               />
               <BlastResults
-                v-if="key != currentCDS.start.toString()"
+                v-else
                 :blastResults="blastResults[key]"
                 :allowSelect="false"
                 @newFunction="setFunction"
@@ -162,7 +172,7 @@
     </div>
     <div class="info-bottom">
       <p>
-        <strong>Your selected gene span:</strong> {{ newStart }}-{{ newStop }}
+        <strong>Your selected open reading frame:</strong> {{ newStart }}-{{ newStop }}
       </p>
       <p><strong>Your function selection:</strong> {{ newFunction }}</p>
       <router-link
@@ -246,6 +256,8 @@ export default {
       data5: [{ x: [], y: [] }],
       data6: [{ x: [], y: [] }],
       nextCDS: null,
+      nextStart: null,
+      prevStop: null,
     };
 
   },
@@ -256,8 +268,8 @@ export default {
 
   computed: {
 
-    sortedBlastKeys: function () {
-      return Object.keys(this.blastResults).sort((a, b) => b - a);
+    blastKeys: function () {
+      return Object.keys(this.blastResults);
     },
 
   },
@@ -275,8 +287,11 @@ export default {
           this.blastResults = response.data.blast;
           this.startOptions = response.data.start_options;
           this.stopOptions = response.data.stop_options;
+          console.log(this.stopOptions);
           this.newStart = this.currentCDS.start;
           this.newStop = this.currentCDS.stop;
+          this.prevStop = response.data.prev_stop;
+          this.nextStart = response.data.next_start;
           this.data1 = [
             {
               x: response.data.x_data,
@@ -315,8 +330,11 @@ export default {
           ];
           this.dataExists = true;
           this.pageLoading = false;
-          this.frame = ((this.currentCDS.start + 2) % 3) + 1;
-          if (this.currentCDS.strand == "-") this.frame += 3;
+          if (this.currentCDS.strand == "-") {
+            this.frame = ((this.currentCDS.stop + 2) % 3) + 4;
+          }
+          else this.frame = ((this.currentCDS.start + 2) % 3) + 1;
+          console.log(this.frame);
 
           this.nextCDS = response.data.nextCDS;
           console.log(this.nextCDS);
@@ -370,24 +388,12 @@ export default {
       this.editCDS();
     },
 
-    keepOriginal() {
-      const payload = {
-        id: this.currentCDS.id,
-        start: this.currentCDS.start,
-        stop: this.currentCDS.stop,
-        strand: this.currentCDS.strand,
-        function: "None",
-        status: this.currentCDS.status,
-      };
-      this.updateCDS(payload, this.currentCDS.id);
-    },
-
     setFunction(funct) {
       this.newFunction = funct;
     },
 
-    setGeneSpan(start, stop) {
-      if (start != this.newStart) {
+    setORF(start, stop) {
+      if (start != this.newStart || stop != this.newStop) {
         this.dataExists = false;
         this.newFunction = "";
         this.newStop = stop;
@@ -395,7 +401,11 @@ export default {
         this.newStart = start;
         this.currentCDS.start = start;
         this.frame = ((start + 2) % 3) + 1;
-        if (this.currentCDS.strand == "-") this.frame += 3;
+        if (this.currentCDS.strand == "-") {
+          this.frame = ((this.currentCDS.stop + 2) % 3) + 4;
+        }
+        else this.frame = ((this.currentCDS.start + 2) % 3) + 1;
+        console.log(this.frame);
         this.$nextTick().then(() => {
           this.dataExists = true;
         });
@@ -427,6 +437,22 @@ export default {
 
 .btn-action {
   margin: 7px;
+}
+
+.red-text {
+  color:  #db230e;
+}
+
+.blue-text {
+  color: #044a79;
+}
+
+.green-text {
+  color: #82E0AA;
+}
+
+.grey-text {
+  color: lightslategrey;
 }
 
 /* ----- Coding Potential ----- */
