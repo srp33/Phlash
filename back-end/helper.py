@@ -7,7 +7,7 @@ from builtins import FileNotFoundError
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 FASTA_EXTENSIONS = set(['.fasta', '.fna'])
-GENBANK_EXTENSIONS = set(['.gb', '.gbk'])
+GENBANK_EXTENSIONS = set(['.gb', '.gbk', '.gbf'])
 GDATA_EXTENSIONS = set(['.gdata'])
 LDATA_EXTENSIONS = set(['.ldata'])
 BLAST_EXTENSIONS = set(['.json'])

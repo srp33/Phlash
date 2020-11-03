@@ -216,12 +216,16 @@ def get_start_options(genome, maximum, strand, minimum):
     '''
     Finds all the start codons within a range of DNA indicated by the minimum and maximum parameters.
     '''
+    print(minimum)
+    print(maximum)
+    print(strand)
     bacteria_start_codons = ["ATG", "GTG", "TTG"]
     start_options = []
     maximum += 3
     gene = ""
     if (strand != "-"):
         gene = genome[minimum:maximum]
+        print(gene)
     else:
         gene = genome.reverse_complement()[minimum:maximum]
     for index in range(0, len(gene)):
@@ -241,8 +245,6 @@ def get_starts_stops(cds_id, genome, genemark_gdata_file):
 
     dnamaster_cds = DNAMaster.query.filter_by(id=cds_id).first()
     genemark_cds = GeneMark.query.filter_by(stop=dnamaster_cds.stop).first()
-    print(dnamaster_cds)
-    print(genemark_cds)
 
     minimum = -100 # 100 base pairs lower than the start position
     maximum = 100 # 100 base pairs higher than the start position
@@ -315,6 +317,9 @@ def get_starts_stops(cds_id, genome, genemark_gdata_file):
     if len(start_options) == 0:
         start_options.append(dnamaster_cds.start)
         stop_options.append(dnamaster_cds.stop)
+
+    print(start_options)
+    print(stop_options)
     
     # dnamaster_cds.start_options = str(start_options)[1:-1]
     # dnamaster_cds.stop_options = str(stop_options)[1:-1]

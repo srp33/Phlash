@@ -15,7 +15,7 @@ response_object = {}
 USERS = []
 ROOT = os.path.dirname(os.path.abspath(__file__))
 FASTA_EXTENSIONS = set(['.fasta', '.fna'])
-GENBANK_EXTENSIONS = set(['.gb', '.gbk'])
+GENBANK_EXTENSIONS = set(['.gb', '.gbk', '.gbf'])
 GDATA_EXTENSIONS = set(['.gdata'])
 LDATA_EXTENSIONS = set(['.ldata'])
 
@@ -44,7 +44,7 @@ def check_uploaded_files(UPLOAD_FOLDER):
 
     return response_object
 
-def upload_file(request, UPLOAD_FOLDER):
+def upload_file(request, UPLOAD_FOLDER, current_user):
     '''
     Uploads a either a genbank or fasta file and overwrites existing files.
     Runs GeneMark on fasta files.
@@ -68,7 +68,7 @@ def upload_file(request, UPLOAD_FOLDER):
             if file_type == 'fasta':
                 handle_fasta(UPLOAD_FOLDER)
             else:
-                handle_genbank(UPLOAD_FOLDER)
+                handle_genbank(UPLOAD_FOLDER, current_user)
         else:
             response_object["not_allowed"] = file.filename
     else:
@@ -83,9 +83,11 @@ def display_files(UPLOAD_FOLDER):
     response_object["fasta_file"] = "Not found"
     response_object["genbank_file"] = "Not found"
     for file in os.listdir(UPLOAD_FOLDER):
+        print(file)
         if (file.endswith(".fasta") or file.endswith(".fna") or file.endswith(".txt")):
             response_object["fasta_file"] = file
-        elif (file.endswith(".gb") or file.endswith(".gbk")):
+            print(response_object["fasta_file"])
+        elif (file.endswith(".gb") or file.endswith(".gbk") or file.endswith(".gbf")):
             response_object["genbank_file"] = file
 
     return response_object
@@ -112,10 +114,10 @@ def delete_file(file_path, UPLOAD_FOLDER):
         if (file_path.endswith(".fasta") or file_path.endswith(".fna") or file_path.endswith(".txt")):
             db.session.query(GeneMark).delete()
             for file in os.listdir(UPLOAD_FOLDER):
-                if (file.endswith(".gb") or file.endswith(".gbk")):
+                if (file.endswith(".gb") or file.endswith(".gbk") or file.endswith(".gbf")):
                     continue
                 os.remove(os.path.join(UPLOAD_FOLDER, file))
-        elif (file_path.endswith(".gb") or file_path.endswith(".gbk")):
+        elif (file_path.endswith(".gb") or file_path.endswith(".gbk") or file_path.endswith("gbf")):
             db.session.query(DNAMaster).delete()
             for file in os.listdir(UPLOAD_FOLDER):
                 if (file.endswith(".fasta") or file.endswith(".fna") or file.endswith(".txt")
@@ -244,12 +246,13 @@ def get_keys_by_value(dict, value_to_find):
     return keys
 
 # ---------- GENBANK FILE HELPER FUNCTIONS ----------
-def handle_genbank(UPLOAD_FOLDER):
+def handle_genbank(UPLOAD_FOLDER, current_user):
     '''
     Gets the genbank file and parses through it.
     '''
     genbank_file = helper.get_file_path("genbank", UPLOAD_FOLDER)
     parse_dnamaster_genbank(genbank_file)
+    create_fasta(genbank_file, UPLOAD_FOLDER, current_user)
 
 def parse_dnamaster_genbank(genbank_file):
     """
@@ -288,11 +291,22 @@ def parse_dnamaster_genbank(genbank_file):
                         db.session.add(cds)
                         db.session.commit()
 
-
-
-
-
-
+def create_fasta(genbank_file, UPLOAD_FOLDER, current_user):
+    with open(genbank_file, 'r') as g_file:
+        name = os.path.join(UPLOAD_FOLDER, current_user +".fasta")
+        with open (name, 'w') as fFile:
+            fFile.write(">" + current_user + "\n")
+            startWriting = False
+            content = []
+            for line in g_file:
+                if line.startswith("ORIGIN"):
+                    startWriting = True
+                    continue
+                if startWriting:
+                    line = line.upper()
+                    content.append("".join(line[10:-1].strip().split()))
+            fFile.writelines(content)
+    handle_fasta(UPLOAD_FOLDER)
 
     #Below is create your own fasta file stuff
             # if fileType == "genbank":

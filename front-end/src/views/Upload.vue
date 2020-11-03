@@ -13,11 +13,11 @@
         <p>Please upload the following files:</p>
         <ul>
           <li v-if="!fasta">
-            FASTA file containing the full genome*
+            FASTA file containing the full genome
             <strong>(.fasta, .fna)</strong>
           </li>
           <li v-if="!genbank">
-            GenBank file from DNA Master <strong>(.gb, .gbk)</strong>
+            GenBank file from DNA Master <strong>(.gb, .gbk, .gbf)</strong>
           </li>
           <li v-if="fasta && genbank">
             You have uploaded all required files. Click 'Next' to continue.
@@ -524,6 +524,7 @@ export default {
             `/check_upload/${this.$route.params.phageID}`
         )
         .then((response) => {
+          console.log(response);
           this.fasta = response.data.fasta;
           this.genbank = response.data.genbank;
         })
@@ -604,7 +605,7 @@ export default {
               this.fastaLoading = false;
               this.showFastaSuccessAlert = true;
               this.fasta = true;
-            } else if (fileExt === "gb" || fileExt === "gbk") {
+            } else if (fileExt === "gb" || fileExt === "gbk" || fileExt === "gbf") {
               this.genbankFileName = this.genbankFile.name;
               this.genbankLoading = false;
               this.showGenBankSuccessAlert = true;

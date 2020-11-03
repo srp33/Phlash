@@ -89,14 +89,15 @@ def get_cds_data(UPLOAD_FOLDER, cds_id):
     response_object['y_data_5'] = gdata_df["5"].to_list()
     response_object['y_data_6'] = gdata_df["6"].to_list()
 
-    dnamaster = []
-    reachedCDS = False
+    reached_CDS = False
+    response_object['nextCDS'] = 'undefined'
     for cds in db.session.query(DNAMaster).order_by(DNAMaster.start):
-        if reachedCDS and cds.function == "None selected":
+        if reached_CDS and cds.function == "None selected":
             response_object['nextCDS'] = cds.id
+            print(cds.id)
             break
         elif cds.id == cds_id:
-            reachedCDS = True
+            reached_CDS = True
 
     return response_object
 

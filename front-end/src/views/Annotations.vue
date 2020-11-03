@@ -297,6 +297,9 @@ export default {
 
   methods: {
 
+    /**
+     * Populates dnamaster with data.
+     */
     getData() {
       axios
         .get(
@@ -319,6 +322,9 @@ export default {
         });
     },
     
+    /**
+     * Downloads the GenBank file upon annotation completion.
+     */
     downloadGenBankFile() {
       this.downloadLoading = true;
       axios
@@ -338,11 +344,19 @@ export default {
         });
     },
 
+    /**
+     * Changes the function of a deleted gene so that it is now visible.
+     */
     reinstate(index) {
       this.completedGenes -= 1;
       this.dnamaster[index].function = "None selected";
     },
 
+    /**
+     * Creates the status for a given cds.
+     * @param {number} index the index of a cds.
+     * @return {string} the status of the cds.
+     */
     getStatus(index) {
       var status = "";
       if (this.dnamaster[index].stop - this.dnamaster[index].start < 200) {
@@ -362,6 +376,11 @@ export default {
       return status.substring(0, status.length - 3);
     },
 
+    /**
+     * Determines if there is a large gap or overlap between the current gene and the next.
+     * @param {number} index the index of a cds.
+     * @return {string} the status of the cds.
+     */
     getTailingOverlap(index) {
       var status = "";
       var overlap = this.dnamaster[index].stop - this.dnamaster[index + 1].start
@@ -379,6 +398,11 @@ export default {
       return status;
     },
 
+    /**
+     * Determines if there is a large gap or overlap between the current gene and the previous.
+     * @param {number} index the index of a cds.
+     * @return {string} the status of the cds.
+     */
     getLeadingOverlap(index) {
       var status = "";
       var leadingOverlap = this.dnamaster[index - 1].stop - this.dnamaster[index].start

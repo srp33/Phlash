@@ -420,12 +420,19 @@ export default {
 
   methods: {
 
+    /**
+     * Sets all of the notification variables to false.
+     */
     clearNotifications() {
       this.showBlastDangerAlert = false;
       this.showBlastSuccessAlert = false;
       this.showNoMoreFiles = false;
     },
 
+    /**
+     * Checks to see if the blast output files have been uploaded.
+     * Checks to see if the blast input folder has been downloaded.
+     */
     checkFiles() {
       axios
         .get(
@@ -442,6 +449,9 @@ export default {
         });
     },
 
+    /**
+     * Downloads the blast input files.
+     */
     downloadInputFiles() {
       this.downloadLoading = true;
       axios
@@ -470,6 +480,9 @@ export default {
         });
     },
 
+    /**
+     * Sets the number of blast output files that must be uploaded.
+     */
     setNumFiles() {
       axios
         .post(
@@ -482,6 +495,9 @@ export default {
         });
     },
 
+    /**
+     * Links to the NCBI BLASTp page.
+     */
     goToNCBI() {
       window.open(
         "https://blast.ncbi.nlm.nih.gov/Blast.cgi?PAGE=Proteins",
@@ -490,6 +506,9 @@ export default {
       this.clickedNCBI = true;
     },
 
+    /**
+     * Links to the NCBI BLAST FAQ page.
+     */
     goToHelp() {
       window.open(
         "https://blast.ncbi.nlm.nih.gov/Blast.cgi?CMD=Web&PAGE_TYPE=Blastdocs",
@@ -497,6 +516,9 @@ export default {
       );
     },
 
+    /**
+     * Gets all of the names of all of the blast output files that have been uploaded.
+     */
     displayOutputFiles() {
       axios
         .post(
@@ -513,6 +535,10 @@ export default {
         });
     },
 
+    /**
+     * Deletes a given file.
+     * @param {string} fileName the name of the file to be deleted.
+     */
     deleteOutputFile(fileName) {
       axios
         .post(
@@ -530,6 +556,9 @@ export default {
         });
     },
 
+    /**
+     * Adds the file so that it can be uploaded.
+     */
     handleFilesUpload() {
       this.blastFile = document.querySelector("#blast-upload-form").files.files;
       for (var i = 0; i < this.blastFile.length; i++) {
@@ -539,6 +568,10 @@ export default {
       console.log(this.blastFiles);
     },
 
+    /**
+     * Downloads a given file.
+     * @param {string} fileName the name of the file to be downloaded.
+     */
     downloadOutputFile(fileName) {
       axios
         .post(
@@ -557,7 +590,11 @@ export default {
         });
     },
 
-    uploadOutputFiles(e) {
+    /**
+     * Uploads the blast output files.
+     * Handles incorrect file uploads.
+     */
+    uploadOutputFiles() {
       this.blastLoading = true;
       var data = new FormData();
       var uploadFile = this.blastFiles[this.blastFiles.length - 1];

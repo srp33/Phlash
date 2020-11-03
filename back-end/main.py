@@ -21,11 +21,6 @@ import annotations_cds
 
 # Configuration
 ROOT = os.path.dirname(os.path.abspath(__file__))
-FASTA_EXTENSIONS = set(['.fasta', '.fna'])
-GENBANK_EXTENSIONS = set(['.gb', '.gbk'])
-GDATA_EXTENSIONS = set(['.gdata'])
-LDATA_EXTENSIONS = set(['.ldata'])
-BLAST_EXTENSIONS = set(['.json'])
 
 # Instantiates the app
 app = Flask(__name__)
@@ -74,7 +69,7 @@ def upload(current_user, file_method, file_path):
     app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE
 
     if file_method == "upload":
-        return jsonify(upload_file(request, UPLOAD_FOLDER))
+        return jsonify(upload_file(request, UPLOAD_FOLDER, current_user))
 
     elif file_method == "display":
         return jsonify(display_files(UPLOAD_FOLDER))

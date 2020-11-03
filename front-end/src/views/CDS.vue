@@ -368,7 +368,7 @@ export default {
           payload
         )
         .then(() => {
-          if (this.nextCDS != undefined) {
+          if (this.nextCDS != "undefined") {
             this.$route.params.cdsID = this.nextCDS;
             this.$router.push(
               `/annotations/cds/${this.$route.params.phageID}/${this.$route.params.cdsID}`
