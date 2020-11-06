@@ -34,12 +34,12 @@
           has not been called at all in GeneMark or the stop position differs from GeneMark's gene call.<br />
           <strong>S: </strong>Short, the open reading frame is less than 
           200 base pairs.<br />
-          <strong>LLG: </strong>Long leading gap, there is a large gap between this 
-          and the previous gene<br />
+          <strong>LLG: </strong>Long leading gap, there is more than a 10 base pair gap between this 
+          and the previous gene.<br />
           <strong>LLO: </strong>Long leading overlap, the gene overlaps the previous 
           gene by more than 10 base pairs.<br />
-          <strong>LTG: </strong>Long tailing gap, the gene overlaps the next 
-          gene by more than 10 base pairs.<br />
+          <strong>LTG: </strong>Long tailing gap, there is more than a 10 base pair gap between this 
+          and the next gene.<br />
           <strong>LTO: </strong>Long tailing overlap, the gene overlaps the next  
           gene by more than 10 base pairs.<br />
           <strong>STG: </strong>Short tailing gap, the gene is on a different strand 

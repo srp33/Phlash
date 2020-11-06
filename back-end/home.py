@@ -1,5 +1,20 @@
-"""
-Contains the methods for the Home page.
+"""Contains the functions for the Home page.
+
+Attributes:
+    response_object:
+        The dictionary that the main functions return.
+    USERS:
+        A list of users.
+    ROOT:
+        The root directory.
+    FASTA_EXTENSIONS:
+        The allowed fasta extensions.
+    GENBANK_EXTENSIONS:
+        The allowed genbank extensions.
+    GDATA_EXTENSIONS:
+        The allowed gdata extensions.
+    LDATA_EXTENSIONS:
+        The allowed ldata extensions.
 """
 import main
 from pathlib import Path
@@ -19,20 +34,31 @@ GENBANK_EXTENSIONS = set(['.gb', '.gbk'])
 GDATA_EXTENSIONS = set(['.gdata'])
 LDATA_EXTENSIONS = set(['.ldata'])
 
+# ------------------------------ MAIN FUNCTIONS ------------------------------
 def check_phage_id(phage_id, app):
-    # remove 90 day old users
-    remove_old_users()
-    # get list of existing users
+    """Checks to see if phage ID exists.
+
+    Args:
+        phage_id:
+            The ID being logged in or registered.
+        app:
+            The application.
+
+    Returns:
+        A dictionary containing success message.
+    """
+    remove_old_users() # remove 90 day old users
     get_users()
     if phage_id in USERS:
         handle_existing_users(phage_id)
     else:
         handle_new_users(phage_id, app)
-    # get date that ID will be deleted
     get_deletion_date(phage_id)
     return response_object
 
 def remove_old_users():
+    """Removes 90 day old users.
+    """
     critical_time = arrow.now().shift(days=-90)
     for user in Path(os.path.join(ROOT, 'users')).glob('*'):
         user_time = arrow.get(user.stat().st_mtime)
@@ -40,10 +66,18 @@ def remove_old_users():
             shutil.rmtree(user)
 
 def get_users():
+    """Gets existing users.
+    """
     for dir in os.listdir(os.path.join(ROOT, 'users')):
         USERS.append(dir)
 
 def handle_existing_users(phage_id):
+    """Checks to see if required files are uploaded.
+
+    Args:
+        phage_id:
+            The ID the existing user.
+    """
     response_object['id_status'] = "ID already exists. If this is your ID, please continue. If not, enter a new one."
 
     # check if all required files for phage_id are uploaded
@@ -62,6 +96,14 @@ def handle_existing_users(phage_id):
     response_object['uploaded_all_files'] = True if len(required_files) == 0 else False
 
 def handle_new_users(phage_id, app):
+    """Creates a new user and the associated directories.
+
+    Args:
+        phage_id:
+            The new ID to be created.
+        app:
+            The application.
+    """
     create_directory(os.path.join(ROOT, 'users', phage_id))
     create_directory(os.path.join(ROOT, 'users', phage_id, 'uploads'))
     with app.app_context():
@@ -71,15 +113,23 @@ def handle_new_users(phage_id, app):
     response_object["uploaded_all_files"] = False
 
 def get_deletion_date(phage_id):
-        critical_time = arrow.now().shift(days=-90)
-        for user in Path(os.path.join(ROOT, 'users')).glob('*'):
-            if phage_id in str(user):
-                user_time = arrow.get(user.stat().st_mtime).shift(days=+90)
-                response_object["delete_time"] = str(user_time)
+    """Gets the date that the phage_id will be removed.
+
+    Args:
+        phage_id:
+            The ID of the new phage.
+    """
+    for user in Path(os.path.join(ROOT, 'users')).glob('*'):
+        if phage_id in str(user):
+            user_time = arrow.get(user.stat().st_mtime).shift(days=+90)
+            response_object["delete_time"] = str(user_time)
 
 def create_directory(directory):
-    """
-    Create specified directory.
+    """Creates specified directory.
+
+    Args:
+        directory:
+            The directory path to be created.
     """
     try:
         os.mkdir(directory)

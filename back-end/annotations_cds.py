@@ -1,5 +1,12 @@
-"""
-Contains the methods for the CDS page.
+"""Contains the functions for the CDS page.
+
+Returns CDS data.
+Updates CDS data.
+Parses BLAST results.
+
+Attributes:
+    response_object:
+        The dictionary that is returned by the main functions.
 """
 import models
 from models import *
@@ -10,10 +17,23 @@ import json
 
 response_object = {}
 
+# ------------------------------ MAIN FUNCTIONS ------------------------------
 def annotate_cds(request, cds_id):
-    '''
-    Updates a CDS given the data and the ID.
-    '''
+    """Updates a CDS given the data and the ID.
+
+    Updates the start, stop, and function of a given CDS.
+    If CDS does not exist returns an error message.
+    Updates the CDS status.
+
+    Args:
+        request:
+            A dictionary containing the new CDS data.
+        cds_id:
+            The ID of the CDS to be updated.
+
+    Returns:
+        A dictionary containing a pass or fail message.
+    """
     put_data = request.get_json()
     cds = DNAMaster.query.filter_by(id=cds_id).first()
     genemark_cds = GeneMark.query.filter_by(stop=cds.stop).first()
@@ -39,9 +59,23 @@ def annotate_cds(request, cds_id):
     return response_object
 
 def get_cds_data(UPLOAD_FOLDER, cds_id):
-    '''
-    Queries and returns all of the data for a CDS given the ID
-    '''
+    """Queries and returns all of the data for a CDS given the ID.
+
+    Gets start, stop, function, and status for the CDS.
+    Gets the stop of the previous CDS and the start of the next CDS.
+    Gets the blast results for the CDS.
+    Gets the genemark coding potential data.
+    Gets the next non-updated CDS ID.
+
+    Args:
+        UPLOAD_FOLDER:
+            The folder containing all of the uploaded files.
+        cds_id:
+            The ID of the requested CDS.
+    Returns:
+        A dictionary containing the CDS data including the blast results and coding potential.
+        
+    """
     num_begins = cds_id.rfind('_') + 1
     index = float(cds_id[num_begins:])
     index = int(index)
@@ -101,10 +135,24 @@ def get_cds_data(UPLOAD_FOLDER, cds_id):
 
     return response_object
 
+# ---------- BLAST HELPER FUNCTIONS ----------
 def parse_blast_results(blast_files, cds_id, e_value_thresh):
-    '''
-    Parses through the blast results and returns dictionary containing data.
-    '''
+    """Parses through the blast results and returns a dictionary containing data.
+
+    Removes instances of CREATE_VIEW created by BLAST.
+    Finds the associated blast results for the CDS.
+
+    Args:
+        blast_files:
+            The files containing the blast results.
+        cds_id:
+            The ID of the CDS to be found.
+        e_value_thresh:
+            The blast similarity threshold.
+
+    Returns:
+        A dictionary containing all of the blast data for the CDS.
+    """
     blast_results = {}
     for blast_file in blast_files:
         newLines = []

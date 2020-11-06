@@ -7,7 +7,6 @@
       :annotations="navAnnotations"
     />
     <div class="container">
-      <!--<h1><strong>Phlash</strong></h1>-->
       <p>
         <img id="logo" src="/phlash/images/Logo.png" width="250" />
       </p>
@@ -25,8 +24,8 @@
             class="form-control"
             type="text"
             v-model="phageID"
-            v-on:keyup.enter="checkPhageID(phageID)"
-            placeholder="Enter a unique bacteriophage ID containing letters, numbers, and underscores only"
+            v-on:keyup.enter="checkPhageID()"
+            placeholder="Enter a unique bacteriophage ID that only contains letters, numbers, and underscores."
             aria-label="Enter a unique bacteriophage ID"
             aria-describedby="basic-addon2"
           />
@@ -34,7 +33,7 @@
             <button
               class="btn btn-dark btn-sm"
               type="button"
-              @click="checkPhageID(id)"
+              @click="checkPhageID()"
             >
               <strong>Enter</strong>
             </button>
@@ -130,45 +129,63 @@
 <script>
 import axios from "axios";
 import Navbar from "../components/Navbar.vue";
+
 export default {
   name: "Home",
   components: {
     Navbar,
   },
+
   data() {
+
     return {
       phageID: "",
       idStatus: "",
       allFilesUploaded: false,
       dateToBeDeleted: null,
     };
+
   },
+
   watch: {
+
     phageID() {
       this.phageID = this.phageID.replace(/[^a-zA-Z0-9_]/g, "");
     },
+
   },
   computed: {
+
     navUpload: function () {
       if (this.phageID !== "") return true;
       else return false;
     },
+
     navDNAMaster: function () {
       if (this.phageID !== "" && this.allFilesUploaded) return true;
       return false;
     },
+
     navBlast: function () {
       return false;
     },
+
     navAnnotations: function () {
       return false;
     },
-  },
-  methods: {
 
-    checkPhageID(phageID) {
+  },
+
+  methods: {
+    
+    /**
+     * Checks for non expired phage ID.
+     * Adds phage ID if non-existant.
+     * @param {string} phageID the ID of the phage to be logged in or registered.
+     */
+    checkPhageID() {
       axios
-        .post(process.env.VUE_APP_BASE_URL + `/home/${phageID}`)
+        .post(process.env.VUE_APP_BASE_URL + `/home/${this.phageID}`)
         .then((response) => {
           this.allFilesUploaded = response.data.uploaded_all_files;
           this.idStatus = response.data.id_status;

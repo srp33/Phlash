@@ -276,6 +276,10 @@ export default {
 
   methods: {
 
+    /**
+     * Gets the GeneMark, Blast, and DNAMaster data for the given CDS.
+     * @param {string} cdsID the ID of the CDS.
+     */
     getData(cdsID) {
       axios
         .get(
@@ -344,6 +348,9 @@ export default {
         });
     },
 
+    /**
+     * Changes the CDS data to reflect the user's changes.
+     */
     editCDS() {
       this.updatedCDS = this.currentCDS;
       this.updatedCDS.start = this.newStart;
@@ -360,6 +367,11 @@ export default {
       this.updateCDS(payload, this.updatedCDS.id);
     },
     
+    /**
+     * Updates the database with the new changes on the current cds.
+     * @param {dictionary} payload the new CDS data.
+     * @param {string} cdsID the ID of the CDS to be updated.
+     */
     updateCDS(payload, cdsID) {
       axios
         .put(
@@ -383,15 +395,28 @@ export default {
         });
     },
 
+    /**
+     * Changes the function of the CDS to deleted.
+     * @param {string} cdsID the ID of the CDS to be deleted.
+     */
     deleteCDS(cdsID) {
       this.newFunction = "DELETED";
       this.editCDS();
     },
 
+    /**
+     * Updates the function.
+     * @param {string} function the user selected function.
+     */
     setFunction(funct) {
       this.newFunction = funct;
     },
 
+    /**
+     * Updates the start and stop postions to what the user selected.
+     * @param {number} start the user selected start.
+     * @param {number} stop the user selected stop.
+     */
     setORF(start, stop) {
       if (start != this.newStart || stop != this.newStop) {
         this.dataExists = false;
@@ -476,7 +501,6 @@ export default {
 
 caption {
   display: table-caption;
-  /* caption-side: top; */
 }
 
 tbody {
@@ -498,7 +522,6 @@ tbody {
   width: 100%;
 }
 
-/* --------------------- */
 /* Responsive Design */
 @media only screen and (max-width: 1200px) {
   .coding-potential-graphs {

@@ -49,11 +49,13 @@ export default {
     blast: Boolean,
     annotations: Boolean,
   },
+
   data() {
     return {
       activeCLass: 'active'
     }
   },
+  
 };
 </script>
 

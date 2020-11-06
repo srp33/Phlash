@@ -77,17 +77,29 @@ export default {
     allowSelect: false,
     showWarning: false,
   },
+
   data() {
     return {};
   },
+
   methods: {
+
+    /**
+     * Sets the CDS function from the blast results.
+     * @param {string} funct the function to be added.
+     */
     setFunction(funct) {
       let result = funct.match(/(.*)\[.*\]/);
       this.$emit("newFunction", result[1]);
     },
+
+    /**
+     * Sets the function to none when there are no blast results.
+     */
     setNone() {
       this.$emit("newFunction", "None");
     },
+
   },
 };
 </script>

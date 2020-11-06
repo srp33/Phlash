@@ -1,5 +1,18 @@
-"""
-Contains the methods for the Upload page.
+"""Contains the functions for the Upload page.
+
+Attributes:
+    response_object:
+        The dictionary that the main functions return.
+    ROOT:
+        The root directory.
+    FASTA_EXTENSIONS:
+        The allowed fasta extensions.
+    GENBANK_EXTENSIONS:
+        The allowed genbank extensions.
+    GDATA_EXTENSIONS:
+        The allowed gdata extensions.
+    LDATA_EXTENSIONS:
+        The allowed ldata extensions.
 """
 from werkzeug.utils import secure_filename
 from Bio import SeqIO, Seq
@@ -12,7 +25,6 @@ import helper
 import shutil
 
 response_object = {}
-USERS = []
 ROOT = os.path.dirname(os.path.abspath(__file__))
 FASTA_EXTENSIONS = set(['.fasta', '.fna'])
 GENBANK_EXTENSIONS = set(['.gb', '.gbk', '.gbf'])
@@ -21,9 +33,15 @@ LDATA_EXTENSIONS = set(['.ldata'])
 
 # ------------------------------ MAIN FUNCTIONS ------------------------------
 def check_uploaded_files(UPLOAD_FOLDER):
-    '''
-    Checks if respective files for fasta and genbank are uploaded.
-    '''
+    """Checks if respective files for fasta and genbank are uploaded.
+
+    Args:
+        UPLOAD_FOLDER:
+            The directory containing all of the uploaded files.
+
+    Returns:
+        A dictionary containing a boolean indicating if the files are uploaded.
+    """
     response_object = {} 
     existing_files = []
     for filename in os.listdir(UPLOAD_FOLDER):
@@ -45,11 +63,22 @@ def check_uploaded_files(UPLOAD_FOLDER):
     return response_object
 
 def upload_file(request, UPLOAD_FOLDER, current_user):
-    '''
-    Uploads a either a genbank or fasta file and overwrites existing files.
+    """Uploads a either a genbank or fasta file and overwrites existing files.
+
     Runs GeneMark on fasta files.
     Parses through genbank files.
-    '''
+
+    Args:
+        request:
+            A dictionary containing the files to be uploaded.
+        UPLOAD_FOLDER:
+            The directory containing all of the uploaded files.
+        current_user:
+            The current user ID.
+
+    Returns:
+        A dictionary containing a success message.
+    """
     if 'file' not in request.files:
         response_object["status"] = "'file' not in request.files"
         return response_object
@@ -77,9 +106,15 @@ def upload_file(request, UPLOAD_FOLDER, current_user):
     return response_object
 
 def display_files(UPLOAD_FOLDER):
-    '''
-    Finds the files (genbank or fasta) that have already been uploaded and returns their names. 
-    '''
+    """Finds the files (genbank or fasta) that have already been uploaded and returns their names. 
+
+    Args:
+        UPLOAD_FOLDER:
+            The directory containing all of the uploaded files.
+
+    Returns:
+        A dictionary containing a success message and the genbank or fasta file names.
+    """
     response_object["fasta_file"] = "Not found"
     response_object["genbank_file"] = "Not found"
     for file in os.listdir(UPLOAD_FOLDER):
@@ -93,9 +128,18 @@ def display_files(UPLOAD_FOLDER):
     return response_object
 
 def download_file(file_path, UPLOAD_FOLDER):
-    '''
-    Returns the contents of a file given the file path.
-    '''
+    """Returns the contents of a file given the file path.
+
+    Args:
+        file_path:
+            The path to the file to be downloaded.
+        UPLOAD_FOLDER:
+            The directory containing all of the uploaded files.
+
+    Returns:
+        A dictionary containing a success message and the contents of the file.
+
+    """
     try:
         response_object["file_data"] = open(os.path.join(UPLOAD_FOLDER, file_path)).read()
         response_object["status"] = "success"
@@ -106,10 +150,19 @@ def download_file(file_path, UPLOAD_FOLDER):
     return response_object
 
 def delete_file(file_path, UPLOAD_FOLDER):
-    '''
-    Deletes a file given the file_path.
+    """Deletes a file given the file_path.
+
     Removes all data that has been saved associated with that file.
-    '''
+
+    Args:
+        file_path:
+            The path to the file to be deleted.
+        UPLOAD_FOLDER:
+            The directory containing all of the uploaded files.
+
+    Returns:
+        A dictionary containing a success message.
+    """
     try:
         if (file_path.endswith(".fasta") or file_path.endswith(".fna") or file_path.endswith(".txt")):
             db.session.query(GeneMark).delete()
@@ -139,9 +192,14 @@ def delete_file(file_path, UPLOAD_FOLDER):
 
 # ------------------------------ UPLOAD HELPER FUNCTIONS ------------------------------
 def overwrite_files(file_type, UPLOAD_FOLDER):
-    '''
-    Overwrites existing files with specific extension with newly uploaded files.
-    '''
+    """Overwrites existing files with specific extension with newly uploaded files.
+
+    Args:
+        file_type:
+            The type of the file to be overwritten.
+        UPLOAD_FOLDER:
+            The directory containing all of the uploaded files.
+    """
     for existing_file in os.listdir(UPLOAD_FOLDER):
         ext = os.path.splitext(existing_file)[1].lower()
         if (file_type == "fasta" and ext in ['.fasta', '.fna', '.ldata', '.gdata', '.lst', '.ps']) or \
@@ -151,9 +209,12 @@ def overwrite_files(file_type, UPLOAD_FOLDER):
 
 # ---------- FASTA FILE HELPER FUNCTIONS ----------
 def handle_fasta(UPLOAD_FOLDER):
-    '''
-    Runs GeneMark and parses through ldata file.
-    '''
+    """Runs GeneMark and parses through ldata file.
+
+    Args:
+        UPLOAD_FOLDER:
+            The directory containing all of the uploaded files.
+    """
     fasta_file = helper.get_file_path("fasta", UPLOAD_FOLDER)
     run_genemark(fasta_file)
     try:
@@ -165,8 +226,11 @@ def handle_fasta(UPLOAD_FOLDER):
     parse_genemark_ldata(ldata_file)
 
 def run_genemark(fasta_file_path):
-    """
-    Invokes the GeneMarkS utilities and returns .gdata and .ldata files.
+    """Invokes the GeneMarkS utilities and adds .gdata and .ldata files.
+
+    Args:
+        fasta_file_path:
+            The path to the fasta file.
     """
     result = subprocess.run(["/genemark_suite_linux_64/gmsuite/gc", fasta_file_path], stdout=subprocess.PIPE)
     gc_percent = result.stdout.decode("utf-8").split(" ")[3]
@@ -178,10 +242,14 @@ def run_genemark(fasta_file_path):
     ldata_file_path = "{}.ldata".format(fasta_file_path)
 
 def parse_genemark_ldata(gm_file):
-    '''
-    Parses through GeneMark ldata file to gather CDS calls. 
+    """Parses through GeneMark ldata file to gather CDS calls. 
+
     Adds each CDS to GeneMark table in user's database. 
-    '''
+
+    Args:
+        gm_file:
+            The GeneMark ldata file.
+    """
     genemark_all_genes = dict()
     with open(gm_file, "r") as handle:
         for line in handle:
@@ -235,8 +303,16 @@ def parse_genemark_ldata(gm_file):
                     id_number += 1
 
 def get_keys_by_value(dict, value_to_find):
-    """
-    Finds the stop location (key) given a start location (value).
+    """Finds the stop location (key) given a start location (value).
+
+    Args:
+        dict:
+            The dictionary containing keys and values to find.
+        value_to_find:
+            The value to be found in the dictionary.
+
+    Returns:
+        A list of the keys associated with the value.
     """
     keys = list()
     items = dict.items()
@@ -247,17 +323,26 @@ def get_keys_by_value(dict, value_to_find):
 
 # ---------- GENBANK FILE HELPER FUNCTIONS ----------
 def handle_genbank(UPLOAD_FOLDER, current_user):
-    '''
-    Gets the genbank file and parses through it.
-    '''
+    """Gets the genbank file and parses through it.
+
+    Args:
+        UPLOAD_FOLDER:
+            The directory containing all of the uploaded files.
+        current_user:
+            The current user ID.
+    """
     genbank_file = helper.get_file_path("genbank", UPLOAD_FOLDER)
     parse_dnamaster_genbank(genbank_file)
     create_fasta(genbank_file, UPLOAD_FOLDER, current_user)
 
 def parse_dnamaster_genbank(genbank_file):
-    """
-    Parses through DNA Master GenBank file to gather DNA Master's CDS calls. 
+    """Parses through DNA Master GenBank file to gather DNA Master's CDS calls. 
+
     Adds each CDS to DNA Master table in user's database. 
+
+    Args:
+        genbank_file:
+            The file containing the DNAMaster data.
     """
     print("in parse_dnamaster_genbank")
     DNAMaster.query.delete()
@@ -292,6 +377,16 @@ def parse_dnamaster_genbank(genbank_file):
                         db.session.commit()
 
 def create_fasta(genbank_file, UPLOAD_FOLDER, current_user):
+    """Creates a fasta file from the uploaded genbank file.
+
+    Args:
+        genbank_file:
+            The file containing the DNA sequence.
+        UPLOAD_FOLDER:
+            The directory containing all of the uploaded files.
+        current_user:
+            The current user ID.
+    """
     with open(genbank_file, 'r') as g_file:
         name = os.path.join(UPLOAD_FOLDER, current_user +".fasta")
         with open (name, 'w') as fFile:
@@ -307,25 +402,3 @@ def create_fasta(genbank_file, UPLOAD_FOLDER, current_user):
                     content.append("".join(line[10:-1].strip().split()))
             fFile.writelines(content)
     handle_fasta(UPLOAD_FOLDER)
-
-    #Below is create your own fasta file stuff
-            # if fileType == "genbank":
-            #     with open(os.path.join(UPLOAD_FOLDER, file_name), 'r') as gFile:
-            #         name = os.path.join(UPLOAD_FOLDER, current_user+".fasta")
-            #         with open (name, 'w') as fFile:
-            #             fFile.write(">" + current_user)
-            #             startWriting = False
-            #             content = []
-            #             for line in gFile:
-            #                 if line.startswith("ORIGIN"):
-            #                     startWriting = True
-            #                     continue
-            #                 if startWriting:
-            #                     content.append("".join(line[10:-1].strip().split()))
-            #             print(content)
-            #             fFile.writelines(content)
-            #             file.save(name)
-            # parse appropriate files as soon as uploaded
-            # FIXME: check file conent before parsing.
-            #file_ext = os.path.splitext(file_name)[1].lower()
-            #if file_ext in FASTA_EXTENSIONS:  # run genemark and parse ldata

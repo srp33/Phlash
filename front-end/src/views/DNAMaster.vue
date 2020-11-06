@@ -194,7 +194,7 @@
         title="Update CDS"
         hide-footer
       >
-        <b-form @submit="onSubmitUpdate" @reset="onResetUpdate" align="left">
+        <b-form @submit="onSubmitUpdate" align="left">
           <div>
             Updating {{ updatedCDS.id }} will remove Blast and Annotation
             progress.
@@ -236,7 +236,7 @@
         title="Warning!"
         hide-footer
       >
-        <b-form @submit="onSubmitDelete" @reset="onResetDelete" align="left">
+        <b-form @submit="onSubmitDelete" align="left">
           <p>Are you sure you want to delete {{ deletedCDS.id }}?</p>
           <ul>
             <li><strong>ID:</strong> {{ deletedCDS.id }}</li>
@@ -302,6 +302,7 @@ export default {
   },
 
   computed: {
+
     navUpload: function () {
       return true;
     },
@@ -320,6 +321,10 @@ export default {
 
   },
   methods: {
+
+    /**
+     * Gets the DNAMaster data.
+     */
     getData() {
       axios
         .get(
@@ -335,6 +340,10 @@ export default {
         });
     },
 
+    /**
+     * Deletes the CDS data.
+     * @param {string} cdsID the ID of the CDS.
+     */
     deleteData(cdsID) {
       axios
         .delete(
@@ -351,6 +360,11 @@ export default {
         });
     },
 
+    /**
+     * Updates the CDS data.
+     * @param {dictionary} payload the CDS information.
+     * @param {string} cdsID the ID of the CDS.
+     */
     updateData(payload, cdsID) {
       axios
         .put(
@@ -368,6 +382,10 @@ export default {
         });
     },
 
+    /**
+     * Changes the update CDS to reflect the current CDS.
+     * @param {dictionary} cds the cds data.
+     */
     editCDS(cds) {
       this.updatedCDS.id = cds.id;
       this.updatedCDS.start = cds.start;
@@ -375,6 +393,10 @@ export default {
       this.updatedCDS.strand = cds.strand;
     },
 
+    /**
+     * Changes the delete CDS to reflect the current CDS.
+     * @param {dictionary} cds the cds data.
+     */
     deleteCDS(cds) {
       this.deletedCDS.id = cds.id;
       this.deletedCDS.start = cds.start;
@@ -382,17 +404,10 @@ export default {
       this.deletedCDS.strand = cds.strand;
     },
 
-    initForm() {
-      this.updatedCDS.id = "";
-      this.updatedCDS.start = "";
-      this.updatedCDS.stop = "";
-      this.updatedCDS.strand = "";
-      this.deletedCDS.id = "";
-      this.deletedCDS.start = "";
-      this.deletedCDS.stop = "";
-      this.deletedCDS.strand = "";
-    },
-
+    /**
+     * Hides the modal and sets data to be updated.
+     * @param {event} evt the submit update event object.
+     */
     onSubmitUpdate(evt) {
       evt.preventDefault();
       this.$refs.updateCDSModal.hide();
@@ -408,25 +423,15 @@ export default {
       this.updateData(payload, this.updatedCDS.id);
     },
 
-    onResetUpdate(evt) {
-      evt.preventDefault();
-      this.$refs.updateCDSModal.hide();
-      this.initForm();
-      this.getData();
-    },
-
+    /**
+     * Hides the modal and sets data to be deleted.
+     * @param {event} evt the submit delete event object.
+     */
     onSubmitDelete(evt) {
       evt.preventDefault();
       this.$refs.deleteCDSModal.hide();
       let read = false;
       this.deleteData(this.deletedCDS.id);
-    },
-
-    onResetDelete(evt) {
-      evt.preventDefault();
-      this.$refs.deleteCDSModal.hide();
-      this.initForm();
-      this.getData();
     },
 
   },

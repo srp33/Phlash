@@ -1,5 +1,11 @@
-"""
-Contains the methods for the Annotations page.
+"""Contains the functions for the Annotations page.
+
+Returns DNAMaster data.
+Modifies and returns the GenBank file.
+
+Attributes:
+    response_object:
+        The dictionary that is returned by the main functions.
 """
 import helper
 from Bio import SeqIO, Seq, SeqFeature
@@ -10,9 +16,11 @@ response_object = {}
 
 # ------------------------------ MAIN FUNCTIONS ------------------------------
 def get_dnamaster_data():
-    '''
-    Queries and returns all CDS data created by DNAMaster.
-    '''
+    """Queries and returns all CDS data created by DNAMaster.
+
+    Returns:
+        A dictionary containing the DNAMaster data.
+    """
     dnamaster = []
     for cds in db.session.query(DNAMaster).order_by(DNAMaster.start):
         dnamaster.append({'id': cds.id,
@@ -26,9 +34,15 @@ def get_dnamaster_data():
     return response_object
 
 def get_genbank(UPLOAD_FOLDER):
-    '''
-    Modifies and returns the genbank file.
-    '''
+    """Modifies and returns the GenBank file.
+
+    Args:
+        UPLOAD_FOLDER:
+            The folder containing all of the uploaded files.
+    
+    Returns:
+        The GenBank file.
+    """
     gb_file = helper.get_file_path("genbank", UPLOAD_FOLDER)
     fasta_file = helper.get_file_path("fasta", UPLOAD_FOLDER)
     out_file = modify_genbank(gb_file, fasta_file)
@@ -37,9 +51,17 @@ def get_genbank(UPLOAD_FOLDER):
 
 # ---------- GENBANK HELPER FUNCTIONS ----------
 def modify_genbank(gb_file, fasta_file):
-    '''
-    Creates modified GenBank file for input into Sequin
-    '''
+    """Creates modified GenBank file for input into Sequin.
+
+    Args:
+        gb_file:
+            The GenBank file to be modified.
+        fasta_file:
+            The fasta file containing the DNA sequence.
+
+    Returns:
+        The modified GenBank file.
+    """
     gb_filename = re.search(r'(.*/users/.*/uploads/.*).(\w*)', gb_file)
     out_file = str(gb_filename.group(1)) + '_modified.' + str(gb_filename.group(2))
 
@@ -71,9 +93,15 @@ def modify_genbank(gb_file, fasta_file):
     return out_file
 
 def get_final_annotations(genome):
-    '''
-    Queries and returns the annotations made in DNAMaster database.
-    '''
+    """Queries and returns the annotations made in DNAMaster database.
+
+    Args:
+        genome:
+            The Phage genome.
+    
+    Returns:
+        All of the annotations made for each CDS.
+    """
     final_annotations = {}
     for cds in DNAMaster.query.order_by(DNAMaster.start).all():
         annotation = {}

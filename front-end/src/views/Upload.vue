@@ -510,6 +510,10 @@ export default {
   },
 
   methods: {
+
+    /**
+     * Sets all of the notification variables to false.
+     */
     clearNotifications() {
       this.showFastaDangerAlert = false;
       this.showFastaSuccessAlert = false;
@@ -517,6 +521,9 @@ export default {
       this.showGenBankSuccessAlert = false;
     },
 
+    /**
+     * Checks to see if fasta and genbank files have been uploaded.
+     */
     checkIfFilesUploaded() {
       axios
         .get(
@@ -533,6 +540,9 @@ export default {
         });
     },
 
+    /**
+     * Adds the file so that it can be uploaded.
+     */
     handleFileUpload(fileType) {
       if (fileType === "fasta") {
         this.fastaFile = document.querySelector(
@@ -547,7 +557,12 @@ export default {
       }
     },
 
-    uploadFile(fileType, e) {
+    /**
+     * Uploads a genbank or fasta file.
+     * Checks for incorrect file uploads.
+     * @param {string} fileType fasta or genbank file.
+     */
+    uploadFile(fileType) {
       var data = new FormData();
       this.showFastaDangerAlert = false;
       this.showFastaSuccessAlert = false;
@@ -642,6 +657,9 @@ export default {
         });
     },
 
+    /**
+     * Gets the names of the uploaded fasta and genbank files.
+     */
     displayFiles() {
       axios
         .post(
@@ -661,6 +679,11 @@ export default {
         });
     },
 
+    /**
+     * Deletes a given file.
+     * @param {string} fileName the name of the file to be deleted.
+     * @param {string} type fasta or genbank file.
+     */
     deleteFile(fileName, type) {
       axios
         .post(
@@ -684,6 +707,10 @@ export default {
         });
     },
 
+    /**
+     * Downloads the given file.
+     * @param {string} fileName the name of the file to be downloaded.
+     */
     downloadFile(fileName) {
       axios
         .post(

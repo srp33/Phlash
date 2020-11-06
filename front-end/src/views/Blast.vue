@@ -526,7 +526,6 @@ export default {
             `/blast/${this.$route.params.phageID}/displayOutput/none`
         )
         .then((response) => {
-          console.log(response);
           this.fileNames = response.data.file_names;
           this.checkFiles();
         })
@@ -549,7 +548,6 @@ export default {
           var index = this.fileNames.indexOf(fileName);
           this.fileNames.splice(index, 1);
           if (this.fileNames != this.numFiles) this.blastUploaded = false;
-          console.log(response);
         })
         .catch((error) => {
           console.log(error);
@@ -565,7 +563,6 @@ export default {
         this.blastFiles.push(this.blastFile[i]);
       }
       this.showBlastFiles = true;
-      console.log(this.blastFiles);
     },
 
     /**
@@ -640,7 +637,6 @@ export default {
           }
         )
         .then((response) => {
-          console.log(response);
           if (typeof response.data.uploaded !== "undefined") {
             this.fileNames.push(uploadFile.name);
             this.blastLoading = false;
@@ -667,14 +663,14 @@ export default {
               ).innerHTML = dangerMessage;
             });
           }
+        this.blastFiles.splice(this.blastFiles.length - 1, 1);
+        if (this.blastFiles.length > 0) {
+          this.uploadOutputFiles();
+      }
         })
         .catch((error) => {
           console.log(error);
         });
-      this.blastFiles.splice(this.blastFiles.length - 1, 1);
-      if (this.blastFiles.length > 0) {
-        this.uploadOutputFiles();
-      }
     },
 
   },

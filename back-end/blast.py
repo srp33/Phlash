@@ -1,5 +1,14 @@
-"""
-Contains the methods for the Blast page.
+"""Contains the functions for the Blast page.
+
+Returns CDS data.
+Updates CDS data.
+Parses BLAST results.
+
+Attributes:
+    response_object:
+        The dictionary that is returned by the main functions.
+    ROOT:
+        The root directory.
 """
 from werkzeug.utils import secure_filename
 from contextlib import closing
@@ -21,9 +30,15 @@ ROOT = os.path.dirname(os.path.abspath(__file__))
 
 # ------------------------------ MAIN FUNCTIONS ------------------------------
 def find_blast_zip(current_user):
-    '''
-    Finds if the blast zip exists.
-    '''
+    """Finds if the blast zip exists.
+
+    Args:
+        current_user:
+            The current user ID.
+    
+    Returns:
+        A dictionary containing download boolean indicator.
+    """
     response_object["blast_downloaded"] = False
 
     for filename in os.listdir(os.path.join(ROOT, 'users', current_user)):
@@ -33,9 +48,17 @@ def find_blast_zip(current_user):
     return response_object
 
 def download_blast_input(UPLOAD_FOLDER, current_user):
-    '''
-    Creates and returns the blast input zip folder.
-    '''
+    """Creates and returns the blast input zip folder.
+
+    Args:
+        UPLOAD_FOLDER:
+            The folder containing all the uploaded files.
+        current_user:
+            The current user ID.
+
+    Returns:
+        The blast input files in a zip folder.
+    """
     print("Starting comparisons")
     compare()
     fasta_file = helper.get_file_path("fasta", UPLOAD_FOLDER)
@@ -48,9 +71,18 @@ def download_blast_input(UPLOAD_FOLDER, current_user):
     return f.read()
 
 def upload_blast_output(UPLOAD_FOLDER, request):
-    '''
-    Adds the blast output file to the upload directory if of type json.
-    '''
+    """Adds the blast output file to the upload directory if of type json.
+
+    Args:
+        UPLOAD_FOLDER:
+            The folder containing all the uploaded files.
+        request:
+            A dictionary containing the files to be uploaded.
+
+    Returns:
+        A dictionary containing a success or fail message.
+    """
+    response_object = {}
     if 'file' not in request.files:
         print(request.files)
         response_object["status"] = "'file' not in request.files"
@@ -79,9 +111,15 @@ def upload_blast_output(UPLOAD_FOLDER, request):
     return response_object
 
 def get_blast_output_names(UPLOAD_FOLDER):
-    '''
-    Gets the names of all the files of type json in the upload directory.
-    '''
+    """Gets the names of all the files of type json in the upload directory.
+
+    Args:
+        UPLOAD_FOLDER:
+            The folder containing all the uploaded files.
+
+    Returns:
+        A dictionary containing a list of the blast output file names.
+    """
     file_names = []
     for file in os.listdir(UPLOAD_FOLDER):
         if file.endswith(".json"):
@@ -91,9 +129,19 @@ def get_blast_output_names(UPLOAD_FOLDER):
     return response_object
 
 def download_blast_output(UPLOAD_FOLDER, file_path):
-    '''
-    Returns the contents of a file given the file path.
-    '''
+    """Returns the contents of a file given the file path.
+
+    Returns fail message if file not found.
+
+    Args:
+        UPLOAD_FOLDER:
+            The folder containing all the uploaded files.
+        file_path:
+            The path to the file to be downloaded.
+
+    Returns:
+        A dictionary containing the contents of the file and a success message.
+    """
     try:
         response_object["file_data"] = open(os.path.join(UPLOAD_FOLDER, file_path)).read()
         response_object["status"] = "success"
@@ -104,9 +152,17 @@ def download_blast_output(UPLOAD_FOLDER, file_path):
     return response_object
 
 def delete_blast_output(UPLOAD_FOLDER, file_path):
-    '''
-    Removes a file from the upload directory given the file path.
-    '''
+    """Removes a file from the upload directory given the file path.
+    
+    Args:
+        UPLOAD_FOLDER:
+            The folder containing all the uploaded files.
+        file_path:
+            The path of the file to be removed.
+
+    Returns:
+        A dictionary containing a success message.
+    """
     try:
         os.remove(os.path.join(UPLOAD_FOLDER, file_path))
         response_object["status"] = "success"
@@ -117,6 +173,15 @@ def delete_blast_output(UPLOAD_FOLDER, file_path):
     return response_object
 
 def get_num_blast_files(current_user):
+    """Gets the number of Blast input files in the zip folder.
+
+    Args:
+        current_user:
+            The ID of the current user.
+    
+    Returns:
+        A string containing the number of Blast files or 'None' if not found.
+    """
     for filename in os.listdir(os.path.join(ROOT, 'users', current_user)):
         if filename.endswith('.zip'):
             with closing(ZipFile(os.path.join(ROOT, 'users', current_user, filename))) as archive:
@@ -126,9 +191,8 @@ def get_num_blast_files(current_user):
 
 # ---------- BLAST HELPER FUNCTIONS ----------
 def compare():
-    '''
-    Compares the GeneMark and the DNAMaster CDS calls according to length. 
-    '''
+    """Compares the GeneMark and the DNAMaster CDS calls according to length. 
+    """
     for cds in DNAMaster.query.all():
         dnamaster_cds = DNAMaster.query.filter_by(stop=cds.stop).first()
         genemark_cds = GeneMark.query.filter_by(stop=cds.stop).first()
@@ -142,11 +206,21 @@ def compare():
         db.session.commit()
 
 def create_blast_fasta(current_user, fasta_file, gdata_file):
-    '''
-    Creates fasta file(s) for BLAST input.
-    If more than one file is created, then each file should be 30 kb.
-    @return blast_file_count: number of blast fasta files created.
-    '''
+    """Creates fasta file(s) for BLAST input.
+
+    If more than one file is created, then each file should be 15 kb.
+
+    Args:
+        current_user:
+            The ID of the current user.
+        fasta_file:
+            The file containing the DNA sequence of the phage.
+        gdata_file:
+            The file containing the GeneMark gene calls.
+
+    Returns:
+        The Number of blast fasta files created.
+    """
     filename = re.search('(.*/users/.*)/uploads/.*.\w*', fasta_file)
     genome = SeqIO.read(fasta_file, "fasta").seq
     output = ""
@@ -160,17 +234,9 @@ def create_blast_fasta(current_user, fasta_file, gdata_file):
         db.session.commit()
         for i in range(len(starts)):
             if cds.strand == '+':
-                # if starts[i] == cds.start:
-                #     output += f">{cds.id}, {starts[i]}-{stops[i]}\n"
-                #     output += f"{Seq.translate(sequence=helper.get_sequence(genome, cds.strand, starts[i]-1, stops[i]), table=11)}\n"
-                # else:
                 output += f">{cds.id}_{i + 1}, {starts[i]}-{stops[i]}\n"
                 output += f"{Seq.translate(sequence=helper.get_sequence(genome, cds.strand, starts[i]-1, stops[i]), table=11)}\n"
             else:
-                # if starts[i] == cds.start:
-                #     output += f">{cds.id}, {starts[i]}-{stops[i]}\n"
-                #     output += f"{Seq.translate(sequence=helper.get_sequence(genome, cds.strand, stops[i], starts[i]-1, table=11)}\n"
-                # else:
                 output += f">{cds.id}_{i + 1}, {starts[i]}-{stops[i]}\n"
                 start = len(genome) - stops[i]
                 stop = len(genome) - starts[i] + 1
@@ -197,9 +263,19 @@ def create_blast_fasta(current_user, fasta_file, gdata_file):
 
 # ----- BLAST CREATION HELPER FUNCTIONS ------
 def get_stop_options(genome, start, strand):
-    '''
-    Finds the next stop codon given a start codon index.
-    '''
+    """Finds the next stop codon given a start codon index.
+
+    Args:
+        genome:
+            The genome of the phage.
+        start:
+            The location of the start codon.
+        strand:
+            Complimentary or direct strand.
+
+    Returns:
+        The stop codon index.
+    """
     bacteria_stop_codons = ["TAG", "TAA", "TGA"]
     start -= 1
     gene = ""
@@ -213,9 +289,18 @@ def get_stop_options(genome, start, strand):
             return (start + index + 3)
 
 def get_start_options(genome, maximum, strand, minimum):
-    '''
-    Finds all the start codons within a range of DNA indicated by the minimum and maximum parameters.
-    '''
+    """Finds all the start codons within a range of DNA indicated by the minimum and maximum parameters.
+
+    Args:
+        genome:
+            The genome of the phage.
+        maximum:
+            The max index to search for start codons.
+        strand:
+            Complimentary or direct strand.
+        minimum:
+            The minimum index to search for start codons.
+    """
     print(minimum)
     print(maximum)
     print(strand)
@@ -235,10 +320,20 @@ def get_start_options(genome, maximum, strand, minimum):
     return start_options
 
 def get_starts_stops(cds_id, genome, genemark_gdata_file):
-    '''
-    Finds alternative, possible start positions for a given CDS. 
-    @return start_options, stop_options: list of alternative starts and an associated list of alternative stops
-    '''
+    """Finds alternative, possible start and stop positions for a given CDS. 
+    
+    Args:
+        cds_id:
+            The ID of the CDS.
+        genome:
+            The genome of the phage.
+        genemark_gdata_file:
+            The file containing the genemark gene calls.
+
+    Returns:
+        start_options, stop_options: 
+            list of alternative starts and an associated list of alternative stops.
+    """
     gdata_df = pd.read_csv(genemark_gdata_file, sep='\t', skiprows=16)
     gdata_df.columns = ['Base', '1', '2', '3', '4', '5', '6']
     gdata_df = gdata_df.set_index('Base')
@@ -320,9 +415,6 @@ def get_starts_stops(cds_id, genome, genemark_gdata_file):
 
     print(start_options)
     print(stop_options)
-    
-    # dnamaster_cds.start_options = str(start_options)[1:-1]
-    # dnamaster_cds.stop_options = str(stop_options)[1:-1]
 
     if dnamaster_cds.strand == '+':
         return start_options, stop_options
