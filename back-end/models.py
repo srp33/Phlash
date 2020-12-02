@@ -20,8 +20,8 @@ class DNAMaster(db.Model):
                          nullable=False)
     status = db.Column(db.Text,
                        nullable=False)
-    start_options = db.Column(db.Text)
-    stop_options = db.Column(db.Text)
+    frame = db.Column(db.Integer,
+                        nullable=False)
 
 
 class GeneMark(db.Model):
@@ -36,16 +36,32 @@ class GeneMark(db.Model):
     strand = db.Column(db.Text,
                        nullable=False)
 
-
-# Model class of files uploaded
-class Files(db.Model):
-    __tablename__ = "files"
+class Blast_Results(db.Model):
+    __tablename__ = "blast_results"
     id = db.Column(db.Text,
+                   nullable=False,
                    primary_key=True)
-    name = db.Column(db.Text)
-    date = db.Column(db.DateTime)
+    start = db.Column(db.Integer,
+                      nullable=False)
+    stop = db.Column(db.Integer,
+                     nullable=False)
+    strand = db.Column(db.Text,
+                       nullable=False)
+    results = db.Column(db.Text,
+                       nullable=True)
 
-    def __init__(self, id, name, date):
-        self.id = id
-        self.name = name
-        self.date = date
+class Settings(db.Model):
+    __tablename__ = "settings"
+    back_start_range = db.Column(db.Integer,
+                                nullable=False,
+                                primary_key=True)
+    forward_start_range = db.Column(db.Integer,
+                                    nullable=False)
+    opposite_gap = db.Column(db.Integer,
+                            nullable=False)
+    gap = db.Column(db.Integer,
+                    nullable=False)
+    overlap = db.Column(db.Integer,
+                        nullable=False)
+    short = db.Column(db.Integer,
+                        nullable=False)

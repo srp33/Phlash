@@ -115,3 +115,50 @@ def delete_blast_zip(UPLOAD_FOLDER):
     except FileNotFoundError:
         return "Blast zip file has not been created yet."
     return "success"
+
+def get_frame_and_status(start, stop, strand, coding_potential):
+    start_index = 0
+    find_base = start
+    found = False
+    while not found:
+        if find_base < 1 or find_base > len(coding_potential['x_data']):
+            start_index = 0
+            break
+        found = True
+        try:
+            start_index = coding_potential['x_data'].index(find_base)
+        except:
+            found = False
+            find_base -= 1
+    if start_index > 0:
+        start_index -= 1
+    stop_index = 0
+    find_base = stop
+    found = False
+    while not found:
+        if find_base < 1 or find_base > len(coding_potential['x_data']):
+            stop_index = len(coding_potential['x_data']) - 1
+            break
+        found = True
+        try:
+            stop_index = coding_potential['x_data'].index(find_base)
+        except:
+            found = False
+            find_base += 1
+    if stop_index < len(coding_potential['x_data']) - 1:
+        start_index += 1
+    frame = 0
+    if strand == "-":
+        frame = ((stop + 2) % 3) + 4
+    else:
+        frame = ((start + 2) % 3) + 1
+
+    y_key = 'y_data_' + str(frame)
+    status = "Pass"
+    if coding_potential[y_key][start_index] >= .5 or coding_potential[y_key][stop_index] >= .5:
+        print(coding_potential[y_key][start_index])
+        print(start_index)
+        print(coding_potential[y_key][stop_index])
+        print(stop_index)
+        status = "Fail"
+    return frame, status

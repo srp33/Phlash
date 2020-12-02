@@ -14,11 +14,12 @@ import helper
 import pandas as pd
 import re
 import json
+from datetime import datetime
 
 response_object = {}
 
 # ------------------------------ MAIN FUNCTIONS ------------------------------
-def annotate_cds(request, cds_id):
+def annotate_cds(request, cds_id, UPLOAD_FOLDER):
     """Updates a CDS given the data and the ID.
 
     Updates the start, stop, and function of a given CDS.
@@ -38,21 +39,28 @@ def annotate_cds(request, cds_id):
     cds = DNAMaster.query.filter_by(id=cds_id).first()
     genemark_cds = GeneMark.query.filter_by(stop=cds.stop).first()
     if cds:
+        cds.strand = put_data.get('strand')
         cds.start = put_data.get('start')
         cds.stop = put_data.get('stop')
         cds.function = put_data.get('function')
         response_object['message'] = 'CDS updated!'
     else:
         response_object['message'] = 'CDS did not update.'
-    if genemark_cds:
-        orf_length_dnamaster = cds.stop - cds.start
-        orf_length_genemark = genemark_cds.stop - genemark_cds.stop
-        if orf_length_dnamaster < orf_length_genemark:
-            cds.status = "Fail"
-        else:
-            cds.status = "Pass"
-    else:
-        cds.status = "Undetermined"
+    coding_potential = {}
+    genemark_gdata_file = helper.get_file_path("gdata", UPLOAD_FOLDER)
+    gdata_df = pd.read_csv(genemark_gdata_file, sep='\t', skiprows=16)
+    gdata_df.columns = ['Base', '1', '2', '3', '4', '5', '6']
+    coding_potential['x_data'] = gdata_df["Base"].to_list()
+    coding_potential['y_data_1'] = gdata_df["1"].to_list()
+    coding_potential['y_data_2'] = gdata_df["2"].to_list()
+    coding_potential['y_data_3'] = gdata_df["3"].to_list()
+    coding_potential['y_data_4'] = gdata_df["4"].to_list()
+    coding_potential['y_data_5'] = gdata_df["5"].to_list()
+    coding_potential['y_data_6'] = gdata_df["6"].to_list()
+    
+    frame, status = helper.get_frame_and_status(cds.start, cds.stop, cds.strand, coding_potential)
+    cds.status = status
+    cds.frame = frame
         
     db.session.commit()
 
@@ -97,24 +105,28 @@ def get_cds_data(UPLOAD_FOLDER, cds_id):
                                 'stop': cds.stop,
                                 'strand': cds.strand,
                                 'function': cds.function,
-                                'status': cds.status}
+                                'status': cds.status,
+                                'frame': cds.frame}
     
-    starts = [int(start) for start in cds.start_options.split(",")]
-    stops = [int(stop) for stop in cds.stop_options.split(",")]
-    response_object['start_options'] = starts
-    response_object['stop_options'] = stops
-    print(stops)
+    # starts = [int(start) for start in cds.start_options.split(",")]
+    # stops = [int(stop) for stop in cds.stop_options.split(",")]
+    # response_object['start_options'] = starts
+    # response_object['stop_options'] = stops
+    # print(stops)
+    # print(starts)
+    # blast_files = helper.get_file_path("blast", UPLOAD_FOLDER)
+    # E_VALUE_THRESH = 1e-7
+    starts, stops = get_blasts(cds.start)
     print(starts)
-    blast_files = helper.get_file_path("blast", UPLOAD_FOLDER)
-    E_VALUE_THRESH = 1e-7
-    blast_results = parse_blast_results(blast_files, cds.id, E_VALUE_THRESH)
-    response_object['blast'] = blast_results
+    print(stops)
+    # blast_results = parse_blast_results(blast_files, cds.id, E_VALUE_THRESH)
+    # response_object['blast'] = blast_results
 
     genemark_gdata_file = helper.get_file_path("gdata", UPLOAD_FOLDER)
     gdata_df = pd.read_csv(genemark_gdata_file, sep='\t', skiprows=16)
     gdata_df.columns = ['Base', '1', '2', '3', '4', '5', '6']
     gdata_df = gdata_df[gdata_df.Base.isin(
-        range(min(starts) - 100, cds.stop + 100))]
+        range(min(starts) - 100, max(stops) + 100))]
     response_object['x_data'] = gdata_df["Base"].to_list()
     response_object['y_data_1'] = gdata_df["1"].to_list()
     response_object['y_data_2'] = gdata_df["2"].to_list()
@@ -173,6 +185,7 @@ def parse_blast_results(blast_files, cds_id, e_value_thresh):
                 if title:
                     curr_id = title.group(1)
                     curr_start = title.group(2)
+                    print(curr_start)
                     cds_id_ = cds_id + "_"
                     if cds_id == curr_id or cds_id_ in curr_id:
                         blast_results[curr_start] = []
@@ -195,3 +208,25 @@ def parse_blast_results(blast_files, cds_id, e_value_thresh):
                                 blast_results[curr_start].append(alignment)
 
     return blast_results
+
+def get_blasts(start):
+    print(datetime.now())
+    blasts = {}
+    starts = []
+    stops = []
+    strands = []
+    setting = db.session.query(Settings).order_by(Settings.back_start_range).first()
+    minimum = start - setting.back_start_range
+    maximum = start + setting.forward_start_range
+    for blast in db.session.query(Blast_Results).order_by(Blast_Results.start):
+        if blast.start > minimum and blast.start < maximum:
+            starts.append(blast.start)
+            stops.append(blast.stop)
+            strands.append(blast.strand)
+            blasts[str(blast.start) + '-' + str(blast.stop) + '  ' + blast.strand] = eval(blast.results)
+    response_object['start_options'] = starts
+    response_object['stop_options'] = stops
+    response_object['strands'] = strands
+    response_object['blast'] = blasts
+    print(datetime.now())
+    return starts, stops

@@ -94,6 +94,7 @@ def handle_existing_users(phage_id):
             required_files.remove("ldata")
 
     response_object['uploaded_all_files'] = True if len(required_files) == 0 else False
+    response_object['blast_complete'] = False if db.session.query(Blast_Results).first() is None else True
 
 def handle_new_users(phage_id, app):
     """Creates a new user and the associated directories.
@@ -109,6 +110,14 @@ def handle_new_users(phage_id, app):
     with app.app_context():
         db.drop_all()
         db.create_all()
+    setting = Settings(back_start_range = 300,
+                        forward_start_range = 100,
+                        gap = 10,
+                        overlap = 10,
+                        opposite_gap = 50,
+                        short = 200)
+    db.session.add(setting)
+    db.session.commit()
     response_object["id_status"] = "ID created. Please continue."
     response_object["uploaded_all_files"] = False
 

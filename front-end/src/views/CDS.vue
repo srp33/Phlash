@@ -1,211 +1,287 @@
 <template>
-  <div class="container">
-    <loading
-      :active.sync="pageLoading"
-      :is-full-page="true"
-      :height="100"
-      :width="100"
-    ></loading>
-    <div class="headers">
-      <h1>ID: {{ $route.params.cdsID }}</h1>
-      <h4>Start: {{ currentCDS.start }}</h4>
-      <h4>Stop: {{ currentCDS.stop }}</h4>
-      <h4>Strand: {{ currentCDS.strand }}</h4>
-      <h4>Status: {{ currentCDS.status }}</h4>
-    </div>
-    <div class="alert alert-primary">
-      <p><strong>Instructions</strong></p>
-      <p>
-        Choose a new start for this gene call based on the information given
-        below or keep the current start.
-      </p>
-      <p><strong>Key</strong></p>
-      <p>
-        <strong class="red-text">Red:</strong> selected start and stop positions.<br />
-        <strong class="blue-text">Blue:</strong> coding potential in relation to base number.<br />
-        <strong class="green-text">Light green:</strong> 0.75 coding potential reference line.<br />
-        <strong class="grey-text">Light grey:</strong> The previous gene's stop position and the next
-        gene's start position.
-      </p>
-      <p>
-        <strong>Your selected open reading frame:</strong> {{ newStart }}-{{ newStop }}
-      </p>
-      <p><strong>Your selected function:</strong> {{ newFunction }}</p>
-      <router-link
-        :to="{
-          name: 'Annotations',
-          params: { phageID: $route.params.phageID },
-        }"
-      >
-        <button class="btn btn-light btn-action">
-          <strong>Return</strong>
-        </button>
-      </router-link>
-      <button
-        type="button"
-        class="btn btn-light btn-action"
-        @click="deleteCDS($route.params.cdsID)"
-      >
-        <strong>Delete</strong>
-      </button>
-      <button
-        type="button"
-        v-if="newFunction != ''"
-        class="btn btn-light btn-action"
-        @click="editCDS"
-      >
-        <strong>Update</strong>
-      </button>
-    </div>
-    <div class="coding-potential-table">
-      <h4 style="text-align: center; margin: 20px">Alternative Open Reading Frames</h4>
-      <div class="table-responsive">
-        <table id="cp-table" class="table table-hover">
-          <thead>
-            <tr>
-              <th scope="col">Open Reading Frame</th>
-              <th scope="col">Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="(start, index) in startOptions" :key="index">
-              <th v-if="start + stopOptions[index] === currentCDS.start + currentCDS.stop">
-                {{ start }}-{{ stopOptions[index] }} (current)
-              </th>
-              <th v-else>{{ start }}-{{ stopOptions[index] }}</th>
-              <td>
-                <button
-                  class="btn btn-dark btn-sm"
-                  @click="setORF(start, stopOptions[index])"
-                >
-                  <strong>Select</strong>
-                </button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+  <div class="wrapper">
+    <Navbar
+      :upload="navUpload"
+      :blast="navBlast"
+      :annotations="navAnnotations"
+      :geneMap="navGeneMap"
+      :settings="navSettings"
+      :phageID="navPhageID"
+    />
+    <div class="container">
+      <loading
+        :active.sync="pageLoading"
+        :is-full-page="true"
+        :height="100"
+        :width="100"
+      ></loading>
+      <div class="headers">
+        <h1>ID: {{ $route.params.cdsID }}</h1>
+        <h4>Start: {{ currentCDS.start }}</h4>
+        <h4>Stop: {{ currentCDS.stop }}</h4>
+        <h4>Strand: {{ currentCDS.strand }}</h4>
+        <h4>Frame: {{ this.frame }}</h4>
       </div>
-    </div>
-    <hr />
-    <div class="coding-potential">
-      <h4 style="text-align: center; margin: 40px; height: 100%">
-        GeneMark's Coding Potential Per Frame
-      </h4>
-      <div style="display: inline">
-        <div
-          style="
-            width: 52%;
-            display: inline-block;
-            float: left;
-            margin-right: 10px;
-          "
+      <div class="alert alert-primary">
+        <p><strong>Instructions</strong></p>
+        <p>
+          Choose a new start for this gene call based on the information given
+          below or keep the current start.
+        </p>
+        <p><strong>Key</strong></p>
+        <p>
+          <strong class="red-text">Red Dashed Line:</strong> selected start and stop positions.<br />
+          <strong class="blue-text">Blue Line:</strong> coding potential in relation to base number.<br />
+          <strong class="green-text">Green Line:</strong> 0.75 coding potential reference line.<br />
+          <strong class="grey-text">Grey Line:</strong> The previous gene's stop position and the next
+          gene's start position.<br />
+          <strong>Bold Text:</strong> The currently selected open reading frame.
+        </p>
+        <p>
+          <strong>Your selected open reading frame:</strong> {{ newStart }}-{{ newStop }}
+        </p>
+        <p><strong>Your selected function:</strong> {{ newFunction }}</p>
+        <button
+          type="button"
+          class="btn btn-light btn-action"
+          @click="deleteCDS($route.params.cdsID)"
         >
-          <strong>Direct Sequences</strong>
-        </div>
-        <div style="width: 19%; display: inline-block">
-          <strong>Complementary Sequences</strong>
-        </div>
-      </div>
-      <div class="coding-potential-graphs">
-        <div v-if="dataExists">
-          <Graphs
-            :data1="data1"
-            :data2="data2"
-            :data3="data3"
-            :data4="data4"
-            :data5="data5"
-            :data6="data6"
-            :start="currentCDS.start"
-            :stop="currentCDS.stop"
-            :frame="frame"
-            :prevStop="prevStop"
-            :nextStart="nextStart"
-          />
-        </div>
-        <div v-else>
-          <p>Loading graphs...</p>
-        </div>
-      </div>
-      <p class="graphs-caption">
-        <em>Frames are counted 1-6 (direct 1-3 and complementary 4-6).</em>
-      </p>
-    </div>
-    <hr />
-    <div class="blast-results">
-      <h4 style="text-align: center; margin: 40px">BLAST Results</h4>
-      <div v-if="dataExists" id="accordion">
-        <div class="card" v-for="key in blastKeys" :key="key">
-          <div class="card-header">
-            <h4 class="mb-0">
-              <button
-                class="btn btn-light btn-blast"
-                data-toggle="collapse"
-                aria-expanded="false"
-                v-bind:data-target="'#' + key"
-                v-bind:aria-controls="key"
+          <strong>Delete</strong>
+        </button>
+        <button
+          type="button"
+          v-if="newFunction != ''"
+          class="btn btn-light btn-action"
+          @click="editCDS"
+        >
+          <strong>Update</strong>
+        </button>
+        <div class="nav-btns-wrapper">
+          <router-link
+            :to="{ name: 'Annotations', params: { phageID: $route.params.phageID } }"
+          >
+            <button class="btn btn-light btn-nav">
+              <svg
+                class="bi bi-arrow-left"
+                width="1em"
+                height="1em"
+                viewBox="0 0 16 16"
+                fill="currentColor"
+                xmlns="http://www.w3.org/2000/svg"
               >
-                <strong v-if="key === currentCDS.start.toString() + '-' + currentCDS.stop.toString()"
-                  >{{ key }} (current)</strong
-                >
-                <strong v-else>{{ key }}</strong>
-              </button>
-            </h4>
+                <path
+                  fill-rule="evenodd"
+                  d="M5.854 4.646a.5.5 0 010 .708L3.207 8l2.647 2.646a.5.5 0 01-.708.708l-3-3a.5.5 0 010-.708l3-3a.5.5 0 01.708 0z"
+                  clip-rule="evenodd"
+                />
+                <path
+                  fill-rule="evenodd"
+                  d="M2.5 8a.5.5 0 01.5-.5h10.5a.5.5 0 010 1H3a.5.5 0 01-.5-.5z"
+                  clip-rule="evenodd"
+                />
+              </svg>
+              <strong>Back</strong>
+            </button>
+          </router-link>
+        </div>
+      </div>
+      <div class="coding-potential-table">
+        <h4 style="text-align: center; margin: 20px">Alternative Open Reading Frames</h4>
+        <div style="overflow: hidden;">
+          <div class="table-responsive" style="float: left; width: 40%;">
+            <table id="cp-table" class="table table-hover">
+              <thead>
+                <tr>
+                  <th scope="col">Open Reading Frame</th>
+                  <th scope="col">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="(start, index) in dirStartOptions" :key="index">
+                  <th v-if="start + dirStopOptions[index] === currentCDS.start + currentCDS.stop" >
+                    <strong>{{ start }}-{{ dirStopOptions[index] }}  +</strong>
+                  </th>
+                  <th  style="color:grey" v-else>{{ start }}-{{ dirStopOptions[index] }}  +</th>
+                  <td>
+                    <button
+                      class="btn btn-dark btn-sm"
+                      @click="setORF(start, dirStopOptions[index], '+')"
+                    >
+                      <strong>Select</strong>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           </div>
-          <div v-bind:id="key" class="collapse" data-parent="#accordion">
-            <div class="card-body">
-              <BlastResults
-                v-if="key === currentCDS.start.toString() + '-' + currentCDS.stop.toString()"
-                :blastResults="blastResults[key]"
-                :allowSelect="true"
-                @newFunction="setFunction"
-              />
-              <BlastResults
-                v-else
-                :blastResults="blastResults[key]"
-                :allowSelect="false"
-                @newFunction="setFunction"
-              />
+          <div class="table-responsive" style="float: right; width: 40%">
+            <table id="cp-table" class="table table-hover">
+              <thead>
+                <tr>
+                  <th scope="col">Open Reading Frame</th>
+                  <th scope="col">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="(start, index) in compStartOptions" :key="index">
+                  <th v-if="start + compStopOptions[index] === currentCDS.start + currentCDS.stop" >
+                    <strong>{{ start }}-{{ compStopOptions[index] }}  -</strong>
+                  </th>
+                  <th  style="color:grey" v-else>{{ start }}-{{ compStopOptions[index] }}  -</th>
+                  <td>
+                    <button
+                      class="btn btn-dark btn-sm"
+                      @click="setORF(start, compStopOptions[index], '-')"
+                    >
+                      <strong>Select</strong>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <hr />
+      <div class="coding-potential">
+        <h4 style="text-align: center; margin: 40px; height: 100%">
+          GeneMark's Coding Potential Per Frame
+        </h4>
+        <div style="display: inline">
+          <div
+            style="
+              width: 52%;
+              display: inline-block;
+              float: left;
+              margin-right: 10px;
+            "
+          >
+            <strong>Direct Sequences</strong>
+          </div>
+          <div style="width: 19%; display: inline-block">
+            <strong>Complementary Sequences</strong>
+          </div>
+        </div>
+        <div class="coding-potential-graphs">
+          <div v-if="dataExists">
+            <Graphs
+              :data1="data1"
+              :data2="data2"
+              :data3="data3"
+              :data4="data4"
+              :data5="data5"
+              :data6="data6"
+              :start="currentCDS.start"
+              :stop="currentCDS.stop"
+              :frame="frame"
+              :prevStop="prevStop"
+              :nextStart="nextStart"
+            />
+          </div>
+          <div v-else>
+            <p>Loading graphs...</p>
+          </div>
+        </div>
+        <p class="graphs-caption">
+          <em>Frames are counted 1-6 (direct 1-3 and complementary 4-6).</em>
+        </p>
+      </div>
+      <hr />
+      <div class="blast-results">
+        <h4 style="text-align: center; margin: 40px">BLAST Results</h4>
+        <div v-if="dataExists" id="accordion">
+          <div class="card" v-for="key in blastKeys" :key="key">
+            <div class="card-header">
+              <h4 class="mb-0">
+                <button
+                  class="btn btn-light btn-blast"
+                  data-toggle="collapse"
+                  aria-expanded="false"
+                  v-bind:data-target="'#' + key"
+                  v-bind:aria-controls="key"
+                >
+                  <strong v-if="key === currentCDS.start.toString() + '-' + currentCDS.stop.toString() + '  ' + currentCDS.strand"
+                    >{{ key }}</strong
+                  >
+                  <strong style="color:grey" v-else>{{ key }}</strong>
+                </button>
+              </h4>
+            </div>
+            <div v-bind:id="key" class="collapse" data-parent="#accordion">
+              <div class="card-body">
+                <BlastResults
+                  v-if="key === currentCDS.start.toString() + '-' + currentCDS.stop.toString() + '  ' + currentCDS.strand"
+                  :blastResults="blastResults[key]"
+                  :allowSelect="true"
+                  @newFunction="setFunction"
+                />
+                <BlastResults
+                  v-else
+                  :blastResults="blastResults[key]"
+                  :allowSelect="false"
+                  @newFunction="setFunction"
+                />
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
-    <div class="info-bottom">
-      <p>
-        <strong>Your selected open reading frame:</strong> {{ newStart }}-{{ newStop }}
-      </p>
-      <p><strong>Your function selection:</strong> {{ newFunction }}</p>
-      <router-link
-        :to="{
-          name: 'Annotations',
-          params: { phageID: $route.params.phageID },
-        }"
-      >
-        <button class="btn btn-light btn-action">
-          <strong>Return</strong>
+      <div class="info-bottom">
+        <p>
+          <strong>Your selected open reading frame:</strong> {{ newStart }}-{{ newStop }}
+        </p>
+        <p><strong>Your function selection:</strong> {{ newFunction }}</p>
+        <button
+          type="button"
+          class="btn btn-light btn-action"
+          @click="deleteCDS($route.params.cdsID)"
+        >
+          <strong>Delete</strong>
         </button>
-      </router-link>
-      <button
-        type="button"
-        class="btn btn-light btn-action"
-        @click="deleteCDS($route.params.cdsID)"
-      >
-        <strong>Delete</strong>
-      </button>
-      <button
-        type="button"
-        v-if="newFunction != ''"
-        class="btn btn-light btn-action"
-        @click="editCDS"
-      >
-        <strong>Update</strong>
-      </button>
+        <button
+          type="button"
+          v-if="newFunction != ''"
+          class="btn btn-light btn-action"
+          @click="editCDS"
+        >
+          <strong>Update</strong>
+        </button>
+        <div class="nav-btns-wrapper">
+          <router-link
+            :to="{ name: 'Annotations', params: { phageID: $route.params.phageID } }"
+          >
+            <button class="btn btn-light btn-nav">
+              <svg
+                class="bi bi-arrow-left"
+                width="1em"
+                height="1em"
+                viewBox="0 0 16 16"
+                fill="currentColor"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  fill-rule="evenodd"
+                  d="M5.854 4.646a.5.5 0 010 .708L3.207 8l2.647 2.646a.5.5 0 01-.708.708l-3-3a.5.5 0 010-.708l3-3a.5.5 0 01.708 0z"
+                  clip-rule="evenodd"
+                />
+                <path
+                  fill-rule="evenodd"
+                  d="M2.5 8a.5.5 0 01.5-.5h10.5a.5.5 0 010 1H3a.5.5 0 01-.5-.5z"
+                  clip-rule="evenodd"
+                />
+              </svg>
+              <strong>Back</strong>
+            </button>
+          </router-link>
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
 import axios from "axios";
+import Navbar from "../components/Navbar.vue";
 import BlastResults from "../components/BlastResults.vue";
 import Graphs from "../components/Graphs.vue";
 import Loading from "vue-loading-overlay";
@@ -217,6 +293,7 @@ export default {
     BlastResults,
     Graphs,
     Loading,
+    Navbar,
   },
 
   data() {
@@ -224,6 +301,11 @@ export default {
     return {
       stopOptions: [],
       startOptions: [],
+      dirStartOptions: [],
+      compStartOptions: [],
+      dirStopOptions: [],
+      compStopOptions: [],
+      strands: [],
       currentCDS: {
         id: "",
         start: "",
@@ -231,6 +313,7 @@ export default {
         strand: "",
         function: "",
         status: "",
+        frame: "",
       },
       updatedCDS: {
         id: "",
@@ -272,6 +355,30 @@ export default {
       return Object.keys(this.blastResults);
     },
 
+    navUpload: function () {
+      return true;
+    },
+
+    navBlast: function () {
+      return true;
+    },
+
+    navAnnotations: function () {
+      return true;
+    },
+
+    navGeneMap: function () {
+      return true;
+    },
+
+    navSettings: function () {
+      return true;
+    },
+
+    navPhageID: function () {
+      return this.$route.params.phageID;
+    },
+
   },
 
   methods: {
@@ -291,6 +398,17 @@ export default {
           this.blastResults = response.data.blast;
           this.startOptions = response.data.start_options;
           this.stopOptions = response.data.stop_options;
+          this.strands = response.data.strands;
+          for (var i = 0; i < this.startOptions.length; ++i) {
+            if (this.strands[i] == '+') {
+              this.dirStartOptions.push(this.startOptions[i]);
+              this.dirStopOptions.push(this.stopOptions[i]);
+            }
+            else {
+              this.compStartOptions.push(this.startOptions[i]);
+              this.compStopOptions.push(this.stopOptions[i]);
+            }
+          }
           console.log(this.stopOptions);
           this.newStart = this.currentCDS.start;
           this.newStop = this.currentCDS.stop;
@@ -334,10 +452,7 @@ export default {
           ];
           this.dataExists = true;
           this.pageLoading = false;
-          if (this.currentCDS.strand == "-") {
-            this.frame = ((this.currentCDS.stop + 2) % 3) + 4;
-          }
-          else this.frame = ((this.currentCDS.start + 2) % 3) + 1;
+          this.frame = this.currentCDS.frame
           console.log(this.frame);
 
           this.nextCDS = response.data.nextCDS;
@@ -417,7 +532,7 @@ export default {
      * @param {number} start the user selected start.
      * @param {number} stop the user selected stop.
      */
-    setORF(start, stop) {
+    setORF(start, stop, strand) {
       if (start != this.newStart || stop != this.newStop) {
         this.dataExists = false;
         this.newFunction = "";
@@ -425,6 +540,7 @@ export default {
         this.currentCDS.stop = stop;
         this.newStart = start;
         this.currentCDS.start = start;
+        this.currentCDS.strand = strand;
         this.frame = ((start + 2) % 3) + 1;
         if (this.currentCDS.strand == "-") {
           this.frame = ((this.currentCDS.stop + 2) % 3) + 4;
@@ -443,6 +559,15 @@ export default {
 
 <style scoped>
 /* ----- Title and Headers ----- */
+
+.nav-btns-wrapper {
+  text-align: center;
+}
+
+.btn-nav {
+  margin: 10px;
+}
+
 .headers {
   margin: 40px auto;
 }
@@ -469,7 +594,7 @@ export default {
 }
 
 .blue-text {
-  color: #044a79;
+  color: rgb(41, 41, 228);
 }
 
 .green-text {
@@ -483,7 +608,7 @@ export default {
 /* ----- Coding Potential ----- */
 .coding-potential-table {
   margin: 50px auto;
-  width: 40%;
+  width: 80%;
 }
 
 .table-responsive {

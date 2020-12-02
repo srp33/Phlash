@@ -6,6 +6,7 @@ RUN python -m pip install --upgrade pip \
  && pip install -r requirements.txt
 
 ADD *.py /app/
+ADD custom_gunicorn_conf.py /
 ADD genemark_suite_linux_64.tar.gz /
 ADD gm_key_64.gz /
 

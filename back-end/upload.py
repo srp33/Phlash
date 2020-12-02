@@ -23,6 +23,7 @@ import subprocess
 import models
 import helper
 import shutil
+import pandas as pd
 
 response_object = {}
 ROOT = os.path.dirname(os.path.abspath(__file__))
@@ -59,6 +60,7 @@ def check_uploaded_files(UPLOAD_FOLDER):
                                         "gdata" in existing_files and \
                                         "ldata" in existing_files else False
     response_object["genbank"] = True if "genbank" in existing_files else False
+    response_object["blast_completed"] = False if db.session.query(Blast_Results).first() is None else True
 
     return response_object
 
@@ -118,13 +120,11 @@ def display_files(UPLOAD_FOLDER):
     response_object["fasta_file"] = "Not found"
     response_object["genbank_file"] = "Not found"
     for file in os.listdir(UPLOAD_FOLDER):
-        print(file)
         if (file.endswith(".fasta") or file.endswith(".fna") or file.endswith(".txt")):
             response_object["fasta_file"] = file
-            print(response_object["fasta_file"])
         elif (file.endswith(".gb") or file.endswith(".gbk") or file.endswith(".gbf")):
             response_object["genbank_file"] = file
-
+            response_object["genbank_file_size"] = os.path.getsize(os.path.join(UPLOAD_FOLDER, file))
     return response_object
 
 def download_file(file_path, UPLOAD_FOLDER):
@@ -164,14 +164,16 @@ def delete_file(file_path, UPLOAD_FOLDER):
         A dictionary containing a success message.
     """
     try:
-        if (file_path.endswith(".fasta") or file_path.endswith(".fna") or file_path.endswith(".txt")):
+        # if (file_path.endswith(".fasta") or file_path.endswith(".fna") or file_path.endswith(".txt")):
+        #     db.session.query(GeneMark).delete()
+        #     for file in os.listdir(UPLOAD_FOLDER):
+        #         if (file.endswith(".gb") or file.endswith(".gbk") or file.endswith(".gbf")):
+        #             continue
+        #         os.remove(os.path.join(UPLOAD_FOLDER, file))
+        if (file_path.endswith(".gb") or file_path.endswith(".gbk") or file_path.endswith("gbf")):
             db.session.query(GeneMark).delete()
-            for file in os.listdir(UPLOAD_FOLDER):
-                if (file.endswith(".gb") or file.endswith(".gbk") or file.endswith(".gbf")):
-                    continue
-                os.remove(os.path.join(UPLOAD_FOLDER, file))
-        elif (file_path.endswith(".gb") or file_path.endswith(".gbk") or file_path.endswith("gbf")):
             db.session.query(DNAMaster).delete()
+            db.session.query(Blast_Results).delete()
             for file in os.listdir(UPLOAD_FOLDER):
                 if (file.endswith(".fasta") or file.endswith(".fna") or file.endswith(".txt")
                 or file.endswith(".gdata") or file.endswith(".ldata") or file.endswith(".lst") or file.endswith(".ps")):
@@ -189,6 +191,22 @@ def delete_file(file_path, UPLOAD_FOLDER):
         print("error in clearing tables")
 
     return response_object
+
+def dropzone_genbank(UPLOAD_FOLDER, request, current_user):
+    file = request.files['file']
+    contents = str(file.read(), 'utf-8')
+    print(request.files)
+    if file:
+        file_name = secure_filename(file.filename)
+        found = False
+        for existing_file in os.listdir(UPLOAD_FOLDER):
+            if existing_file.endswith(file_name):
+                found = True
+        if not found:
+            #file.save(os.path.join(UPLOAD_FOLDER, file_name))
+            with open(os.path.join(UPLOAD_FOLDER, file_name), 'w') as f:
+                f.write(contents)
+            handle_genbank(UPLOAD_FOLDER, current_user)
 
 # ------------------------------ UPLOAD HELPER FUNCTIONS ------------------------------
 def overwrite_files(file_type, UPLOAD_FOLDER):
@@ -332,10 +350,10 @@ def handle_genbank(UPLOAD_FOLDER, current_user):
             The current user ID.
     """
     genbank_file = helper.get_file_path("genbank", UPLOAD_FOLDER)
-    parse_dnamaster_genbank(genbank_file)
     create_fasta(genbank_file, UPLOAD_FOLDER, current_user)
+    parse_dnamaster_genbank(genbank_file, UPLOAD_FOLDER)
 
-def parse_dnamaster_genbank(genbank_file):
+def parse_dnamaster_genbank(genbank_file, UPLOAD_FOLDER):
     """Parses through DNA Master GenBank file to gather DNA Master's CDS calls. 
 
     Adds each CDS to DNA Master table in user's database. 
@@ -345,12 +363,23 @@ def parse_dnamaster_genbank(genbank_file):
             The file containing the DNAMaster data.
     """
     print("in parse_dnamaster_genbank")
+    coding_potential = {}
+    genemark_gdata_file = helper.get_file_path("gdata", UPLOAD_FOLDER)
+    gdata_df = pd.read_csv(genemark_gdata_file, sep='\t', skiprows=16)
+    gdata_df.columns = ['Base', '1', '2', '3', '4', '5', '6']
+    coding_potential['x_data'] = gdata_df["Base"].to_list()
+    coding_potential['y_data_1'] = gdata_df["1"].to_list()
+    coding_potential['y_data_2'] = gdata_df["2"].to_list()
+    coding_potential['y_data_3'] = gdata_df["3"].to_list()
+    coding_potential['y_data_4'] = gdata_df["4"].to_list()
+    coding_potential['y_data_5'] = gdata_df["5"].to_list()
+    coding_potential['y_data_6'] = gdata_df["6"].to_list()
     DNAMaster.query.delete()
     with open(genbank_file, "r") as handle:
         for record in SeqIO.parse(handle, "genbank"):
             num = 1
             for feature in record.features:
-                if feature.type == "CDS":
+                if feature.type == "CDS" or feature.type == "tRNA":
                     if "locus_tag" in feature.qualifiers:
                         id = feature.qualifiers["locus_tag"][0]
                     elif "protein_id" in feature.qualifiers:
@@ -362,15 +391,17 @@ def parse_dnamaster_genbank(genbank_file):
                     # FIXME: do something for compound locations, e.g. join(1..218,166710..167034)
                     # if isinstance(feature.location, SeqFeature.CompoundLocation):
                     #     print(f"{feature.location} is a compoundlocation")
-                    
                     strand = "+" if feature.location.strand == 1 else "-"
+                    frame, status = helper.get_frame_and_status(feature.location.start.position, feature.location.end.position, strand, coding_potential)
                     cds = DNAMaster(id = id,
                                     start = feature.location.start.position + 1,
                                     stop = feature.location.end.position,
                                     strand = strand,
                                     function = "None selected",
-                                    status = "None")
-                    
+                                    status = status,
+                                    frame = frame)
+                    if (feature.type == "tRNA"):
+                        cds.function = "tRNA"
                     exists = DNAMaster.query.filter_by(id=id).first()
                     if not exists:
                         db.session.add(cds)

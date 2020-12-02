@@ -60,15 +60,32 @@ def download_blast_input(UPLOAD_FOLDER, current_user):
         The blast input files in a zip folder.
     """
     print("Starting comparisons")
-    compare()
+    # compare()
     fasta_file = helper.get_file_path("fasta", UPLOAD_FOLDER)
     genemark_gdata_file = helper.get_file_path("gdata", UPLOAD_FOLDER)
     print(datetime.now())
-    num_files_downloaded = create_blast_fasta(current_user, fasta_file, genemark_gdata_file)
+    num_files_downloaded = create_blast_fastas(current_user, fasta_file, genemark_gdata_file)
     print(datetime.now())
     f = open(os.path.join(ROOT, 'users', current_user, f"{current_user}_blast.zip"), "rb")
 
     return f.read()
+
+def dropzone(UPLOAD_FOLDER, request):
+    file = request.files['file']
+    contents = str(file.read(), 'utf-8')
+    print(request.files)
+    if file:
+        file_name = secure_filename(file.filename)
+        found = False
+        for existing_file in os.listdir(UPLOAD_FOLDER):
+            if existing_file.endswith(file_name):
+                found = True
+                with open(os.path.join(UPLOAD_FOLDER, existing_file), 'a+') as f:
+                    f.write(contents)
+        if not found:
+            #file.save(os.path.join(UPLOAD_FOLDER, file_name))
+            with open(os.path.join(UPLOAD_FOLDER, file_name), 'w') as f:
+                f.write(contents)
 
 def upload_blast_output(UPLOAD_FOLDER, request):
     """Adds the blast output file to the upload directory if of type json.
@@ -82,6 +99,7 @@ def upload_blast_output(UPLOAD_FOLDER, request):
     Returns:
         A dictionary containing a success or fail message.
     """
+
     response_object = {}
     if 'file' not in request.files:
         print(request.files)
@@ -91,22 +109,41 @@ def upload_blast_output(UPLOAD_FOLDER, request):
         print("in success")
         file = request.files['file']
         if file:
+            print(list(bytes((file.read()[0:6]))))
+            print(list(bytes(b'{\n"Bla')))
+            print(1)
             file_name = secure_filename(file.filename)
-            if helper.allowed_file(file_name, set(['.json'])):
+            print(file_name)
+            if compare(list(bytes(file.read()[0:6])), list(bytes(b'{\n"Bla'))):
+                print(2)
+                if helper.allowed_file(file_name, set(['.json'])):
+                    print(3)
+                    file_ext = file_name.rsplit('.', 1)[1].lower()
+                    for existing_file in os.listdir(UPLOAD_FOLDER):
+                        if existing_file.endswith(file_name):
+                            os.remove(os.path.join(
+                                UPLOAD_FOLDER, existing_file))
 
-                file_ext = file_name.rsplit('.', 1)[1].lower()
-                for existing_file in os.listdir(UPLOAD_FOLDER):
-                    if existing_file.endswith(file_name):
-                        os.remove(os.path.join(
-                            UPLOAD_FOLDER, existing_file))
-
-                file.save(os.path.join(UPLOAD_FOLDER, file_name))
-                response_object["uploaded"] = file_name
-                print(' * uploaded', file_name)
+                    file.save(os.path.join(UPLOAD_FOLDER, file_name))
+                    print(' * uploaded', file_name)
+                else:
+                    response_object["not_allowed"] = file.filename
             else:
-                response_object["not_allowed"] = file.filename
+                print(4)
+                for existing_file in os.listdir(UPLOAD_FOLDER):
+                    if existing_file.endswith(file_name[1:]):
+                        print(5)
+                        with open(existing_file, 'a+') as f1:
+                            with open(file, 'r') as f2:
+                                print(f1.read())
+                                print(f2.read())
+                                f1.write(f2.read())
+                                print(f1.read())
+            response_object["uploaded"] = file_name
+
         else:
-            response_object["status"] = "error in uploading file" 
+            response_object["status"] = "error in uploading file"
+            
 
     return response_object
 
@@ -121,10 +158,13 @@ def get_blast_output_names(UPLOAD_FOLDER):
         A dictionary containing a list of the blast output file names.
     """
     file_names = []
+    file_sizes = []
     for file in os.listdir(UPLOAD_FOLDER):
         if file.endswith(".json"):
             file_names.append(file)
+            file_sizes.append(os.path.getsize(os.path.join(UPLOAD_FOLDER, file)))
     response_object["file_names"] = file_names
+    response_object["file_sizes"] = file_sizes
 
     return response_object
 
@@ -166,6 +206,11 @@ def delete_blast_output(UPLOAD_FOLDER, file_path):
     try:
         os.remove(os.path.join(UPLOAD_FOLDER, file_path))
         response_object["status"] = "success"
+        db.session.query(Blast_Results).delete()
+        try:
+            db.session.commit()
+        except:
+            print("error in clearing table")
     except:
         print("error in deleting " + file_path)
         response_object["status"] = "error in deleting " + file_path
@@ -208,7 +253,7 @@ def compare():
 def create_blast_fasta(current_user, fasta_file, gdata_file):
     """Creates fasta file(s) for BLAST input.
 
-    If more than one file is created, then each file should be 15 kb.
+    If more than one file is created, then each file should be 30 kb.
 
     Args:
         current_user:
@@ -241,13 +286,72 @@ def create_blast_fasta(current_user, fasta_file, gdata_file):
                 start = len(genome) - stops[i]
                 stop = len(genome) - starts[i] + 1
                 output += f"{Seq.translate(sequence=helper.get_sequence(genome, cds.strand, start, stop), table=11)}\n"
-            if getsizeof(output) > 15000:  # only file size to reach 15 kb, else you get a CPU limit from NCBI blast
+            if getsizeof(output) > 30000:  # only file size to reach 30 kb, else you get a CPU limit from NCBI blast
                 with open(out_file, "w") as f:
                     f.write(output)
                 output = ""
                 blast_file_count += 1
                 out_file = f"{str(filename.group(1))}/{current_user}_blast_{blast_file_count}.fasta"
                 files_to_zip.append(out_file)
+
+    with open(out_file, "w") as f:
+        f.write(output)
+    
+    # zip all out_files together
+    zip_file = zipfile.ZipFile(f"{str(filename.group(1))}/{current_user}_blast.zip", 'w', zipfile.ZIP_DEFLATED)
+    for filename in files_to_zip:
+        arcname = filename.rsplit('/', 1)[-1].lower()
+        zip_file.write(filename, arcname)
+    zip_file.close()
+    
+    return blast_file_count
+
+def create_blast_fastas(current_user, fasta_file, gdata_file):
+    """Creates fasta file(s) for BLAST input.
+
+    If more than one file is created, then each file should be 30 kb.
+
+    Args:
+        current_user:
+            The ID of the current user.
+        fasta_file:
+            The file containing the DNA sequence of the phage.
+        gdata_file:
+            The file containing the GeneMark gene calls.
+
+    Returns:
+        The Number of blast fasta files created.
+    """
+    filename = re.search('(.*/users/.*)/uploads/.*.\w*', fasta_file)
+    genome = SeqIO.read(fasta_file, "fasta").seq
+    output = ""
+    blast_file_count = 1  # keep track of num blast files created
+    out_file = f"{str(filename.group(1))}/{current_user}_blast_{blast_file_count}.fasta"
+    files_to_zip = [out_file]
+    starts, stops = get_start_stop('+', genome, gdata_file)
+    for i in range(len(starts)):
+        output += f">+, {starts[i]}-{stops[i]}\n"
+        output += f"{Seq.translate(sequence=helper.get_sequence(genome, '+', starts[i]-1, stops[i]), table=11)}\n"
+        if getsizeof(output) > 30000:  # only file size to reach 30 kb, else you get a CPU limit from NCBI blast
+            with open(out_file, "w") as f:
+                f.write(output)
+            output = ""
+            blast_file_count += 1
+            out_file = f"{str(filename.group(1))}/{current_user}_blast_{blast_file_count}.fasta"
+            files_to_zip.append(out_file)
+    starts, stops = get_start_stop('-', genome, gdata_file)
+    for i in range(len(starts)):
+        output += f">-, {starts[i]}-{stops[i]}\n"
+        start = len(genome) - stops[i]
+        stop = len(genome) - starts[i] + 1
+        output += f"{Seq.translate(sequence=helper.get_sequence(genome, '-', start, stop), table=11)}\n"
+        if getsizeof(output) > 30000:  # only file size to reach 30 kb, else you get a CPU limit from NCBI blast
+            with open(out_file, "w") as f:
+                f.write(output)
+            output = ""
+            blast_file_count += 1
+            out_file = f"{str(filename.group(1))}/{current_user}_blast_{blast_file_count}.fasta"
+            files_to_zip.append(out_file)
 
     with open(out_file, "w") as f:
         f.write(output)
@@ -301,16 +405,12 @@ def get_start_options(genome, maximum, strand, minimum):
         minimum:
             The minimum index to search for start codons.
     """
-    print(minimum)
-    print(maximum)
-    print(strand)
     bacteria_start_codons = ["ATG", "GTG", "TTG"]
     start_options = []
     maximum += 3
     gene = ""
     if (strand != "-"):
         gene = genome[minimum:maximum]
-        print(gene)
     else:
         gene = genome.reverse_complement()[minimum:maximum]
     for index in range(0, len(gene)):
@@ -341,7 +441,7 @@ def get_starts_stops(cds_id, genome, genemark_gdata_file):
     dnamaster_cds = DNAMaster.query.filter_by(id=cds_id).first()
     genemark_cds = GeneMark.query.filter_by(stop=dnamaster_cds.stop).first()
 
-    minimum = -100 # 100 base pairs lower than the start position
+    minimum = -300 # 100 base pairs lower than the start position
     maximum = 100 # 100 base pairs higher than the start position
     genome_length = len(genome)
     if dnamaster_cds.strand == '+':
@@ -399,7 +499,7 @@ def get_starts_stops(cds_id, genome, genemark_gdata_file):
     stop_options = []
     for start in possible_start_options:
         stop_options.append(get_stop_options(genome, start, dnamaster_cds.strand))
-        if (stop_options[-1] - start < 75 and start != dnamaster_cds.start):
+        if (stop_options[-1] - start < 30 and start != dnamaster_cds.start):
             stop_options.pop()
         else:
             if dnamaster_cds.strand == '+':
@@ -413,10 +513,54 @@ def get_starts_stops(cds_id, genome, genemark_gdata_file):
         start_options.append(dnamaster_cds.start)
         stop_options.append(dnamaster_cds.stop)
 
-    print(start_options)
-    print(stop_options)
-
     if dnamaster_cds.strand == '+':
+        return start_options, stop_options
+    else:
+        return stop_options, start_options
+
+def get_start_stop(strand, genome, genemark_gdata_file):
+    """Finds alternative, possible start and stop positions for a given CDS. 
+    
+    Args:
+        cds_id:
+            The ID of the CDS.
+        genome:
+            The genome of the phage.
+        genemark_gdata_file:
+            The file containing the genemark gene calls.
+
+    Returns:
+        start_options, stop_options: 
+            list of alternative starts and an associated list of alternative stops.
+    """
+    gdata_df = pd.read_csv(genemark_gdata_file, sep='\t', skiprows=16)
+    gdata_df.columns = ['Base', '1', '2', '3', '4', '5', '6']
+    gdata_df = gdata_df.set_index('Base')
+
+    genome_length = len(genome)
+    possible_start_options = get_start_options(genome, genome_length - 1, strand, 0)
+
+    start_options = []
+    stop_options = []
+    for start in possible_start_options:
+        stop_options.append(get_stop_options(genome, start, strand))
+        if stop_options[-1] is None:
+            stop_options.pop()
+        elif stop_options[-1] - start < 30:
+            stop_options.pop()
+        else:
+            if strand == '+':
+                start_options.append(start)
+            else:
+                start_options.append(genome_length - start + 1)
+                stop = stop_options.pop()
+                stop_options.append(genome_length - stop + 1)
+
+    if len(start_options) == 0:
+        start_options.append(dnamaster_cds.start)
+        stop_options.append(dnamaster_cds.stop)
+
+    if strand == '+':
         return start_options, stop_options
     else:
         return stop_options, start_options

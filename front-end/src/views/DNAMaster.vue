@@ -2,7 +2,6 @@
   <div class="wrapper">
     <Navbar
       :upload="navUpload"
-      :dnamaster="navDNAMaster"
       :blast="navBlast"
       :annotations="navAnnotations"
     />
@@ -307,9 +306,9 @@ export default {
       return true;
     },
 
-    navDNAMaster: function () {
-      return true;
-    },
+    // navDNAMaster: function () {
+    //   return true;
+    // },
 
     navBlast: function () {
       return true;

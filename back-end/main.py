@@ -18,6 +18,10 @@ from annotations import *
 import annotations
 from annotations_cds import *
 import annotations_cds
+from annotations_gene_map import *
+import annotations_gene_map
+from settings import *
+import settings
 
 # Configuration
 ROOT = os.path.dirname(os.path.abspath(__file__))
@@ -28,7 +32,7 @@ app.config.from_object(__name__)
 db.init_app(app)
 
 # Enables CORS
-CORS(app, resources={r'/*': {'origins': '*'}})
+CORS(app)
 
 # routers ------------------------------------------------------------------
 @app.route('/phlash_api/test', methods=['GET'])
@@ -79,6 +83,9 @@ def upload(current_user, file_method, file_path):
 
     elif file_method == "delete":
         return jsonify(delete_file(file_path, UPLOAD_FOLDER))
+    elif file_method == "uploadGenbank":
+        dropzone_genbank(UPLOAD_FOLDER, request, current_user)
+        return jsonify("success")
 
 @app.route('/phlash_api/dnamaster/<current_user>', methods=['GET', 'POST'])
 def dnamaster(current_user):
@@ -146,8 +153,11 @@ def blast(current_user, file_method, file_path):
 
         elif file_method == "numFiles":
             return get_num_blast_files(current_user)
+        elif file_method == "test":
+            dropzone(UPLOAD_FOLDER, request)
+            return jsonify("success")
 
-@app.route('/phlash_api/annotations/<current_user>', methods=['GET', 'POST'])
+@app.route('/phlash_api/annotations/<current_user>', methods=['GET', 'POST', 'PUT'])
 def annotate_data(current_user):
     """
     Compares DNA Master's predictions against GeneMark's.
@@ -161,10 +171,16 @@ def annotate_data(current_user):
     response_object = {'status': 'success'}
 
     if request.method == "GET":
+        if (db.session.query(Blast_Results).first() is None):
+            print("empty")
+            parse_blast(UPLOAD_FOLDER)
         return jsonify(get_dnamaster_data())
 
     if request.method == "POST":
         return get_genbank(UPLOAD_FOLDER)
+
+    if request.method == "PUT":
+        return jsonify(add_cds(request, UPLOAD_FOLDER))
 
 @app.route('/phlash_api/annotations/cds/<current_user>/<cds_id>', methods=['GET', 'POST', 'PUT', 'DELETE'])
 def cds_annotation(current_user, cds_id):
@@ -183,7 +199,33 @@ def cds_annotation(current_user, cds_id):
         return jsonify(get_cds_data(UPLOAD_FOLDER, cds_id))
                 
     if request.method == "PUT":
-        return jsonify(annotate_cds(request, cds_id))
+        return jsonify(annotate_cds(request, cds_id, UPLOAD_FOLDER))
+
+@app.route('/phlash_api/annotations/geneMap/<current_user>/', methods=['GET'])
+def gene_map(current_user):
+    """
+    Builds and returns the gene map.
+    """
+    DATABASE = "sqlite:///{}".format(os.path.join(ROOT,
+                                                  'users', current_user, f"{current_user}.db"))
+    app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE
+    UPLOAD_FOLDER = os.path.join(ROOT, 'users', current_user, 'uploads')
+    if request.method == "GET":
+        return jsonify(get_map(UPLOAD_FOLDER))
+
+@app.route('/phlash_api/settings/<current_user>/<payload>/', methods=['PUT', 'GET'])
+def settings(current_user, payload):
+    """
+    Updates default settings.
+    """
+    DATABASE = "sqlite:///{}".format(os.path.join(ROOT,
+                                                  'users', current_user, f"{current_user}.db"))
+    app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE
+    if request.method == "GET":
+        if payload == "none":
+            return jsonify(get_settings())
+        else:
+            return jsonify(update_settings(payload))
 
 if __name__ == '__main__':
     app.run()

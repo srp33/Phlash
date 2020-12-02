@@ -6,6 +6,7 @@ import DNAMaster from './views/DNAMaster.vue';
 import Blast from './views/Blast.vue';
 import Annotations from './views/Annotations.vue';
 import CDS from './views/CDS.vue';
+import GeneMap from './views/GeneMap.vue';
 
 Vue.use(Router);
 
@@ -42,6 +43,11 @@ export default new Router({
       path: '/annotations/cds/:phageID/:cdsID',
       name: 'CDS',
       component: CDS,
+    },
+    {
+      path: '/annotations/geneMap/:phageID',
+      name: 'GeneMap',
+      component: GeneMap,
     }
   ],
 });

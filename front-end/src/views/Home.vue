@@ -2,9 +2,11 @@
   <div class="wrapper">
     <Navbar
       :upload="navUpload"
-      :dnamaster="navDNAMaster"
       :blast="navBlast"
       :annotations="navAnnotations"
+      :geneMap="navGeneMap"
+      :settings="navSettings"
+      :phageID="navPhageID"
     />
     <div class="container">
       <p>
@@ -62,8 +64,37 @@
         </div>
         <div class="nav-btns-wrapper">
           <router-link
-            :to="{ name: 'DNAMaster', params: { phageID: phageID } }"
-            v-if="idStatus.includes('ID already exists') && allFilesUploaded"
+            :to="{ name: 'Blast', params: { phageID: phageID } }"
+            v-if="idStatus.includes('ID already exists') && allFilesUploaded && !blastComplete"
+          >
+            <button class="btn btn-light">
+              <strong>Next</strong>
+              <svg
+                class="bi bi-arrow-right"
+                width="1em"
+                height="1em"
+                viewBox="0 0 16 16"
+                fill="currentColor"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  fill-rule="evenodd"
+                  d="M10.146 4.646a.5.5 0 01.708 0l3 3a.5.5 0 010 .708l-3 3a.5.5 0 01-.708-.708L12.793 8l-2.647-2.646a.5.5 0 010-.708z"
+                  clip-rule="evenodd"
+                />
+                <path
+                  fill-rule="evenodd"
+                  d="M2 8a.5.5 0 01.5-.5H13a.5.5 0 010 1H2.5A.5.5 0 012 8z"
+                  clip-rule="evenodd"
+                />
+              </svg>
+            </button>
+          </router-link>
+        </div>
+        <div class="nav-btns-wrapper">
+          <router-link
+            :to="{ name: 'Annotations', params: { phageID: phageID } }"
+            v-if="idStatus.includes('ID already exists') && allFilesUploaded && blastComplete"
           >
             <button class="btn btn-light">
               <strong>Next</strong>
@@ -139,10 +170,11 @@ export default {
   data() {
 
     return {
-      phageID: "",
+      phageID: null,
       idStatus: "",
       allFilesUploaded: false,
       dateToBeDeleted: null,
+      blastComplete: false,
     };
 
   },
@@ -157,21 +189,35 @@ export default {
   computed: {
 
     navUpload: function () {
-      if (this.phageID !== "") return true;
+      if (this.phageID !== null) return true;
       else return false;
     },
 
-    navDNAMaster: function () {
-      if (this.phageID !== "" && this.allFilesUploaded) return true;
-      return false;
-    },
+    // navDNAMaster: function () {
+    //   if (this.phageID !== "" && this.allFilesUploaded) return true;
+    //   return false;
+    // },
 
     navBlast: function () {
+      if (this.phageID !== null && this.allFilesUploaded) return true;
       return false;
     },
 
     navAnnotations: function () {
+      return this.blastComplete;
+    },
+
+    navGeneMap: function () {
+      if (this.phageID !== null && this.allFilesUploaded) return true;
       return false;
+    },
+
+    navSettings: function () {
+      return false;
+    },
+
+    navPhageID: function () {
+      return this.phageID;
     },
 
   },
@@ -187,7 +233,9 @@ export default {
       axios
         .post(process.env.VUE_APP_BASE_URL + `/home/${this.phageID}`)
         .then((response) => {
+          console.log(response.data)
           this.allFilesUploaded = response.data.uploaded_all_files;
+          this.blastComplete = response.data.blast_complete;
           this.idStatus = response.data.id_status;
           const monthNames = [
             "January",
