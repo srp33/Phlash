@@ -22,6 +22,8 @@ from annotations_gene_map import *
 import annotations_gene_map
 from settings import *
 import settings
+import threading
+import time
 
 # Configuration
 ROOT = os.path.dirname(os.path.abspath(__file__))
@@ -133,7 +135,11 @@ def blast(current_user, file_method, file_path):
     app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE
 
     if request.method == "GET":
-        return jsonify(find_blast_zip(current_user))
+        if file_method == "checkFiles":
+            return jsonify(find_blast_zip(current_user))
+        elif file_method == "autoAnnotate":
+            auto_annotate(UPLOAD_FOLDER, current_user)
+            return jsonify("success")
         
     if request.method == "POST":
         if file_method == "downloadInput":
@@ -153,12 +159,26 @@ def blast(current_user, file_method, file_path):
 
         elif file_method == "numFiles":
             return get_num_blast_files(current_user)
-        elif file_method == "test":
+
+        elif file_method == "drop":
             dropzone(UPLOAD_FOLDER, request)
             return jsonify("success")
 
-@app.route('/phlash_api/annotations/<current_user>', methods=['GET', 'POST', 'PUT'])
-def annotate_data(current_user):
+        elif file_method == "deleteBlastResults":
+            size1 = db.session.query(Blast_Results).count()
+            print(size1)
+            time.sleep(.2)
+            size2 = db.session.query(Blast_Results).count()
+            print(size2)
+            if (size1 == size2):
+                db.session.query(Blast_Results).delete()
+                db.session.commit()
+                return jsonify("success")
+            else:
+                return jsonify("fail")
+
+@app.route('/phlash_api/annotations/<current_user>/<file_method>', methods=['GET', 'POST', 'PUT'])
+def annotate_data(current_user, file_method):
     """
     Compares DNA Master's predictions against GeneMark's.
     GET method shows all the DNA Master predictions with a status and action item for each.
@@ -171,16 +191,34 @@ def annotate_data(current_user):
     response_object = {'status': 'success'}
 
     if request.method == "GET":
-        if (db.session.query(Blast_Results).first() is None):
-            print("empty")
-            parse_blast(UPLOAD_FOLDER)
-        return jsonify(get_dnamaster_data())
+        print("get")
+        if file_method == "delete":
+            db.session.query(Blast_Results).delete()
+            db.session.commit()
+            print("delete")
+            return jsonify("success")
+        if file_method == "blast":
+            if (db.session.query(Blast_Results).first() is None):
+                print("empty")
+                parse_blast(UPLOAD_FOLDER)
+                return jsonify("empty")
+            else:
+                return jsonify("not empty")
+        else:
+            print("CDS")
+            # print("data")
+            # if (db.session.query(Blast_Results).first() is None):
+            #     print("empty")
+            #     th = threading.Thread(target=parse_blast, args=(UPLOAD_FOLDER,))
+            #     th.start()
+            return jsonify(get_dnamaster_data())
+        print("done")
 
     if request.method == "POST":
         return get_genbank(UPLOAD_FOLDER)
 
     if request.method == "PUT":
-        return jsonify(add_cds(request, UPLOAD_FOLDER))
+        return jsonify(add_cds(request, UPLOAD_FOLDER, current_user))
 
 @app.route('/phlash_api/annotations/cds/<current_user>/<cds_id>', methods=['GET', 'POST', 'PUT', 'DELETE'])
 def cds_annotation(current_user, cds_id):

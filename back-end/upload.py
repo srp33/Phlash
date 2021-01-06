@@ -392,7 +392,7 @@ def parse_dnamaster_genbank(genbank_file, UPLOAD_FOLDER):
                     # if isinstance(feature.location, SeqFeature.CompoundLocation):
                     #     print(f"{feature.location} is a compoundlocation")
                     strand = "+" if feature.location.strand == 1 else "-"
-                    frame, status = helper.get_frame_and_status(feature.location.start.position, feature.location.end.position, strand, coding_potential)
+                    frame, status = helper.get_frame_and_status(feature.location.start.position + 1, feature.location.end.position, strand, coding_potential)
                     cds = DNAMaster(id = id,
                                     start = feature.location.start.position + 1,
                                     stop = feature.location.end.position,

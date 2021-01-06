@@ -22,16 +22,15 @@
           This is a visual representation of all of the genes in their current state.<br />
           Scroll right to see the rest of the genome.
         </p>
+        <hr />
         <p><strong>Key</strong></p>
         <p>
           <strong class="orange-text">Orange:</strong> An arrow pointing left indicates a gene on the complimentary strand.<br />
           <strong class="blue-text">Blue:</strong> An arrow pointing right indicates a gene on the direct strand.<br />
         </p>
+        <hr />
         <div class="nav-btns-wrapper">
-          <router-link
-            :to="{ name: 'Annotations', params: { phageID: $route.params.phageID } }"
-          >
-            <button class="btn btn-light btn-nav">
+            <button class="btn btn-light btn-nav" @click="goBack()">
               <svg
                 class="bi bi-arrow-left"
                 width="1em"
@@ -53,7 +52,6 @@
               </svg>
               <strong>Back</strong>
             </button>
-          </router-link>
         </div>
       </div>
     </div>
@@ -80,7 +78,14 @@ export default {
     return {
       pageLoading: true,
       image: null,
+      prevRoute: null,
     };
+  },
+
+  beforeRouteEnter(to, from, next) {
+    next(vm => {
+      vm.prevRoute = from
+    })
   },
 
   created() {
@@ -116,19 +121,25 @@ export default {
   },
 
   methods: {
-      getGraph() {
-          axios
-            .get(
-                process.env.VUE_APP_BASE_URL +
-                    `/annotations/geneMap/${this.$route.params.phageID}`
-            )
-            .then((response) => {
-                this.image = "data:image/png;base64, " + response.data.image.slice(2, response.data.image.length - 1);
-                this.pageLoading = false;
-            })
-            .catch((error) => {
-                console.log(error);
-            });
+
+    goBack() {
+      console.log(this.prevRoute);
+      this.$router.push(this.prevRoute);
+    },
+
+    getGraph() {
+        axios
+          .get(
+              process.env.VUE_APP_BASE_URL +
+                  `/annotations/geneMap/${this.$route.params.phageID}`
+          )
+          .then((response) => {
+              this.image = "data:image/png;base64, " + response.data.image.slice(2, response.data.image.length - 1);
+              this.pageLoading = false;
+          })
+          .catch((error) => {
+              console.log(error);
+          });
       }
   },
 }

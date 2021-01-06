@@ -31,7 +31,7 @@
               <button
                 v-if="allowSelect"
                 class="btn btn-dark btn-sm"
-                @click="setFunction(alignment.title)"
+                @click="setFunction(alignment.title, alignment.accession)"
               >
                 <strong>Select</strong>
               </button>
@@ -88,9 +88,9 @@ export default {
      * Sets the CDS function from the blast results.
      * @param {string} funct the function to be added.
      */
-    setFunction(funct) {
-      let result = funct.match(/(.*)\[.*\]/);
-      this.$emit("newFunction", result[1]);
+    setFunction(funct, accession) {
+      let result = funct.match(/(.*) \[.*\]/);
+      this.$emit("newFunction", result[1] + '##' + accession);
     },
 
     /**

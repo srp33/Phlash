@@ -47,6 +47,7 @@
           Files are read and parsed as they are uploaded. Keep this in mind if
           uploading files take a moment.
         </div>
+        <hr />
         <div class="nav-btns-wrapper">
           <router-link :to="{ name: 'Home' }">
             <button class="btn btn-light btn-nav">

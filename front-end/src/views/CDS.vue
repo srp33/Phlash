@@ -28,6 +28,7 @@
           Choose a new start for this gene call based on the information given
           below or keep the current start.
         </p>
+        <hr />
         <p><strong>Key</strong></p>
         <p>
           <strong class="red-text">Red Dashed Line:</strong> selected start and stop positions.<br />
@@ -37,10 +38,11 @@
           gene's start position.<br />
           <strong>Bold Text:</strong> The currently selected open reading frame.
         </p>
+        <hr />
         <p>
           <strong>Your selected open reading frame:</strong> {{ newStart }}-{{ newStop }}
         </p>
-        <p><strong>Your selected function:</strong> {{ newFunction }}</p>
+        <p><strong>Your selected function:</strong> {{ displayFunction }}</p>
         <button
           type="button"
           class="btn btn-light btn-action"
@@ -56,6 +58,7 @@
         >
           <strong>Update</strong>
         </button>
+        <hr />
         <div class="nav-btns-wrapper">
           <router-link
             :to="{ name: 'Annotations', params: { phageID: $route.params.phageID } }"
@@ -230,7 +233,7 @@
         <p>
           <strong>Your selected open reading frame:</strong> {{ newStart }}-{{ newStop }}
         </p>
-        <p><strong>Your function selection:</strong> {{ newFunction }}</p>
+        <p><strong>Your selected function:</strong> {{ displayFunction }}</p>
         <button
           type="button"
           class="btn btn-light btn-action"
@@ -394,6 +397,11 @@ export default {
             `/annotations/cds/${this.$route.params.phageID}/${cdsID}`
         )
         .then((response) => {
+          if (response.data.message != "Finished") {
+            this.$router.push(
+              `/annotations/${this.$route.params.phageID}`
+            );
+          }
           this.currentCDS = response.data.cds;
           this.blastResults = response.data.blast;
           this.startOptions = response.data.start_options;
@@ -409,7 +417,6 @@ export default {
               this.compStopOptions.push(this.stopOptions[i]);
             }
           }
-          console.log(this.stopOptions);
           this.newStart = this.currentCDS.start;
           this.newStop = this.currentCDS.stop;
           this.prevStop = response.data.prev_stop;
@@ -453,10 +460,8 @@ export default {
           this.dataExists = true;
           this.pageLoading = false;
           this.frame = this.currentCDS.frame
-          console.log(this.frame);
 
           this.nextCDS = response.data.nextCDS;
-          console.log(this.nextCDS);
         })
         .catch((error) => {
           console.error(error);
@@ -524,6 +529,8 @@ export default {
      * @param {string} function the user selected function.
      */
     setFunction(funct) {
+      let match = funct.match(/(.*)##(.*)/);
+      this.displayFunction = match[1];
       this.newFunction = funct;
     },
 
@@ -536,6 +543,7 @@ export default {
       if (start != this.newStart || stop != this.newStop) {
         this.dataExists = false;
         this.newFunction = "";
+        this.displayFunction = "";
         this.newStop = stop;
         this.currentCDS.stop = stop;
         this.newStart = start;

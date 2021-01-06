@@ -47,8 +47,10 @@
       </div>
     </nav>
       <b-modal v-model="showSettings" ref="settingsModal" id="settings-modal" title="Settings" hide-footer>
+        Refresh the page for the new settings to take effect.
+        <hr />
         <b-form @submit="onSubmit" align="left">
-          <b-form-group label="Start Search Range (back):" label-for="search-back-input">
+          <b-form-group label="Start Search Range (back):" label-size="lg" label-for="search-back-input">
             This number (defaulted at 300) represents how many base pairs back from the current start position 
             alternate start codons will be searched for.
             <b-form-input
@@ -59,7 +61,7 @@
               placeholder="Enter start search range"
             ></b-form-input>
           </b-form-group>
-          <b-form-group label="Start Search Range (forward):" label-for="search-forward-input">
+          <b-form-group label="Start Search Range (forward):" label-size="lg" label-for="search-forward-input">
             This number (defaulted at 100) represents how many base pairs forward from the current start position 
             alternate start codons will be searched for.
             <b-form-input
@@ -70,7 +72,7 @@
               placeholder="Enter start search range"
             ></b-form-input>
           </b-form-group>
-          <b-form-group label="Gap:" label-for="gap-input">
+          <b-form-group label="Gap:" label-size="lg" label-for="gap-input">
             This number (defaulted at 10) represents the maximum acceptable number of base pairs between two adjacent genes. 
             Gaps greater than this number will be flagged.
             <b-form-input
@@ -81,7 +83,7 @@
               placeholder="Enter acceptable gap length"
             ></b-form-input>
           </b-form-group>
-          <b-form-group label="Overlap:" label-for="overlap-input">
+          <b-form-group label="Overlap:" label-size="lg" label-for="overlap-input">
             This number (defaulted at 10) represents the maximum acceptable number of base pairs two adjacent genes overlap. 
             Overlaps greater than this number will be flagged.
             <b-form-input
@@ -92,7 +94,7 @@
               placeholder="Enter acceptable overlap length."
             ></b-form-input>
           </b-form-group>
-          <b-form-group label="Opposite Strand Gap:" label-for="opposite-gap-input">
+          <b-form-group label="Opposite Strand Gap:" label-size="lg" label-for="opposite-gap-input">
             This number (defaulted at 50) represents the minimum acceptable number of base pairs between two adjacent 
             genes on different strands. Gaps shorter than this number will be flagged.
             <b-form-input
@@ -103,7 +105,7 @@
               placeholder="Enter acceptable gap length"
             ></b-form-input>
           </b-form-group>
-          <b-form-group label="Minimum Gene Length:" label-for="short-input">
+          <b-form-group label="Minimum Gene Length:" label-size="lg" label-for="short-input">
             This number (defaulted at 200) represents the minimum acceptable number of base pairs in a gene. 
             Genes shorter than this number will be flagged.
             <b-form-input

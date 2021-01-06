@@ -14,6 +14,7 @@ import re
 import json
 import pandas as pd
 from datetime import datetime
+import os
 
 response_object = {}
 
@@ -83,16 +84,27 @@ def modify_genbank(gb_file, fasta_file):
                 try:
                     locus_tag = feature.qualifiers["locus_tag"][0]
                     if locus_tag in final_annotations.keys():
-                        new_start = final_annotations[locus_tag]["start"]
-                        feature.location = SeqFeature.FeatureLocation(SeqFeature.ExactPosition(new_start - 1),
-                                                                        SeqFeature.ExactPosition(feature.location.end.position),
-                                                                        feature.location.strand)
-                        if feature.type == "CDS" or feature.type == "tRNA":
-                            feature.qualifiers["product"][0] = final_annotations[locus_tag]["function"]
-                            if feature.qualifiers["product"][0] == "DELETED":
+                        if (feature.type == "tRNA"):
+                            if final_annotations[locus_tag]["function"] == "trnaDELETED":
                                 final_features.pop()
                                 continue
-                            feature.qualifiers["translation"][0] = final_annotations[locus_tag]["translation"]
+                        else:
+                            new_start = final_annotations[locus_tag]["start"]
+                            feature.location = SeqFeature.FeatureLocation(SeqFeature.ExactPosition(new_start - 1),
+                                                                            SeqFeature.ExactPosition(feature.location.end.position),
+                                                                            feature.location.strand)
+                            if feature.type == "CDS":
+                                if final_annotations[locus_tag]["function"].find('##') != -1:
+                                    pattern = re.compile("(.*)##(.*)")
+                                    matches = pattern.search(final_annotations[locus_tag]["function"])
+                                    feature.qualifiers["product"][0] = matches.group(1)
+                                    feature.qualifiers["protein_id"] = matches.group(2)
+                                else:
+                                    feature.qualifiers["product"][0] = final_annotations[locus_tag]["function"]
+                                if feature.qualifiers["product"][0] == "DELETED":
+                                    final_features.pop()
+                                    continue
+                                feature.qualifiers["translation"][0] = final_annotations[locus_tag]["translation"][0:-1]
                 except:
                     continue
             else:
@@ -153,6 +165,7 @@ def parse_blast(UPLOAD_FOLDER):
     counter = 0
     try:
         for blast_file in blast_files:
+            print(blast_file)
             newLines = []
             with open(blast_file, 'r') as f:
                 lines = f.readlines()
@@ -203,14 +216,19 @@ def parse_blast(UPLOAD_FOLDER):
                                                     stop = curr_stop,
                                                     strand = curr_strand,
                                                     results = str(results))
-                        db.session.add(blast_result)
-                        db.session.commit()
+                        try:
+                            db.session.add(blast_result)
+                            db.session.commit()
+                        except:
+                            print("Don't do a thing")
     except:
         print("leave me alone!")
-
+    for filename in os.listdir(UPLOAD_FOLDER):
+        if filename.endswith('.json'):
+            os.remove(os.path.join(UPLOAD_FOLDER, filename))
     print(datetime.now())
 
-def add_cds(request, UPLOAD_FOLDER):
+def add_cds(request, UPLOAD_FOLDER, current_user):
     new_cds_data = request.get_json()
     force = new_cds_data.get('force')
     coding_potential = {}
@@ -224,7 +242,7 @@ def add_cds(request, UPLOAD_FOLDER):
     coding_potential['y_data_4'] = gdata_df["4"].to_list()
     coding_potential['y_data_5'] = gdata_df["5"].to_list()
     coding_potential['y_data_6'] = gdata_df["6"].to_list()
-    frame, status = helper.get_frame_and_status(new_cds_data.get('start'), new_cds_data.get('stop'), new_cds_data.get('strand'), coding_potential)
+    frame, status = helper.get_frame_and_status(int(new_cds_data.get('start')), int(new_cds_data.get('stop')), new_cds_data.get('strand'), coding_potential)
     cds = DNAMaster(id = new_cds_data.get('id'),
                     start = new_cds_data.get('start'),
                     stop = new_cds_data.get('stop'),
@@ -233,19 +251,29 @@ def add_cds(request, UPLOAD_FOLDER):
                     status = status,
                     frame = frame)
 
-    exists = DNAMaster.query.filter_by(id=new_cds_data.get('id')).first()
+    exists = DNAMaster.query.filter_by(start=new_cds_data.get('start'), stop=new_cds_data.get('stop'), strand=new_cds_data.get('strand')).first()
     orf = Blast_Results.query.filter_by(start=new_cds_data.get('start'), stop=new_cds_data.get('stop'), strand=new_cds_data.get('strand')).first()
     if force:
-        if exists:
-            exists.start = new_cds_data.get('start')
-            exists.stop = new_cds_data.get('stop')
-            exists.strand = new_cds_data.get('strand')
-            db.session.commit()
-        else:
-            db.session.add(cds)
-            db.session.commit()
-            add_genbank_cds(UPLOAD_FOLDER, cds)
+        # if exists:
+        #     exists.start = new_cds_data.get('start')
+        #     exists.stop = new_cds_data.get('stop')
+        #     exists.strand = new_cds_data.get('strand')
+        #     db.session.commit()
+        # else:
+        db.session.add(cds)
+        db.session.commit()
+        # add_genbank_cds(UPLOAD_FOLDER, cds)
         response_object['message'] = "Added succesfully."
+        id_index = 0
+        for cds in db.session.query(DNAMaster).order_by(DNAMaster.start):
+            id_index += 1
+            cds.id = str(id_index)
+        db.session.commit()
+        id_index = 0
+        for cds in db.session.query(DNAMaster).order_by(DNAMaster.start):
+            id_index += 1
+            cds.id = current_user + '_' + str(id_index)
+        db.session.commit()
         return response_object
     if exists:
         response_object['message'] = "ID already exists."
@@ -255,6 +283,16 @@ def add_cds(request, UPLOAD_FOLDER):
         db.session.add(cds)
         db.session.commit()
         response_object['message'] = "Added succesfully."
+        id_index = 0
+        for cds in db.session.query(DNAMaster).order_by(DNAMaster.start):
+            id_index += 1
+            cds.id = str(id_index)
+        db.session.commit()
+        id_index = 0
+        for cds in db.session.query(DNAMaster).order_by(DNAMaster.start):
+            id_index += 1
+            cds.id = current_user + '_' + str(id_index)
+        db.session.commit()
         add_genbank_cds(UPLOAD_FOLDER, cds)
     return response_object
 
@@ -281,6 +319,8 @@ def add_genbank_cds(UPLOAD_FOLDER, cds):
         new_contents.append('                     /locus_tag="' + cds.id + '"\n')
         new_contents.append("     CDS             complement(" + str(cds.start) + ".." + str(cds.stop) + ")\n")
     else:
+        start = cds.start
+        stop = cds.stop
         translation = Seq.translate(sequence=helper.get_sequence(genome, cds.strand, start - 1, stop), table=11)
         new_contents.append("     gene            " + str(cds.start) + ".." + str(cds.stop) + "\n")
         new_contents.append('                     /gene="' + str((prev_gene + 1)) + '"\n')
@@ -305,7 +345,6 @@ def add_genbank_cds(UPLOAD_FOLDER, cds):
             else:
                 new_contents.append('                     ' + str(translation[0:44]) + '\n')
                 translation = translation[44:]
-    print(new_contents)
     for i in range(len(new_contents)):
         contents.insert(i + index, new_contents[i])
     with open(helper.get_file_path("genbank", UPLOAD_FOLDER), "w") as genbank:

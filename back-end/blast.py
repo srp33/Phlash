@@ -40,11 +40,12 @@ def find_blast_zip(current_user):
         A dictionary containing download boolean indicator.
     """
     response_object["blast_downloaded"] = False
-
+    response_object["message"] = "Uploaded"
+    if (db.session.query(Blast_Results).first() is None):
+        response_object["message"] = "Not Uploaded"
     for filename in os.listdir(os.path.join(ROOT, 'users', current_user)):
         if filename.endswith('.zip'):
             response_object["blast_downloaded"] = True
-
     return response_object
 
 def download_blast_input(UPLOAD_FOLDER, current_user):
@@ -250,6 +251,148 @@ def compare():
             dnamaster_cds.status = "Undetermined"
         db.session.commit()
 
+def auto_annotate(UPLOAD_FOLDER, current_user):
+    coding_potential = {}
+    genemark_gdata_file = helper.get_file_path("gdata", UPLOAD_FOLDER)
+    gdata_df = pd.read_csv(genemark_gdata_file, sep='\t', skiprows=16)
+    gdata_df.columns = ['Base', '1', '2', '3', '4', '5', '6']
+    coding_potential['x_data'] = gdata_df["Base"].to_list()
+    coding_potential['y_data_1'] = gdata_df["1"].to_list()
+    coding_potential['y_data_2'] = gdata_df["2"].to_list()
+    coding_potential['y_data_3'] = gdata_df["3"].to_list()
+    coding_potential['y_data_4'] = gdata_df["4"].to_list()
+    coding_potential['y_data_5'] = gdata_df["5"].to_list()
+    coding_potential['y_data_6'] = gdata_df["6"].to_list()
+    DNAMaster.query.delete()
+    db.session.commit()
+    id_index = 0
+    with open(os.path.join(UPLOAD_FOLDER, current_user + ".predict"), 'r') as glimmer:
+        for line in glimmer:
+            if line[0] == '>':
+                continue
+            id_index += 1
+            column = line.strip().split()
+            frame = int(column[3])
+            start = int(column[1])
+            stop = int(column[2])
+            strand = '+'
+            if frame < 0:
+                stop = int(column[1])
+                start = int(column[2])
+                strand = '-'
+            frame, status = helper.get_frame_and_status(start, stop, strand, coding_potential)
+            cds = DNAMaster(id = 'Glimmer_' + str(id_index),
+                            start = start,
+                            stop = stop,
+                            strand = strand,
+                            function = "None selected",
+                            status = status,
+                            frame = frame)
+            print(cds)
+            db.session.add(cds)
+    db.session.commit()
+    with open(os.path.join(UPLOAD_FOLDER, current_user + "_aragorn.txt"), 'r') as aragorn:
+        pattern1 = re.compile("tRNA-.*")
+        pattern2 = re.compile("Sequence (.*)\[(.*),(.*)\]")
+        function = ""
+        stop = ""
+        start = ""
+        strand = ""
+        id_index = 0
+        for line in aragorn:
+            line = line.strip()
+            if re.match(pattern1, line) != None:
+                function = line
+            if re.match(pattern2, line) != None:
+                id_index += 1
+                orf = re.search(pattern2, line)
+                if (orf.group(1)) == 'c':
+                    strand = '-'
+                    start = orf.group(3)
+                    stop = orf.group(2)
+                else:
+                    strand = '+'
+                    start = orf.group(2)
+                    stop = orf.group(3)
+                cds = DNAMaster(id = "Aragron_" + str(id_index),
+                                start = int(start),
+                                stop = int(stop),
+                                strand = strand,
+                                function = function,
+                                status = "tRNA",
+                                frame = 0)
+                db.session.add(cds)
+    db.session.commit()
+    with open(os.path.join(UPLOAD_FOLDER, current_user + ".fasta.ldata"), 'r') as genemark:
+        start = 0
+        stop = 0
+        frame = 0
+        prob = 0.0
+        id_index = 0
+        first = True
+        for line in genemark:
+            if line == '\n':
+                break
+            if line[0] != '#':
+                column = line.strip().split()
+                new_prob = 0.0
+                try:
+                    new_prob = (float(column[3]) + float(column[4])) / 2
+                except:
+                    new_prob = 0.0
+                if frame > 3 and start == int(column[0]) and new_prob < prob:
+                    continue
+                if frame < 3 and stop == int(column[1]) and new_prob < prob:
+                    continue
+                if (first) or (frame > 3 and start == int(column[0])) or (frame < 3 and stop == int(column[1])):
+                    first = False
+                    start = int(column[0])
+                    stop = int(column[1])
+                    frame = int(column[2])
+                    prob = new_prob
+                else:
+                    found = False
+                    if frame > 3:
+                        cds = DNAMaster.query.filter_by(start=start).first()
+                        print(cds)
+                        print(start)
+                        if cds == None:
+                            id_index += 1
+                            cds = DNAMaster(id = "Genbank_" + str(id_index),
+                                            start = int(start),
+                                            stop = int(stop),
+                                            strand = '-',
+                                            function = "None selected",
+                                            status = "tRNA",
+                                            frame = frame)
+                            db.session.add(cds)
+                            db.session.commit()
+                    else:
+                        cds = DNAMaster.query.filter_by(stop=stop).first()
+                        print(cds)
+                        print(stop)
+                        if cds == None:
+                            id_index += 1
+                            cds = DNAMaster(id = "Genbank_" + str(id_index),
+                                            start = int(start),
+                                            stop = int(stop),
+                                            strand = '+',
+                                            function = "None selected",
+                                            status = "tRNA",
+                                            frame = frame)
+                            db.session.add(cds)
+                            db.session.commit()
+                    start = int(column[0])
+                    stop = int(column[1])
+                    frame = int(column[2])
+                    prob = new_prob
+    id_index = 0
+    for cds in db.session.query(DNAMaster).order_by(DNAMaster.start):
+        id_index += 1
+        cds.id = current_user + '_' + str(id_index)
+    db.session.commit()
+
+
 def create_blast_fasta(current_user, fasta_file, gdata_file):
     """Creates fasta file(s) for BLAST input.
 
@@ -412,9 +555,12 @@ def get_start_options(genome, maximum, strand, minimum):
     if (strand != "-"):
         gene = genome[minimum:maximum]
     else:
+        print("complimentary")
         gene = genome.reverse_complement()[minimum:maximum]
     for index in range(0, len(gene)):
         codon = gene[index:index + 3]
+        if (index == 3 or index == 217 or index == 218 or index == 219):
+            print(codon)
         if codon in bacteria_start_codons:
             start_options.append(minimum + index + 1)
     return start_options
@@ -564,4 +710,3 @@ def get_start_stop(strand, genome, genemark_gdata_file):
         return start_options, stop_options
     else:
         return stop_options, start_options
-
