@@ -264,7 +264,6 @@ export default {
 
   created() {
     this.setNumFiles();
-    this.autoAnnotate();
   },
 
   computed: {
@@ -501,6 +500,7 @@ export default {
           this.downloadLoading = false;
           this.blastDownloaded = true;
           this.setNumFiles();
+          this.autoAnnotate();
         })
         .catch((error) => {
           console.log(error);

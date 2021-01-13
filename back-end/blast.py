@@ -16,6 +16,7 @@ from zipfile import ZipFile
 from datetime import datetime
 from Bio import SeqIO, Seq, SeqFeature
 from collections import OrderedDict
+import subprocess
 from models import *
 import json
 import os
@@ -265,8 +266,13 @@ def auto_annotate(UPLOAD_FOLDER, current_user):
     coding_potential['y_data_6'] = gdata_df["6"].to_list()
     DNAMaster.query.delete()
     db.session.commit()
+
+    fasta_file_path = os.path.join(UPLOAD_FOLDER, current_user + ".fasta")
+    phanotate_file = fasta_file_path[0 : -6] + "_phanotate.txt"
+    subprocess.run(["/usr/local/lib/python3.7/site-packages/phanotate.py", fasta_file_path, "-o" + phanotate_file])
+
     id_index = 0
-    with open(os.path.join(UPLOAD_FOLDER, current_user + ".predict"), 'r') as glimmer:
+    with open(os.path.join(UPLOAD_FOLDER, current_user + "_glimmer.predict"), 'r') as glimmer:
         for line in glimmer:
             if line[0] == '>':
                 continue
@@ -288,7 +294,6 @@ def auto_annotate(UPLOAD_FOLDER, current_user):
                             function = "None selected",
                             status = status,
                             frame = frame)
-            print(cds)
             db.session.add(cds)
     db.session.commit()
     with open(os.path.join(UPLOAD_FOLDER, current_user + "_aragorn.txt"), 'r') as aragorn:
@@ -314,7 +319,7 @@ def auto_annotate(UPLOAD_FOLDER, current_user):
                     strand = '+'
                     start = orf.group(2)
                     stop = orf.group(3)
-                cds = DNAMaster(id = "Aragron_" + str(id_index),
+                cds = DNAMaster(id = "Aragorn_" + str(id_index),
                                 start = int(start),
                                 stop = int(stop),
                                 strand = strand,
@@ -354,38 +359,66 @@ def auto_annotate(UPLOAD_FOLDER, current_user):
                     found = False
                     if frame > 3:
                         cds = DNAMaster.query.filter_by(start=start).first()
-                        print(cds)
-                        print(start)
-                        if cds == None:
-                            id_index += 1
-                            cds = DNAMaster(id = "Genbank_" + str(id_index),
-                                            start = int(start),
-                                            stop = int(stop),
-                                            strand = '-',
-                                            function = "None selected",
-                                            status = "tRNA",
-                                            frame = frame)
+                        if cds == None or cds.status == 'Fail':
+                            frame, status = helper.get_frame_and_status(start, stop, '-', coding_potential)
+                            if cds == None or (cds.status == 'Fail' and status == 'Pass'):
+                                id_index += 1
+                                cds = DNAMaster(id = "Genemark_" + str(id_index),
+                                                start = int(start),
+                                                stop = int(stop),
+                                                strand = '-',
+                                                function = "None selected",
+                                                status = status,
+                                                frame = frame)
                             db.session.add(cds)
                             db.session.commit()
                     else:
                         cds = DNAMaster.query.filter_by(stop=stop).first()
-                        print(cds)
-                        print(stop)
-                        if cds == None:
-                            id_index += 1
-                            cds = DNAMaster(id = "Genbank_" + str(id_index),
-                                            start = int(start),
-                                            stop = int(stop),
-                                            strand = '+',
-                                            function = "None selected",
-                                            status = "tRNA",
-                                            frame = frame)
-                            db.session.add(cds)
-                            db.session.commit()
+                        if cds == None or cds.status == 'Fail':
+                            frame, status = helper.get_frame_and_status(start, stop, '+', coding_potential)
+                            if cds == None or (cds.status == 'Fail' and status == 'Pass'):
+                                id_index += 1
+                                cds = DNAMaster(id = "Genemark_" + str(id_index),
+                                                start = int(start),
+                                                stop = int(stop),
+                                                strand = '+',
+                                                function = "None selected",
+                                                status = status,
+                                                frame = frame)
+                                db.session.add(cds)
+                                db.session.commit()
                     start = int(column[0])
                     stop = int(column[1])
                     frame = int(column[2])
                     prob = new_prob
+    id_index = 0
+    with open(phanotate_file, 'r') as phanotate:
+        for line in phanotate:
+            if line[0] == '#':
+                continue
+            id_index += 1
+            column = line.strip().split()
+            strand = str(column[2])
+            start = int(column[1])
+            stop = int(column[0])
+            cds = DNAMaster.query.filter_by(start=start).first()
+            if strand == '+':
+                start = int(column[0])
+                stop = int(column[1])
+                cds = DNAMaster.query.filter_by(stop=stop).first()
+            if cds == None or cds.status == 'Fail':
+                frame, status = helper.get_frame_and_status(start, stop, strand, coding_potential)
+                if cds == None or (cds.status == 'Fail' and status == 'Pass'):
+                    cds = DNAMaster(id = 'Phanotate_' + str(id_index),
+                                    start = start,
+                                    stop = stop,
+                                    strand = strand,
+                                    function = "None selected",
+                                    status = status,
+                                    frame = frame)
+                    db.session.add(cds)
+    db.session.commit()
+
     id_index = 0
     for cds in db.session.query(DNAMaster).order_by(DNAMaster.start):
         id_index += 1

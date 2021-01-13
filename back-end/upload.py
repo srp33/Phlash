@@ -259,6 +259,12 @@ def run_genemark(fasta_file_path):
     gdata_file_path = "{}.gdata".format(fasta_file_path)
     ldata_file_path = "{}.ldata".format(fasta_file_path)
 
+    glimmer_file = fasta_file_path[0 : -6] + "_glimmer"
+    subprocess.run(["/opt/glimmer3.02/scripts/g3-from-scratch.csh", fasta_file_path, glimmer_file])
+
+    aragorn_file = fasta_file_path[0 : -6] + "_aragorn.txt"
+    subprocess.run(["aragorn", fasta_file_path, aragorn_file])
+
 def parse_genemark_ldata(gm_file):
     """Parses through GeneMark ldata file to gather CDS calls. 
 
