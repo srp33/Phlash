@@ -17,8 +17,8 @@
       ></loading>
       <div class="headers">
         <h1>ID: {{ $route.params.cdsID }}</h1>
-        <h4>Start: {{ currentCDS.start }}</h4>
-        <h4>Stop: {{ currentCDS.stop }}</h4>
+        <h4>Left: {{ currentCDS.start }}</h4>
+        <h4>Right: {{ currentCDS.stop }}</h4>
         <h4>Strand: {{ currentCDS.strand }}</h4>
         <h4>Frame: {{ this.frame }}</h4>
       </div>

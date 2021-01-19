@@ -311,14 +311,12 @@ def auto_annotate(UPLOAD_FOLDER, current_user):
             if re.match(pattern2, line) != None:
                 id_index += 1
                 orf = re.search(pattern2, line)
+                start = orf.group(2)
+                stop = orf.group(3)
                 if (orf.group(1)) == 'c':
                     strand = '-'
-                    start = orf.group(3)
-                    stop = orf.group(2)
                 else:
                     strand = '+'
-                    start = orf.group(2)
-                    stop = orf.group(3)
                 cds = DNAMaster(id = "Aragorn_" + str(id_index),
                                 start = int(start),
                                 stop = int(stop),
@@ -362,6 +360,8 @@ def auto_annotate(UPLOAD_FOLDER, current_user):
                         if cds == None or cds.status == 'Fail':
                             frame, status = helper.get_frame_and_status(start, stop, '-', coding_potential)
                             if cds == None or (cds.status == 'Fail' and status == 'Pass'):
+                                if cds != None:
+                                    db.session.delete(cds)
                                 id_index += 1
                                 cds = DNAMaster(id = "Genemark_" + str(id_index),
                                                 start = int(start),
@@ -377,6 +377,8 @@ def auto_annotate(UPLOAD_FOLDER, current_user):
                         if cds == None or cds.status == 'Fail':
                             frame, status = helper.get_frame_and_status(start, stop, '+', coding_potential)
                             if cds == None or (cds.status == 'Fail' and status == 'Pass'):
+                                if cds != None:
+                                    db.session.delete(cds)
                                 id_index += 1
                                 cds = DNAMaster(id = "Genemark_" + str(id_index),
                                                 start = int(start),
@@ -409,6 +411,8 @@ def auto_annotate(UPLOAD_FOLDER, current_user):
             if cds == None or cds.status == 'Fail':
                 frame, status = helper.get_frame_and_status(start, stop, strand, coding_potential)
                 if cds == None or (cds.status == 'Fail' and status == 'Pass'):
+                    if cds != None:
+                        db.session.delete(cds)
                     cds = DNAMaster(id = 'Phanotate_' + str(id_index),
                                     start = start,
                                     stop = stop,
@@ -423,6 +427,8 @@ def auto_annotate(UPLOAD_FOLDER, current_user):
     for cds in db.session.query(DNAMaster).order_by(DNAMaster.start):
         id_index += 1
         cds.id = current_user + '_' + str(id_index)
+        if (cds.stop < cds.start) or (Blast_Results.query.filter_by(start=cds.start, stop=cds.stop, strand=cds.strand).first()):
+            db.session.delete(cds)
     db.session.commit()
 
 

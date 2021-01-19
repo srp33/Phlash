@@ -121,8 +121,8 @@
             <thead>
               <tr>
                 <th scope="col">ID</th>
-                <th scope="col">Start</th>
-                <th scope="col">Stop</th>
+                <th scope="col">Left</th>
+                <th scope="col">Right</th>
                 <th scope="col">Strand</th>
                 <th width="200px" scope="col">Function</th>
                 <th scope="col">Status</th>
