@@ -59,7 +59,7 @@ def check_uploaded_files(UPLOAD_FOLDER):
     response_object["fasta"] = True if "fasta" in existing_files and \
                                         "gdata" in existing_files and \
                                         "ldata" in existing_files else False
-    response_object["genbank"] = True if "genbank" in existing_files else False
+    response_object["genbank"] = True
     response_object["blast_completed"] = False if db.session.query(Blast_Results).first() is None else True
 
     return response_object
@@ -120,8 +120,9 @@ def display_files(UPLOAD_FOLDER):
     response_object["fasta_file"] = "Not found"
     response_object["genbank_file"] = "Not found"
     for file in os.listdir(UPLOAD_FOLDER):
-        if (file.endswith(".fasta") or file.endswith(".fna") or file.endswith(".txt")):
+        if (file.endswith(".fasta") or file.endswith(".fna")):
             response_object["fasta_file"] = file
+            response_object["fasta_file_size"] = os.path.getsize(os.path.join(UPLOAD_FOLDER, file))
         elif (file.endswith(".gb") or file.endswith(".gbk") or file.endswith(".gbf")):
             response_object["genbank_file"] = file
             response_object["genbank_file_size"] = os.path.getsize(os.path.join(UPLOAD_FOLDER, file))
@@ -170,14 +171,14 @@ def delete_file(file_path, UPLOAD_FOLDER):
         #         if (file.endswith(".gb") or file.endswith(".gbk") or file.endswith(".gbf")):
         #             continue
         #         os.remove(os.path.join(UPLOAD_FOLDER, file))
-        if (file_path.endswith(".gb") or file_path.endswith(".gbk") or file_path.endswith("gbf")):
+        if (file_path.endswith(".fasta") or file_path.endswith(".fna")):
             db.session.query(GeneMark).delete()
             db.session.query(DNAMaster).delete()
             db.session.query(Blast_Results).delete()
             for file in os.listdir(UPLOAD_FOLDER):
-                if (file.endswith(".fasta") or file.endswith(".fna") or file.endswith(".txt")
-                or file.endswith(".gdata") or file.endswith(".ldata") or file.endswith(".lst") or file.endswith(".ps")):
-                    continue
+                # if (file.endswith(".fasta") or file.endswith(".fna")
+                # or file.endswith(".gdata") or file.endswith(".ldata") or file.endswith(".lst") or file.endswith(".ps")):
+                #     continue
                 os.remove(os.path.join(UPLOAD_FOLDER, file))
     except:
         print("error")
@@ -192,7 +193,7 @@ def delete_file(file_path, UPLOAD_FOLDER):
 
     return response_object
 
-def dropzone_genbank(UPLOAD_FOLDER, request, current_user):
+def dropzone_fasta(UPLOAD_FOLDER, request, current_user):
     file = request.files['file']
     contents = str(file.read(), 'utf-8')
     print(request.files)
@@ -206,7 +207,7 @@ def dropzone_genbank(UPLOAD_FOLDER, request, current_user):
             #file.save(os.path.join(UPLOAD_FOLDER, file_name))
             with open(os.path.join(UPLOAD_FOLDER, file_name), 'w') as f:
                 f.write(contents)
-            handle_genbank(UPLOAD_FOLDER, current_user)
+            handle_fasta(UPLOAD_FOLDER)
 
 # ------------------------------ UPLOAD HELPER FUNCTIONS ------------------------------
 def overwrite_files(file_type, UPLOAD_FOLDER):
@@ -241,7 +242,7 @@ def handle_fasta(UPLOAD_FOLDER):
         print("GeneMark did not save ldata file properly.")
         print("Check that your GeneMark key is in the correct location.")
         return("error")
-    parse_genemark_ldata(ldata_file)
+    # parse_genemark_ldata(ldata_file)
 
 def run_genemark(fasta_file_path):
     """Invokes the GeneMarkS utilities and adds .gdata and .ldata files.
@@ -260,6 +261,7 @@ def run_genemark(fasta_file_path):
     ldata_file_path = "{}.ldata".format(fasta_file_path)
 
     glimmer_file = fasta_file_path[0 : -6] + "_glimmer"
+    print(fasta_file_path)
     subprocess.run(["/opt/glimmer3.02/scripts/g3-from-scratch.csh", fasta_file_path, glimmer_file])
 
     aragorn_file = fasta_file_path[0 : -6] + "_aragorn.txt"
@@ -346,96 +348,96 @@ def get_keys_by_value(dict, value_to_find):
     return keys
 
 # ---------- GENBANK FILE HELPER FUNCTIONS ----------
-def handle_genbank(UPLOAD_FOLDER, current_user):
-    """Gets the genbank file and parses through it.
+# def handle_genbank(UPLOAD_FOLDER, current_user):
+#     """Gets the genbank file and parses through it.
 
-    Args:
-        UPLOAD_FOLDER:
-            The directory containing all of the uploaded files.
-        current_user:
-            The current user ID.
-    """
-    genbank_file = helper.get_file_path("genbank", UPLOAD_FOLDER)
-    create_fasta(genbank_file, UPLOAD_FOLDER, current_user)
-    parse_dnamaster_genbank(genbank_file, UPLOAD_FOLDER)
+#     Args:
+#         UPLOAD_FOLDER:
+#             The directory containing all of the uploaded files.
+#         current_user:
+#             The current user ID.
+#     """
+#     genbank_file = helper.get_file_path("genbank", UPLOAD_FOLDER)
+#     create_fasta(genbank_file, UPLOAD_FOLDER, current_user)
+#     parse_dnamaster_genbank(genbank_file, UPLOAD_FOLDER)
 
-def parse_dnamaster_genbank(genbank_file, UPLOAD_FOLDER):
-    """Parses through DNA Master GenBank file to gather DNA Master's CDS calls. 
+# def parse_dnamaster_genbank(genbank_file, UPLOAD_FOLDER):
+#     """Parses through DNA Master GenBank file to gather DNA Master's CDS calls. 
 
-    Adds each CDS to DNA Master table in user's database. 
+#     Adds each CDS to DNA Master table in user's database. 
 
-    Args:
-        genbank_file:
-            The file containing the DNAMaster data.
-    """
-    print("in parse_dnamaster_genbank")
-    coding_potential = {}
-    genemark_gdata_file = helper.get_file_path("gdata", UPLOAD_FOLDER)
-    gdata_df = pd.read_csv(genemark_gdata_file, sep='\t', skiprows=16)
-    gdata_df.columns = ['Base', '1', '2', '3', '4', '5', '6']
-    coding_potential['x_data'] = gdata_df["Base"].to_list()
-    coding_potential['y_data_1'] = gdata_df["1"].to_list()
-    coding_potential['y_data_2'] = gdata_df["2"].to_list()
-    coding_potential['y_data_3'] = gdata_df["3"].to_list()
-    coding_potential['y_data_4'] = gdata_df["4"].to_list()
-    coding_potential['y_data_5'] = gdata_df["5"].to_list()
-    coding_potential['y_data_6'] = gdata_df["6"].to_list()
-    DNAMaster.query.delete()
-    with open(genbank_file, "r") as handle:
-        for record in SeqIO.parse(handle, "genbank"):
-            num = 1
-            for feature in record.features:
-                if feature.type == "CDS" or feature.type == "tRNA":
-                    if "locus_tag" in feature.qualifiers:
-                        id = feature.qualifiers["locus_tag"][0]
-                    elif "protein_id" in feature.qualifiers:
-                        id = feature.qualifiers["protein_id"][0]
-                    else:
-                        id = f"cds_{num}"
-                        num += 1
+#     Args:
+#         genbank_file:
+#             The file containing the DNAMaster data.
+#     """
+#     print("in parse_dnamaster_genbank")
+#     coding_potential = {}
+#     genemark_gdata_file = helper.get_file_path("gdata", UPLOAD_FOLDER)
+#     gdata_df = pd.read_csv(genemark_gdata_file, sep='\t', skiprows=16)
+#     gdata_df.columns = ['Base', '1', '2', '3', '4', '5', '6']
+#     coding_potential['x_data'] = gdata_df["Base"].to_list()
+#     coding_potential['y_data_1'] = gdata_df["1"].to_list()
+#     coding_potential['y_data_2'] = gdata_df["2"].to_list()
+#     coding_potential['y_data_3'] = gdata_df["3"].to_list()
+#     coding_potential['y_data_4'] = gdata_df["4"].to_list()
+#     coding_potential['y_data_5'] = gdata_df["5"].to_list()
+#     coding_potential['y_data_6'] = gdata_df["6"].to_list()
+#     DNAMaster.query.delete()
+#     with open(genbank_file, "r") as handle:
+#         for record in SeqIO.parse(handle, "genbank"):
+#             num = 1
+#             for feature in record.features:
+#                 if feature.type == "CDS" or feature.type == "tRNA":
+#                     if "locus_tag" in feature.qualifiers:
+#                         id = feature.qualifiers["locus_tag"][0]
+#                     elif "protein_id" in feature.qualifiers:
+#                         id = feature.qualifiers["protein_id"][0]
+#                     else:
+#                         id = f"cds_{num}"
+#                         num += 1
 
-                    # FIXME: do something for compound locations, e.g. join(1..218,166710..167034)
-                    # if isinstance(feature.location, SeqFeature.CompoundLocation):
-                    #     print(f"{feature.location} is a compoundlocation")
-                    strand = "+" if feature.location.strand == 1 else "-"
-                    frame, status = helper.get_frame_and_status(feature.location.start.position + 1, feature.location.end.position, strand, coding_potential)
-                    cds = DNAMaster(id = id,
-                                    start = feature.location.start.position + 1,
-                                    stop = feature.location.end.position,
-                                    strand = strand,
-                                    function = "None selected",
-                                    status = status,
-                                    frame = frame)
-                    if (feature.type == "tRNA"):
-                        cds.function = "tRNA"
-                    exists = DNAMaster.query.filter_by(id=id).first()
-                    if not exists:
-                        db.session.add(cds)
-                        db.session.commit()
+#                     # FIXME: do something for compound locations, e.g. join(1..218,166710..167034)
+#                     # if isinstance(feature.location, SeqFeature.CompoundLocation):
+#                     #     print(f"{feature.location} is a compoundlocation")
+#                     strand = "+" if feature.location.strand == 1 else "-"
+#                     frame, status = helper.get_frame_and_status(feature.location.start.position + 1, feature.location.end.position, strand, coding_potential)
+#                     cds = DNAMaster(id = id,
+#                                     start = feature.location.start.position + 1,
+#                                     stop = feature.location.end.position,
+#                                     strand = strand,
+#                                     function = "None selected",
+#                                     status = status,
+#                                     frame = frame)
+#                     if (feature.type == "tRNA"):
+#                         cds.function = "tRNA"
+#                     exists = DNAMaster.query.filter_by(id=id).first()
+#                     if not exists:
+#                         db.session.add(cds)
+#                         db.session.commit()
 
-def create_fasta(genbank_file, UPLOAD_FOLDER, current_user):
-    """Creates a fasta file from the uploaded genbank file.
+# def create_fasta(genbank_file, UPLOAD_FOLDER, current_user):
+#     """Creates a fasta file from the uploaded genbank file.
 
-    Args:
-        genbank_file:
-            The file containing the DNA sequence.
-        UPLOAD_FOLDER:
-            The directory containing all of the uploaded files.
-        current_user:
-            The current user ID.
-    """
-    with open(genbank_file, 'r') as g_file:
-        name = os.path.join(UPLOAD_FOLDER, current_user +".fasta")
-        with open (name, 'w') as fFile:
-            fFile.write(">" + current_user + "\n")
-            startWriting = False
-            content = []
-            for line in g_file:
-                if line.startswith("ORIGIN"):
-                    startWriting = True
-                    continue
-                if startWriting:
-                    line = line.upper()
-                    content.append("".join(line[10:-1].strip().split()))
-            fFile.writelines(content)
-    handle_fasta(UPLOAD_FOLDER)
+#     Args:
+#         genbank_file:
+#             The file containing the DNA sequence.
+#         UPLOAD_FOLDER:
+#             The directory containing all of the uploaded files.
+#         current_user:
+#             The current user ID.
+#     """
+#     with open(genbank_file, 'r') as g_file:
+#         name = os.path.join(UPLOAD_FOLDER, current_user +".fasta")
+#         with open (name, 'w') as fFile:
+#             fFile.write(">" + current_user + "\n")
+#             startWriting = False
+#             content = []
+#             for line in g_file:
+#                 if line.startswith("ORIGIN"):
+#                     startWriting = True
+#                     continue
+#                 if startWriting:
+#                     line = line.upper()
+#                     content.append("".join(line[10:-1].strip().split()))
+#             fFile.writelines(content)
+#     handle_fasta(UPLOAD_FOLDER)

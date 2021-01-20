@@ -266,11 +266,11 @@ export default {
       return {
         url: this.getUploadUrl(),
         addRemoveLinks: true,
-        acceptedFiles: ".gb, .gbk, .gbf",
+        acceptedFiles: ".fasta, .fna",
         chunking: false,
         maxFiles: 1,
         dictDefaultMessage: "Drag files here or click to browse",
-        dictInvalidFileType: "Only '.gb', '.gbk', or '.gbf' file types are allowed.",
+        dictInvalidFileType: "Only '.fasta' or '.fna' file types are allowed.",
         dictRemoveFileConfirmation: "Are you sure you want to remove this file? This will remove all progress that you have made on this Phage.",
         dictMaxFilesExceeded: "You can only upload one file.",
         init: function() {
@@ -281,8 +281,8 @@ export default {
             )
             .then((response) => {
               console.log(response.data);
-              var fileName = response.data.genbank_file;
-              var fileSize = response.data.genbank_file_size;
+              var fileName = response.data.fasta_file;
+              var fileSize = response.data.fasta_file_size;
               if (fileName != "Not found") {
                 this.addCustomFile(
                   // File options

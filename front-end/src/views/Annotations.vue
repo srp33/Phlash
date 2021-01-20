@@ -347,7 +347,7 @@ export default {
       ],
       dnamaster: [],
       startOptions: [],
-      showDownloadGenbank: false,
+      showDownloadGenbank: true,
       showAddCDS: false,
       currCDS: {
         id: "",

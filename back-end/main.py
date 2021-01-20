@@ -86,7 +86,7 @@ def upload(current_user, file_method, file_path):
     elif file_method == "delete":
         return jsonify(delete_file(file_path, UPLOAD_FOLDER))
     elif file_method == "uploadGenbank":
-        dropzone_genbank(UPLOAD_FOLDER, request, current_user)
+        dropzone_fasta(UPLOAD_FOLDER, request, current_user)
         return jsonify("success")
 
 @app.route('/phlash_api/dnamaster/<current_user>', methods=['GET', 'POST'])
@@ -215,7 +215,7 @@ def annotate_data(current_user, file_method):
         print("done")
 
     if request.method == "POST":
-        return get_genbank(UPLOAD_FOLDER)
+        return get_genbank(UPLOAD_FOLDER, current_user)
 
     if request.method == "PUT":
         return jsonify(add_cds(request, UPLOAD_FOLDER, current_user))
