@@ -12,8 +12,8 @@
       <h1>Upload Files</h1>
       <div class="alert alert-primary">
         <p><strong>Instructions</strong></p>
-        <p v-if="fasta && genbank">You have uploaded all required files. Click 'Next' to continue.</p>
-        <p v-else>Please upload the GenBank file from DNA Master <strong>(.gb, .gbk, .gbf)</strong> and then double click 'Next'</p>
+        <p v-if="fasta">You have uploaded all required files. Click 'Next' to continue.</p>
+        <p v-else>Please upload a FASTA file <strong>(.fasta, .fna)</strong> containing the entire DNA sequence and then click 'Next'</p>
         <div class="alert alert-warning" v-if="showDelayMessage">
           <svg
             class="bi bi-info-circle-fill"
@@ -29,7 +29,7 @@
               clip-rule="evenodd"
             />
           </svg>
-          GeneMark is automatically executed once you upload your GenBank file.<br />
+          GeneMark is automatically executed once you upload your FASTA file.<br />
           <svg
             class="bi bi-info-circle-fill"
             width="1em"
@@ -78,9 +78,9 @@
               name: 'Blast',
               params: { phageID: $route.params.phageID },
             }"
-            :event="fasta && genbank ? 'click' : ''"
+            :event="fasta? 'click' : ''"
           >
-            <button class="btn btn-light btn-nav disabled" id="next-top" @click="checkIfFilesUploaded">
+            <button class="btn btn-light btn-nav disabled" id="next-top" @mouseenter="checkIfFilesUploaded">
               <strong>Next</strong>
               <svg
                 class="bi bi-arrow-right"
@@ -106,11 +106,11 @@
         </div>
       </div>
 
-      <div class="upload-wrapper genbank">
-        <h5 class="upload-title">GenBank file</h5>
+      <div class="upload-wrapper fasta">
+        <h5 class="upload-title">FASTA file</h5>
         <vue-dropzone ref="myVueDropzone" id="dropzone" :duplicateCheck="true" :options="dropzoneOptions" :destroyDropzone="false"></vue-dropzone>
       </div>
-      <div class="nav-btns-wrapper">
+      <div @mouseenter="checkIfFilesUploaded" class="nav-btns-wrapper">
         <router-link :to="{ name: 'Home' }">
           <button class="btn btn-light btn-nav">
             <svg
@@ -140,9 +140,9 @@
             name: 'Blast',
             params: { phageID: $route.params.phageID },
           }"
-          :event="fasta && genbank ? 'click' : ''"
+          :event="fasta? 'click' : ''"
         >
-          <button class="btn btn-light btn-nav disabled" id="next-bottom" @click="checkIfFilesUploaded">
+          <button class="btn btn-light btn-nav disabled" id="next-bottom" @mouseenter="checkIfFilesUploaded">
             <strong>Next</strong>
             <svg
               class="bi bi-arrow-right"
@@ -191,7 +191,6 @@ export default {
 
     return {
       fasta: false,
-      genbank: false,
       showDelayMessage: true,
       dropzoneOptions: this.setDropzone(),
       blastCompleted: false,
@@ -209,19 +208,12 @@ export default {
       return true;
     },
 
-    // navDNAMaster: function () {
-    //   if (this.fasta && this.genbank) return true;
-    //   else return false;
-    // },
-
     navBlast: function () {
-      if (this.fasta && this.genbank) return true;
-      else return false;
+      return this.fasta
     },
 
     navGeneMap: function () {
-      if (this.fasta && this.genbank) return true;
-      else return false;
+      return this.fasta
     },
 
     navAnnotations: function () {
@@ -241,14 +233,7 @@ export default {
   watch: {
 
     fasta: function () {
-      if (this.fasta && this.genbank) {
-        document.getElementById("next-top").classList.remove("disabled");
-        document.getElementById("next-bottom").classList.remove("disabled");
-      }
-    },
-
-    genbank: function () {
-      if (this.fasta && this.genbank) {
+      if (this.fasta) {
         document.getElementById("next-top").classList.remove("disabled");
         document.getElementById("next-bottom").classList.remove("disabled");
       }
@@ -277,7 +262,7 @@ export default {
 
           axios
             .post(
-              this.options.url.slice(0,this.options.url.indexOf("uploadGenbank")) + `display/none`
+              this.options.url.slice(0,this.options.url.indexOf("uploadFasta")) + `display/none`
             )
             .then((response) => {
               console.log(response.data);
@@ -331,7 +316,7 @@ export default {
             if (file.processing) {
             axios
               .post(
-                this.options.url.slice(0,this.options.url.indexOf("uploadGenbank")) + `delete/${file.name}`
+                this.options.url.slice(0,this.options.url.indexOf("uploadFasta")) + `delete/${file.name}`
               )
               .then((response) => {
                 console.log(response.data);
@@ -349,11 +334,11 @@ export default {
      * Returns the upload URL for dropzone.
      */
     getUploadUrl() {
-      return `http://daniel.byu.edu:5000/phlash_api/upload/${this.$route.params.phageID}/uploadGenbank/none`;
+      return `http://daniel.byu.edu:5000/phlash_api/upload/${this.$route.params.phageID}/uploadFasta/none`;
     },
 
     /**
-     * Checks to see if fasta and genbank files have been uploaded.
+     * Checks to see if the fasta file has been uploaded.
      */
     checkIfFilesUploaded() {
       axios
@@ -365,8 +350,7 @@ export default {
           console.log(response);
           this.blastCompleted = response.data.blast_completed;
           this.fasta = response.data.fasta;
-          this.genbank = response.data.genbank;
-          if (this.fasta && this.genbank) {
+          if (this.fasta) {
             this.showDelayMessage = false;
           }
         })
@@ -391,6 +375,10 @@ h1 {
 .alert-primary {
   text-align: left;
   margin: 40px auto;
+}
+
+.alert-warning {
+  margin-top: 20px;
 }
 
 .bi-info-circle-fill {
@@ -431,18 +419,6 @@ h1 {
   width: 100%;
 }
 
-.btn-upload {
-  border: 3px dashed gray;
-  color: gray;
-  background-color: white;
-  padding-top: 20px;
-  padding-bottom: 20px;
-  width: 100%;
-  border-radius: 8px;
-  font-size: 18px;
-  font-weight: bold;
-}
-
 .upload-btn-wrapper input[type="file"] {
   font-size: 100px;
   position: absolute;
@@ -451,57 +427,8 @@ h1 {
   opacity: 0;
 }
 
-.selected-file {
-  display: inline-block;
-  margin: 10px;
-}
-
-.selected-file strong {
-  color: #474747;
-  font-size: 16px;
-  text-align: center;
-}
-
-.selected-file span {
-  margin: 0;
-  color: #474747;
-  font-size: 16px;
-  text-align: left;
-}
-
-.btn-upload-submit {
-  display: block;
-  margin: auto;
-  width: 100%;
-}
-
-.genbank {
+.fasta {
   margin-bottom: 15px;
 }
 
-.btn-download:hover {
-  color: rgb(26, 87, 26);
-}
-
-.btn-trash:hover {
-  color: rgb(143, 27, 27);
-}
-
-.btn-download {
-  width: 48%;
-  margin: 5px;
-}
-
-.btn-trash {
-  width: 48%;
-  margin: 5px;
-}
-
-.file-list {
-  padding-top: 20px;
-}
-
-.alert-warning {
-  margin-top: 20px;
-}
 </style>

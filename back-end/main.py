@@ -74,18 +74,13 @@ def upload(current_user, file_method, file_path):
     DATABASE = "sqlite:///{}".format(os.path.join(ROOT, 'users', current_user, f"{current_user}.db"))
     app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE
 
-    if file_method == "upload":
-        return jsonify(upload_file(request, UPLOAD_FOLDER, current_user))
-
-    elif file_method == "display":
+    if file_method == "display":
         return jsonify(display_files(UPLOAD_FOLDER))
-       
-    elif file_method == "download":
-        return jsonify(download_file(file_path, UPLOAD_FOLDER))
 
     elif file_method == "delete":
         return jsonify(delete_file(file_path, UPLOAD_FOLDER))
-    elif file_method == "uploadGenbank":
+
+    elif file_method == "uploadFasta":
         dropzone_fasta(UPLOAD_FOLDER, request, current_user)
         return jsonify("success")
 
@@ -215,7 +210,7 @@ def annotate_data(current_user, file_method):
         print("done")
 
     if request.method == "POST":
-        return get_genbank(UPLOAD_FOLDER, current_user)
+        return get_genbank(UPLOAD_FOLDER, current_user, request)
 
     if request.method == "PUT":
         return jsonify(add_cds(request, UPLOAD_FOLDER, current_user))

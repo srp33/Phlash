@@ -47,7 +47,7 @@ def get_dnamaster_data():
 
     return response_object
 
-def get_genbank(UPLOAD_FOLDER, current_user):
+def get_genbank(UPLOAD_FOLDER, current_user, payload):
     """Modifies and returns the GenBank file.
 
     Args:
@@ -60,16 +60,31 @@ def get_genbank(UPLOAD_FOLDER, current_user):
     gb_file = helper.get_file_path("genbank", UPLOAD_FOLDER)
     fasta_file = helper.get_file_path("fasta", UPLOAD_FOLDER)
     #out_file = modify_genbank(gb_file, fasta_file)
-    gb_file = create_genbank(fasta_file, UPLOAD_FOLDER, current_user)
+    gb_file = create_genbank(fasta_file, UPLOAD_FOLDER, current_user, payload)
     f = open(gb_file, "r")
     return f.read()
 
 # ---------- GENBANK HELPER FUNCTIONS ----------
-def create_genbank(fasta_file, UPLOAD_FOLDER, current_user):
+def create_genbank(fasta_file, UPLOAD_FOLDER, current_user, payload):
+    headers = payload.get_json()
+    print(headers)
     gb_file = os.path.join(UPLOAD_FOLDER, current_user + ".gb")
     genome = SeqIO.read(fasta_file, "fasta").seq
     genome = Seq(str(genome), IUPAC.unambiguous_dna)
-    record = SeqRecord(genome, id='', name=current_user, description='This is just a test.')
+    record = SeqRecord(genome, id='', name=headers["phageName"], description=headers["source"])
+    record.annotations["AUTHORS"] = "Becker, L.W."
+    record.annotations["Reference"] = "whole thing"
+
+    qualifiers = {}
+    qualifiers["organism"] = headers["source"]
+    qualifiers["mol_type"] = headers["molType"]
+    qualifiers["isolation_source"] = headers["isolationSource"]
+    qualifiers["lab_host"] = headers["labHost"]
+    qualifiers["country"] = headers["country"]
+    qualifiers["identified_by"] = headers["identifiedBy"]
+    qualifiers["note"] = headers["notes"]
+    feature = SeqFeature(FeatureLocation(start=0, end=len(genome)), type='source', qualifiers=qualifiers)
+    record.features.append(feature)
 
     idNumber = 0
     for cds in DNAMaster.query.order_by(DNAMaster.start).all():
@@ -80,19 +95,21 @@ def create_genbank(fasta_file, UPLOAD_FOLDER, current_user):
             qualifiers = {}
             qualifiers["gene"] = str(idNumber)
             qualifiers["locus_tag"] = cds.id[0:-1] + str(idNumber)
+            if headers["includeNotes"]:
+                qualifiers["note"] = cds.notes
             feature = SeqFeature(FeatureLocation(start=cds.start - 1, end=cds.stop, strand=-1), id=cds.id[0:-1] + str(idNumber), type='gene', qualifiers=qualifiers)
             record.features.append(feature)
             if cds.status == "tRNA":
                 qualifiers = {}
                 qualifiers["gene"] = str(idNumber)
-                qualifiers["locus_tag"] = cds.id[0:-1] + str(idNumber)
+                qualifiers["locus_tag"] = headers["phageName"] + '_' + str(idNumber)
                 qualifiers["note"] = cds.function
                 feature = SeqFeature(FeatureLocation(start=cds.start - 1, end=cds.stop, strand=-1), id=cds.id[0:-1] + str(idNumber), type='tRNA', qualifiers=qualifiers)
                 record.features.append(feature)
             else:
                 qualifiers = {}
                 qualifiers["gene"] = str(idNumber)
-                qualifiers["locus_tag"] = cds.id[0:-1] + str(idNumber)
+                qualifiers["locus_tag"] = headers["phageName"] + '_' + str(idNumber)
                 qualifiers["codon_start"] = [1]
                 qualifiers["transl_table"] = [11]
                 pattern = re.compile("(.*)##(.*)")
@@ -108,20 +125,22 @@ def create_genbank(fasta_file, UPLOAD_FOLDER, current_user):
         else:
             qualifiers = {}
             qualifiers["gene"] = str(idNumber)
-            qualifiers["locus_tag"] = cds.id[0:-1] + str(idNumber)
+            qualifiers["locus_tag"] = headers["phageName"] + '_' + str(idNumber)
+            if headers["includeNotes"]:
+                qualifiers["note"] = cds.notes
             feature = SeqFeature(FeatureLocation(start=cds.start - 1, end=cds.stop), id=cds.id[0:-1] + str(idNumber), type='gene', qualifiers=qualifiers)
             record.features.append(feature)
             if cds.status == "tRNA":
                 qualifiers = {}
                 qualifiers["gene"] = str(idNumber)
-                qualifiers["locus_tag"] = cds.id[0:-1] + str(idNumber)
+                qualifiers["locus_tag"] = headers["phageName"] + '_' + str(idNumber)
                 qualifiers["note"] = cds.function
                 feature = SeqFeature(FeatureLocation(start=cds.start - 1, end=cds.stop), id=cds.id[0:-1] + str(idNumber), type='tRNA', qualifiers=qualifiers)
                 record.features.append(feature)
             else:
                 qualifiers = {}
                 qualifiers["gene"] = str(idNumber)
-                qualifiers["locus_tag"] = cds.id[0:-1] + str(idNumber)
+                qualifiers["locus_tag"] = headers["phageName"] + '_' + str(idNumber)
                 qualifiers["codon_start"] = [1]
                 qualifiers["transl_table"] = [11]
                 pattern = re.compile("(.*)##(.*)")
@@ -134,6 +153,39 @@ def create_genbank(fasta_file, UPLOAD_FOLDER, current_user):
                 record.features.append(feature)
     with open(gb_file, 'w') as genbank:
         SeqIO.write(record, genbank, 'genbank')
+    new_lines = []
+    with open (gb_file, 'r') as genbank:
+        lines = genbank.readlines()
+        for index, line in enumerate(lines):
+            if index is 0:
+                new_lines.append(line[0:-28] + "     linear       " + datetime.now().strftime('%d-%b-%Y').upper() + '\n')
+            elif index is 5 or index is 6:
+                if headers["source"] != "":
+                    new_lines.append(line[0:-2] + headers["source"] + '\n')
+            elif index is 7:
+                if headers["organism"] != "":
+                    new_lines.append(line[0:-2] + headers["organism"] + '\n')
+                new_lines.append("REFERENCE   1  (bases 1 to " + str(len(genome)) + ")\n")
+                long_line = "  AUTHORS   " + headers["authors"]
+                while len(long_line) > 81:
+                    new_lines.append(long_line[0:80] + '\n')
+                    long_line = long_line[81:]
+                new_lines.append(long_line + '\n')
+                long_line = "  TITLE     " + headers["title"]
+                while len(long_line) > 81:
+                    new_lines.append(long_line[0:80] + '\n')
+                    long_line = long_line[81:]
+                new_lines.append(long_line + '\n')
+                long_line = "  JOURNAL   " + headers["journal"]
+                while len(long_line) > 81:
+                    new_lines.append(long_line[0:80] + '\n')
+                    long_line = long_line[81:]
+                new_lines.append(long_line + '\n')
+            else:
+                new_lines.append(line)
+    print(new_lines[0])
+    with open (gb_file, 'w') as genbank:
+        genbank.writelines(new_lines)
     return gb_file
 
 
@@ -303,6 +355,10 @@ def parse_blast(UPLOAD_FOLDER):
     for filename in os.listdir(UPLOAD_FOLDER):
         if filename.endswith('.json'):
             os.remove(os.path.join(UPLOAD_FOLDER, filename))
+    # for cds in db.session.query(DNAMaster).order_by(DNAMaster.start):
+    #     if Blast_Results.query.filter_by(start=cds.start, stop=cds.stop, strand=cds.strand).first() == None and cds.status != "tRNA":
+    #         db.session.delete(cds)
+    #         db.session.commit()
     print(datetime.now())
 
 def add_cds(request, UPLOAD_FOLDER, current_user):

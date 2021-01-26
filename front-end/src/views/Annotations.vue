@@ -90,7 +90,7 @@
           </router-link>
         </div>
       </div>
-      <div  v-if="blastLoading" class="alert alert-warning alert-dismissible">
+      <div v-if="blastLoading" class="alert alert-warning alert-dismissible">
         <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
         The Blast results are being interpretted which can take several minutes.<br />
         If 'Annotate' is clicked for a CDS that does not currently have any data, you will be brought 
@@ -99,11 +99,7 @@
       </div>
       <div class="alert alert-dark" v-if="completedGenes != dnamaster.length">
         You have
-        <strong
-          >{{ dnamaster.length - completedGenes }}/{{
-            dnamaster.length
-          }}</strong
-        >
+        <strong>{{ dnamaster.length - completedGenes }}/{{ dnamaster.length }}</strong>
         genes remaining.
       </div>
       <div
@@ -244,38 +240,128 @@
     </div>
     <b-modal
       v-model="showDownloadGenbank"
-      id="finished-modal"
+      id="download-genbank-modal"
+      ref="finishedModal"
       title="Congratulations!"
       hide-footer
     >
       <p>You have finished your phage genome annotations!</p>
-      <b-button
-        class="mt-3"
-        block
-        style="margin-top: 0px"
-        @click="downloadGenBankFile"
-      >
-        <strong>Download GenBank file</strong>
-        <div
-          v-if="downloadLoading"
-          class="spinner-border spinner-border-sm"
-          role="status"
-        >
-          <span class="sr-only"></span>
-        </div>
-      </b-button>
+      <p>You may enter any additional information that you would like added to the GenBank file below or leave it blank.</p>
+      <hr />
+      <b-form @submit="onDownloadGenBank" align="left">
+        <b-form-group label="Phage Name:" label-size="lg" label-for="phage-name">
+          <b-form-input
+            id="phage-name"
+            type="text"
+            v-model="genbankAnnotations.phageName"
+            required
+            placeholder="Lambda"
+          ></b-form-input>
+        </b-form-group>
+        <b-form-group label="Source:" label-size="lg" label-for="source">
+          <b-form-input
+            id="source"
+            type="text"
+            v-model="genbankAnnotations.source"
+            placeholder="Escherichia Phage Lambda"
+          ></b-form-input>
+        </b-form-group>
+        <b-form-group label="Organism:" label-size="lg" label-for="organism">
+          <b-form-input
+            id="organism"
+            type="text"
+            v-model="genbankAnnotations.organism"
+            placeholder="Viruses; Duplodnaviria; Heunggongvirae;..."
+          ></b-form-input>
+        </b-form-group>
+        <b-form-group label="Molecular Type:" label-size="lg" label-for="molType">
+          <b-form-input
+            id="molType"
+            type="text"
+            v-model="genbankAnnotations.molType"
+            placeholder="genomic DNA"
+          ></b-form-input>
+        </b-form-group>
+        <b-form-group label="Isolation Source:" label-size="lg" label-for="isolation-source">
+          <b-form-input
+            id="isolation-source"
+            type="text"
+            v-model="genbankAnnotations.isolationSource"
+            placeholder="raw sewage"
+          ></b-form-input>
+        </b-form-group>
+        <b-form-group label="Lab Host:" label-size="lg" label-for="lab-host">
+          <b-form-input
+            id="lab-host"
+            type="text"
+            v-model="genbankAnnotations.labHost"
+            placeholder="Escherichia"
+          ></b-form-input>
+        </b-form-group>
+        <b-form-group label="Identified By:" label-size="lg" label-for="identified-by">
+          <b-form-input
+            id="identified-by"
+            type="text"
+            v-model="genbankAnnotations.identifiedBy"
+            placeholder="John Doe"
+          ></b-form-input>
+        </b-form-group>
+        <b-form-group label="Authors:" label-size="lg" label-for="authors">
+          <b-form-input
+            id="authors"
+            type="text"
+            v-model="genbankAnnotations.authors"
+            placeholder="Doe,J.W., Wright,S."
+          ></b-form-input>
+        </b-form-group>
+        <b-form-group label="Title:" label-size="lg" label-for="title">
+          <b-form-input
+            id="title"
+            type="text"
+            v-model="genbankAnnotations.title"
+            placeholder="Direct Submission"
+          ></b-form-input>
+        </b-form-group>
+        <b-form-group label="Journal:" label-size="lg" label-for="journal">
+          <b-form-input
+            id="journal"
+            type="text"
+            v-model="genbankAnnotations.journal"
+            placeholder="Submitted (18-SEP-2021) Microbiology and Molecular Biology, Brigham
+            Young University, Provo, UT 84602, USA"
+          ></b-form-input>
+        </b-form-group>
+        <b-form-group label="Country:" label-size="lg" label-for="country">
+          <b-form-input
+            id="country"
+            type="text"
+            v-model="genbankAnnotations.country"
+            placeholder="USA"
+          ></b-form-input>
+        </b-form-group>
+        <b-form-group label="Notes:" label-size="lg" label-for="notes">
+          <b-form-input
+            id="notes"
+            type="text"
+            v-model="genbankAnnotations.notes"
+            placeholder="complete genome"
+          ></b-form-input>
+        </b-form-group>
+        <b-form-group label="Include Notes:" label-size="lg" label-for="include-notes">
+          <b-form-checkbox
+            id="include-notes"
+            type="checkbox"
+            v-model="genbankAnnotations.includeNotes"
+          ></b-form-checkbox>
+        </b-form-group>
+        <hr />
+        <b-button type="submit" class="mt-3" block style="margin-top: 0px">
+          <strong>Download Genbank File</strong>
+        </b-button>
+      </b-form>
     </b-modal>
     <b-modal v-model="showAddCDS" ref="addCDSModal" id="addCDS-modal" title="Add CDS" hide-footer>
       <b-form @submit="onSubmitAdd" align="left">
-        <!-- <b-form-group label="ID:" label-size="lg" label-for="add-id-input">
-          <b-form-input
-            id="add-id-input"
-            type="string"
-            v-model="addCDS.id"
-            required
-            placeholder="Enter CDS ID"
-          ></b-form-input>
-        </b-form-group> -->
         <b-form-group label="Left:" label-size="lg" label-for="add-start-input">
           <b-form-input
             id="add-start-input"
@@ -340,6 +426,21 @@ export default {
         force: false,
         read: []
       },
+      genbankAnnotations: {
+        phageName: "",
+        source: "",
+        organism: "",
+        isolationSource: "",
+        labHost: "",
+        identifiedBy: "",
+        authors: "",
+        title: "",
+        journal: "",
+        country: "USA",
+        molType: "genomic DNA",
+        notes: "complete genome",
+        includeNotes: false,
+      },
       strandOptions: [
         { value: null, text: "Please select a direction" },
         { value: "+", text: "+ (Direct)" },
@@ -369,7 +470,6 @@ export default {
 
   created() {
     this.getData();
-    this.parseBlast();
   },
 
   computed: {
@@ -418,6 +518,7 @@ export default {
           this.oppositeGap = response.data.opposite_gap;
           this.short = response.data.short;
           this.pageLoading = false;
+          this.genbankAnnotations.phageName = this.$route.params.phageID;
           for (var i = 0; i < this.dnamaster.length; i++) {
             // this.dnamaster[i].id = this.$route.params.phageID + '_' + (i + 1);
             if (this.dnamaster[i].function != "None selected")
@@ -426,6 +527,7 @@ export default {
           if (this.completedGenes == this.dnamaster.length) {
             this.showDownloadGenbank = true;
           }
+          this.parseBlast();
         })
         .catch((error) => {
           console.error(error);
@@ -444,9 +546,8 @@ export default {
             this.$bvToast.toast(`All of the BLAST results have finished being interpretted.`, {
               title: 'Finished',
               appendToast: false
-            })
+            });
           }
-          console.log(response.data);
         })
         .catch((error) => {
           console.error(error);
@@ -456,12 +557,17 @@ export default {
     /**
      * Downloads the GenBank file upon annotation completion.
      */
-    downloadGenBankFile() {
+    onDownloadGenBank(evt) {
+      console.log(this.genbankAnnotations.includeNotes);
+      evt.preventDefault();
+      this.$refs.finishedModal.hide();
+      const payload = this.genbankAnnotations;
       this.downloadLoading = true;
       axios
         .post(
           process.env.VUE_APP_BASE_URL +
-            `/annotations/${this.$route.params.phageID}/none`
+            `/annotations/${this.$route.params.phageID}/none`,
+            payload
         )
         .then((response) => {
           let data = response.data;
@@ -642,7 +748,7 @@ export default {
               title: 'ADD FAILED',
               autoHideDelay: 5000,
               appendToast: false
-            })
+            });
           }
           else if (response.data.message == "Not orf.") {
             this.$bvToast.toast(`The inputted start and stop locations do not represent an ORF. To ignore this 
@@ -650,7 +756,7 @@ export default {
               title: 'ADD FAILED',
               autoHideDelay: 5000,
               appendToast: false
-            })
+            });
           }
           else {
             window.location.reload();

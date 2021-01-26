@@ -22,6 +22,8 @@ class DNAMaster(db.Model):
                        nullable=False)
     frame = db.Column(db.Integer,
                         nullable=False)
+    notes = db.Column(db.Text,
+                        nullable=True)
 
 
 class GeneMark(db.Model):
@@ -35,6 +37,14 @@ class GeneMark(db.Model):
                      nullable=False)
     strand = db.Column(db.Text,
                        nullable=False)
+
+class Gene_Calls(db.Model):
+    __tablename__ = "gene_calls"
+    id = db.Column(db.Text,
+                   nullable=False,
+                   primary_key=True)
+    calls = db.Column(db.Text,
+                      nullable=True)
 
 class Blast_Results(db.Model):
     __tablename__ = "blast_results"

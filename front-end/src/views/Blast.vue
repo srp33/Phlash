@@ -13,8 +13,7 @@
       <div class="alert alert-primary">
         <p><strong>Instructions</strong></p>
         <p>
-          Follow the steps below. Double click 'Next' when all the steps have been
-          completed.
+          Follow the steps below. Click 'Next' when all the steps have been completed.
         </p>
         <hr />
         <div class="nav-btns-wrapper">
@@ -54,7 +53,7 @@
             }"
             :event="blastDownloaded && blastUploaded ? 'click' : ''"
           >
-            <button class="btn btn-light btn-nav disabled" id="next-top"  @click="displayOutputFiles()">
+            <button class="btn btn-light btn-nav disabled" id="next-top"  @mouseenter="displayOutputFiles()">
               <strong>Next</strong>
               <svg
                 class="bi bi-arrow-right"
@@ -166,7 +165,7 @@
           </li>
         </ol>
       </div>
-      <div @mouseenter="displayOutputFiles()" class="nav-btns-wrapper">
+      <div class="nav-btns-wrapper">
         <router-link
           :to="{
             name: 'Upload',
@@ -203,7 +202,7 @@
           }"
           :event="blastDownloaded && blastUploaded ? 'click' : ''"
         >
-          <button class="btn btn-light btn-nav disabled" id="next-bottom" @click="uploadReminder()">
+          <button class="btn btn-light btn-nav disabled" id="next-bottom" @click="uploadReminder()" @mouseenter="displayOutputFiles()">
             <strong>Next</strong>
             <svg
               class="bi bi-arrow-right"
@@ -255,6 +254,7 @@ export default {
       clickedNCBI: false,
       blastDownloaded: false,
       blastUploaded: false,
+      autoAnnotated: false,
       numFiles: 1,
       fileNames: [],
       dropzoneOptions: this.setDropzone(),
@@ -302,7 +302,7 @@ export default {
   watch: {
 
     blastDownloaded: function () {
-      if (this.blastDownloaded && this.blastUploaded) {
+      if (this.blastDownloaded && this.blastUploaded && this.autoAnnotated) {
         document.getElementById("next-top").classList.remove("disabled");
         document.getElementById("next-bottom").classList.remove("disabled");
       } else {
@@ -312,7 +312,7 @@ export default {
     },
 
     blastUploaded: function () {
-      if (this.blastDownloaded && this.blastUploaded) {
+      if (this.blastDownloaded && this.blastUploaded && this.autoAnnotated) {
         document.getElementById("next-top").classList.remove("disabled");
         document.getElementById("next-bottom").classList.remove("disabled");
       } else {
@@ -466,7 +466,8 @@ export default {
           console.log(response.data);
           this.blastDownloaded = response.data.blast_downloaded;
           if (this.fileNames.length == this.numFiles) this.blastUploaded = true;
-          if (response.data.message == "Uploaded") this.blastUploaded = true;
+          if (response.data.uploaded) this.blastUploaded = true;
+          if (response.data.annotated) this.autoAnnotated = true;
           console.log(this.blastUploaded);
           if (!this.blastDownloaded) this.downloadInputFiles();
         })
@@ -632,19 +633,9 @@ h1 {
   margin-bottom: 20px;
 }
 
-.steps img {
-  max-width: 100%;
-  height: auto;
-  margin: 10px;
-}
-
 .zipfile-tip {
   font-size: 0.9em;
   margin-bottom: 0;
-}
-
-.btn-step {
-  margin: 15px auto;
 }
 
 .nav-btns-wrapper {
@@ -665,86 +656,4 @@ h1 {
   margin-left: 5px;
 }
 
-/* ----- Upload ----- */
-.upload-wrapper {
-  margin: 30px auto;
-}
-
-.upload-btn-wrapper {
-  position: relative;
-  overflow: hidden;
-  display: inline-block;
-  width: 100%;
-}
-
-.btn-upload {
-  border: 3px dashed gray;
-  color: gray;
-  background-color: white;
-  padding-top: 20px;
-  padding-bottom: 20px;
-  width: 100%;
-  border-radius: 8px;
-  font-size: 18px;
-  font-weight: bold;
-}
-
-.upload-btn-wrapper input[type="file"] {
-  font-size: 100px;
-  position: absolute;
-  left: 0;
-  top: 0;
-  opacity: 0;
-}
-
-.selected-files {
-  display: inline-block;
-  margin: 10px;
-}
-
-.selected-files strong,
-.selected-files ul {
-  color: #474747;
-  font-size: 16px;
-  text-align: center;
-}
-
-.selected-files ul {
-  padding-left: 0;
-}
-
-.selected-files span {
-  margin: 0;
-  color: #474747;
-  font-size: 16px;
-  text-align: left;
-}
-
-.btn-upload-submit {
-  display: block;
-  margin: auto;
-  width: 100%;
-}
-
-.btn-download:hover {
-  color: rgb(26, 87, 26);
-}
-
-.btn-trash:hover {
-  color: rgb(143, 27, 27);
-}
-
-.btn-download {
-  width: 48%;
-  margin: 5px;
-}
-
-.btn-trash {
-  width: 48%;
-  margin: 5px;
-}
-
-.file-list {
-  padding-top: 20px;
-}
 </style>

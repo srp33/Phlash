@@ -21,6 +21,7 @@
         <h4>Right: {{ currentCDS.stop }}</h4>
         <h4>Strand: {{ currentCDS.strand }}</h4>
         <h4>Frame: {{ this.frame }}</h4>
+        <h4>Called by: {{ this.calledBy }}</h4>
       </div>
       <div class="alert alert-primary">
         <p><strong>Instructions</strong></p>
@@ -39,6 +40,16 @@
           <strong>Bold Text:</strong> The currently selected open reading frame.
         </p>
         <hr />
+        <div style="float: right; width: 50%;">
+          <p><strong>Notes:</strong></p>
+          <b-form-textarea
+            id="textarea"
+            v-model="notes"
+            placeholder="Click 'Update' to save notes"
+            rows="3"
+            max-rows="10"
+          ></b-form-textarea>
+        </div>
         <p>
           <strong>Your selected open reading frame:</strong> {{ newStart }}-{{ newStop }}
         </p>
@@ -190,23 +201,33 @@
         </p>
       </div>
       <hr />
-      <div class="blast-results">
-        <h4 style="text-align: center; margin: 40px">BLAST Results</h4>
-        <div v-if="dataExists" id="accordion">
-          <div class="card" v-for="key in blastKeys" :key="key">
-            <div class="card-header">
+    </div>
+    <div class="blast-results">
+      <h4 style="text-align: center; margin: 40px">BLAST Results</h4>
+      <div style="float: left; width: 50%;">
+        <div v-if="dataExists" class="table-responsive2" id="accordion" style="margin: 1em;">
+          <div class="card border-secondary" v-for="key in dirBlastKeys" :key="key">
+            <div class="card-body">
               <h4 class="mb-0">
                 <button
-                  class="btn btn-light btn-blast"
+                  class="btn btn-outline-secondary btn-blast"
                   data-toggle="collapse"
                   aria-expanded="false"
                   v-bind:data-target="'#' + key"
                   v-bind:aria-controls="key"
+                  v-if="key !== currentCDS.start.toString() + '-' + currentCDS.stop.toString() + '  ' + currentCDS.strand"
                 >
-                  <strong v-if="key === currentCDS.start.toString() + '-' + currentCDS.stop.toString() + '  ' + currentCDS.strand"
-                    >{{ key }}</strong
-                  >
-                  <strong style="color:grey" v-else>{{ key }}</strong>
+                  <strong>{{ key }}</strong>
+                </button>
+                <button
+                  class="btn btn-secondary btn-blast"
+                  data-toggle="collapse"
+                  aria-expanded="false"
+                  v-bind:data-target="'#' + key"
+                  v-bind:aria-controls="key"
+                  v-else
+                >
+                  <strong>{{ key }}</strong>
                 </button>
               </h4>
             </div>
@@ -214,13 +235,13 @@
               <div class="card-body">
                 <BlastResults
                   v-if="key === currentCDS.start.toString() + '-' + currentCDS.stop.toString() + '  ' + currentCDS.strand"
-                  :blastResults="blastResults[key]"
+                  :blastResults="dirBlastResults[key]"
                   :allowSelect="true"
                   @newFunction="setFunction"
                 />
                 <BlastResults
                   v-else
-                  :blastResults="blastResults[key]"
+                  :blastResults="dirBlastResults[key]"
                   :allowSelect="false"
                   @newFunction="setFunction"
                 />
@@ -229,6 +250,54 @@
           </div>
         </div>
       </div>
+      <div style="float: left; width: 50%;">
+        <div v-if="dataExists" class="table-responsive2" id="accordion" style="margin: 1em;">
+          <div class="card border-secondary" v-for="key in compBlastKeys" :key="key">
+            <div class="card-body">
+              <h4 class="mb-0">
+                <button
+                  class="btn btn-outline-secondary btn-blast"
+                  data-toggle="collapse"
+                  aria-expanded="false"
+                  v-bind:data-target="'#' + key"
+                  v-bind:aria-controls="key"
+                  v-if="key !== currentCDS.start.toString() + '-' + currentCDS.stop.toString() + '  ' + currentCDS.strand"
+                >
+                  <strong>{{ key }}</strong>
+                </button>
+                <button
+                  class="btn btn-secondary btn-blast"
+                  data-toggle="collapse"
+                  aria-expanded="false"
+                  v-bind:data-target="'#' + key"
+                  v-bind:aria-controls="key"
+                  v-else
+                >
+                  <strong>{{ key }}</strong>
+                </button>
+              </h4>
+            </div>
+            <div v-bind:id="key" class="collapse" data-parent="#accordion">
+              <div class="card-body">
+                <BlastResults
+                  v-if="key === currentCDS.start.toString() + '-' + currentCDS.stop.toString() + '  ' + currentCDS.strand"
+                  :blastResults="compBlastResults[key]"
+                  :allowSelect="true"
+                  @newFunction="setFunction"
+                />
+                <BlastResults
+                  v-else
+                  :blastResults="compBlastResults[key]"
+                  :allowSelect="false"
+                  @newFunction="setFunction"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="container">
       <div class="info-bottom">
         <p>
           <strong>Your selected open reading frame:</strong> {{ newStart }}-{{ newStop }}
@@ -302,8 +371,6 @@ export default {
   data() {
 
     return {
-      stopOptions: [],
-      startOptions: [],
       dirStartOptions: [],
       compStartOptions: [],
       dirStopOptions: [],
@@ -327,7 +394,8 @@ export default {
         status: "",
       },
       frame: null,
-      blastResults: [],
+      dirBlastResults: [],
+      compBlastResults: [],
       showFunction: false,
       showStart: false,
       newFunction: "",
@@ -344,6 +412,11 @@ export default {
       nextCDS: null,
       nextStart: null,
       prevStop: null,
+      calledBy: "",
+      glimmer: "",
+      genemark: "",
+      phanotate: "",
+      notes: "",
     };
 
   },
@@ -354,8 +427,12 @@ export default {
 
   computed: {
 
-    blastKeys: function () {
-      return Object.keys(this.blastResults);
+    dirBlastKeys: function () {
+      return Object.keys(this.dirBlastResults);
+    },
+
+    compBlastKeys: function () {
+      return Object.keys(this.compBlastResults);
     },
 
     navUpload: function () {
@@ -403,20 +480,13 @@ export default {
             );
           }
           this.currentCDS = response.data.cds;
-          this.blastResults = response.data.blast;
-          this.startOptions = response.data.start_options;
-          this.stopOptions = response.data.stop_options;
-          this.strands = response.data.strands;
-          for (var i = 0; i < this.startOptions.length; ++i) {
-            if (this.strands[i] == '+') {
-              this.dirStartOptions.push(this.startOptions[i]);
-              this.dirStopOptions.push(this.stopOptions[i]);
-            }
-            else {
-              this.compStartOptions.push(this.startOptions[i]);
-              this.compStopOptions.push(this.stopOptions[i]);
-            }
-          }
+          this.dirBlastResults = response.data.dir_blast;
+          this.compBlastResults = response.data.comp_blast;
+          console.log(this.dirBlastResults);
+          this.dirStartOptions = response.data.dir_start_options;
+          this.dirStopOptions = response.data.dir_stop_options;
+          this.compStartOptions = response.data.comp_start_options;
+          this.compStopOptions = response.data.comp_stop_options;
           this.newStart = this.currentCDS.start;
           this.newStop = this.currentCDS.stop;
           this.prevStop = response.data.prev_stop;
@@ -459,8 +529,27 @@ export default {
           ];
           this.dataExists = true;
           this.pageLoading = false;
-          this.frame = this.currentCDS.frame
-
+          this.frame = this.currentCDS.frame;
+          this.notes = this.currentCDS.notes;
+          this.glimmer = response.data.glimmer;
+          this.genemark = response.data.genemark;
+          this.phanotate = response.data.phanotate;
+          var called = false;
+          var cds = this.currentCDS.start.toString() + '-' + this.currentCDS.stop.toString() + ' ' + this.currentCDS.strand;
+          if (this.glimmer.indexOf(cds) > -1) {
+            called = true;
+            this.calledBy += "Glimmer, ";
+          }
+          if (this.genemark.indexOf(cds) > -1) {
+            called = true;
+            this.calledBy += "GeneMark, ";
+          }
+          if (this.phanotate.indexOf(cds) > -1) {
+            called = true;
+            this.calledBy += "Phanotate, ";
+          }
+          if (called) { this.calledBy = this.calledBy.substring(0, this.calledBy.length - 2); }
+          else { this.calledBy = "None"}
           this.nextCDS = response.data.nextCDS;
         })
         .catch((error) => {
@@ -482,6 +571,7 @@ export default {
         stop: this.updatedCDS.stop,
         strand: this.updatedCDS.strand,
         function: this.updatedCDS.function,
+        notes: this.notes,
         status: this.currentCDS.status,
       };
       this.updateCDS(payload, this.updatedCDS.id);
@@ -549,6 +639,23 @@ export default {
         this.newStart = start;
         this.currentCDS.start = start;
         this.currentCDS.strand = strand;
+        this.calledBy = "";
+        var called = false;
+        var cds = this.currentCDS.start.toString() + '-' + this.currentCDS.stop.toString() + ' ' + this.currentCDS.strand;
+        if (this.glimmer.indexOf(cds) > -1) {
+          called = true;
+          this.calledBy += "Glimmer, ";
+        }
+        if (this.genemark.indexOf(cds) > -1) {
+          called = true;
+          this.calledBy += "GeneMark, ";
+        }
+        if (this.phanotate.indexOf(cds) > -1) {
+          called = true;
+          this.calledBy += "Phanotate, ";
+        }
+        if (called) { this.calledBy = this.calledBy.substring(0, this.calledBy.length - 2); }
+        else { this.calledBy = "None"}
         this.frame = ((start + 2) % 3) + 1;
         if (this.currentCDS.strand == "-") {
           this.frame = ((this.currentCDS.stop + 2) % 3) + 4;
@@ -567,6 +674,11 @@ export default {
 
 <style scoped>
 /* ----- Title and Headers ----- */
+
+.blast-results {
+  margin: 1em;
+  margin-bottom: 3em;
+}
 
 .nav-btns-wrapper {
   text-align: center;
@@ -621,6 +733,12 @@ export default {
 
 .table-responsive {
   max-height: 250px;
+  overflow-y: auto;
+  display: inline-block;
+}
+
+.table-responsive2 {
+  max-height: 400px;
   overflow-y: auto;
   display: inline-block;
 }

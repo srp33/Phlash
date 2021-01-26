@@ -43,6 +43,8 @@ def annotate_cds(request, cds_id, UPLOAD_FOLDER):
         cds.start = put_data.get('start')
         cds.stop = put_data.get('stop')
         cds.function = put_data.get('function')
+        cds.notes = put_data.get('notes')
+        print(cds.notes)
         response_object['message'] = 'CDS updated!'
         print(cds)
     else:
@@ -110,7 +112,8 @@ def get_cds_data(UPLOAD_FOLDER, cds_id):
                                 'strand': cds.strand,
                                 'function': cds.function,
                                 'status': cds.status,
-                                'frame': cds.frame}
+                                'frame': cds.frame,
+                                'notes': cds.notes}
     
     # starts = [int(start) for start in cds.start_options.split(",")]
     # stops = [int(stop) for stop in cds.stop_options.split(",")]
@@ -150,6 +153,10 @@ def get_cds_data(UPLOAD_FOLDER, cds_id):
             break
         elif cds.id == cds_id:
             reached_CDS = True
+    response_object['glimmer'] = Gene_Calls.query.filter_by(id='Glimmer').first().calls.split(',')
+    response_object['genemark'] = Gene_Calls.query.filter_by(id='GeneMark').first().calls.split(',')
+    response_object['phanotate'] = Gene_Calls.query.filter_by(id='Phanotate').first().calls.split(',')
+
 
     return response_object
 
@@ -215,21 +222,37 @@ def parse_blast_results(blast_files, cds_id, e_value_thresh):
     return blast_results
 
 def get_blasts(start):
-    blasts = {}
+    dir_blasts = {}
+    comp_blasts = {}
+    dir_starts = []
+    dir_stops = []
+    comp_starts = []
+    comp_stops = []
     starts = []
     stops = []
     strands = []
     setting = db.session.query(Settings).order_by(Settings.back_start_range).first()
     minimum = start - setting.back_start_range
     maximum = start + setting.forward_start_range
-    for blast in db.session.query(Blast_Results).order_by(Blast_Results.start):
+    for blast in db.session.query(Blast_Results).filter_by(strand='+').order_by(Blast_Results.start):
         if blast.start > minimum and blast.start < maximum:
             starts.append(blast.start)
             stops.append(blast.stop)
-            strands.append(blast.strand)
-            blasts[str(blast.start) + '-' + str(blast.stop) + '  ' + blast.strand] = eval(blast.results)
-    response_object['start_options'] = starts
-    response_object['stop_options'] = stops
-    response_object['strands'] = strands
-    response_object['blast'] = blasts
+            dir_starts.append(blast.start)
+            dir_stops.append(blast.stop)
+            dir_blasts[str(blast.start) + '-' + str(blast.stop) + '  ' + blast.strand] = eval(blast.results)
+    for blast in db.session.query(Blast_Results).filter_by(strand='-').order_by(Blast_Results.start):
+        if blast.start > minimum and blast.start < maximum:
+            starts.append(blast.start)
+            stops.append(blast.stop)
+            comp_starts.append(blast.start)
+            comp_stops.append(blast.stop)
+            comp_blasts[str(blast.start) + '-' + str(blast.stop) + '  ' + blast.strand] = eval(blast.results)
+    print(dir_blasts)
+    response_object['comp_start_options'] = comp_starts
+    response_object['comp_stop_options'] = comp_stops
+    response_object['dir_start_options'] = dir_starts
+    response_object['dir_stop_options'] = dir_stops
+    response_object['dir_blast'] = dir_blasts
+    response_object['comp_blast'] = comp_blasts
     return starts, stops
