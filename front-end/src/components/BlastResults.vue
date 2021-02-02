@@ -46,24 +46,10 @@
           </tr>
         </tbody>
       </table>
-      <div v-if="blastResults.length === 0">
-        <h4>
+      <div>
+        <h4 v-if="blastResults.length === 0">
           <em>No hits found.</em>
         </h4>
-        <button
-          v-if="allowSelect"
-          class="btn btn-dark btn-sm"
-          @click="setNone()"
-        >
-          <strong>Set function as "None"</strong>
-        </button>
-        <button
-          v-if="!allowSelect"
-          class="btn btn-dark btn-sm"
-          @click="showWarning = true"
-        >
-          <strong>Set function as "None"</strong>
-        </button>
       </div>
     </div>
   </div>
@@ -91,13 +77,6 @@ export default {
     setFunction(funct, accession) {
       let result = funct.match(/(.*) \[.*\]/);
       this.$emit("newFunction", result[1] + '##' + accession);
-    },
-
-    /**
-     * Sets the function to none when there are no blast results.
-     */
-    setNone() {
-      this.$emit("newFunction", "None");
     },
 
   },

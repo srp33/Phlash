@@ -2,7 +2,7 @@
 
 Returns CDS data.
 Updates CDS data.
-Parses BLAST results.
+Queries BLAST results.
 
 Attributes:
     response_object:
@@ -37,7 +37,6 @@ def annotate_cds(request, cds_id, UPLOAD_FOLDER):
     """
     put_data = request.get_json()
     cds = DNAMaster.query.filter_by(id=cds_id).first()
-    genemark_cds = GeneMark.query.filter_by(stop=cds.stop).first()
     if cds:
         cds.strand = put_data.get('strand')
         cds.start = put_data.get('start')
@@ -115,17 +114,7 @@ def get_cds_data(UPLOAD_FOLDER, cds_id):
                                 'frame': cds.frame,
                                 'notes': cds.notes}
     
-    # starts = [int(start) for start in cds.start_options.split(",")]
-    # stops = [int(stop) for stop in cds.stop_options.split(",")]
-    # response_object['start_options'] = starts
-    # response_object['stop_options'] = stops
-    # print(stops)
-    # print(starts)
-    # blast_files = helper.get_file_path("blast", UPLOAD_FOLDER)
-    # E_VALUE_THRESH = 1e-7
     starts, stops = get_blasts(cds.start)
-    # blast_results = parse_blast_results(blast_files, cds.id, E_VALUE_THRESH)
-    # response_object['blast'] = blast_results
 
     genemark_gdata_file = helper.get_file_path("gdata", UPLOAD_FOLDER)
     gdata_df = pd.read_csv(genemark_gdata_file, sep='\t', skiprows=16)
@@ -161,67 +150,19 @@ def get_cds_data(UPLOAD_FOLDER, cds_id):
     return response_object
 
 # ---------- BLAST HELPER FUNCTIONS ----------
-def parse_blast_results(blast_files, cds_id, e_value_thresh):
-    """Parses through the blast results and returns a dictionary containing data.
+def get_blasts(start):
+    """Queries and returns all of the data for a CDS given the current start position.
 
-    Removes instances of CREATE_VIEW created by BLAST.
-    Finds the associated blast results for the CDS.
+    Gets alternate starts and stops within range defined in settings
+    Gets the blast results for all alternate CDS.
 
     Args:
-        blast_files:
-            The files containing the blast results.
-        cds_id:
-            The ID of the CDS to be found.
-        e_value_thresh:
-            The blast similarity threshold.
-
+        start:
+            The start position of the current CDS.
     Returns:
-        A dictionary containing all of the blast data for the CDS.
+        Lists of the alternate starts and stops.
+        
     """
-    blast_results = {}
-    for blast_file in blast_files:
-        newLines = []
-        with open(blast_file, 'r') as f:
-            lines = f.readlines()
-            for line in lines:
-                if line != "CREATE_VIEW\n":
-                    newLines.append(line)
-        with open(blast_file, 'w') as f:
-            f.writelines(newLines)    
-            
-        with open(blast_file) as f:
-            blasts = json.load(f)["BlastOutput2"]
-            for blast in blasts:
-                search = blast["report"]["results"]["search"]
-                title = re.search(
-                    "([A-Z]+_\d+_*\d*), (\d+-\d+)", search["query_title"])
-                if title:
-                    curr_id = title.group(1)
-                    curr_start = title.group(2)
-                    cds_id_ = cds_id + "_"
-                    if cds_id == curr_id or cds_id_ in curr_id:
-                        blast_results[curr_start] = []
-                        hits = search["hits"]
-                        for hit in hits:
-                            hsps = hit["hsps"][0]
-                            if hsps["evalue"] <= e_value_thresh:
-                                alignment = {}
-                                description = hit["description"][0]
-                                alignment['accession'] = description["accession"]
-                                alignment["title"] = description["title"]
-                                alignment["evalue"] = '{:0.2e}'.format(
-                                    hsps["evalue"])
-                                alignment["query_from"] = hsps["query_from"]
-                                alignment["query_to"] = hsps["query_to"]
-                                alignment["hit_from"] = hsps["hit_from"]
-                                alignment["hit_to"] = hsps["hit_to"]
-                                alignment["percent_identity"] = round(
-                                    hsps["identity"] / hsps["align_len"] * 100, 2)
-                                blast_results[curr_start].append(alignment)
-
-    return blast_results
-
-def get_blasts(start):
     dir_blasts = {}
     comp_blasts = {}
     dir_starts = []

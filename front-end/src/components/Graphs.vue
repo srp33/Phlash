@@ -1,6 +1,7 @@
 <template>
   <div id="columns">
     <div class="column">
+      <strong> Direct Sequences </strong>
       <Plotly
         class="graph"
         v-if="frame == 1"
@@ -45,6 +46,7 @@
       ></Plotly>
     </div>
     <div class="column">
+      <strong> Complementary Sequences </strong>
       <Plotly
         class="graph"
         v-if="frame == 4"
@@ -698,7 +700,7 @@ export default {
       // ----- LAYOUT 1b -----
       layout1b: {
         autosize: false,
-        paper_bgcolor: "lightgrey",
+        paper_bgcolor: "rgba(219,219,219,0.5)",
         width: 590,
         height: 200,
         color: "black",
@@ -853,7 +855,7 @@ export default {
       // ----- LAYOUT 2b -----
       layout2b: {
         autosize: false,
-        paper_bgcolor: "lightgrey",
+        paper_bgcolor: "rgba(219,219,219,0.5)",
         width: 590,
         height: 200,
         margin: {
@@ -974,7 +976,7 @@ export default {
       // ----- LAYOUT 3b -----
       layout3b: {
         autosize: false,
-        paper_bgcolor: "lightgrey",
+        paper_bgcolor: "rgba(219,219,219,0.5)",
         width: 590,
         height: 225,
         margin: {
@@ -1101,7 +1103,7 @@ export default {
       // ----- LAYOUT 4b -----
       layout4b: {
         autosize: false,
-        paper_bgcolor: "lightgrey",
+        paper_bgcolor: "rgba(219,219,219,0.5)",
         width: 590,
         height: 200,
         margin: {
@@ -1254,7 +1256,7 @@ export default {
       // ----- LAYOUT 5b -----
       layout5b: {
         autosize: false,
-        paper_bgcolor: "lightgrey",
+        paper_bgcolor: "rgba(219,219,219,0.5)",
         width: 590,
         height: 200,
         margin: {
@@ -1375,7 +1377,7 @@ export default {
       // ----- LAYOUT 6b -----
       layout6b: {
         autosize: false,
-        paper_bgcolor: "lightgrey",
+        paper_bgcolor: "rgba(219,219,219,0.5)",
         width: 590,
         height: 225,
         margin: {

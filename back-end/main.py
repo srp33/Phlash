@@ -171,6 +171,24 @@ def blast(current_user, file_method, file_path):
                 return jsonify("success")
             else:
                 return jsonify("fail")
+        else:
+            index = file_path.find(".json")
+            name = file_path[0:index + 5]
+            size = file_path[index + 5:]
+            # file_data = db.session.query(Files).filter_by(name=name).first()
+            # if file_data != None:
+            #     db.session.delete(file_data)
+            #     db.session.commit()
+            file_data = Files(name=name,
+                            date=file_method,
+                            size=size,
+                            complete=False)
+            try:
+                db.session.add(file_data)
+                db.session.commit()
+            except:
+                return jsonify("already added")
+            return jsonify("success")
 
 @app.route('/phlash_api/annotations/<current_user>/<file_method>', methods=['GET', 'POST', 'PUT'])
 def annotate_data(current_user, file_method):
@@ -201,11 +219,6 @@ def annotate_data(current_user, file_method):
                 return jsonify("not empty")
         else:
             print("CDS")
-            # print("data")
-            # if (db.session.query(Blast_Results).first() is None):
-            #     print("empty")
-            #     th = threading.Thread(target=parse_blast, args=(UPLOAD_FOLDER,))
-            #     th.start()
             return jsonify(get_dnamaster_data())
         print("done")
 

@@ -115,7 +115,7 @@
                   <th v-if="start + dirStopOptions[index] === currentCDS.start + currentCDS.stop" >
                     <strong>{{ start }}-{{ dirStopOptions[index] }}  +</strong>
                   </th>
-                  <th  style="color:grey" v-else>{{ start }}-{{ dirStopOptions[index] }}  +</th>
+                  <th style="color:grey" v-else>{{ start }}-{{ dirStopOptions[index] }}  +</th>
                   <td>
                     <button
                       class="btn btn-dark btn-sm"
@@ -161,21 +161,6 @@
         <h4 style="text-align: center; margin: 40px; height: 100%">
           GeneMark's Coding Potential Per Frame
         </h4>
-        <div style="display: inline">
-          <div
-            style="
-              width: 52%;
-              display: inline-block;
-              float: left;
-              margin-right: 10px;
-            "
-          >
-            <strong>Direct Sequences</strong>
-          </div>
-          <div style="width: 19%; display: inline-block">
-            <strong>Complementary Sequences</strong>
-          </div>
-        </div>
         <div class="coding-potential-graphs">
           <div v-if="dataExists">
             <Graphs
@@ -201,11 +186,10 @@
         </p>
       </div>
       <hr />
-    </div>
-    <div class="blast-results">
-      <h4 style="text-align: center; margin: 40px">BLAST Results</h4>
-      <div style="float: left; width: 50%;">
-        <div v-if="dataExists" class="table-responsive2" id="accordion" style="margin: 1em;">
+      <div class="blast-results">
+        <h4 style="text-align: center; margin: 40px">BLAST Results</h4>
+        <strong> Direct Strand </strong>
+        <div v-if="dataExists" class="table-responsive2" id="accordion" style="float: center; width: 100%; margin: 1em;">
           <div class="card border-secondary" v-for="key in dirBlastKeys" :key="key">
             <div class="card-body">
               <h4 class="mb-0">
@@ -249,9 +233,8 @@
             </div>
           </div>
         </div>
-      </div>
-      <div style="float: left; width: 50%;">
-        <div v-if="dataExists" class="table-responsive2" id="accordion" style="margin: 1em;">
+        <strong> Complementary Strand </strong>
+        <div v-if="dataExists" class="table-responsive2" id="accordion" style="float: center; width: 100%; margin: 1em;">
           <div class="card border-secondary" v-for="key in compBlastKeys" :key="key">
             <div class="card-body">
               <h4 class="mb-0">
@@ -296,8 +279,7 @@
           </div>
         </div>
       </div>
-    </div>
-    <div class="container">
+      <hr />
       <div class="info-bottom">
         <p>
           <strong>Your selected open reading frame:</strong> {{ newStart }}-{{ newStop }}
@@ -375,7 +357,8 @@ export default {
       compStartOptions: [],
       dirStopOptions: [],
       compStopOptions: [],
-      strands: [],
+      dirBlastResults: [],
+      compBlastResults: [],
       currentCDS: {
         id: "",
         start: "",
@@ -394,15 +377,9 @@ export default {
         status: "",
       },
       frame: null,
-      dirBlastResults: [],
-      compBlastResults: [],
-      showFunction: false,
-      showStart: false,
-      newFunction: "",
+      newFunction: "None selected",
       newStart: null,
       newStop: null,
-      dataExists: false,
-      pageLoading: true,
       data1: [{ x: [], y: [] }],
       data2: [{ x: [], y: [] }],
       data3: [{ x: [], y: [] }],
@@ -417,6 +394,10 @@ export default {
       genemark: "",
       phanotate: "",
       notes: "",
+      dataExists: false,
+      pageLoading: true,
+      showFunction: false,
+      showStart: false,
     };
 
   },
@@ -464,7 +445,7 @@ export default {
   methods: {
 
     /**
-     * Gets the GeneMark, Blast, and DNAMaster data for the given CDS.
+     * Gets the GeneMark, Blast, and auto-annotation data for the given CDS.
      * @param {string} cdsID the ID of the CDS.
      */
     getData(cdsID) {
@@ -480,6 +461,9 @@ export default {
             );
           }
           this.currentCDS = response.data.cds;
+          if (this.currentCDS.function != "DELETED") {
+            this.newFunction = this.currentCDS.function;
+          }
           this.dirBlastResults = response.data.dir_blast;
           this.compBlastResults = response.data.comp_blast;
           console.log(this.dirBlastResults);
@@ -564,7 +548,7 @@ export default {
       this.updatedCDS = this.currentCDS;
       this.updatedCDS.start = this.newStart;
       this.updatedCDS.stop = this.newStop;
-      this.updatedCDS.function = this.newFunction;
+      this.updatedCDS.function = "@" + this.newFunction;
       const payload = {
         id: this.updatedCDS.id,
         start: this.updatedCDS.start,

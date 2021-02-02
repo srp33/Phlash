@@ -25,19 +25,6 @@ class DNAMaster(db.Model):
     notes = db.Column(db.Text,
                         nullable=True)
 
-
-class GeneMark(db.Model):
-    __tablename__ = "genemark"
-    id = db.Column(db.Text,
-                   nullable=False,
-                   primary_key=True)
-    start = db.Column(db.Integer,
-                      nullable=False)
-    stop = db.Column(db.Integer,
-                     nullable=False)
-    strand = db.Column(db.Text,
-                       nullable=False)
-
 class Gene_Calls(db.Model):
     __tablename__ = "gene_calls"
     id = db.Column(db.Text,
@@ -74,4 +61,15 @@ class Settings(db.Model):
     overlap = db.Column(db.Integer,
                         nullable=False)
     short = db.Column(db.Integer,
-                        nullable=False)
+                      nullable=False)
+class Files(db.Model):
+    __tablename__ = "files"
+    name = db.Column(db.Text,
+                     nullable=False,
+                     primary_key=True)
+    date = db.Column(db.Text,
+                     nullable=False)
+    size = db.Column(db.Text,
+                     nullable=False)
+    complete = db.Column(db.Boolean,
+                         nullable=True)

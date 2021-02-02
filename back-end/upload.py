@@ -87,7 +87,7 @@ def delete_file(file_path, UPLOAD_FOLDER):
     """
     try:
         if (file_path.endswith(".fasta") or file_path.endswith(".fna")):
-            db.session.query(GeneMark).delete()
+            db.session.query(Files).delete()
             db.session.query(DNAMaster).delete()
             db.session.query(Blast_Results).delete()
             db.session.query(Gene_Calls).delete()

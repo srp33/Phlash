@@ -1,5 +1,5 @@
 <template>
-  <div class="wrapper" @click="checkFiles">
+  <div class="wrapper">
     <Navbar
       :upload="navUpload"
       :blast="navBlast"
@@ -147,7 +147,9 @@
                 <strong>Algorithm:</strong> blastp (protein-protein BLAST)
               </li>
             </ul>
-            <img id="step-two" src="/phlash/images/blast_step2.png" />
+            <div class="alert alert-light alert-dismissible">
+              <img id="step-two" src="/phlash/images/blast_step2.png" width="100%" />
+            </div>
           </li>
           <li class="step">
             In the top left table on the results page, click on
@@ -155,7 +157,9 @@
             for downloading your results. Choose
             <strong>Single-file JSON</strong>. Continue when you have your
             downloaded file ready for upload.<br />
-            <img id="step-three" src="/phlash/images/blast_step3.png" />
+            <div class="alert alert-light alert-dismissible">
+              <img id="step-three" src="/phlash/images/blast_step3.png" width="100%" />
+            </div>
           </li>
           <li class="step">
             Upload your <strong>{{ numFiles }} single-file JSON</strong> BLAST
@@ -250,6 +254,7 @@ export default {
   data() {
 
     return {
+      height1: 30,
       downloadLoading: false,
       clickedNCBI: false,
       blastDownloaded: false,
@@ -257,6 +262,7 @@ export default {
       autoAnnotated: false,
       numFiles: 1,
       fileNames: [],
+      badFiles: [],
       dropzoneOptions: this.setDropzone(),
     };
 
@@ -364,6 +370,7 @@ export default {
               console.log(response.data);
               var fileNames = response.data.file_names;
               var fileSizes = response.data.file_sizes;
+              var fileMods = response.data.file_mods;
               for (var i = 0; i < fileNames.length; ++i) {
                 this.addCustomFile(
                   // File options
@@ -375,12 +382,13 @@ export default {
                       // name of file on page
                       name: fileNames[i],
                       // image size
-                      size: fileSizes[i],
+                      size: Number(fileSizes[i]),
                       // image type
                       type: 'application/json',
                       // flag: status upload
                       status: this.SUCCESS,
-                      lastModifiedDate: "unimportant",
+                      // last modification date
+                      lastModifiedDate: fileMods[i],
                   },
                   // Custom response for event success
                   {
@@ -407,10 +415,20 @@ export default {
             this.emit("complete", file);
           }
 
-          // this.on("addedfile", function(file) {
-          //   console.log(file.lastModifiedDate);
-          //   file.lastModifiedDate = "unimportant";
-          // });
+          this.on("addedfile", function(file) {
+            console.log(file.lastModifiedDate);
+            console.log(file.size)
+            axios
+            .post(
+              this.options.url.slice(0,this.options.url.indexOf("drop")) + `${file.lastModifiedDate}/${file.name}${file.size}`
+            )
+            .then((response) => {
+              console.log(response.data);
+            })
+            .catch((error) => {
+              console.log(error);
+            });
+          });
 
           this.on("removedfile", function(file) {
             console.log(file);
@@ -465,7 +483,7 @@ export default {
         .then((response) => {
           console.log(response.data);
           this.blastDownloaded = response.data.blast_downloaded;
-          if (this.fileNames.length == this.numFiles) this.blastUploaded = true;
+          if (this.fileNames.length == this.numFiles && this.badFiles.length == 0) this.blastUploaded = true;
           if (response.data.uploaded) this.blastUploaded = true;
           if (response.data.annotated) this.autoAnnotated = true;
           console.log(this.blastUploaded);
@@ -557,6 +575,7 @@ export default {
         )
         .then((response) => {
           this.fileNames = response.data.file_names;
+          this.badFiles = response.data.bad_files;
           this.checkFiles();
         })
         .catch((error) => {
@@ -565,13 +584,31 @@ export default {
     },
 
     uploadReminder() {
+      var incorrectUploads = ""
+      for (var i = 0; i < this.badFiles.length; ++i) {
+        if (i < this.badFiles.length - 1) {
+          incorrectUploads.concat(this.badFiles[i] + ", ");
+        }
+        else {
+          incorrectUploads.concat(this.badFiles[i] + ".");
+        }
+      }
       if (!this.blastUploaded) {
-        this.$bvToast.toast(`All ${this.numFiles} files have not been uploaded. If it looks like all files have been added, 
-        it is possible that a duplicate file has been added. Remove the duplicate and re-upload it and all other files before continuing.`, {
-          title: 'UPLOAD ALL FILES',
-          autoHideDelay: 15000,
-          appendToast: false
-        })
+        if (this.badFiles.length == 0) {
+          this.$bvToast.toast(`All ${this.numFiles} files have not been uploaded.`, {
+            title: 'UPLOAD ALL FILES',
+            autoHideDelay: 15000,
+            appendToast: false
+          })
+        }
+        else {
+          this.$bvToast.toast(`All ${this.numFiles} files have not been uploaded. The following files have either not finished 
+          uploading or encountered an error and must be removed and reuploaded: ${incorrectUploads}`, {
+            title: 'UPLOAD ALL FILES',
+            autoHideDelay: 15000,
+            appendToast: false
+          })
+        }
       }
     },
 

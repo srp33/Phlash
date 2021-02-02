@@ -14,6 +14,7 @@ from werkzeug.utils import secure_filename
 from contextlib import closing
 from zipfile import ZipFile
 from datetime import datetime
+import time
 from Bio import SeqIO, Seq, SeqFeature
 from collections import OrderedDict
 import subprocess
@@ -87,10 +88,22 @@ def dropzone(UPLOAD_FOLDER, request):
                 found = True
                 with open(os.path.join(UPLOAD_FOLDER, existing_file), 'a+') as f:
                     f.write(contents)
+                    if contents[-6:] == "\n]\n}\n\n":
+                        file_data = db.session.query(Files).filter_by(name=file.filename).first()
+                        file_data.complete = True
+                        print(file_data.complete)
+                        db.session.commit()
+                        print(db.session.query(Files).filter_by(name=file.filename).first().complete)
         if not found:
             #file.save(os.path.join(UPLOAD_FOLDER, file_name))
             with open(os.path.join(UPLOAD_FOLDER, file_name), 'w') as f:
                 f.write(contents)
+            if contents[-6:] == "\n]\n}\n\n":
+                file_data = db.session.query(Files).filter_by(name=file.filename).first()
+                file_data.complete = True
+                print(file_data.complete)
+                db.session.commit()
+                print(db.session.query(Files).filter_by(name=file.filename).first().complete)
 
 def upload_blast_output(UPLOAD_FOLDER, request):
     """Adds the blast output file to the upload directory if of type json.
@@ -164,12 +177,26 @@ def get_blast_output_names(UPLOAD_FOLDER):
     """
     file_names = []
     file_sizes = []
+    file_mods = []
+    bad_files = []
     for file in os.listdir(UPLOAD_FOLDER):
         if file.endswith(".json"):
-            file_names.append(file)
-            file_sizes.append(os.path.getsize(os.path.join(UPLOAD_FOLDER, file)))
+            print(file)
+            # file_sizes.append(os.path.getsize(os.path.join(UPLOAD_FOLDER, file)))
+            file_data = db.session.query(Files).filter_by(name=file).first()
+            print(file_data)
+            print(file_data.name)
+            print(file_data.complete)
+            if file_data.complete:
+                file_mods.append(file_data.date)
+                file_sizes.append(file_data.size)
+                file_names.append(file_data.name)
+            else:
+                bad_files.append(file_data.name)
+    response_object["bad_files"] = bad_files
     response_object["file_names"] = file_names
     response_object["file_sizes"] = file_sizes
+    response_object["file_mods"] = file_mods
 
     return response_object
 

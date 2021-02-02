@@ -21,9 +21,6 @@
         <p>
           Gene calls from DNA Master and GeneMark have been compared. A status
           has been assigned to each gene call from DNA Master.
-          <br />
-          When the 'Action' column only contains buttons with a white background, you will
-          be able to download your GenBank file.
         </p>
         <hr />
         <p><strong>Status Definitions</strong></p>
@@ -53,7 +50,7 @@
         <p><strong>Actions</strong></p>
         <p>
           <strong>Annotate: </strong>When clicked a function and alternate open reading frame can be added.<br />
-          <strong>Edit: </strong>When clicked a function and alternate open reading frame can be added.<br />
+          <strong>White background: </strong>This CDS has already been updated but can still be edited.<br />
           <strong>Delete: </strong>When clicked this gene will be removed.<br />
           <strong>Reinstate: </strong>When clicked the deleted gene will be added.<br />
           In rare occasions that not all of the coding sequences needed are shown, 'Add CDS' may be clicked to add 
@@ -100,15 +97,18 @@
       <div class="alert alert-dark" v-if="completedGenes != dnamaster.length">
         You have
         <strong>{{ dnamaster.length - completedGenes }}/{{ dnamaster.length }}</strong>
-        genes remaining.
+        genes remaining. You can 
+        <a href="#" @click="showDownloadGenbank = true" class="alert-link">
+          download your GenBank file here</a
+        >.
       </div>
       <div
-        class="alert alert-success"
+        class="alert alert-dark"
         v-if="completedGenes == dnamaster.length"
       >
-        Congratulations! You can now
-        <a href="#" @click="downloadGenBankFile" class="alert-link">
-          download your GenBank file</a
+        Congratulations! You can 
+        <a href="#" @click="showDownloadGenbank = true" class="alert-link">
+          download your GenBank file here</a
         >.
       </div>
       <div id="annotations" align="center">
@@ -136,10 +136,11 @@
                 <td v-if="curr.function == 'DELETED' || curr.status == 'trnaDELETED'"></td>
                 <td v-else>{{ curr.strand }}</td>
                 <td v-if="curr.function == 'DELETED' || curr.status == 'trnaDELETED'"></td>
-                <td v-else-if="curr.function.length < 16">
-                  {{ curr.function }}
+                <td v-else-if="curr.function == 'None selected'"> {{ curr.function }} </td>
+                <td v-else-if="curr.function.length < 17">
+                  {{ curr.function.substring(1, curr.function.length) }}
                 </td>
-                <td v-else>{{ curr.function.substring(0, 13) }}...</td>
+                <td v-else>{{ curr.function.substring(1, 14) }}...</td>
                 <td v-if="curr.function == 'DELETED' || curr.status == 'trnaDELETED'"></td>
                 <td v-else-if="curr.status == 'tRNA'" style="color: orange">
                   {{ getStatus(index) }}
@@ -181,9 +182,9 @@
                     <button
                       class="btn btn-outline-dark btn-sm"
                       style="width: 100px"
-                      v-if="curr.function !== 'None selected'"
+                      v-if="curr.function[0] === '@'"
                     >
-                      <strong>Edit</strong>
+                      <strong>Annotate</strong>
                     </button>
                   </router-link>
                   <router-link
@@ -447,19 +448,16 @@ export default {
         { value: "-", text: "- (Complementary)" }
       ],
       dnamaster: [],
-      startOptions: [],
-      showDownloadGenbank: true,
-      showAddCDS: false,
       currCDS: {
         id: "",
         start: "",
         stop: "",
         strand: "",
       },
-      fileDownloaded: false,
+      showDownloadGenbank: false,
+      showAddCDS: false,
       pageLoading: true,
       blastLoading: true,
-      downloadLoading: false,
       completedGenes: 0,
       gap: null,
       overlap: null,
@@ -520,7 +518,6 @@ export default {
           this.pageLoading = false;
           this.genbankAnnotations.phageName = this.$route.params.phageID;
           for (var i = 0; i < this.dnamaster.length; i++) {
-            // this.dnamaster[i].id = this.$route.params.phageID + '_' + (i + 1);
             if (this.dnamaster[i].function != "None selected")
               ++this.completedGenes;
           }
@@ -562,7 +559,6 @@ export default {
       evt.preventDefault();
       this.$refs.finishedModal.hide();
       const payload = this.genbankAnnotations;
-      this.downloadLoading = true;
       axios
         .post(
           process.env.VUE_APP_BASE_URL +
@@ -576,8 +572,6 @@ export default {
           link.href = window.URL.createObjectURL(blob);
           link.download = `${this.$route.params.phageID}_modified.gb`;
           link.click();
-          this.downloadLoading = false;
-          this.fileDownloaded = true;
         });
     },
 

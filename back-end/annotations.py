@@ -112,11 +112,15 @@ def create_genbank(fasta_file, UPLOAD_FOLDER, current_user, payload):
                 qualifiers["locus_tag"] = headers["phageName"] + '_' + str(idNumber)
                 qualifiers["codon_start"] = [1]
                 qualifiers["transl_table"] = [11]
-                pattern = re.compile("(.*)##(.*)")
+                pattern = re.compile("@*(.*)##(.*)")
                 matches = pattern.search(cds.function)
                 if matches:
                     qualifiers["product"] = matches.group(1)
                     qualifiers["protein_id"] = matches.group(2)
+                    print(qualifiers)
+                else:
+                    qualifiers["product"] = "Hypothetical Protein"
+                    qualifiers["protein_id"] = "unknown:" + qualifiers["locus_tag"]
                 start = len(genome) - cds.stop
                 stop = len(genome) - cds.start + 1
                 qualifiers["translation"] = Seq.translate(helper.get_sequence(genome, cds.strand, start, stop), table=11)[0:-1]

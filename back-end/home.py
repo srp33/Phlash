@@ -59,7 +59,7 @@ def check_phage_id(phage_id, app):
 def remove_old_users():
     """Removes 90 day old users.
     """
-    critical_time = arrow.now().shift(days=-90)
+    critical_time = arrow.now().shift(days=-1)
     for user in Path(os.path.join(ROOT, 'users')).glob('*'):
         user_time = arrow.get(user.stat().st_mtime)
         if user_time < critical_time:
