@@ -138,7 +138,10 @@ def blast(current_user, file_method, file_path):
         
     if request.method == "POST":
         if file_method == "downloadInput":
-            return download_blast_input(UPLOAD_FOLDER, current_user)
+            return download_blast_input(current_user)
+
+        elif file_method == "createInput":
+            return jsonify(create_blast_input(UPLOAD_FOLDER, current_user))
 
         elif file_method == "uploadOutput":
             return jsonify(upload_blast_output(UPLOAD_FOLDER, request))

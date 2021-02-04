@@ -63,26 +63,7 @@
             :to="{ name: 'Blast', params: { phageID: $route.params.phageID } }"
           >
             <button class="btn btn-light btn-nav">
-              <svg
-                class="bi bi-arrow-left"
-                width="1em"
-                height="1em"
-                viewBox="0 0 16 16"
-                fill="currentColor"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  fill-rule="evenodd"
-                  d="M5.854 4.646a.5.5 0 010 .708L3.207 8l2.647 2.646a.5.5 0 01-.708.708l-3-3a.5.5 0 010-.708l3-3a.5.5 0 01.708 0z"
-                  clip-rule="evenodd"
-                />
-                <path
-                  fill-rule="evenodd"
-                  d="M2.5 8a.5.5 0 01.5-.5h10.5a.5.5 0 010 1H3a.5.5 0 01-.5-.5z"
-                  clip-rule="evenodd"
-                />
-              </svg>
-              <strong>Back</strong>
+              <strong>&#129052; Back</strong>
             </button>
           </router-link>
         </div>
@@ -112,7 +93,7 @@
         >.
       </div>
       <div id="annotations" align="center">
-        <div class="table-responsive">
+        <div class="table-responsive" style="overflow-y:auto; max-height:50em;">
           <table class="table table-hover" align="center">
             <thead>
               <tr>
@@ -120,7 +101,7 @@
                 <th scope="col">Left</th>
                 <th scope="col">Right</th>
                 <th scope="col">Strand</th>
-                <th width="200px" scope="col">Function</th>
+                <th width="12.5em" scope="col">Function</th>
                 <th scope="col">Status</th>
                 <th scope="col">Action</th>
               </tr>
@@ -154,7 +135,7 @@
                 <td v-if="curr.function == 'DELETED' || curr.status == 'trnaDELETED'">
                   <button
                     class="btn btn-outline-dark btn-sm"
-                    style="width: 100px"
+                    style="width: 6.25em"
                     @click="reinstate(index)"
                   >
                     <strong>Reinstate</strong>
@@ -163,7 +144,7 @@
                 <td v-else-if="curr.status == 'tRNA'">
                   <button
                     class="btn btn-outline-dark btn-sm"
-                    style="width: 100px"
+                    style="width: 6.25em"
                     @click="deleteTRNA(index)"
                   >
                     <strong>Delete</strong>
@@ -181,7 +162,7 @@
                   >
                     <button
                       class="btn btn-outline-dark btn-sm"
-                      style="width: 100px"
+                      style="width: 6.25em"
                       v-if="curr.function[0] === '@'"
                     >
                       <strong>Annotate</strong>
@@ -198,7 +179,7 @@
                   >
                     <button
                       class="btn btn-dark btn-sm"
-                      style="width: 100px"
+                      style="width: 6.25em"
                       v-if="curr.function === 'None selected'"
                     >
                       <strong>Annotate</strong>
@@ -210,33 +191,16 @@
           </table>
         </div>
       </div>
-      <div class="nav-btns-wrapper">
-        <router-link
-          :to="{ name: 'Blast', params: { phageID: $route.params.phageID } }"
-        >
-          <button class="btn btn-light btn-nav">
-            <svg
-              class="bi bi-arrow-left"
-              width="1em"
-              height="1em"
-              viewBox="0 0 16 16"
-              fill="currentColor"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                fill-rule="evenodd"
-                d="M5.854 4.646a.5.5 0 010 .708L3.207 8l2.647 2.646a.5.5 0 01-.708.708l-3-3a.5.5 0 010-.708l3-3a.5.5 0 01.708 0z"
-                clip-rule="evenodd"
-              />
-              <path
-                fill-rule="evenodd"
-                d="M2.5 8a.5.5 0 01.5-.5h10.5a.5.5 0 010 1H3a.5.5 0 01-.5-.5z"
-                clip-rule="evenodd"
-              />
-            </svg>
-            <strong>Back</strong>
-          </button>
-        </router-link>
+      <div class="alert alert-primary">
+        <div class="nav-btns-wrapper">
+          <router-link
+            :to="{ name: 'Blast', params: { phageID: $route.params.phageID } }"
+          >
+            <button class="btn btn-light btn-nav">
+              <strong>&#129052; Back</strong>
+            </button>
+          </router-link>
+        </div>
       </div>
     </div>
     <b-modal
@@ -348,7 +312,7 @@
             placeholder="complete genome"
           ></b-form-input>
         </b-form-group>
-        <b-form-group label="Include Notes:" label-size="lg" label-for="include-notes">
+        <b-form-group label="Include CDS Notes:" label-size="lg" label-for="include-notes">
           <b-form-checkbox
             id="include-notes"
             type="checkbox"
@@ -356,7 +320,7 @@
           ></b-form-checkbox>
         </b-form-group>
         <hr />
-        <b-button type="submit" class="mt-3" block style="margin-top: 0px">
+        <b-button type="submit" class="mt-3" block style="margin-top: 0em">
           <strong>Download Genbank File</strong>
         </b-button>
       </b-form>
@@ -395,7 +359,7 @@
           </b-form-checkbox>
         </b-form-group>
         <hr />
-        <b-button type="submit" class="mt-3" block style="margin-top: 0px">
+        <b-button type="submit" class="mt-3" block style="margin-top: 0em">
           <strong>Submit</strong>
         </b-button>
       </b-form>
@@ -771,42 +735,32 @@ export default {
 }
 
 h1 {
-  margin: 40px auto;
+  margin: 1em auto;
 }
 
 .alert-primary {
   text-align: left;
-  margin: 40px auto;
+  margin: 1.5em auto;
 }
 
 .btn-gb {
-  margin: 15px auto;
+  margin: 1em auto;
 }
 
 .nav-btns-wrapper {
   text-align: center;
 }
 
-.btn-nav {
-  margin: 10px;
-}
-
-.btn-map {
-  margin: 10px;
-}
-
-.bi-arrow-left {
-  margin-right: 5px;
-  margin-left: 0px;
-}
-
-.status-btn {
-  width: 100%;
-}
-
 td,
 th {
   word-wrap: break-word;
-  width: 150px;
+  width: 9.5em;
+}
+
+.table-responsive thead th {
+  position: sticky;
+  top: 0;
+  background: #eee;
+  border: darkgray;
 }
 </style>

@@ -32,9 +32,9 @@
         <hr />
         <p><strong>Key</strong></p>
         <p>
-          <strong class="red-text">Red Dashed Line:</strong> selected start and stop positions.<br />
-          <strong class="blue-text">Blue Line:</strong> coding potential in relation to base number.<br />
-          <strong class="green-text">Green Line:</strong> 0.75 coding potential reference line.<br />
+          <strong class="red-text">Red Dashed Line:</strong> The selected start and stop positions.<br />
+          <strong class="blue-text">Blue Line:</strong> The coding potential in relation to base number.<br />
+          <strong class="green-text">Green Line:</strong> A 0.75 coding potential reference line.<br />
           <strong class="grey-text">Grey Line:</strong> The previous gene's stop position and the next
           gene's start position.<br />
           <strong>Bold Text:</strong> The currently selected open reading frame.
@@ -75,26 +75,7 @@
             :to="{ name: 'Annotations', params: { phageID: $route.params.phageID } }"
           >
             <button class="btn btn-light btn-nav">
-              <svg
-                class="bi bi-arrow-left"
-                width="1em"
-                height="1em"
-                viewBox="0 0 16 16"
-                fill="currentColor"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  fill-rule="evenodd"
-                  d="M5.854 4.646a.5.5 0 010 .708L3.207 8l2.647 2.646a.5.5 0 01-.708.708l-3-3a.5.5 0 010-.708l3-3a.5.5 0 01.708 0z"
-                  clip-rule="evenodd"
-                />
-                <path
-                  fill-rule="evenodd"
-                  d="M2.5 8a.5.5 0 01.5-.5h10.5a.5.5 0 010 1H3a.5.5 0 01-.5-.5z"
-                  clip-rule="evenodd"
-                />
-              </svg>
-              <strong>Back</strong>
+              <strong>&#129052; Back</strong>
             </button>
           </router-link>
         </div>
@@ -190,11 +171,11 @@
         <h4 style="text-align: center; margin: 40px">BLAST Results</h4>
         <strong> Direct Strand </strong>
         <div v-if="dataExists" class="table-responsive2" id="accordion" style="float: center; width: 100%; margin: 1em;">
-          <div class="card border-secondary" v-for="key in dirBlastKeys" :key="key">
+          <div class="card border-dark" v-for="key in dirBlastKeys" :key="key">
             <div class="card-body">
               <h4 class="mb-0">
                 <button
-                  class="btn btn-outline-secondary btn-blast"
+                  class="btn btn-outline-dark btn-blast"
                   data-toggle="collapse"
                   aria-expanded="false"
                   v-bind:data-target="'#' + key"
@@ -204,7 +185,7 @@
                   <strong>{{ key }}</strong>
                 </button>
                 <button
-                  class="btn btn-secondary btn-blast"
+                  class="btn btn-dark btn-blast"
                   data-toggle="collapse"
                   aria-expanded="false"
                   v-bind:data-target="'#' + key"
@@ -235,11 +216,11 @@
         </div>
         <strong> Complementary Strand </strong>
         <div v-if="dataExists" class="table-responsive2" id="accordion" style="float: center; width: 100%; margin: 1em;">
-          <div class="card border-secondary" v-for="key in compBlastKeys" :key="key">
+          <div class="card border-dark" v-for="key in compBlastKeys" :key="key">
             <div class="card-body">
               <h4 class="mb-0">
                 <button
-                  class="btn btn-outline-secondary btn-blast"
+                  class="btn btn-outline-dark btn-blast"
                   data-toggle="collapse"
                   aria-expanded="false"
                   v-bind:data-target="'#' + key"
@@ -249,7 +230,7 @@
                   <strong>{{ key }}</strong>
                 </button>
                 <button
-                  class="btn btn-secondary btn-blast"
+                  class="btn btn-dark btn-blast"
                   data-toggle="collapse"
                   aria-expanded="false"
                   v-bind:data-target="'#' + key"
@@ -280,7 +261,17 @@
         </div>
       </div>
       <hr />
-      <div class="info-bottom">
+      <div class="alert alert-primary">
+        <div style="float: right; width: 50%;">
+          <p><strong>Notes:</strong></p>
+          <b-form-textarea
+            id="textarea"
+            v-model="notes"
+            placeholder="Click 'Update' to save notes"
+            rows="3"
+            max-rows="10"
+          ></b-form-textarea>
+        </div>
         <p>
           <strong>Your selected open reading frame:</strong> {{ newStart }}-{{ newStop }}
         </p>
@@ -300,31 +291,13 @@
         >
           <strong>Update</strong>
         </button>
+        <hr />
         <div class="nav-btns-wrapper">
           <router-link
             :to="{ name: 'Annotations', params: { phageID: $route.params.phageID } }"
           >
             <button class="btn btn-light btn-nav">
-              <svg
-                class="bi bi-arrow-left"
-                width="1em"
-                height="1em"
-                viewBox="0 0 16 16"
-                fill="currentColor"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  fill-rule="evenodd"
-                  d="M5.854 4.646a.5.5 0 010 .708L3.207 8l2.647 2.646a.5.5 0 01-.708.708l-3-3a.5.5 0 010-.708l3-3a.5.5 0 01.708 0z"
-                  clip-rule="evenodd"
-                />
-                <path
-                  fill-rule="evenodd"
-                  d="M2.5 8a.5.5 0 01.5-.5h10.5a.5.5 0 010 1H3a.5.5 0 01-.5-.5z"
-                  clip-rule="evenodd"
-                />
-              </svg>
-              <strong>Back</strong>
+              <strong>&#129052; Back</strong>
             </button>
           </router-link>
         </div>
@@ -404,6 +377,7 @@ export default {
 
   created() {
     this.getData(this.$route.params.cdsID);
+    window.scrollTo(0, 0);
   },
 
   computed: {

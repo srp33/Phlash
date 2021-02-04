@@ -53,28 +53,79 @@ def find_blast_zip(current_user):
             response_object["blast_downloaded"] = True
     return response_object
 
-def download_blast_input(UPLOAD_FOLDER, current_user):
-    """Creates and returns the blast input zip folder.
+def download_blast_input(current_user):
+    """Returns the blast input zip folder.
 
     Args:
-        UPLOAD_FOLDER:
-            The folder containing all the uploaded files.
         current_user:
             The current user ID.
 
     Returns:
         The blast input files in a zip folder.
     """
-    print("Starting comparisons")
-    # compare()
-    fasta_file = helper.get_file_path("fasta", UPLOAD_FOLDER)
-    # genemark_gdata_file = helper.get_file_path("gdata", UPLOAD_FOLDER)
-    print(datetime.now())
-    num_files_downloaded = create_blast_fastas(current_user, fasta_file)
-    print(datetime.now())
     f = open(os.path.join(ROOT, 'users', current_user, f"{current_user}_blast.zip"), "rb")
 
     return f.read()
+
+def create_blast_input(UPLOAD_FOLDER, current_user):
+    """Creates fasta file(s) for BLAST input.
+
+    If more than one file is created, then each file should be 30 kb.
+
+    Args:
+        current_user:
+            The ID of the current user.
+        fasta_file:
+            The file containing the DNA sequence of the phage.
+        gdata_file:
+            The file containing the GeneMark gene calls.
+
+    Returns:
+        The Number of blast fasta files created.
+    """
+    fasta_file = helper.get_file_path("fasta", UPLOAD_FOLDER)
+    filename = re.search('(.*/users/.*)/uploads/.*.\w*', fasta_file)
+    genome = SeqIO.read(fasta_file, "fasta").seq
+    output = ""
+    blast_file_count = 1  # keep track of num blast files created
+    out_file = f"{str(filename.group(1))}/{current_user}_blast_{blast_file_count}.fasta"
+    files_to_zip = [out_file]
+    starts, stops = get_start_stop('+', genome)
+    for i in range(len(starts)):
+        output += f">+, {starts[i]}-{stops[i]}\n"
+        output += f"{Seq.translate(sequence=helper.get_sequence(genome, '+', starts[i]-1, stops[i]), table=11)}\n"
+        if getsizeof(output) > 30000:  # only file size to reach 30 kb, else you get a CPU limit from NCBI blast
+            with open(out_file, "w") as f:
+                f.write(output)
+            output = ""
+            blast_file_count += 1
+            out_file = f"{str(filename.group(1))}/{current_user}_blast_{blast_file_count}.fasta"
+            files_to_zip.append(out_file)
+    starts, stops = get_start_stop('-', genome)
+    for i in range(len(starts)):
+        output += f">-, {starts[i]}-{stops[i]}\n"
+        start = len(genome) - stops[i]
+        stop = len(genome) - starts[i] + 1
+        output += f"{Seq.translate(sequence=helper.get_sequence(genome, '-', start, stop), table=11)}\n"
+        if getsizeof(output) > 30000:  # only file size to reach 30 kb, else you get a CPU limit from NCBI blast
+            with open(out_file, "w") as f:
+                f.write(output)
+            output = ""
+            blast_file_count += 1
+            out_file = f"{str(filename.group(1))}/{current_user}_blast_{blast_file_count}.fasta"
+            files_to_zip.append(out_file)
+
+    with open(out_file, "w") as f:
+        f.write(output)
+    
+    # zip all out_files together
+    zip_file = zipfile.ZipFile(f"{str(filename.group(1))}/{current_user}_blast.zip", 'w', zipfile.ZIP_DEFLATED)
+    for filename in files_to_zip:
+        arcname = filename.rsplit('/', 1)[-1].lower()
+        zip_file.write(filename, arcname)
+    zip_file.close()
+    
+    return blast_file_count
 
 def dropzone(UPLOAD_FOLDER, request):
     file = request.files['file']

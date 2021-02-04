@@ -37,7 +37,7 @@
           <li class="nav-item">
             <router-link :to="{ name: 'GeneMap', params: {phageID: this.phageID} }"
                          :event="blast ? 'click' : ''">
-              <a class="nav-link" href="#">gene map</a>
+              <a class="nav-link" href="#">genome map</a>
             </router-link>
           </li>
           <li class="nav-item" v-if="settings">

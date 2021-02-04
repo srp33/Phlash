@@ -18,8 +18,8 @@
           >!
         </p>
         <p>
-          Enter an ID for your bacteriphage below to get started.
-          <em>Please note that your ID will be removed after 90 days.</em>
+          Enter a unique bacteriophage ID that only contains letters, numbers, and underscores below.<br>
+          <em>Please note that all data associated with this ID will be removed after 90 days.</em>
         </p>
         <div class="input-group mb-3">
           <input
@@ -27,7 +27,7 @@
             type="text"
             v-model="phageID"
             v-on:keyup.enter="checkPhageID()"
-            placeholder="Enter a unique bacteriophage ID that only contains letters, numbers, and underscores."
+            placeholder="Enter ID here."
             aria-label="Enter a unique bacteriophage ID"
             aria-describedby="basic-addon2"
           />
@@ -37,7 +37,7 @@
               type="button"
               @click="checkPhageID()"
             >
-              <strong>Enter</strong>
+              <strong>Start</strong>
             </button>
           </div>
         </div>
@@ -68,26 +68,7 @@
             v-if="idStatus.includes('ID already exists') && allFilesUploaded && !blastComplete"
           >
             <button class="btn btn-light">
-              <strong>Next</strong>
-              <svg
-                class="bi bi-arrow-right"
-                width="1em"
-                height="1em"
-                viewBox="0 0 16 16"
-                fill="currentColor"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  fill-rule="evenodd"
-                  d="M10.146 4.646a.5.5 0 01.708 0l3 3a.5.5 0 010 .708l-3 3a.5.5 0 01-.708-.708L12.793 8l-2.647-2.646a.5.5 0 010-.708z"
-                  clip-rule="evenodd"
-                />
-                <path
-                  fill-rule="evenodd"
-                  d="M2 8a.5.5 0 01.5-.5H13a.5.5 0 010 1H2.5A.5.5 0 012 8z"
-                  clip-rule="evenodd"
-                />
-              </svg>
+              <strong>Next &#129054;</strong>
             </button>
           </router-link>
         </div>
@@ -97,26 +78,7 @@
             v-if="idStatus.includes('ID already exists') && allFilesUploaded && blastComplete"
           >
             <button class="btn btn-light">
-              <strong>Next</strong>
-              <svg
-                class="bi bi-arrow-right"
-                width="1em"
-                height="1em"
-                viewBox="0 0 16 16"
-                fill="currentColor"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  fill-rule="evenodd"
-                  d="M10.146 4.646a.5.5 0 01.708 0l3 3a.5.5 0 010 .708l-3 3a.5.5 0 01-.708-.708L12.793 8l-2.647-2.646a.5.5 0 010-.708z"
-                  clip-rule="evenodd"
-                />
-                <path
-                  fill-rule="evenodd"
-                  d="M2 8a.5.5 0 01.5-.5H13a.5.5 0 010 1H2.5A.5.5 0 012 8z"
-                  clip-rule="evenodd"
-                />
-              </svg>
+              <strong>Next &#129054;</strong>
             </button>
           </router-link>
         </div>
@@ -129,26 +91,7 @@
             "
           >
             <button class="btn btn-light">
-              <strong>Next</strong>
-              <svg
-                class="bi bi-arrow-right"
-                width="1em"
-                height="1em"
-                viewBox="0 0 16 16"
-                fill="currentColor"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  fill-rule="evenodd"
-                  d="M10.146 4.646a.5.5 0 01.708 0l3 3a.5.5 0 010 .708l-3 3a.5.5 0 01-.708-.708L12.793 8l-2.647-2.646a.5.5 0 010-.708z"
-                  clip-rule="evenodd"
-                />
-                <path
-                  fill-rule="evenodd"
-                  d="M2 8a.5.5 0 01.5-.5H13a.5.5 0 010 1H2.5A.5.5 0 012 8z"
-                  clip-rule="evenodd"
-                />
-              </svg>
+              <strong>Next &#129054;</strong>
             </button>
           </router-link>
         </div>

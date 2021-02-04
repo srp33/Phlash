@@ -59,7 +59,7 @@ def check_phage_id(phage_id, app):
 def remove_old_users():
     """Removes 90 day old users.
     """
-    critical_time = arrow.now().shift(days=-1)
+    critical_time = arrow.now().shift(days=-90)
     for user in Path(os.path.join(ROOT, 'users')).glob('*'):
         user_time = arrow.get(user.stat().st_mtime)
         if user_time < critical_time:
@@ -81,19 +81,12 @@ def handle_existing_users(phage_id):
     response_object['id_status'] = "ID already exists. If this is your ID, please continue. If not, enter a new one."
 
     # check if all required files for phage_id are uploaded
-    required_files = ["fasta", "genbank", "gdata", "ldata"]
+    response_object['uploaded_all_files'] = False
     for filename in os.listdir(os.path.join(ROOT, 'users', phage_id, 'uploads')):
         ext = os.path.splitext(filename)[1].lower()
         if ext in FASTA_EXTENSIONS:
-            required_files.remove("fasta")
-        elif ext in GENBANK_EXTENSIONS:
-            required_files.remove("genbank")
-        elif ext in GDATA_EXTENSIONS:
-            required_files.remove("gdata")
-        elif ext in LDATA_EXTENSIONS:
-            required_files.remove("ldata")
+            response_object['uploaded_all_files'] = True
 
-    response_object['uploaded_all_files'] = True if len(required_files) == 0 else False
     response_object['blast_complete'] = False if db.session.query(Blast_Results).first() is None else True
 
 def handle_new_users(phage_id, app):

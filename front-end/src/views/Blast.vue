@@ -13,7 +13,15 @@
       <div class="alert alert-primary">
         <p><strong>Instructions</strong></p>
         <p>
-          Follow the steps below. Click 'Next' when all the steps have been completed.
+          Complete all of the steps below and then click 'Next'.
+        </p>
+        <p v-if="annotating">
+          Phlash is currently auto-annotating the bacteriophage genome.<br />
+          Phlash relies on 
+          <a href="#" @click="goToWebsite('GeneMarkS')" class="alert-link"><i>GeneMarkS</i></a>, 
+          <a href="#" @click="goToWebsite('Glimmer3')" class="alert-link"><i>Glimmer3</i></a>, 
+          <a href="#" @click="goToWebsite('Aragorn')" class="alert-link"><i>ARAGORN</i></a>, and 
+          <a href="#" @click="goToWebsite('Phanotate')" class="alert-link"><i>PHANOTATE</i></a> to predict genes.
         </p>
         <hr />
         <div class="nav-btns-wrapper">
@@ -24,26 +32,7 @@
             }"
           >
             <button class="btn btn-light btn-nav">
-              <svg
-                class="bi bi-arrow-left"
-                width="1em"
-                height="1em"
-                viewBox="0 0 16 16"
-                fill="currentColor"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  fill-rule="evenodd"
-                  d="M5.854 4.646a.5.5 0 010 .708L3.207 8l2.647 2.646a.5.5 0 01-.708.708l-3-3a.5.5 0 010-.708l3-3a.5.5 0 01.708 0z"
-                  clip-rule="evenodd"
-                />
-                <path
-                  fill-rule="evenodd"
-                  d="M2.5 8a.5.5 0 01.5-.5h10.5a.5.5 0 010 1H3a.5.5 0 01-.5-.5z"
-                  clip-rule="evenodd"
-                />
-              </svg>
-              <strong>Back</strong>
+              <strong>&#129052; Back</strong>
             </button>
           </router-link>
           <router-link
@@ -53,60 +42,37 @@
             }"
             :event="blastDownloaded && blastUploaded ? 'click' : ''"
           >
-            <button class="btn btn-light btn-nav disabled" id="next-top"  @mouseenter="displayOutputFiles()">
-              <strong>Next</strong>
-              <svg
-                class="bi bi-arrow-right"
-                width="1em"
-                height="1em"
-                viewBox="0 0 16 16"
-                fill="currentColor"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  fill-rule="evenodd"
-                  d="M10.146 4.646a.5.5 0 01.708 0l3 3a.5.5 0 010 .708l-3 3a.5.5 0 01-.708-.708L12.793 8l-2.647-2.646a.5.5 0 010-.708z"
-                  clip-rule="evenodd"
-                />
-                <path
-                  fill-rule="evenodd"
-                  d="M2 8a.5.5 0 01.5-.5H13a.5.5 0 010 1H2.5A.5.5 0 012 8z"
-                  clip-rule="evenodd"
-                />
-              </svg>
+            <button class="btn btn-light btn-nav disabled" id="next-top" @click="uploadReminder()" @mouseenter="displayOutputFiles()">
+              <strong>Next &#129054;</strong>
             </button>
           </router-link>
         </div>
       </div>
       <div class="steps">
         <loading
-          :active.sync="downloadLoading"
+          :active.sync="orfLoading"
           :is-full-page="true"
           :height="100"
           :width="100"
+          :loader="dots"
         ></loading>
+        <loading
+          :active.sync="orfLoading"
+          :is-full-page="true"
+          :height="100"
+          :width="100"
+        >Finding ORFs...</loading>
         <ol>
           <li class="step">
-            <a href="#" @click="downloadInputFiles" class="alert-link"
-              >Download the zipped FASTA file(s)</a
-            >
-            that will be used as input for BLAST.
+            <strong>Download BLASTp input files. </strong>
+            Phlash will locate every open reading frame (ORF) on every frame of the phage's DNA sequence. 
+            The ORFs are put in multi-FASTA format to be uploaded into BLAST. 
+            The more searches that BLAST has to make, the longer it will take. 
+            For this reason, Phlash limits the number of ORFs per file.
+            Download the zipped FASTA file(s) by clicking 
+            <a href="#" @click="downloadInputFiles" class="alert-link">here</a>.
             <p class="zipfile-tip">
-              <svg
-                class="bi bi-info-circle-fill"
-                width="1em"
-                height="1em"
-                viewBox="0 0 16 16"
-                fill="currentColor"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  fill-rule="evenodd"
-                  d="M8 16A8 8 0 108 0a8 8 0 000 16zm.93-9.412l-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM8 5.5a1 1 0 100-2 1 1 0 000 2z"
-                  clip-rule="evenodd"
-                />
-              </svg>
-              If you can't open your zip file, try using
+              &#128712; If you can't open your zip file, try using
               <a
                 target="_blank"
                 rel="noopener noreferrer"
@@ -114,121 +80,103 @@
                 >7-Zip</a
               >.
             </p>
-            <p v-if="downloadLoading">Downloading...</p>
+            <p v-if="downloadLoading">Downloading BLASTp input files...</p>
           </li>
           <li class="step">
-            <a href="#" @click="goToNCBI" class="alert-link"
+            <strong>BLAST the entire Phage DNA sequence.</strong>
+            <!-- <a href="#" @click="goToWebsite" class="alert-link"
               >Go to BLASTp's website.
-            </a>
-            <i
+            </a> -->
+            <!-- <i
               >At the website, make sure to upload the files and set the
               appropriate parameters, as show in the list and screenshot
               below. Note that if pop-ups are allowed for this page when 
               the link is clicked the number of tabs that are needed will 
               be opened.</i
-            ><br />
+            ><br /> -->
             <div class="alert alert-warning alert-dismissible" v-if="clickedNCBI">
               <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
               This will take several minutes. If it seems to be taking a long
               time, it is still probably working correctly. <br />
               If an error occurs refresh the page or try re-running that file. Oftentimes it will then work correctly.<br />
               For help troubleshooting,
-              <a href="#" @click="goToHelp" class="alert-link">visit the FAQ</a
+              <a href="#" @click="goToWebsite('Help')" class="alert-link">visit the FAQ</a
               >.
             </div>
-            <ul>
+            <ol type="a">
               <li>
-                <strong>Upload File:</strong> Upload the FASTA file from step 1.
+                <strong>Go to the NCBI BLAST website:</strong> Click
+                <a href="#" @click="goToWebsite('Blast')" class="alert-link"> here </a>
+                to open up a tab for every BLASTp input file. Please note that if pop-ups are blocked for Phlash only one tab will open.
               </li>
               <li>
-                <strong>Database:</strong> Non-redundant protein sequences (nr)
+                <strong>Standard Protein BLAST</strong> 
+                Ensure that the main heading says <i>'Standard Protein BLAST'</i>. If it does not, select the <i>'blastp'</i> tab.
               </li>
               <li>
-                <strong>Algorithm:</strong> blastp (protein-protein BLAST)
+                <strong>Upload File:</strong> 
+                In the <i>'Enter Query Sequence'</i> box click the <i>'Choose File'</i> button and upload one of the BLASTp input files that was in the downloaded zip-folder.
+                You must remove all of the files from the zip folder before you will be able to select a file to upload. 
+                Ensure that you do not upload the same file twice, that you upload every file, and that you do not upload the zip folder as this will result in errors.
               </li>
-            </ul>
+              <li>
+                <strong>Database:</strong> 
+                In the <i>'Choose Search Set'</i> box, under <i>'Database'</i>, choose <i>'Non-redundant protein sequences (nr)'</i> from the dropdown options box.
+              </li>
+              <li>
+                <strong>Algorithm:</strong> 
+                In the <i>'Program Selection'</i> box, select <i>'blastp (protein-protein BLAST)'</i>
+              </li>
+              <li>
+                <strong>BLAST:</strong> 
+                Click the <i>'BLAST'</i> button and wait for the search to finish.
+              </li>
+            </ol>
             <div class="alert alert-light alert-dismissible">
               <img id="step-two" src="/phlash/images/blast_step2.png" width="100%" />
             </div>
           </li>
           <li class="step">
+            <strong>Download Single-file JSON</strong>
             In the top left table on the results page, click on
-            <i>"Download All."</i> This will show you file formatting options
+            <i>'Download All.'</i> This will show you file formatting options
             for downloading your results. Choose
-            <strong>Single-file JSON</strong>. Continue when you have your
-            downloaded file ready for upload.<br />
+            <i>'Single-file JSON.'</i> After completing this process you will have a JSON that corresponds to each FASTA file that you uploaded.<br />
             <div class="alert alert-light alert-dismissible">
               <img id="step-three" src="/phlash/images/blast_step3.png" width="100%" />
             </div>
           </li>
-          <li class="step">
-            Upload your <strong>{{ numFiles }} single-file JSON</strong> BLAST
-            results.
+          <li class="step" v-if="blastDownloaded">
+            <strong>Upload your {{ numFiles }} single-file JSON BLAST results.</strong>
             <vue-dropzone v-if="!blastUploaded" ref="myVueDropzone" id="dropzone" :duplicateCheck="true" :options="dropzoneOptions" :destroyDropzone="false"></vue-dropzone>
-            <button v-else class = "btn btn-outline-secondary btn-lg btn-block" style="margin: 30px auto;" @click="removeAll()">BLAST files have been uploaded, click to remove and reupload.</button>
+            <button v-else class = "btn btn-outline-dark btn-lg btn-block" style="margin: 30px auto;" @click="removeAll()">BLAST files have been uploaded, click to remove and reupload.</button>
           </li>
         </ol>
       </div>
-      <div class="nav-btns-wrapper">
-        <router-link
-          :to="{
-            name: 'Upload',
-            params: { phageID: $route.params.phageID },
-          }"
-        >
-          <button class="btn btn-light btn-nav">
-            <svg
-              class="bi bi-arrow-left"
-              width="1em"
-              height="1em"
-              viewBox="0 0 16 16"
-              fill="currentColor"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                fill-rule="evenodd"
-                d="M5.854 4.646a.5.5 0 010 .708L3.207 8l2.647 2.646a.5.5 0 01-.708.708l-3-3a.5.5 0 010-.708l3-3a.5.5 0 01.708 0z"
-                clip-rule="evenodd"
-              />
-              <path
-                fill-rule="evenodd"
-                d="M2.5 8a.5.5 0 01.5-.5h10.5a.5.5 0 010 1H3a.5.5 0 01-.5-.5z"
-                clip-rule="evenodd"
-              />
-            </svg>
-            <strong>Back</strong>
-          </button>
-        </router-link>
-        <router-link
-          :to="{
-            name: 'Annotations',
-            params: { phageID: $route.params.phageID },
-          }"
-          :event="blastDownloaded && blastUploaded ? 'click' : ''"
-        >
-          <button class="btn btn-light btn-nav disabled" id="next-bottom" @click="uploadReminder()" @mouseenter="displayOutputFiles()">
-            <strong>Next</strong>
-            <svg
-              class="bi bi-arrow-right"
-              width="1em"
-              height="1em"
-              viewBox="0 0 16 16"
-              fill="currentColor"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                fill-rule="evenodd"
-                d="M10.146 4.646a.5.5 0 01.708 0l3 3a.5.5 0 010 .708l-3 3a.5.5 0 01-.708-.708L12.793 8l-2.647-2.646a.5.5 0 010-.708z"
-                clip-rule="evenodd"
-              />
-              <path
-                fill-rule="evenodd"
-                d="M2 8a.5.5 0 01.5-.5H13a.5.5 0 010 1H2.5A.5.5 0 012 8z"
-                clip-rule="evenodd"
-              />
-            </svg>
-          </button>
-        </router-link>
+      <div class="alert alert-primary">
+        <div class="nav-btns-wrapper">
+          <router-link
+            :to="{
+              name: 'Upload',
+              params: { phageID: $route.params.phageID },
+            }"
+          >
+            <button class="btn btn-light btn-nav">
+              <strong>&#129052; Back</strong>
+            </button>
+          </router-link>
+          <router-link
+            :to="{
+              name: 'Annotations',
+              params: { phageID: $route.params.phageID },
+            }"
+            :event="blastDownloaded && blastUploaded ? 'click' : ''"
+          >
+            <button class="btn btn-light btn-nav disabled" id="next-bottom" @click="uploadReminder()" @mouseenter="displayOutputFiles()">
+              <strong>Next &#129054;</strong>
+            </button>
+          </router-link>
+        </div>
       </div>
     </div>
   </div>
@@ -255,12 +203,14 @@ export default {
 
     return {
       height1: 30,
+      orfLoading: true,
       downloadLoading: false,
       clickedNCBI: false,
       blastDownloaded: false,
       blastUploaded: false,
       autoAnnotated: false,
-      numFiles: 1,
+      annotating: false,
+      numFiles: 50,
       fileNames: [],
       badFiles: [],
       dropzoneOptions: this.setDropzone(),
@@ -269,7 +219,7 @@ export default {
   },
 
   created() {
-    this.setNumFiles();
+    this.checkFiles();
   },
 
   computed: {
@@ -344,7 +294,7 @@ export default {
         maxFiles: null,
         parallelUploads: 5,
         chunkSize: 10000000,
-        dictDefaultMessage: "Drag files here or click to browse",
+        dictDefaultMessage: "Drag files here or click to browse.",
         dictInvalidFileType: "Only '.json' file types are allowed.",
         dictRemoveFileConfirmation: "Are you sure you want to remove this file?",
         dictMaxFilesExceeded: "The number of files uploaded exceeds the number of expected blast results.",
@@ -369,6 +319,7 @@ export default {
             .then((response) => {
               console.log(response.data);
               var fileNames = response.data.file_names;
+              fileNames = fileNames.concat(response.data.bad_files);
               var fileSizes = response.data.file_sizes;
               var fileMods = response.data.file_mods;
               for (var i = 0; i < fileNames.length; ++i) {
@@ -457,6 +408,7 @@ export default {
     },
 
     autoAnnotate() {
+      this.annotating = true;
       axios
         .get(
           process.env.VUE_APP_BASE_URL +
@@ -464,6 +416,8 @@ export default {
         )
         .then((response) => {
           console.log(response.data);
+          this.annotated = true;
+          this.annotating = false;
         })
         .catch((error) => {
           console.log(error);
@@ -475,6 +429,7 @@ export default {
      * Checks to see if the blast input folder has been downloaded.
      */
     checkFiles() {
+      console.log("checkFiles");
       axios
         .get(
           process.env.VUE_APP_BASE_URL +
@@ -483,11 +438,31 @@ export default {
         .then((response) => {
           console.log(response.data);
           this.blastDownloaded = response.data.blast_downloaded;
-          if (this.fileNames.length == this.numFiles && this.badFiles.length == 0) this.blastUploaded = true;
-          if (response.data.uploaded) this.blastUploaded = true;
-          if (response.data.annotated) this.autoAnnotated = true;
+          if (!this.blastDownloaded) { this.createInputFiles(); }
+          else { this.orfLoading = false; }
+          if (response.data.uploaded) { this.blastUploaded = true; }
+          if (response.data.annotated) { this.autoAnnotated = true; }
+          if (!this.autoAnnotated) { this.autoAnnotate(); }
           console.log(this.blastUploaded);
-          if (!this.blastDownloaded) this.downloadInputFiles();
+          this.setNumFiles();
+          // if (!this.blastDownloaded) this.downloadInputFiles();
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    },
+
+    createInputFiles() {
+      axios
+        .post(
+          process.env.VUE_APP_BASE_URL +
+            `/blast/${this.$route.params.phageID}/createInput/none`,
+        )
+        .then((response) => {
+          console.log(response.data);
+          this.numFiles = response.data;
+          this.orfLoading = false;
+          this.blastDownloaded = true;
         })
         .catch((error) => {
           console.log(error);
@@ -510,16 +485,13 @@ export default {
         )
         .then((response) => {
           console.log(response.data);
+          this.downloadLoading = false;
           let file_data = response.data;
           const blob = new Blob([file_data], { type: "application/zip" });
           let link = document.createElement("a");
           link.href = window.URL.createObjectURL(blob);
           link.download = `${this.$route.params.phageID}_blast.zip`;
           link.click();
-          this.downloadLoading = false;
-          this.blastDownloaded = true;
-          this.setNumFiles();
-          this.autoAnnotate();
         })
         .catch((error) => {
           console.log(error);
@@ -530,44 +502,71 @@ export default {
      * Sets the number of blast output files that must be uploaded.
      */
     setNumFiles() {
+      console.log("setNumFiles");
       axios
         .post(
           process.env.VUE_APP_BASE_URL +
             `/blast/${this.$route.params.phageID}/numFiles/none`
         )
         .then((response) => {
-          this.numFiles = Number(response.data);
-          this.displayOutputFiles();
+          if (response.data != "None") {
+            this.numFiles = Number(response.data);
+            this.displayOutputFiles();
+          }
         });
     },
 
     /**
-     * Links to the NCBI BLASTp page.
+     * Links to an external website.
+     * @param {string} site the website to be redirected to.
      */
-    goToNCBI() {
-      for (var i = 0; i < this.numFiles; ++i) {
+    goToWebsite(site) {
+      if (site == "Blast") {
+        for (var i = 0; i < this.numFiles; ++i) {
+          window.open(
+            "https://blast.ncbi.nlm.nih.gov/Blast.cgi?PAGE=Proteins",
+            "_blank"
+          );
+        }
+        this.clickedNCBI = true;
+      }
+      else if (site == "Help") {
         window.open(
-          "https://blast.ncbi.nlm.nih.gov/Blast.cgi?PAGE=Proteins",
+          "https://blast.ncbi.nlm.nih.gov/Blast.cgi?CMD=Web&PAGE_TYPE=Blastdocs",
           "_blank"
         );
       }
-      this.clickedNCBI = true;
-    },
-
-    /**
-     * Links to the NCBI BLAST FAQ page.
-     */
-    goToHelp() {
-      window.open(
-        "https://blast.ncbi.nlm.nih.gov/Blast.cgi?CMD=Web&PAGE_TYPE=Blastdocs",
-        "_blank"
-      );
+      else if (site == "GeneMarkS") {
+        window.open(
+          "https://academic.oup.com/nar/article/29/12/2607/1034721?login=true",
+          "_blank"
+        );
+      }
+      else if (site == "Glimmer3") {
+        window.open(
+          "http://ccb.jhu.edu/papers/glimmer3.pdf",
+          "_blank"
+        );
+      }
+      else if (site == "Aragorn") {
+        window.open(
+          "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC373265/",
+          "_blank"
+        );
+      }
+      else if (site == "Phanotate") {
+        window.open(
+          "https://academic.oup.com/bioinformatics/article/35/22/4537/5480131",
+          "_blank"
+        );
+      }
     },
 
     /**
      * Gets all of the names of all of the blast output files that have been uploaded.
      */
     displayOutputFiles() {
+      console.log("displayOutputFiles");
       axios
         .post(
           process.env.VUE_APP_BASE_URL +
@@ -576,7 +575,7 @@ export default {
         .then((response) => {
           this.fileNames = response.data.file_names;
           this.badFiles = response.data.bad_files;
-          this.checkFiles();
+          if (this.fileNames.length == this.numFiles && this.badFiles.length == 0) { this.blastUploaded = true; }
         })
         .catch((error) => {
           console.log(error);
@@ -587,10 +586,10 @@ export default {
       var incorrectUploads = ""
       for (var i = 0; i < this.badFiles.length; ++i) {
         if (i < this.badFiles.length - 1) {
-          incorrectUploads.concat(this.badFiles[i] + ", ");
+          incorrectUploads += this.badFiles[i] + ", ";
         }
         else {
-          incorrectUploads.concat(this.badFiles[i] + ".");
+          incorrectUploads += this.badFiles[i] + ".";
         }
       }
       if (!this.blastUploaded) {
@@ -602,6 +601,7 @@ export default {
           })
         }
         else {
+          console.log(incorrectUploads);
           this.$bvToast.toast(`All ${this.numFiles} files have not been uploaded. The following files have either not finished 
           uploading or encountered an error and must be removed and reuploaded: ${incorrectUploads}`, {
             title: 'UPLOAD ALL FILES',
