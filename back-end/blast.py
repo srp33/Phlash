@@ -43,9 +43,10 @@ def find_blast_zip(current_user):
     """
     response_object["blast_downloaded"] = False
     response_object["uploaded"] = True
-    response_object["annotated"] = True
-    if db.session.query(DNAMaster).first() is None:
-        response_object["annotated"] = False
+    response_object["annotated"] = False
+    for filename in os.listdir(os.path.join(ROOT, 'users', current_user, 'uploads')):
+        if filename.endswith('.ldata'):
+            response_object["annotated"] = True
     if (db.session.query(Blast_Results).first() is None):
         response_object["uploaded"] = False
     for filename in os.listdir(os.path.join(ROOT, 'users', current_user)):

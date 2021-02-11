@@ -7,6 +7,7 @@ import Blast from './views/Blast.vue';
 import Annotations from './views/Annotations.vue';
 import CDS from './views/CDS.vue';
 import GeneMap from './views/GeneMap.vue';
+import Contact from './views/Contact.vue';
 
 Vue.use(Router);
 
@@ -48,6 +49,11 @@ export default new Router({
       path: '/annotations/geneMap/:phageID',
       name: 'GeneMap',
       component: GeneMap,
+    },
+    {
+      path: '/contact',
+      name: 'Contact',
+      component: Contact,
     }
   ],
 });

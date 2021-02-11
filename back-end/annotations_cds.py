@@ -98,8 +98,10 @@ def get_cds_data(UPLOAD_FOLDER, cds_id):
     prev_cds = DNAMaster.query.filter_by(id=prev_id).first()
     next_cds = DNAMaster.query.filter_by(id=next_id).first()
     if prev_cds is not None:
+        response_object['prevCDS'] = prev_id
         response_object['prev_stop'] = prev_cds.stop
     else:
+        response_object['prevCDS'] = 'undefined'
         response_object['prev_stop'] = 0
     if next_cds is not None:
         response_object['next_start'] = next_cds.start
@@ -137,8 +139,17 @@ def get_cds_data(UPLOAD_FOLDER, cds_id):
     reached_CDS = False
     response_object['nextCDS'] = 'undefined'
     for cds in db.session.query(DNAMaster).order_by(DNAMaster.start):
-        if reached_CDS and cds.function == "None selected":
+        if reached_CDS and cds.function != "DELETED" and cds.status != "tRNA":
             response_object['nextCDS'] = cds.id
+            break
+        elif cds.id == cds_id:
+            reached_CDS = True
+
+    reached_CDS = False
+    response_object['prevCDS'] = 'undefined'
+    for cds in db.session.query(DNAMaster).order_by(DNAMaster.start.desc()):
+        if reached_CDS and cds.function != "DELETED" and cds.status != "tRNA":
+            response_object['prevCDS'] = cds.id
             break
         elif cds.id == cds_id:
             reached_CDS = True
@@ -165,6 +176,7 @@ def get_blasts(start):
     """
     dir_blasts = {}
     comp_blasts = {}
+    all_blasts = {}
     dir_starts = []
     dir_stops = []
     comp_starts = []
@@ -182,6 +194,7 @@ def get_blasts(start):
             dir_starts.append(blast.start)
             dir_stops.append(blast.stop)
             dir_blasts[str(blast.start) + '-' + str(blast.stop) + '  ' + blast.strand] = eval(blast.results)
+            all_blasts[str(blast.start) + '-' + str(blast.stop) + '  ' + blast.strand] = eval(blast.results)
     for blast in db.session.query(Blast_Results).filter_by(strand='-').order_by(Blast_Results.start):
         if blast.start > minimum and blast.start < maximum:
             starts.append(blast.start)
@@ -189,11 +202,12 @@ def get_blasts(start):
             comp_starts.append(blast.start)
             comp_stops.append(blast.stop)
             comp_blasts[str(blast.start) + '-' + str(blast.stop) + '  ' + blast.strand] = eval(blast.results)
-    print(dir_blasts)
+            all_blasts[str(blast.start) + '-' + str(blast.stop) + '  ' + blast.strand] = eval(blast.results)
     response_object['comp_start_options'] = comp_starts
     response_object['comp_stop_options'] = comp_stops
     response_object['dir_start_options'] = dir_starts
     response_object['dir_stop_options'] = dir_stops
     response_object['dir_blast'] = dir_blasts
     response_object['comp_blast'] = comp_blasts
+    response_object['all_blast'] = all_blasts
     return starts, stops

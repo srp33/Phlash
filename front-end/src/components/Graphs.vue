@@ -146,7 +146,7 @@ export default {
           dtick: 200,
           showcrossline: true,
           spikemode: "across",
-          spikecolor: "green",
+          spikecolor: "#1b9e77",
           spikedash: "solid",
           spikethickness: 2,
         },
@@ -181,7 +181,7 @@ export default {
             yref: "paper",
             y1: 1,
             line: {
-              color: "red",
+              color: "#d95f02",
               width: 1.5,
               dash: "dot",
             },
@@ -194,7 +194,7 @@ export default {
             yref: "paper",
             y1: 1,
             line: {
-              color: "red",
+              color: "#d95f02",
               width: 1.5,
               dash: "dot",
             },
@@ -262,7 +262,7 @@ export default {
           dtick: 200,
           showcrossline: true,
           spikemode: "across",
-          spikecolor: "green",
+          spikecolor: "#1b9e77",
           spikedash: "solid",
           spikethickness: 2,
         },
@@ -297,7 +297,7 @@ export default {
             yref: "paper",
             y1: 1,
             line: {
-              color: "red",
+              color: "#d95f02",
               width: 1.5,
               dash: "dot",
             },
@@ -310,7 +310,7 @@ export default {
             yref: "paper",
             y1: 1,
             line: {
-              color: "red",
+              color: "#d95f02",
               width: 1.5,
               dash: "dot",
             },
@@ -352,7 +352,7 @@ export default {
           dtick: 200,
           showcrossline: true,
           spikemode: "across",
-          spikecolor: "green",
+          spikecolor: "#1b9e77",
           spikedash: "solid",
           spikethickness: 2,
         },
@@ -387,7 +387,7 @@ export default {
             yref: "paper",
             y1: 1,
             line: {
-              color: "red",
+              color: "#d95f02",
               width: 1.5,
               dash: "dot",
             },
@@ -400,7 +400,7 @@ export default {
             yref: "paper",
             y1: 1,
             line: {
-              color: "red",
+              color: "#d95f02",
               width: 1.5,
               dash: "dot",
             },
@@ -436,7 +436,7 @@ export default {
           },
           showcrossline: true,
           spikemode: "across",
-          spikecolor: "green",
+          spikecolor: "#1b9e77",
           spikedash: "solid",
           spikethickness: 2,
         },
@@ -471,7 +471,7 @@ export default {
             yref: "paper",
             y1: 1,
             line: {
-              color: "red",
+              color: "#d95f02",
               width: 1.5,
               dash: "dot",
             },
@@ -484,7 +484,7 @@ export default {
             yref: "paper",
             y1: 1,
             line: {
-              color: "red",
+              color: "#d95f02",
               width: 1.5,
               dash: "dot",
             },
@@ -552,7 +552,7 @@ export default {
           },
           showcrossline: true,
           spikemode: "across",
-          spikecolor: "green",
+          spikecolor: "#1b9e77",
           spikedash: "solid",
           spikethickness: 2,
         },
@@ -587,7 +587,7 @@ export default {
             yref: "paper",
             y1: 1,
             line: {
-              color: "red",
+              color: "#d95f02",
               width: 1.5,
               dash: "dot",
             },
@@ -600,7 +600,7 @@ export default {
             yref: "paper",
             y1: 1,
             line: {
-              color: "red",
+              color: "#d95f02",
               width: 1.5,
               dash: "dot",
             },
@@ -642,7 +642,7 @@ export default {
           },
           showcrossline: true,
           spikemode: "across",
-          spikecolor: "green",
+          spikecolor: "#1b9e77",
           spikedash: "solid",
           spikethickness: 2,
         },
@@ -677,7 +677,7 @@ export default {
             yref: "paper",
             y1: 1,
             line: {
-              color: "red",
+              color: "#d95f02",
               width: 1.5,
               dash: "dot",
             },
@@ -690,7 +690,7 @@ export default {
             yref: "paper",
             y1: 1,
             line: {
-              color: "red",
+              color: "#d95f02",
               width: 1.5,
               dash: "dot",
             },
@@ -729,7 +729,7 @@ export default {
           dtick: 200,
           showcrossline: true,
           spikemode: "across",
-          spikecolor: "green",
+          spikecolor: "#1b9e77",
           spikedash: "solid",
           spikethickness: 2,
         },
@@ -764,7 +764,7 @@ export default {
             yref: "paper",
             y1: 1,
             line: {
-              color: "red",
+              color: "#d95f02",
               width: 1.5,
               dash: "dot",
             },
@@ -777,7 +777,7 @@ export default {
             yref: "paper",
             y1: 1,
             line: {
-              color: "red",
+              color: "#d95f02",
               width: 1.5,
               dash: "dot",
             },
@@ -790,8 +790,8 @@ export default {
             yref: "paper",
             y1: .75,
             line: {
-              color: "green",
-              width: 0.5,
+              color: "#1b9e77",
+              width: 1.0,
             },
           },
           {
@@ -802,8 +802,8 @@ export default {
             yref: "paper",
             y1: 1,
             line: {
-              color: "black",
-              width: 0.5,
+              color: "#7570b3",
+              width: 1.0,
             },
           },
           {
@@ -814,8 +814,8 @@ export default {
             yref: "paper",
             y1: 1,
             line: {
-              color: "black",
-              width: 0.5,
+              color: "#7570b3",
+              width: 1.0,
             },
           },
         ],
@@ -882,7 +882,7 @@ export default {
           dtick: 200,
           showcrossline: true,
           spikemode: "across",
-          spikecolor: "green",
+          spikecolor: "#1b9e77",
           spikedash: "solid",
           spikethickness: 2,
         },
@@ -917,7 +917,7 @@ export default {
             yref: "paper",
             y1: 1,
             line: {
-              color: "red",
+              color: "#d95f02",
               width: 1.5,
               dash: "dot",
             },
@@ -930,7 +930,7 @@ export default {
             yref: "paper",
             y1: 1,
             line: {
-              color: "red",
+              color: "#d95f02",
               width: 1.5,
               dash: "dot",
             },
@@ -943,8 +943,8 @@ export default {
             yref: "paper",
             y1: .75,
             line: {
-              color: "green",
-              width: 0.5,
+              color: "#1b9e77",
+              width: 1.0,
             },
           },
           {
@@ -955,8 +955,8 @@ export default {
             yref: "paper",
             y1: 1,
             line: {
-              color: "black",
-              width: 0.5,
+              color: "#7570b3",
+              width: 1.0,
             },
           },
           {
@@ -967,8 +967,8 @@ export default {
             yref: "paper",
             y1: 1,
             line: {
-              color: "black",
-              width: 0.5,
+              color: "#7570b3",
+              width: 1.0,
             },
           },
         ],
@@ -1009,7 +1009,7 @@ export default {
           dtick: 200,
           showcrossline: true,
           spikemode: "across",
-          spikecolor: "green",
+          spikecolor: "#1b9e77",
           spikedash: "solid",
           spikethickness: 2,
         },
@@ -1044,7 +1044,7 @@ export default {
             yref: "paper",
             y1: 1,
             line: {
-              color: "red",
+              color: "#d95f02",
               width: 1.5,
               dash: "dot",
             },
@@ -1057,7 +1057,7 @@ export default {
             yref: "paper",
             y1: 1,
             line: {
-              color: "red",
+              color: "#d95f02",
               width: 1.5,
               dash: "dot",
             },
@@ -1070,8 +1070,8 @@ export default {
             yref: "paper",
             y1: .75,
             line: {
-              color: "green",
-              width: 0.5,
+              color: "#1b9e77",
+              width: 1.0,
             },
           },
           {
@@ -1082,8 +1082,8 @@ export default {
             yref: "paper",
             y1: 1,
             line: {
-              color: "black",
-              width: 0.5,
+              color: "#7570b3",
+              width: 1.0,
             },
           },
           {
@@ -1094,8 +1094,8 @@ export default {
             yref: "paper",
             y1: 1,
             line: {
-              color: "black",
-              width: 0.5,
+              color: "#7570b3",
+              width: 1.0,
             },
           },
         ],
@@ -1130,7 +1130,7 @@ export default {
           },
           showcrossline: true,
           spikemode: "across",
-          spikecolor: "green",
+          spikecolor: "#1b9e77",
           spikedash: "solid",
           spikethickness: 2,
         },
@@ -1165,7 +1165,7 @@ export default {
             yref: "paper",
             y1: 1,
             line: {
-              color: "red",
+              color: "#d95f02",
               width: 1.5,
               dash: "dot",
             },
@@ -1178,7 +1178,7 @@ export default {
             yref: "paper",
             y1: 1,
             line: {
-              color: "red",
+              color: "#d95f02",
               width: 1.5,
               dash: "dot",
             },
@@ -1191,8 +1191,8 @@ export default {
             yref: "paper",
             y1: .75,
             line: {
-              color: "green",
-              width: 0.5,
+              color: "#1b9e77",
+              width: 1.0,
             },
           },
           {
@@ -1203,8 +1203,8 @@ export default {
             yref: "paper",
             y1: 1,
             line: {
-              color: "black",
-              width: 0.5,
+              color: "#7570b3",
+              width: 1.0,
             },
           },
           {
@@ -1215,8 +1215,8 @@ export default {
             yref: "paper",
             y1: 1,
             line: {
-              color: "black",
-              width: 0.5,
+              color: "#7570b3",
+              width: 1.0,
             },
           },
         ],
@@ -1283,7 +1283,7 @@ export default {
           },
           showcrossline: true,
           spikemode: "across",
-          spikecolor: "green",
+          spikecolor: "#1b9e77",
           spikedash: "solid",
           spikethickness: 2,
         },
@@ -1318,7 +1318,7 @@ export default {
             yref: "paper",
             y1: 1,
             line: {
-              color: "red",
+              color: "#d95f02",
               width: 1.5,
               dash: "dot",
             },
@@ -1331,7 +1331,7 @@ export default {
             yref: "paper",
             y1: 1,
             line: {
-              color: "red",
+              color: "#d95f02",
               width: 1.5,
               dash: "dot",
             },
@@ -1344,8 +1344,8 @@ export default {
             yref: "paper",
             y1: .75,
             line: {
-              color: "green",
-              width: 0.5,
+              color: "#1b9e77",
+              width: 1.0,
             },
           },
           {
@@ -1356,8 +1356,8 @@ export default {
             yref: "paper",
             y1: 1,
             line: {
-              color: "black",
-              width: 0.5,
+              color: "#7570b3",
+              width: 1.0,
             },
           },
           {
@@ -1368,8 +1368,8 @@ export default {
             yref: "paper",
             y1: 1,
             line: {
-              color: "black",
-              width: 0.5,
+              color: "#7570b3",
+              width: 1.0,
             },
           },
         ],
@@ -1410,7 +1410,7 @@ export default {
           },
           showcrossline: true,
           spikemode: "across",
-          spikecolor: "green",
+          spikecolor: "#1b9e77",
           spikedash: "solid",
           spikethickness: 2,
         },
@@ -1445,7 +1445,7 @@ export default {
             yref: "paper",
             y1: 1,
             line: {
-              color: "red",
+              color: "#d95f02",
               width: 1.5,
               dash: "dot",
             },
@@ -1458,7 +1458,7 @@ export default {
             yref: "paper",
             y1: 1,
             line: {
-              color: "red",
+              color: "#d95f02",
               width: 1.5,
               dash: "dot",
             },
@@ -1471,8 +1471,8 @@ export default {
             yref: "paper",
             y1: .75,
             line: {
-              color: "green",
-              width: 0.5,
+              color: "#1b9e77",
+              width: 1.0,
             },
           },
           {
@@ -1483,8 +1483,8 @@ export default {
             yref: "paper",
             y1: 1,
             line: {
-              color: "black",
-              width: 0.5,
+              color: "#7570b3",
+              width: 1.0,
             },
           },
           {
@@ -1495,8 +1495,8 @@ export default {
             yref: "paper",
             y1: 1,
             line: {
-              color: "black",
-              width: 0.5,
+              color: "#7570b3",
+              width: 1.0,
             },
           },
         ],

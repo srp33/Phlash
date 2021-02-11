@@ -1,5 +1,5 @@
 <template>
-  <div class="wrapper" @click="checkIfFilesUploaded">
+  <div class="wrapper">
     <Navbar
       :upload="navUpload"
       :blast="navBlast"
@@ -13,11 +13,11 @@
       <div class="alert alert-primary">
         <p><strong>Instructions</strong></p>
         <p v-if="fasta">You have uploaded a FASTA file. Click 'Next' to continue.</p>
-        <p v-else>Please upload a FASTA file <strong>(.fasta, .fna)</strong> containing the entire DNA sequence of your bacteriophage.</p>
+        <p v-else>Please upload a FASTA file <strong>(.fasta, .fna, .fa)</strong> containing the entire DNA sequence of your bacteriophage.</p>
         <hr />
         <div class="nav-btns-wrapper">
           <router-link :to="{ name: 'Home' }">
-            <button class="btn btn-light btn-nav">
+            <button class="btn btn-light btn-nav" @click="stopInterval">
               <strong>&#129052; Back</strong>
             </button>
           </router-link>
@@ -28,7 +28,7 @@
             }"
             :event="fasta? 'click' : ''"
           >
-            <button class="btn btn-light btn-nav disabled" id="next-top" @mouseenter="checkIfFilesUploaded">
+            <button class="btn btn-light btn-nav disabled" id="next-top" @click="stopInterval">
               <strong>Next &#129054;</strong>
             </button>
           </router-link>
@@ -41,7 +41,7 @@
       <div class="alert alert-primary">
         <div class="nav-btns-wrapper">
           <router-link :to="{ name: 'Home' }">
-            <button class="btn btn-light btn-nav">
+            <button class="btn btn-light btn-nav" @click="stopInterval">
               <strong>&#129052; Back</strong>
             </button>
           </router-link>
@@ -52,7 +52,7 @@
             }"
             :event="fasta? 'click' : ''"
           >
-            <button class="btn btn-light btn-nav disabled" id="next-bottom" @mouseenter="checkIfFilesUploaded">
+            <button class="btn btn-light btn-nav disabled" id="next-bottom" @click="stopInterval">
               <strong>Next &#129054;</strong>
             </button>
           </router-link>
@@ -85,6 +85,7 @@ export default {
       fasta: false,
       dropzoneOptions: this.setDropzone(),
       blastCompleted: false,
+      interval: null,
     };
 
   },
@@ -128,6 +129,10 @@ export default {
         document.getElementById("next-top").classList.remove("disabled");
         document.getElementById("next-bottom").classList.remove("disabled");
       }
+      else {
+        document.getElementById("next-top").classList.add("disabled");
+        document.getElementById("next-bottom").classList.add("disabled");
+      }
     },
 
   },
@@ -142,11 +147,11 @@ export default {
       return {
         url: this.getUploadUrl(),
         addRemoveLinks: true,
-        acceptedFiles: ".fasta, .fna",
+        acceptedFiles: ".fasta, .fna, .fa",
         chunking: false,
         maxFiles: 1,
         dictDefaultMessage: "Drag FASTA file here or click to browse.",
-        dictInvalidFileType: "Only '.fasta' or '.fna' file types are allowed.",
+        dictInvalidFileType: "Only '.fasta', '.fna', or '.fa' file types are allowed.",
         dictRemoveFileConfirmation: "Are you sure you want to remove this file? This will remove all progress that you have made on this phage.",
         dictMaxFilesExceeded: "You can only upload one file.",
         init: function() {
@@ -202,6 +207,11 @@ export default {
             this.emit("complete", file);
           }
 
+          // this.on("success", function(file, response, bool) {
+          //   this.$emit('uploadSuccess');
+          //   alert("uploadSuccess");
+          // });
+
           this.on("removedfile", function(file) {
             console.log(file);
             if (file.processing) {
@@ -228,24 +238,33 @@ export default {
       return `http://daniel.byu.edu:5000/phlash_api/upload/${this.$route.params.phageID}/uploadFasta/none`;
     },
 
+    stopInterval() {
+      if (this.fasta) {
+        clearInterval(this.interval);
+      }
+      // this.$destroy();
+    },
+    
     /**
      * Checks to see if the fasta file has been uploaded.
      */
     checkIfFilesUploaded() {
-      console.log(this.$route.params.phageID);
-      if (this.$route.params.phageID != undefined)
-      axios
-        .get(
-          process.env.VUE_APP_BASE_URL +
-            `/check_upload/${this.$route.params.phageID}`
-        )
-        .then((response) => {
-          this.blastCompleted = response.data.blast_completed;
-          this.fasta = response.data.fasta;
-        })
-        .catch((error) => {
-          console.log(error);
-        });
+      this.interval = setInterval(() => {
+        console.log("test");
+        if (this.$route.params.phageID != undefined)
+        axios
+          .get(
+            process.env.VUE_APP_BASE_URL +
+              `/check_upload/${this.$route.params.phageID}`
+          )
+          .then((response) => {
+            this.blastCompleted = response.data.blast_completed;
+            this.fasta = response.data.fasta;
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+      }, 1000);
     },   
   },
 };

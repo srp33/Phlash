@@ -27,7 +27,7 @@ import pandas as pd
 
 response_object = {}
 ROOT = os.path.dirname(os.path.abspath(__file__))
-FASTA_EXTENSIONS = set(['.fasta', '.fna'])
+FASTA_EXTENSIONS = set(['.fasta', '.fna', '.fa'])
 GENBANK_EXTENSIONS = set(['.gb', '.gbk', '.gbf'])
 GDATA_EXTENSIONS = set(['.gdata'])
 LDATA_EXTENSIONS = set(['.ldata'])
@@ -66,7 +66,7 @@ def display_files(UPLOAD_FOLDER):
     """
     response_object["fasta_file"] = "Not found"
     for file in os.listdir(UPLOAD_FOLDER):
-        if (file.endswith(".fasta") or file.endswith(".fna")):
+        if (file.endswith(".fasta") or file.endswith(".fna") or file.endswith(".fa")):
             response_object["fasta_file"] = file
             response_object["fasta_file_size"] = os.path.getsize(os.path.join(UPLOAD_FOLDER, file))
     return response_object
@@ -86,7 +86,7 @@ def delete_file(file_path, UPLOAD_FOLDER):
         A dictionary containing a success message.
     """
     try:
-        if (file_path.endswith(".fasta") or file_path.endswith(".fna")):
+        if (file_path.endswith(".fasta") or file_path.endswith(".fna") or file.endswith(".fa")):
             db.session.query(Files).delete()
             db.session.query(DNAMaster).delete()
             db.session.query(Blast_Results).delete()
@@ -127,7 +127,7 @@ def overwrite_files(file_type, UPLOAD_FOLDER):
     """
     for existing_file in os.listdir(UPLOAD_FOLDER):
         ext = os.path.splitext(existing_file)[1].lower()
-        if (file_type == "fasta" and ext in ['.fasta', '.fna', '.ldata', '.gdata', '.lst', '.ps']) or \
+        if (file_type == "fasta" and ext in ['.fasta', '.fna', '.fa', '.ldata', '.gdata', '.lst', '.ps']) or \
             (file_type == "genbank" and ext in GENBANK_EXTENSIONS):
             os.remove(os.path.join(UPLOAD_FOLDER, existing_file))
             print(f" * removed {existing_file}")

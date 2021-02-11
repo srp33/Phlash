@@ -19,8 +19,11 @@
       <div class="alert alert-primary">
         <p><strong>Instructions</strong></p>
         <p>
-          Gene calls from DNA Master and GeneMark have been compared. A status
-          has been assigned to each gene call from DNA Master.
+          Gene calls have been made from <i>GeneMarkS</i>, <i>Glimmer3</i>, <i>ARAGORN</i>, and <i>PHANOTATE</i> and are shown below. 
+          To have the most accurate annotation of this genome manual annotation is necessary. 
+          The status for each gene is shown below which are mearly guides and suggestions. 
+          The status does not actually mean that a gene call is correct or incorrect. 
+          The parameters used for creating the status for each gene can be updated in the 'Settings' tab above.
         </p>
         <hr />
         <p><strong>Status Definitions</strong></p>
@@ -44,7 +47,7 @@
           than the previous gene and has a gap less than {{oppositeGap}} base pairs in length.<br />
           <strong>SLG: </strong>Short leading gap, the gene is on a different strand 
           than the next gene and has a gap less than {{oppositeGap}} base pairs in length.<br />
-          <strong>GOOD: </strong>The gene has a reasonable length and overlap.     
+          <strong>R: </strong>The gene has a reasonable length and overlap.     
         </p>
         <hr />
         <p><strong>Actions</strong></p>
@@ -54,9 +57,12 @@
           <strong>Delete: </strong>When clicked this gene will be removed.<br />
           <strong>Reinstate: </strong>When clicked the deleted gene will be added.<br />
           In rare occasions that not all of the coding sequences needed are shown, 'Add CDS' may be clicked to add 
-          a new custom CDS.
+          a new custom CDS.<br />
+          Although the GenBank file can be downloaded at anytime by clicking 'Download', you should not submit this file to GenBank 
+          until you have reviewed each CDS, made necessary adjustments, and are sure that your annotation is accurate.<br />
+          <button class="btn btn-light" @click="showAddCDS = true"><strong>Add CDS</strong></button>
+          <button class="btn btn-light" @click="showDownloadGenbank = true" style="margin:1em;"><strong>Download</strong></button>
         </p>
-        <button class="btn btn-light" @click="showAddCDS = true"><strong>Add CDS</strong></button>
         <hr />
         <div class="nav-btns-wrapper">
           <router-link
@@ -75,13 +81,10 @@
         back to this page.<br />
         A notification will appear when finished.
       </div>
-      <div class="alert alert-dark" v-if="completedGenes != dnamaster.length">
+      <div class="alert alert-light" v-if="completedGenes != dnamaster.length">
         You have
         <strong>{{ dnamaster.length - completedGenes }}/{{ dnamaster.length }}</strong>
-        genes remaining. You can 
-        <a href="#" @click="showDownloadGenbank = true" class="alert-link">
-          download your GenBank file here</a
-        >.
+        genes remaining.
       </div>
       <div
         class="alert alert-dark"
@@ -207,10 +210,9 @@
       v-model="showDownloadGenbank"
       id="download-genbank-modal"
       ref="finishedModal"
-      title="Congratulations!"
+      title="Download GenBank File"
       hide-footer
     >
-      <p>You have finished your phage genome annotations!</p>
       <p>You may enter any additional information that you would like added to the GenBank file below or leave it blank.</p>
       <hr />
       <b-form @submit="onDownloadGenBank" align="left">
@@ -619,7 +621,7 @@ export default {
         status += this.getLeadingOverlap(index);
         status += this.getTailingOverlap(index);
       }
-      if (status == "") { return "GOOD"; }
+      if (status == "") { return "R"; }
       return status.substring(0, status.length - 3);
     },
 

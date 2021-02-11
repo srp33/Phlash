@@ -26,18 +26,11 @@
       <div class="alert alert-primary">
         <p><strong>Instructions</strong></p>
         <p>
-          Choose a new start for this gene call based on the information given
-          below or keep the current start.
-        </p>
-        <hr />
-        <p><strong>Key</strong></p>
-        <p>
-          <strong class="red-text">Red Dashed Line:</strong> The selected start and stop positions.<br />
-          <strong class="blue-text">Blue Line:</strong> The coding potential in relation to base number.<br />
-          <strong class="green-text">Green Line:</strong> A 0.75 coding potential reference line.<br />
-          <strong class="grey-text">Grey Line:</strong> The previous gene's stop position and the next
-          gene's start position.<br />
-          <strong>Bold Text:</strong> The currently selected open reading frame.
+          Here you can make any necessary changes to this CDS by editing its start and stop sites and its function. 
+          Before making any final decisions you should review and consider all of the information below including 
+          the alternative open reading frames, the coding potential graphs, and the BLAST results. 
+          Click 'Save' to save changes made to this CDS or you can click 'Delete' if you wish to remove this CDS. 
+          Above you can see generic information for the current CDS including which auto-annotation programs called that gene.
         </p>
         <hr />
         <div style="float: right; width: 50%;">
@@ -45,15 +38,22 @@
           <b-form-textarea
             id="textarea"
             v-model="notes"
-            placeholder="Click 'Update' to save notes"
+            placeholder="Original Glimmer call @bp 408 has strength..."
             rows="3"
             max-rows="10"
           ></b-form-textarea>
         </div>
         <p>
-          <strong>Your selected open reading frame:</strong> {{ newStart }}-{{ newStop }}
+          <strong>Your selected open reading frame:</strong> {{ newStart }}-{{ newStop }} {{ newStrand }}
         </p>
         <p><strong>Your selected function:</strong> {{ displayFunction }}</p>
+        <button
+          type="button"
+          class="btn btn-light btn-action"
+          @click="editCDS"
+        >
+          <strong>Save</strong>
+        </button>
         <button
           type="button"
           class="btn btn-light btn-action"
@@ -61,15 +61,23 @@
         >
           <strong>Delete</strong>
         </button>
-        <button
-          type="button"
-          v-if="newFunction != ''"
-          class="btn btn-light btn-action"
-          @click="editCDS"
-        >
-          <strong>Update</strong>
-        </button>
         <hr />
+        <div class="nav-btns-wrapper">
+          <button
+            type="button"
+            class="btn btn-light btn-action"
+            @click="navPrevCDS()"
+          >
+            <strong>&#129052; Prev CDS</strong>
+          </button>
+          <button
+            type="button"
+            class="btn btn-light btn-action"
+            @click="navNextCDS()"
+          >
+            <strong>Next CDS &#129054;</strong>
+          </button>
+        </div>
         <div class="nav-btns-wrapper">
           <router-link
             :to="{ name: 'Annotations', params: { phageID: $route.params.phageID } }"
@@ -84,6 +92,7 @@
         <h4 style="text-align: center; margin: 20px">Alternative Open Reading Frames</h4>
         <div style="overflow: hidden;">
           <div class="table-responsive" style="float: left; width: 40%;">
+            <strong> Direct Strand </strong>
             <table id="cp-table" class="table table-hover">
               <thead>
                 <tr>
@@ -93,12 +102,10 @@
               </thead>
               <tbody>
                 <tr v-for="(start, index) in dirStartOptions" :key="index">
-                  <th v-if="start + dirStopOptions[index] === currentCDS.start + currentCDS.stop" >
-                    <strong>{{ start }}-{{ dirStopOptions[index] }}  +</strong>
-                  </th>
-                  <th style="color:grey" v-else>{{ start }}-{{ dirStopOptions[index] }}  +</th>
+                  <th>{{ start }}-{{ dirStopOptions[index] }}  +</th>
                   <td>
                     <button
+                      v-if="start + dirStopOptions[index] !== currentCDS.start + currentCDS.stop"
                       class="btn btn-dark btn-sm"
                       @click="setORF(start, dirStopOptions[index], '+')"
                     >
@@ -110,6 +117,7 @@
             </table>
           </div>
           <div class="table-responsive" style="float: right; width: 40%">
+            <strong> Complementary Strand </strong>
             <table id="cp-table" class="table table-hover">
               <thead>
                 <tr>
@@ -119,12 +127,10 @@
               </thead>
               <tbody>
                 <tr v-for="(start, index) in compStartOptions" :key="index">
-                  <th v-if="start + compStopOptions[index] === currentCDS.start + currentCDS.stop" >
-                    <strong>{{ start }}-{{ compStopOptions[index] }}  -</strong>
-                  </th>
-                  <th  style="color:grey" v-else>{{ start }}-{{ compStopOptions[index] }}  -</th>
+                  <th>{{ start }}-{{ compStopOptions[index] }}  -</th>
                   <td>
                     <button
+                      v-if="start + compStopOptions[index] !== currentCDS.start + currentCDS.stop"
                       class="btn btn-dark btn-sm"
                       @click="setORF(start, compStopOptions[index], '-')"
                     >
@@ -142,6 +148,16 @@
         <h4 style="text-align: center; margin: 40px; height: 100%">
           GeneMark's Coding Potential Per Frame
         </h4>
+        <div class="alert alert-primary">
+          <p><strong>Key</strong></p>
+          <p>
+            <strong class="red-text">Orange Dashed Line:</strong> The selected start and stop positions.<br />
+            <strong class="blue-text">Blue Line:</strong> The coding potential in relation to base number.<br />
+            <strong class="green-text">Green Line:</strong> A 0.75 coding potential reference line.<br />
+            <strong class="grey-text">Purple Line:</strong> The previous gene's stop position and the next
+            gene's start position.<br />
+          </p>
+        </div>
         <div class="coding-potential-graphs">
           <div v-if="dataExists">
             <Graphs
@@ -167,7 +183,13 @@
         </p>
       </div>
       <hr />
-      <div class="blast-results">
+      <h4 style="text-align: center; margin: 40px">BLAST Results for {{ newStart }}-{{ newStop }}</h4>
+      <BlastResults
+        :blastResults="allBlastResults[currentCDS.start.toString() + '-' + currentCDS.stop.toString() + '  ' + currentCDS.strand]"
+        :allowSelect="true"
+        @newFunction="setFunction"
+      />
+      <!-- <div class="blast-results">
         <h4 style="text-align: center; margin: 40px">BLAST Results</h4>
         <strong> Direct Strand </strong>
         <div v-if="dataExists" class="table-responsive2" id="accordion" style="float: center; width: 100%; margin: 1em;">
@@ -259,7 +281,7 @@
             </div>
           </div>
         </div>
-      </div>
+      </div> -->
       <hr />
       <div class="alert alert-primary">
         <div style="float: right; width: 50%;">
@@ -267,15 +289,22 @@
           <b-form-textarea
             id="textarea"
             v-model="notes"
-            placeholder="Click 'Update' to save notes"
+            placeholder="Original Glimmer call @bp 408 has strength..."
             rows="3"
             max-rows="10"
           ></b-form-textarea>
         </div>
         <p>
-          <strong>Your selected open reading frame:</strong> {{ newStart }}-{{ newStop }}
+          <strong>Your selected open reading frame:</strong> {{ newStart }}-{{ newStop }} {{ newStrand }}
         </p>
         <p><strong>Your selected function:</strong> {{ displayFunction }}</p>
+        <button
+          type="button"
+          class="btn btn-light btn-action"
+          @click="editCDS"
+        >
+          <strong>Save</strong>
+        </button>
         <button
           type="button"
           class="btn btn-light btn-action"
@@ -283,15 +312,23 @@
         >
           <strong>Delete</strong>
         </button>
-        <button
-          type="button"
-          v-if="newFunction != ''"
-          class="btn btn-light btn-action"
-          @click="editCDS"
-        >
-          <strong>Update</strong>
-        </button>
         <hr />
+        <div class="nav-btns-wrapper">
+          <button
+            type="button"
+            class="btn btn-light btn-action"
+            @click="navPrevCDS()"
+          >
+            <strong>&#129052; Prev CDS</strong>
+          </button>
+          <button
+            type="button"
+            class="btn btn-light btn-action"
+            @click="navNextCDS()"
+          >
+            <strong>Next CDS &#129054;</strong>
+          </button>
+        </div>
         <div class="nav-btns-wrapper">
           <router-link
             :to="{ name: 'Annotations', params: { phageID: $route.params.phageID } }"
@@ -332,6 +369,7 @@ export default {
       compStopOptions: [],
       dirBlastResults: [],
       compBlastResults: [],
+      allBlastResults: [],
       currentCDS: {
         id: "",
         start: "",
@@ -353,6 +391,7 @@ export default {
       newFunction: "None selected",
       newStart: null,
       newStop: null,
+      newStrand: null,
       data1: [{ x: [], y: [] }],
       data2: [{ x: [], y: [] }],
       data3: [{ x: [], y: [] }],
@@ -360,6 +399,7 @@ export default {
       data5: [{ x: [], y: [] }],
       data6: [{ x: [], y: [] }],
       nextCDS: null,
+      prevCDS: null,
       nextStart: null,
       prevStop: null,
       calledBy: "",
@@ -371,6 +411,7 @@ export default {
       pageLoading: true,
       showFunction: false,
       showStart: false,
+      saved: true,
     };
 
   },
@@ -440,13 +481,14 @@ export default {
           }
           this.dirBlastResults = response.data.dir_blast;
           this.compBlastResults = response.data.comp_blast;
-          console.log(this.dirBlastResults);
+          this.allBlastResults = response.data.all_blast;
           this.dirStartOptions = response.data.dir_start_options;
           this.dirStopOptions = response.data.dir_stop_options;
           this.compStartOptions = response.data.comp_start_options;
           this.compStopOptions = response.data.comp_stop_options;
           this.newStart = this.currentCDS.start;
           this.newStop = this.currentCDS.stop;
+          this.newStrand = this.currentCDS.strand;
           this.prevStop = response.data.prev_stop;
           this.nextStart = response.data.next_start;
           this.data1 = [
@@ -509,16 +551,54 @@ export default {
           if (called) { this.calledBy = this.calledBy.substring(0, this.calledBy.length - 2); }
           else { this.calledBy = "None"}
           this.nextCDS = response.data.nextCDS;
+          this.prevCDS = response.data.prevCDS;
         })
         .catch((error) => {
           console.error(error);
         });
     },
 
+    navNextCDS() {
+      var cont = true;
+      if (!this.saved) {
+        cont = confirm("Are you sure you want to continue without saving?");
+      }
+      if (cont == true) {
+        if (this.nextCDS != "undefined") {
+          this.$route.params.cdsID = this.nextCDS;
+          this.$router.push(
+            `/annotations/cds/${this.$route.params.phageID}/${this.$route.params.cdsID}`
+          );
+          window.location.reload();
+        } else {
+          this.$router.push(`/annotations/${this.$route.params.phageID}`);
+        }
+      }
+    },
+
+    navPrevCDS() {
+      var cont = true;
+      if (!this.saved) {
+        cont = confirm("Are you sure you want to continue without saving?");
+      }
+      if (cont == true) {
+        if (this.prevCDS != "undefined") {
+          this.$route.params.cdsID = this.prevCDS;
+          this.$router.push(
+            `/annotations/cds/${this.$route.params.phageID}/${this.$route.params.cdsID}`
+          );
+          window.location.reload();
+        } else {
+          this.$router.push(`/annotations/${this.$route.params.phageID}`);
+        }
+      }
+    },
+
     /**
      * Changes the CDS data to reflect the user's changes.
      */
     editCDS() {
+      this.saved = true;
       this.updatedCDS = this.currentCDS;
       this.updatedCDS.start = this.newStart;
       this.updatedCDS.stop = this.newStop;
@@ -548,15 +628,7 @@ export default {
           payload
         )
         .then(() => {
-          if (this.nextCDS != "undefined") {
-            this.$route.params.cdsID = this.nextCDS;
-            this.$router.push(
-              `/annotations/cds/${this.$route.params.phageID}/${this.$route.params.cdsID}`
-            );
-            window.location.reload();
-          } else {
-            this.$router.push(`/annotations/${this.$route.params.phageID}`);
-          }
+          console.log(response);
         })
         .catch((error) => {
           console.error(error);
@@ -577,6 +649,7 @@ export default {
      * @param {string} function the user selected function.
      */
     setFunction(funct) {
+      this.saved = false;
       let match = funct.match(/(.*)##(.*)/);
       this.displayFunction = match[1];
       this.newFunction = funct;
@@ -588,6 +661,7 @@ export default {
      * @param {number} stop the user selected stop.
      */
     setORF(start, stop, strand) {
+      this.saved = false;
       if (start != this.newStart || stop != this.newStop) {
         this.dataExists = false;
         this.newFunction = "";
@@ -595,6 +669,7 @@ export default {
         this.newStop = stop;
         this.currentCDS.stop = stop;
         this.newStart = start;
+        this.newStrand = strand;
         this.currentCDS.start = start;
         this.currentCDS.strand = strand;
         this.calledBy = "";
@@ -668,7 +743,7 @@ export default {
 }
 
 .red-text {
-  color:  #db230e;
+  color: #d95f02;
 }
 
 .blue-text {
@@ -676,11 +751,11 @@ export default {
 }
 
 .green-text {
-  color: #82E0AA;
+  color: #1b9e77;
 }
 
 .grey-text {
-  color: lightslategrey;
+  color: #7570b3;
 }
 
 /* ----- Coding Potential ----- */

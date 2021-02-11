@@ -12,28 +12,28 @@
       <p>
         <img id="logo" src="/phlash/images/Logo.png" width="250" />
       </p>
-      <div class="alert alert-primary" align="left">
-        <p>
-          Welcome to <strong><i>Phlash</i></strong
-          >!
-        </p>
+      <div class="alert alert-primary">
+        <p style="text-align:center;"><strong style="font-size:2em;">Phlash</strong></p>
+        <p style="text-align:center;">The first user-friendly bacteriophage genome annotation application.</p>
+        <hr />
         <p>
           Enter a unique bacteriophage ID that only contains letters, numbers, and underscores below.<br>
           <em>Please note that all data associated with this ID will be removed after 90 days.</em>
         </p>
-        <div class="input-group mb-3">
+        <div class="input-group mb-2" style="horizontal-align: center; width: 50%; margin: 0 auto;">
           <input
             class="form-control"
             type="text"
             v-model="phageID"
             v-on:keyup.enter="checkPhageID()"
-            placeholder="Enter ID here."
+            placeholder="Phage ID"
             aria-label="Enter a unique bacteriophage ID"
             aria-describedby="basic-addon2"
           />
           <div class="input-group-append">
             <button
-              class="btn btn-dark btn-sm"
+              id="start"
+              class="btn btn-dark btn-sm disabled"
               type="button"
               @click="checkPhageID()"
             >
@@ -41,6 +41,7 @@
             </button>
           </div>
         </div>
+        <hr v-if="idStatus !== ''" />
         <p class="id-status" v-if="idStatus !== ''">
           {{ idStatus }}
         </p>
@@ -62,6 +63,7 @@
           You have until <strong>{{ dateToBeDeleted }}</strong> to complete
           annotations for this phage.
         </div>
+        <hr v-if="idStatus !== ''" />
         <div class="nav-btns-wrapper">
           <router-link
             :to="{ name: 'Blast', params: { phageID: phageID } }"
@@ -126,6 +128,9 @@ export default {
 
     phageID() {
       this.phageID = this.phageID.replace(/[^a-zA-Z0-9_]/g, "");
+      if (this.phageID != null) {
+        document.getElementById("start").classList.remove("disabled");
+      }
     },
 
   },
@@ -173,35 +178,37 @@ export default {
      * @param {string} phageID the ID of the phage to be logged in or registered.
      */
     checkPhageID() {
-      axios
-        .post(process.env.VUE_APP_BASE_URL + `/home/${this.phageID}`)
-        .then((response) => {
-          console.log(response.data)
-          this.allFilesUploaded = response.data.uploaded_all_files;
-          this.blastComplete = response.data.blast_complete;
-          this.idStatus = response.data.id_status;
-          const monthNames = [
-            "January",
-            "February",
-            "March",
-            "April",
-            "May",
-            "June",
-            "July",
-            "August",
-            "September",
-            "October",
-            "November",
-            "December",
-          ];
-          let date = new Date(response.data.delete_time);
-          this.dateToBeDeleted = `${
-            monthNames[date.getUTCMonth()]
-          } ${date.getUTCDate()}, ${date.getUTCFullYear()}`;
-        })
-        .catch((error) => {
-          console.error(error);
-        });
+      if (this.phageID != "" && this.phageID != null) {
+        axios
+          .post(process.env.VUE_APP_BASE_URL + `/home/${this.phageID}`)
+          .then((response) => {
+            console.log(response.data)
+            this.allFilesUploaded = response.data.uploaded_all_files;
+            this.blastComplete = response.data.blast_complete;
+            this.idStatus = response.data.id_status;
+            const monthNames = [
+              "January",
+              "February",
+              "March",
+              "April",
+              "May",
+              "June",
+              "July",
+              "August",
+              "September",
+              "October",
+              "November",
+              "December",
+            ];
+            let date = new Date(response.data.delete_time);
+            this.dateToBeDeleted = `${
+              monthNames[date.getUTCMonth()]
+            } ${date.getUTCDate()}, ${date.getUTCFullYear()}`;
+          })
+          .catch((error) => {
+            console.error(error);
+          });
+      }
     },
     
   },

@@ -9,31 +9,16 @@
       :phageID="navPhageID"
     />
     <div class="container">
-      <loading
-        :active.sync="pageLoading"
-        :is-full-page="true"
-        :height="100"
-        :width="100"
-      ></loading>
-      <loading
-        :active.sync="pageLoading"
-        :is-full-page="true"
-        :height="100"
-        :width="100"
-      >Creating Genome Map...</loading>
-      <h1>Genome Map</h1>
+      <h1>Contact</h1>
       <div class="alert alert-primary">
-        <p><strong>Instructions</strong></p>
-        <p>
-          This is a visual representation of all of the genes in their current state.<br />
-          Scroll right to see the rest of the genome.
-        </p>
-        <hr />
-        <p><strong>Key</strong></p>
-        <p>
-          <strong class="orange-text">Orange:</strong> An arrow pointing left indicates a gene on the complimentary strand.<br />
-          <strong class="blue-text">Blue:</strong> An arrow pointing right indicates a gene on the direct strand.<br />
-        </p>
+        <img id="step-two" src="/phlash/images/Piccolo.jpg" style="float: left; height:7em" />
+        This application was created by the Piccolo Lab at Brigham Young University. <br />
+        To view the source code, report a bug, or suggest a change, click 
+        <a href="#" @click="goToWebsite('GitHub')" class="alert-link"><i>here</i></a>. <br />
+        To contact Doctor Stephen Piccolo, click 
+        <a href="#" @click="goToWebsite('Contact')" class="alert-link"><i>here</i></a>. <br />
+        To view information about the Piccolo Lab, click click 
+        <a href="#" @click="goToWebsite('Home')" class="alert-link"><i>here</i></a>. <br />
         <hr />
         <div class="nav-btns-wrapper">
             <button class="btn btn-light btn-nav" @click="goBack()">
@@ -42,31 +27,22 @@
         </div>
       </div>
     </div>
-    <div style="overflow-x:auto; width=100%;">
-      <img v-bind:src="image" />
-    </div>
   </div>
 </template>
 
 <script>
-import axios from "axios";
-import Loading from "vue-loading-overlay";
-import "vue-loading-overlay/dist/vue-loading.css";
 import Navbar from "../components/Navbar.vue";
 
 
 export default {
-  name: "GeneMap",
+  name: "Contact",
   components: {
-    Loading,
     Navbar,
   },
 
   data() {
 
     return {
-      pageLoading: true,
-      image: null,
       prevRoute: null,
     };
   },
@@ -88,7 +64,7 @@ export default {
     },
 
     navBlast: function () {
-      return true;
+      return false;
     },
 
     navAnnotations: function () {
@@ -96,7 +72,7 @@ export default {
     },
 
     navGeneMap: function () {
-      return true;
+      return false;
     },
 
     navSettings: function () {
@@ -116,21 +92,28 @@ export default {
       this.$router.push(this.prevRoute);
     },
 
-    getGraph() {
-        axios
-          .get(
-              process.env.VUE_APP_BASE_URL +
-                  `/annotations/geneMap/${this.$route.params.phageID}`
-          )
-          .then((response) => {
-              this.image = "data:image/png;base64, " + response.data.image.slice(2, response.data.image.length - 1);
-              this.pageLoading = false;
-          })
-          .catch((error) => {
-              console.log(error);
-          });
+     goToWebsite(site) {
+      if (site == "Home") {
+        window.open(
+          "https://biology.byu.edu/piccolo-lab",
+          "_blank"
+        );
       }
+      else if (site == "Contact") {
+        window.open(
+          "https://biology.byu.edu/piccolo-lab/contact",
+          "_blank"
+        );
+      }
+      else if (site == "GitHub") {
+        window.open(
+          "https://biology.byu.edu/piccolo-lab",
+          "_blank"
+        );
+      }
+     },
   },
+
 }
 </script>
 

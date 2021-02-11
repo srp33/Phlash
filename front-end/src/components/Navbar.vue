@@ -43,6 +43,9 @@
           <li class="nav-item" v-if="settings">
             <a class="nav-link" href="#" @click="getSettings">settings</a>
           </li>
+          <li class="nav-item">
+            <router-link to="/contact"><a class="nav-link" href="#">contact</a></router-link>
+          </li>
         </ul>
       </div>
     </nav>

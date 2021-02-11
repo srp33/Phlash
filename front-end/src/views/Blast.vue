@@ -12,16 +12,18 @@
       <h1>BLAST</h1>
       <div class="alert alert-primary">
         <p><strong>Instructions</strong></p>
-        <p>
-          Complete all of the steps below and then click 'Next'.
-        </p>
         <p v-if="annotating">
-          Phlash is currently auto-annotating the bacteriophage genome.<br />
+          Phlash is currently auto-annotating the bacteriophage genome. Even so, you can continue to work on your phage genome.<br />
           Phlash relies on 
           <a href="#" @click="goToWebsite('GeneMarkS')" class="alert-link"><i>GeneMarkS</i></a>, 
           <a href="#" @click="goToWebsite('Glimmer3')" class="alert-link"><i>Glimmer3</i></a>, 
           <a href="#" @click="goToWebsite('Aragorn')" class="alert-link"><i>ARAGORN</i></a>, and 
           <a href="#" @click="goToWebsite('Phanotate')" class="alert-link"><i>PHANOTATE</i></a> to predict genes.
+        </p>
+        <p>BLAST is a powerful tool that will compare the genes in your phage's genome with a database of genes in other organisms. 
+        The BLAST results obtained will help you determine the likelihood of a given gene call being accurate.</p>
+        <p>
+          Complete all of the steps below and then click 'Next'.
         </p>
         <hr />
         <div class="nav-btns-wrapper">
@@ -30,8 +32,9 @@
               name: 'Upload',
               params: { phageID: $route.params.phageID },
             }"
+            :event="autoAnnotated ? 'click' : ''"
           >
-            <button class="btn btn-light btn-nav">
+            <button class="btn btn-light btn-nav disabled" id="back-top" @click="stopInterval">
               <strong>&#129052; Back</strong>
             </button>
           </router-link>
@@ -42,7 +45,7 @@
             }"
             :event="blastDownloaded && blastUploaded ? 'click' : ''"
           >
-            <button class="btn btn-light btn-nav disabled" id="next-top" @click="uploadReminder()" @mouseenter="displayOutputFiles()">
+            <button class="btn btn-light btn-nav disabled" id="next-top" @click="uploadReminder()">
               <strong>Next &#129054;</strong>
             </button>
           </router-link>
@@ -64,59 +67,56 @@
         >Finding ORFs...</loading>
         <ol>
           <li class="step">
-            <strong>Download BLASTp input files. </strong>
+            <strong>Download and extract BLAST input files. </strong>
             Phlash will locate every open reading frame (ORF) on every frame of the phage's DNA sequence. 
-            The ORFs are put in multi-FASTA format to be uploaded into BLAST. 
+            The ORFs are put in <a href="#" @click="goToWebsite('Fasta')" class="alert-link">multi-FASTA format</a> to be uploaded into BLAST. 
             The more searches that BLAST has to make, the longer it will take. 
-            For this reason, Phlash limits the number of ORFs per file.
-            Download the zipped FASTA file(s) by clicking 
-            <a href="#" @click="downloadInputFiles" class="alert-link">here</a>.
-            <p class="zipfile-tip">
-              &#128712; If you can't open your zip file, try using
-              <a
-                target="_blank"
-                rel="noopener noreferrer"
-                href="https://www.7-zip.org/"
-                >7-Zip</a
-              >.
-            </p>
-            <p v-if="downloadLoading">Downloading BLASTp input files...</p>
+            For this reason, Phlash separates the ORFs into multiple files.
+            All of the FASTA files are then put into a zip file.
+            <ol type="a">
+              <li>
+                <strong>Download:</strong> 
+                Download the zipped FASTA file(s) by clicking 
+                <a href="#" @click="downloadInputFiles" class="alert-link">here</a>.
+                <p class="zipfile-tip">
+                  &#128712; If you can't open your zip file, try using
+                  <a href="#" @click="goToWebsite('Zip')" class="alert-link">7-Zip</a> (Windows only).
+                </p>
+                <p v-if="downloadLoading">Downloading BLAST input files...</p>
+              </li>
+              <li>
+                <strong>Extract:</strong> 
+                You must extract all of the FASTA files from the zip folder. 
+                If you are unsure how to do this, watch one of the following tutorials: <br />
+                <a href="#" @click="goToWebsite('Windows')" class="alert-link">Windows OS</a>, 
+                <a href="#" @click="goToWebsite('Mac')" class="alert-link">Mac OS</a>, 
+                <a href="#" @click="goToWebsite('Chrome')" class="alert-link">Chrome OS</a>.
+              </li>
+            </ol>
           </li>
           <li class="step">
             <strong>BLAST the entire Phage DNA sequence.</strong>
-            <!-- <a href="#" @click="goToWebsite" class="alert-link"
-              >Go to BLASTp's website.
-            </a> -->
-            <!-- <i
-              >At the website, make sure to upload the files and set the
-              appropriate parameters, as show in the list and screenshot
-              below. Note that if pop-ups are allowed for this page when 
-              the link is clicked the number of tabs that are needed will 
-              be opened.</i
-            ><br /> -->
             <div class="alert alert-warning alert-dismissible" v-if="clickedNCBI">
               <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
               This will take several minutes. If it seems to be taking a long
               time, it is still probably working correctly. <br />
               If an error occurs refresh the page or try re-running that file. Oftentimes it will then work correctly.<br />
               For help troubleshooting,
-              <a href="#" @click="goToWebsite('Help')" class="alert-link">visit the FAQ</a
-              >.
+              <a href="#" @click="goToWebsite('Help')" class="alert-link">visit the FAQ</a>.
             </div>
             <ol type="a">
               <li>
                 <strong>Go to the NCBI BLAST website:</strong> Click
                 <a href="#" @click="goToWebsite('Blast')" class="alert-link"> here </a>
-                to open up a tab for every BLASTp input file. Please note that if pop-ups are blocked for Phlash only one tab will open.
+                to open up a tab for every BLAST input file. Please note that if pop-ups are blocked for Phlash only one tab will open.
               </li>
               <li>
-                <strong>Standard Protein BLAST</strong> 
+                <strong>Standard Protein BLAST:</strong> 
                 Ensure that the main heading says <i>'Standard Protein BLAST'</i>. If it does not, select the <i>'blastp'</i> tab.
               </li>
               <li>
                 <strong>Upload File:</strong> 
-                In the <i>'Enter Query Sequence'</i> box click the <i>'Choose File'</i> button and upload one of the BLASTp input files that was in the downloaded zip-folder.
-                You must remove all of the files from the zip folder before you will be able to select a file to upload. 
+                In the <i>'Enter Query Sequence'</i> box click the <i>'Choose File'</i> button and upload one of the BLAST input files that was in the downloaded zip-folder. 
                 Ensure that you do not upload the same file twice, that you upload every file, and that you do not upload the zip folder as this will result in errors.
               </li>
               <li>
@@ -137,7 +137,7 @@
             </div>
           </li>
           <li class="step">
-            <strong>Download Single-file JSON</strong>
+            <strong>Download the Single-file JSON.</strong>
             In the top left table on the results page, click on
             <i>'Download All.'</i> This will show you file formatting options
             for downloading your results. Choose
@@ -147,7 +147,11 @@
             </div>
           </li>
           <li class="step" v-if="blastDownloaded">
-            <strong>Upload your {{ numFiles }} single-file JSON BLAST results.</strong>
+            <strong>Upload your {{ numFiles }} single-file JSON BLAST results.</strong> 
+            You may upload all files at once. 
+            Upload speed varies depending on your internet connection. 
+            If a file appears to get stuck while uploading simply cancel the upload and re-upload that file. 
+            Note that if you attempt to upload a duplicate file it will not upload.
             <vue-dropzone v-if="!blastUploaded" ref="myVueDropzone" id="dropzone" :duplicateCheck="true" :options="dropzoneOptions" :destroyDropzone="false"></vue-dropzone>
             <button v-else class = "btn btn-outline-dark btn-lg btn-block" style="margin: 30px auto;" @click="removeAll()">BLAST files have been uploaded, click to remove and reupload.</button>
           </li>
@@ -160,8 +164,9 @@
               name: 'Upload',
               params: { phageID: $route.params.phageID },
             }"
+            :event="autoAnnotated ? 'click' : ''"
           >
-            <button class="btn btn-light btn-nav">
+            <button class="btn btn-light btn-nav disabled" id="back-bottom" @click="stopInterval">
               <strong>&#129052; Back</strong>
             </button>
           </router-link>
@@ -172,7 +177,7 @@
             }"
             :event="blastDownloaded && blastUploaded ? 'click' : ''"
           >
-            <button class="btn btn-light btn-nav disabled" id="next-bottom" @click="uploadReminder()" @mouseenter="displayOutputFiles()">
+            <button class="btn btn-light btn-nav disabled" id="next-bottom" @click="uploadReminder()">
               <strong>Next &#129054;</strong>
             </button>
           </router-link>
@@ -202,7 +207,6 @@ export default {
   data() {
 
     return {
-      height1: 30,
       orfLoading: true,
       downloadLoading: false,
       clickedNCBI: false,
@@ -214,6 +218,7 @@ export default {
       fileNames: [],
       badFiles: [],
       dropzoneOptions: this.setDropzone(),
+      interval: null,
     };
 
   },
@@ -225,7 +230,7 @@ export default {
   computed: {
 
     navUpload: function () {
-      return true;
+      return this.autoAnnotate;
     },
 
     // navDNAMaster: function () {
@@ -261,7 +266,8 @@ export default {
       if (this.blastDownloaded && this.blastUploaded && this.autoAnnotated) {
         document.getElementById("next-top").classList.remove("disabled");
         document.getElementById("next-bottom").classList.remove("disabled");
-      } else {
+      } 
+      else {
         document.getElementById("next-top").classList.add("disabled");
         document.getElementById("next-bottom").classList.add("disabled");
       }
@@ -271,9 +277,17 @@ export default {
       if (this.blastDownloaded && this.blastUploaded && this.autoAnnotated) {
         document.getElementById("next-top").classList.remove("disabled");
         document.getElementById("next-bottom").classList.remove("disabled");
-      } else {
+      }
+      else {
         document.getElementById("next-top").classList.add("disabled");
         document.getElementById("next-bottom").classList.add("disabled");
+      }
+    },
+
+    autoAnnotated: function () {
+      if (this.autoAnnotated) {
+        document.getElementById("back-top").classList.remove("disabled");
+        document.getElementById("back-bottom").classList.remove("disabled");
       }
     },
 
@@ -416,12 +430,16 @@ export default {
         )
         .then((response) => {
           console.log(response.data);
-          this.annotated = true;
+          this.autoAnnotated = true;
           this.annotating = false;
         })
         .catch((error) => {
           console.log(error);
         });
+    },
+
+    stopInterval() {
+      clearInterval(this.interval);
     },
 
     /**
@@ -560,26 +578,59 @@ export default {
           "_blank"
         );
       }
+      else if (site == "Fasta") {
+        window.open(
+          "http://www.metagenomics.wiki/tools/fastq/multi-fasta-format#:~:text=FASTA%20is%20a%20text-file%20format%20for%20representing%20nucleotide,A%20multi-FASTA%20file%20contains%20multiple%20FASTA%20formated%20sequences.",
+          "_blank"
+        );
+      }
+      else if (site == "Zip") {
+        window.open(
+          "https://www.7-zip.org/",
+          "_blank"
+        );
+      }
+      else if (site == "Windows") {
+        window.open(
+          "https://www.youtube.com/watch?v=HLBSS3JjAh0",
+          "_blank"
+        );
+      }
+      else if (site == "Mac") {
+        window.open(
+          "https://www.youtube.com/watch?v=O-zHTZWuakg",
+          "_blank"
+        );
+      }
+      else if (site == "Chrome") {
+        window.open(
+          "https://www.youtube.com/watch?v=OuaXF19UFsE",
+          "_blank"
+        );
+      }
+     
     },
 
     /**
      * Gets all of the names of all of the blast output files that have been uploaded.
      */
     displayOutputFiles() {
-      console.log("displayOutputFiles");
-      axios
-        .post(
-          process.env.VUE_APP_BASE_URL +
-            `/blast/${this.$route.params.phageID}/displayOutput/none`
-        )
-        .then((response) => {
-          this.fileNames = response.data.file_names;
-          this.badFiles = response.data.bad_files;
-          if (this.fileNames.length == this.numFiles && this.badFiles.length == 0) { this.blastUploaded = true; }
-        })
-        .catch((error) => {
-          console.log(error);
-        });
+      this.interval = setInterval(() => {
+        console.log("displayOutputFiles");
+        axios
+          .post(
+            process.env.VUE_APP_BASE_URL +
+              `/blast/${this.$route.params.phageID}/displayOutput/none`
+          )
+          .then((response) => {
+            this.fileNames = response.data.file_names;
+            this.badFiles = response.data.bad_files;
+            if (this.fileNames.length == this.numFiles && this.badFiles.length == 0) { this.blastUploaded = true; }
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+      }, 1000);
     },
 
     uploadReminder() {
@@ -609,6 +660,9 @@ export default {
             appendToast: false
           })
         }
+      }
+      else {
+        clearInterval(this.interval);
       }
     },
 
