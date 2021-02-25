@@ -15,15 +15,9 @@
         :height="100"
         :width="100"
       ></loading>
-      <div class="headers">
         <h1>ID: {{ $route.params.cdsID }}</h1>
-        <h4>Left: {{ currentCDS.start }}</h4>
-        <h4>Right: {{ currentCDS.stop }}</h4>
-        <h4>Strand: {{ currentCDS.strand }}</h4>
-        <h4>Frame: {{ this.frame }}</h4>
-        <h4>Called by: {{ this.calledBy }}</h4>
-      </div>
-      <div class="alert alert-primary">
+      <div class="alert alert-secondary">
+        <hr />
         <p><strong>Instructions</strong></p>
         <p>
           Here you can make any necessary changes to this CDS by editing its start and stop sites and its function. 
@@ -39,40 +33,45 @@
             id="textarea"
             v-model="notes"
             placeholder="Original Glimmer call @bp 408 has strength..."
-            rows="3"
+            rows="5"
             max-rows="10"
           ></b-form-textarea>
         </div>
         <p>
-          <strong>Your selected open reading frame:</strong> {{ newStart }}-{{ newStop }} {{ newStrand }}
+          <strong>Left:</strong> {{ currentCDS.start }}<br />
+          <strong>Right:</strong> {{ currentCDS.stop }}<br />
+          <span v-if="currentCDS.strand == '-'"><strong>Strand:</strong> Direct</span>
+          <span v-else><strong>Strand:</strong> Complementary</span><br />
+          <strong>Frame:</strong> {{ this.frame }}<br />
+          <strong>Called by:</strong> {{ this.calledBy }}<br />
+          <strong>Product:</strong> {{displayFunction}}
         </p>
-        <p><strong>Your selected function:</strong> {{ displayFunction }}</p>
         <button
           type="button"
-          class="btn btn-light btn-action"
+          class="btn btn-dark btn-action"
           @click="editCDS"
         >
-          <strong>Save</strong>
+          <strong>&#9998; Save</strong>
         </button>
         <button
           type="button"
-          class="btn btn-light btn-action"
+          class="btn btn-dark btn-action"
           @click="deleteCDS($route.params.cdsID)"
         >
-          <strong>Delete</strong>
+          <strong>&#128465; Delete</strong>
         </button>
         <hr />
         <div class="nav-btns-wrapper">
           <button
             type="button"
-            class="btn btn-light btn-action"
+            class="btn btn-dark btn-nav"
             @click="navPrevCDS()"
           >
             <strong>&#129052; Prev CDS</strong>
           </button>
           <button
             type="button"
-            class="btn btn-light btn-action"
+            class="btn btn-dark btn-nav"
             @click="navNextCDS()"
           >
             <strong>Next CDS &#129054;</strong>
@@ -82,79 +81,72 @@
           <router-link
             :to="{ name: 'Annotations', params: { phageID: $route.params.phageID } }"
           >
-            <button class="btn btn-light btn-nav">
-              <strong>&#129052; Back</strong>
+            <button class="btn btn-dark btn-nav">
+              <strong>&#129053; Return to Annotations</strong>
             </button>
           </router-link>
         </div>
+        <hr />
       </div>
       <div class="coding-potential-table">
-        <h4 style="text-align: center; margin: 20px">Alternative Open Reading Frames</h4>
+        <h4 style="text-align: center; margin: 1em">Alternative Open Reading Frames</h4>
         <div style="overflow: hidden;">
-          <div class="table-responsive" style="float: left; width: 40%;">
-            <strong> Direct Strand </strong>
-            <table id="cp-table" class="table table-hover">
-              <thead>
-                <tr>
-                  <th scope="col">Open Reading Frame</th>
-                  <th scope="col">Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="(start, index) in dirStartOptions" :key="index">
-                  <th>{{ start }}-{{ dirStopOptions[index] }}  +</th>
-                  <td>
-                    <button
-                      v-if="start + dirStopOptions[index] !== currentCDS.start + currentCDS.stop"
-                      class="btn btn-dark btn-sm"
-                      @click="setORF(start, dirStopOptions[index], '+')"
-                    >
-                      <strong>Select</strong>
-                    </button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+          <div style="float: left; width: 40%;">
+            <strong style="font-size:1.4em;">Direct Strand</strong>
+            <div class="table-responsive">
+              <table id="cp-table" class="table table-hover">
+                <tbody>
+                  <tr v-for="(start, index) in dirStartOptions" :key="index">
+                    <th>{{ start }}-{{ dirStopOptions[index] }}</th>
+                    <td>
+                      <button
+                        v-if="start + dirStopOptions[index] !== currentCDS.start + currentCDS.stop"
+                        class="btn btn-dark btn-sm"
+                        @click="setORF(start, dirStopOptions[index], '+')"
+                      >
+                        <strong>Select</strong>
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
-          <div class="table-responsive" style="float: right; width: 40%">
-            <strong> Complementary Strand </strong>
-            <table id="cp-table" class="table table-hover">
-              <thead>
-                <tr>
-                  <th scope="col">Open Reading Frame</th>
-                  <th scope="col">Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="(start, index) in compStartOptions" :key="index">
-                  <th>{{ start }}-{{ compStopOptions[index] }}  -</th>
-                  <td>
-                    <button
-                      v-if="start + compStopOptions[index] !== currentCDS.start + currentCDS.stop"
-                      class="btn btn-dark btn-sm"
-                      @click="setORF(start, compStopOptions[index], '-')"
-                    >
-                      <strong>Select</strong>
-                    </button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+          <div style="float: right; width: 40%">
+            <strong style="font-size:1.4em;">Complementary Strand</strong>
+            <div class="table-responsive">
+              <table id="cp-table" class="table table-hover">
+                <tbody>
+                  <tr v-for="(start, index) in compStartOptions" :key="index">
+                    <th>{{ start }}-{{ compStopOptions[index] }}</th>
+                    <td>
+                      <button
+                        v-if="start + compStopOptions[index] !== currentCDS.start + currentCDS.stop"
+                        class="btn btn-dark btn-sm"
+                        @click="setORF(start, compStopOptions[index], '-')"
+                      >
+                        <strong>Select</strong>
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </div>
       <hr />
       <div class="coding-potential">
-        <h4 style="text-align: center; margin: 40px; height: 100%">
+        <h4 style="text-align: center; margin: 1em; height: 100%">
           GeneMark's Coding Potential Per Frame
         </h4>
-        <div class="alert alert-primary">
+        <div class="alert alert-secondary">
           <p><strong>Key</strong></p>
           <p>
-            <strong class="red-text">Orange Dashed Line:</strong> The selected start and stop positions.<br />
-            <strong class="blue-text">Blue Line:</strong> The coding potential in relation to base number.<br />
-            <strong class="green-text">Green Line:</strong> A 0.75 coding potential reference line.<br />
-            <strong class="grey-text">Purple Line:</strong> The previous gene's stop position and the next
+            <strong style="color:#2559AA;">Blue Line:</strong> The coding potential in relation to base number.<br />
+            <strong style="color:#d95f02;">Orange Dashed Line:</strong> The selected start and stop positions.<br />
+            <strong style="color:#1b9e77;">Green Line:</strong> A 0.75 coding potential reference line.<br />
+            <strong style="color:#7570b3;">Purple Line:</strong> The previous gene's stop position and the next
             gene's start position.<br />
           </p>
         </div>
@@ -183,147 +175,59 @@
         </p>
       </div>
       <hr />
-      <h4 style="text-align: center; margin: 40px">BLAST Results for {{ newStart }}-{{ newStop }}</h4>
+      <h4 style="text-align: center; margin: 1em">BLAST Results for {{ newStart }} - {{ newStop }}</h4>
       <BlastResults
         :blastResults="allBlastResults[currentCDS.start.toString() + '-' + currentCDS.stop.toString() + '  ' + currentCDS.strand]"
         :allowSelect="true"
         @newFunction="setFunction"
       />
-      <!-- <div class="blast-results">
-        <h4 style="text-align: center; margin: 40px">BLAST Results</h4>
-        <strong> Direct Strand </strong>
-        <div v-if="dataExists" class="table-responsive2" id="accordion" style="float: center; width: 100%; margin: 1em;">
-          <div class="card border-dark" v-for="key in dirBlastKeys" :key="key">
-            <div class="card-body">
-              <h4 class="mb-0">
-                <button
-                  class="btn btn-outline-dark btn-blast"
-                  data-toggle="collapse"
-                  aria-expanded="false"
-                  v-bind:data-target="'#' + key"
-                  v-bind:aria-controls="key"
-                  v-if="key !== currentCDS.start.toString() + '-' + currentCDS.stop.toString() + '  ' + currentCDS.strand"
-                >
-                  <strong>{{ key }}</strong>
-                </button>
-                <button
-                  class="btn btn-dark btn-blast"
-                  data-toggle="collapse"
-                  aria-expanded="false"
-                  v-bind:data-target="'#' + key"
-                  v-bind:aria-controls="key"
-                  v-else
-                >
-                  <strong>{{ key }}</strong>
-                </button>
-              </h4>
-            </div>
-            <div v-bind:id="key" class="collapse" data-parent="#accordion">
-              <div class="card-body">
-                <BlastResults
-                  v-if="key === currentCDS.start.toString() + '-' + currentCDS.stop.toString() + '  ' + currentCDS.strand"
-                  :blastResults="dirBlastResults[key]"
-                  :allowSelect="true"
-                  @newFunction="setFunction"
-                />
-                <BlastResults
-                  v-else
-                  :blastResults="dirBlastResults[key]"
-                  :allowSelect="false"
-                  @newFunction="setFunction"
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-        <strong> Complementary Strand </strong>
-        <div v-if="dataExists" class="table-responsive2" id="accordion" style="float: center; width: 100%; margin: 1em;">
-          <div class="card border-dark" v-for="key in compBlastKeys" :key="key">
-            <div class="card-body">
-              <h4 class="mb-0">
-                <button
-                  class="btn btn-outline-dark btn-blast"
-                  data-toggle="collapse"
-                  aria-expanded="false"
-                  v-bind:data-target="'#' + key"
-                  v-bind:aria-controls="key"
-                  v-if="key !== currentCDS.start.toString() + '-' + currentCDS.stop.toString() + '  ' + currentCDS.strand"
-                >
-                  <strong>{{ key }}</strong>
-                </button>
-                <button
-                  class="btn btn-dark btn-blast"
-                  data-toggle="collapse"
-                  aria-expanded="false"
-                  v-bind:data-target="'#' + key"
-                  v-bind:aria-controls="key"
-                  v-else
-                >
-                  <strong>{{ key }}</strong>
-                </button>
-              </h4>
-            </div>
-            <div v-bind:id="key" class="collapse" data-parent="#accordion">
-              <div class="card-body">
-                <BlastResults
-                  v-if="key === currentCDS.start.toString() + '-' + currentCDS.stop.toString() + '  ' + currentCDS.strand"
-                  :blastResults="compBlastResults[key]"
-                  :allowSelect="true"
-                  @newFunction="setFunction"
-                />
-                <BlastResults
-                  v-else
-                  :blastResults="compBlastResults[key]"
-                  :allowSelect="false"
-                  @newFunction="setFunction"
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-      </div> -->
       <hr />
-      <div class="alert alert-primary">
+      <div class="alert alert-secondary">
         <div style="float: right; width: 50%;">
           <p><strong>Notes:</strong></p>
           <b-form-textarea
             id="textarea"
             v-model="notes"
             placeholder="Original Glimmer call @bp 408 has strength..."
-            rows="3"
+            rows="5"
             max-rows="10"
           ></b-form-textarea>
         </div>
         <p>
-          <strong>Your selected open reading frame:</strong> {{ newStart }}-{{ newStop }} {{ newStrand }}
+          <strong>Left:</strong> {{ currentCDS.start }}<br />
+          <strong>Right:</strong> {{ currentCDS.stop }}<br />
+          <span v-if="currentCDS.strand == '-'"><strong>Strand:</strong> Direct</span>
+          <span v-else><strong>Strand:</strong> Complementary</span><br />
+          <strong>Frame:</strong> {{ this.frame }}<br />
+          <strong>Called by:</strong> {{ this.calledBy }}<br />
+          <strong>Product:</strong> {{displayFunction}}
         </p>
-        <p><strong>Your selected function:</strong> {{ displayFunction }}</p>
         <button
           type="button"
-          class="btn btn-light btn-action"
+          class="btn btn-dark btn-action"
           @click="editCDS"
         >
-          <strong>Save</strong>
+          <strong>&#9998; Save</strong>
         </button>
         <button
           type="button"
-          class="btn btn-light btn-action"
+          class="btn btn-dark btn-action"
           @click="deleteCDS($route.params.cdsID)"
         >
-          <strong>Delete</strong>
+          <strong>&#128465; Delete</strong>
         </button>
         <hr />
         <div class="nav-btns-wrapper">
           <button
             type="button"
-            class="btn btn-light btn-action"
+            class="btn btn-dark btn-action"
             @click="navPrevCDS()"
           >
             <strong>&#129052; Prev CDS</strong>
           </button>
           <button
             type="button"
-            class="btn btn-light btn-action"
+            class="btn btn-dark btn-action"
             @click="navNextCDS()"
           >
             <strong>Next CDS &#129054;</strong>
@@ -333,11 +237,12 @@
           <router-link
             :to="{ name: 'Annotations', params: { phageID: $route.params.phageID } }"
           >
-            <button class="btn btn-light btn-nav">
-              <strong>&#129052; Back</strong>
+            <button class="btn btn-dark btn-nav">
+              <strong>&#129053; Return to Annotations</strong>
             </button>
           </router-link>
         </div>
+        <hr />
       </div>
     </div>
   </div>
@@ -389,6 +294,7 @@ export default {
       },
       frame: null,
       newFunction: "None selected",
+      displayFunction: "",
       newStart: null,
       newStop: null,
       newStrand: null,
@@ -478,6 +384,15 @@ export default {
           this.currentCDS = response.data.cds;
           if (this.currentCDS.function != "DELETED") {
             this.newFunction = this.currentCDS.function;
+            this.displayFunction = this.newFunction;
+            let indexSeparation = this.newFunction.indexOf('##');
+            if (indexSeparation != -1) {
+              this.displayFunction = this.displayFunction.substring(0, indexSeparation);
+            }
+            if (this.newFunction[0] == '@') {
+              this.displayFunction = this.displayFunction.substring(1);
+            }
+            console.log(this.displayFunction);
           }
           this.dirBlastResults = response.data.dir_blast;
           this.compBlastResults = response.data.comp_blast;
@@ -558,6 +473,9 @@ export default {
         });
     },
 
+    /**
+     * Re-routes to the next CDS and/or displays a save reminder.
+     */
     navNextCDS() {
       var cont = true;
       if (!this.saved) {
@@ -576,6 +494,9 @@ export default {
       }
     },
 
+    /**
+     * Re-routes to the previous CDS and/or displays a save reminder.
+     */
     navPrevCDS() {
       var cont = true;
       if (!this.saved) {
@@ -628,7 +549,27 @@ export default {
           payload
         )
         .then(() => {
-          console.log(response);
+          if (this.newFunction != "DELETED") {
+            this.$bvToast.toast(
+                `The CDS ${cdsID} has been saved.`,
+                {
+                  title: "SAVED",
+                  autoHideDelay: 5000,
+                  appendToast: false,
+                }
+              );
+          }
+          else {
+            this.$bvToast.toast(
+                `The CDS ${cdsID} has been deleted. You will be re-routed to the next CDS.`,
+                {
+                  title: "DELETED",
+                  autoHideDelay: 5000,
+                  appendToast: false,
+                }
+              );
+            this.navNextCDS();
+          }
         })
         .catch((error) => {
           console.error(error);
@@ -649,9 +590,11 @@ export default {
      * @param {string} function the user selected function.
      */
     setFunction(funct) {
+      console.log(funct);
       this.saved = false;
       let match = funct.match(/(.*)##(.*)/);
       this.displayFunction = match[1];
+      console.log(this.displayFunction);
       this.newFunction = funct;
     },
 
@@ -665,7 +608,7 @@ export default {
       if (start != this.newStart || stop != this.newStop) {
         this.dataExists = false;
         this.newFunction = "";
-        this.displayFunction = "";
+        this.displayFunction = "None selected";
         this.newStop = stop;
         this.currentCDS.stop = stop;
         this.newStart = start;
@@ -706,7 +649,6 @@ export default {
 </script>
 
 <style scoped>
-/* ----- Title and Headers ----- */
 
 .blast-results {
   margin: 1em;
@@ -718,62 +660,35 @@ export default {
 }
 
 .btn-nav {
-  margin: 10px;
+  margin: 0.25em;
 }
 
-.headers {
-  margin: 40px auto;
+h1 {
+  margin-top: .7em;
 }
 
-.alert-primary {
-  text-align: left;
-  margin: 40px auto;
-}
-
-.subheader {
-  text-align: left;
+h4 {
+  font-size: 1.7em;
 }
 
 .info-bottom {
-  margin: 50px auto;
+  margin: 1em auto;
 }
 
 .btn-action {
-  margin: 7px;
+  margin: 0.25em;
 }
 
-.red-text {
-  color: #d95f02;
-}
-
-.blue-text {
-  color: rgb(41, 41, 228);
-}
-
-.green-text {
-  color: #1b9e77;
-}
-
-.grey-text {
-  color: #7570b3;
-}
-
-/* ----- Coding Potential ----- */
 .coding-potential-table {
-  margin: 50px auto;
+  margin: 2em auto;
   width: 80%;
 }
 
 .table-responsive {
-  max-height: 250px;
+  max-height: 15em;
   overflow-y: auto;
   display: inline-block;
-}
-
-.table-responsive2 {
-  max-height: 400px;
-  overflow-y: auto;
-  display: inline-block;
+  font-size: 1.4em;
 }
 
 .table-responsive thead th {
@@ -781,6 +696,7 @@ export default {
   top: 0;
   background: #eee;
   border: darkgray;
+  font-size: 1em;
 }
 
 caption {
@@ -792,24 +708,29 @@ tbody {
 }
 
 .coding-potential-graphs {
-  height: 650px;
+  height: 40em;
 }
 
 .graphs-caption {
-  margin-top: 15px;
+  margin-top: 1em;
   text-align: left;
   color: grey;
 }
 
-/* ----- Blast Results ----- */
-.btn-blast {
-  width: 100%;
+.alert-secondary {
+  background-color: white;
+  border-color:white;
+  font-size: 1.40em;
+  text-align: left;
 }
 
-/* Responsive Design */
-@media only screen and (max-width: 1200px) {
+.btn-dark {
+  font-size: 15pt;
+}
+
+@media only screen and (max-width: 50em) {
   .coding-potential-graphs {
-    height: 1300px;
+    height: 50em;
   }
 }
 </style>

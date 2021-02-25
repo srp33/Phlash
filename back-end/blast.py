@@ -45,8 +45,9 @@ def find_blast_zip(current_user):
     response_object["uploaded"] = True
     response_object["annotated"] = False
     for filename in os.listdir(os.path.join(ROOT, 'users', current_user, 'uploads')):
-        if filename.endswith('.ldata'):
+        if (filename.endswith('.gdata')):
             response_object["annotated"] = True
+            break
     if (db.session.query(Blast_Results).first() is None):
         response_object["uploaded"] = False
     for filename in os.listdir(os.path.join(ROOT, 'users', current_user)):
@@ -54,273 +55,16 @@ def find_blast_zip(current_user):
             response_object["blast_downloaded"] = True
     return response_object
 
-def download_blast_input(current_user):
-    """Returns the blast input zip folder.
-
-    Args:
-        current_user:
-            The current user ID.
-
-    Returns:
-        The blast input files in a zip folder.
-    """
-    f = open(os.path.join(ROOT, 'users', current_user, f"{current_user}_blast.zip"), "rb")
-
-    return f.read()
-
-def create_blast_input(UPLOAD_FOLDER, current_user):
-    """Creates fasta file(s) for BLAST input.
-
-    If more than one file is created, then each file should be 30 kb.
-
-    Args:
-        current_user:
-            The ID of the current user.
-        fasta_file:
-            The file containing the DNA sequence of the phage.
-        gdata_file:
-            The file containing the GeneMark gene calls.
-
-    Returns:
-        The Number of blast fasta files created.
-    """
-    fasta_file = helper.get_file_path("fasta", UPLOAD_FOLDER)
-    filename = re.search('(.*/users/.*)/uploads/.*.\w*', fasta_file)
-    genome = SeqIO.read(fasta_file, "fasta").seq
-    output = ""
-    blast_file_count = 1  # keep track of num blast files created
-    out_file = f"{str(filename.group(1))}/{current_user}_blast_{blast_file_count}.fasta"
-    files_to_zip = [out_file]
-    starts, stops = get_start_stop('+', genome)
-    for i in range(len(starts)):
-        output += f">+, {starts[i]}-{stops[i]}\n"
-        output += f"{Seq.translate(sequence=helper.get_sequence(genome, '+', starts[i]-1, stops[i]), table=11)}\n"
-        if getsizeof(output) > 30000:  # only file size to reach 30 kb, else you get a CPU limit from NCBI blast
-            with open(out_file, "w") as f:
-                f.write(output)
-            output = ""
-            blast_file_count += 1
-            out_file = f"{str(filename.group(1))}/{current_user}_blast_{blast_file_count}.fasta"
-            files_to_zip.append(out_file)
-    starts, stops = get_start_stop('-', genome)
-    for i in range(len(starts)):
-        output += f">-, {starts[i]}-{stops[i]}\n"
-        start = len(genome) - stops[i]
-        stop = len(genome) - starts[i] + 1
-        output += f"{Seq.translate(sequence=helper.get_sequence(genome, '-', start, stop), table=11)}\n"
-        if getsizeof(output) > 30000:  # only file size to reach 30 kb, else you get a CPU limit from NCBI blast
-            with open(out_file, "w") as f:
-                f.write(output)
-            output = ""
-            blast_file_count += 1
-            out_file = f"{str(filename.group(1))}/{current_user}_blast_{blast_file_count}.fasta"
-            files_to_zip.append(out_file)
-
-    with open(out_file, "w") as f:
-        f.write(output)
-    
-    # zip all out_files together
-    zip_file = zipfile.ZipFile(f"{str(filename.group(1))}/{current_user}_blast.zip", 'w', zipfile.ZIP_DEFLATED)
-    for filename in files_to_zip:
-        arcname = filename.rsplit('/', 1)[-1].lower()
-        zip_file.write(filename, arcname)
-    zip_file.close()
-    
-    return blast_file_count
-
-def dropzone(UPLOAD_FOLDER, request):
-    file = request.files['file']
-    contents = str(file.read(), 'utf-8')
-    print(request.files)
-    if file:
-        file_name = secure_filename(file.filename)
-        found = False
-        for existing_file in os.listdir(UPLOAD_FOLDER):
-            if existing_file.endswith(file_name):
-                found = True
-                with open(os.path.join(UPLOAD_FOLDER, existing_file), 'a+') as f:
-                    f.write(contents)
-                    if contents[-6:] == "\n]\n}\n\n":
-                        file_data = db.session.query(Files).filter_by(name=file.filename).first()
-                        file_data.complete = True
-                        print(file_data.complete)
-                        db.session.commit()
-                        print(db.session.query(Files).filter_by(name=file.filename).first().complete)
-        if not found:
-            #file.save(os.path.join(UPLOAD_FOLDER, file_name))
-            with open(os.path.join(UPLOAD_FOLDER, file_name), 'w') as f:
-                f.write(contents)
-            if contents[-6:] == "\n]\n}\n\n":
-                file_data = db.session.query(Files).filter_by(name=file.filename).first()
-                file_data.complete = True
-                print(file_data.complete)
-                db.session.commit()
-                print(db.session.query(Files).filter_by(name=file.filename).first().complete)
-
-def upload_blast_output(UPLOAD_FOLDER, request):
-    """Adds the blast output file to the upload directory if of type json.
-
-    Args:
-        UPLOAD_FOLDER:
-            The folder containing all the uploaded files.
-        request:
-            A dictionary containing the files to be uploaded.
-
-    Returns:
-        A dictionary containing a success or fail message.
-    """
-
-    response_object = {}
-    if 'file' not in request.files:
-        print(request.files)
-        response_object["status"] = "'file' not in request.files"
-        print("in fail")
-    else:
-        print("in success")
-        file = request.files['file']
-        if file:
-            print(list(bytes((file.read()[0:6]))))
-            print(list(bytes(b'{\n"Bla')))
-            print(1)
-            file_name = secure_filename(file.filename)
-            print(file_name)
-            if compare(list(bytes(file.read()[0:6])), list(bytes(b'{\n"Bla'))):
-                print(2)
-                if helper.allowed_file(file_name, set(['.json'])):
-                    print(3)
-                    file_ext = file_name.rsplit('.', 1)[1].lower()
-                    for existing_file in os.listdir(UPLOAD_FOLDER):
-                        if existing_file.endswith(file_name):
-                            os.remove(os.path.join(
-                                UPLOAD_FOLDER, existing_file))
-
-                    file.save(os.path.join(UPLOAD_FOLDER, file_name))
-                    print(' * uploaded', file_name)
-                else:
-                    response_object["not_allowed"] = file.filename
-            else:
-                print(4)
-                for existing_file in os.listdir(UPLOAD_FOLDER):
-                    if existing_file.endswith(file_name[1:]):
-                        print(5)
-                        with open(existing_file, 'a+') as f1:
-                            with open(file, 'r') as f2:
-                                print(f1.read())
-                                print(f2.read())
-                                f1.write(f2.read())
-                                print(f1.read())
-            response_object["uploaded"] = file_name
-
-        else:
-            response_object["status"] = "error in uploading file"
-            
-
-    return response_object
-
-def get_blast_output_names(UPLOAD_FOLDER):
-    """Gets the names of all the files of type json in the upload directory.
-
-    Args:
-        UPLOAD_FOLDER:
-            The folder containing all the uploaded files.
-
-    Returns:
-        A dictionary containing a list of the blast output file names.
-    """
-    file_names = []
-    file_sizes = []
-    file_mods = []
-    bad_files = []
-    for file in os.listdir(UPLOAD_FOLDER):
-        if file.endswith(".json"):
-            print(file)
-            # file_sizes.append(os.path.getsize(os.path.join(UPLOAD_FOLDER, file)))
-            file_data = db.session.query(Files).filter_by(name=file).first()
-            print(file_data)
-            print(file_data.name)
-            print(file_data.complete)
-            if file_data.complete:
-                file_mods.append(file_data.date)
-                file_sizes.append(file_data.size)
-                file_names.append(file_data.name)
-            else:
-                bad_files.append(file_data.name)
-    response_object["bad_files"] = bad_files
-    response_object["file_names"] = file_names
-    response_object["file_sizes"] = file_sizes
-    response_object["file_mods"] = file_mods
-
-    return response_object
-
-def download_blast_output(UPLOAD_FOLDER, file_path):
-    """Returns the contents of a file given the file path.
-
-    Returns fail message if file not found.
-
-    Args:
-        UPLOAD_FOLDER:
-            The folder containing all the uploaded files.
-        file_path:
-            The path to the file to be downloaded.
-
-    Returns:
-        A dictionary containing the contents of the file and a success message.
-    """
-    try:
-        response_object["file_data"] = open(os.path.join(UPLOAD_FOLDER, file_path)).read()
-        response_object["status"] = "success"
-    except:
-        print("error in downloading " + file_path)
-        response_object["status"] = "error in downloading " + file_path
-
-    return response_object
-
-def delete_blast_output(UPLOAD_FOLDER, file_path):
-    """Removes a file from the upload directory given the file path.
-    
-    Args:
-        UPLOAD_FOLDER:
-            The folder containing all the uploaded files.
-        file_path:
-            The path of the file to be removed.
-
-    Returns:
-        A dictionary containing a success message.
-    """
-    try:
-        os.remove(os.path.join(UPLOAD_FOLDER, file_path))
-        response_object["status"] = "success"
-        db.session.query(Blast_Results).delete()
-        try:
-            db.session.commit()
-        except:
-            print("error in clearing table")
-    except:
-        print("error in deleting " + file_path)
-        response_object["status"] = "error in deleting " + file_path
-
-    return response_object
-
-def get_num_blast_files(current_user):
-    """Gets the number of Blast input files in the zip folder.
-
-    Args:
-        current_user:
-            The ID of the current user.
-    
-    Returns:
-        A string containing the number of Blast files or 'None' if not found.
-    """
-    for filename in os.listdir(os.path.join(ROOT, 'users', current_user)):
-        if filename.endswith('.zip'):
-            with closing(ZipFile(os.path.join(ROOT, 'users', current_user, filename))) as archive:
-                num_blast_files = len(archive.infolist())
-                return str(num_blast_files)
-    return "None"
-
-# ---------- BLAST HELPER FUNCTIONS ----------
-
 def auto_annotate(UPLOAD_FOLDER, current_user):
+    """Auto annotates the entire genome.
+
+    Args:
+        UPLOAD_FOLDER:
+            The path to the folder containing all files associated with the current user.
+        current_user:
+            The ID of the current user.
+    """
+
     fasta_file_path = helper.get_file_path("fasta", UPLOAD_FOLDER)
     
     result = subprocess.run(["/genemark_suite_linux_64/gmsuite/gc", fasta_file_path], stdout=subprocess.PIPE)
@@ -524,10 +268,8 @@ def auto_annotate(UPLOAD_FOLDER, current_user):
                        calls = phanotate_calls)
     db.session.add(calls)
     db.session.commit()
-    print(phanotate_calls)
-    print(genemark_calls)
-    print(glimmer_calls)
     id_index = 0
+
     for cds in db.session.query(DNAMaster).order_by(DNAMaster.start):
         id_index += 1
         cds.id = current_user + '_' + str(id_index)
@@ -535,64 +277,26 @@ def auto_annotate(UPLOAD_FOLDER, current_user):
             db.session.delete(cds)
     db.session.commit()
 
+    # Remove files created for autoannotation.
+    for filename in os.listdir(UPLOAD_FOLDER):
+        if not filename.endswith(".fasta") and not filename.endswith(".gdata"):
+            os.remove(os.path.join(UPLOAD_FOLDER, filename))
 
-# def create_blast_fasta(current_user, fasta_file, gdata_file):
-#     """Creates fasta file(s) for BLAST input.
+def download_blast_input(current_user):
+    """Returns the blast input zip folder.
 
-#     If more than one file is created, then each file should be 30 kb.
+    Args:
+        current_user:
+            The current user ID.
 
-#     Args:
-#         current_user:
-#             The ID of the current user.
-#         fasta_file:
-#             The file containing the DNA sequence of the phage.
-#         gdata_file:
-#             The file containing the GeneMark gene calls.
+    Returns:
+        The blast input files in a zip folder.
+    """
+    f = open(os.path.join(ROOT, 'users', current_user, f"{current_user}_blast.zip"), "rb")
 
-#     Returns:
-#         The Number of blast fasta files created.
-#     """
-#     filename = re.search('(.*/users/.*)/uploads/.*.\w*', fasta_file)
-#     genome = SeqIO.read(fasta_file, "fasta").seq
-#     output = ""
-#     blast_file_count = 1  # keep track of num blast files created
-#     out_file = f"{str(filename.group(1))}/{current_user}_blast_{blast_file_count}.fasta"
-#     files_to_zip = [out_file]
-#     for cds in db.session.query(DNAMaster).order_by(DNAMaster.start):
-#         starts, stops = get_starts_stops(cds.id, genome, gdata_file)
-#         cds.start_options = ", ".join([str(start) for start in starts])
-#         cds.stop_options = ", ".join([str(stop) for stop in stops])
-#         db.session.commit()
-#         for i in range(len(starts)):
-#             if cds.strand == '+':
-#                 output += f">{cds.id}_{i + 1}, {starts[i]}-{stops[i]}\n"
-#                 output += f"{Seq.translate(sequence=helper.get_sequence(genome, cds.strand, starts[i]-1, stops[i]), table=11)}\n"
-#             else:
-#                 output += f">{cds.id}_{i + 1}, {starts[i]}-{stops[i]}\n"
-#                 start = len(genome) - stops[i]
-#                 stop = len(genome) - starts[i] + 1
-#                 output += f"{Seq.translate(sequence=helper.get_sequence(genome, cds.strand, start, stop), table=11)}\n"
-#             if getsizeof(output) > 30000:  # only file size to reach 30 kb, else you get a CPU limit from NCBI blast
-#                 with open(out_file, "w") as f:
-#                     f.write(output)
-#                 output = ""
-#                 blast_file_count += 1
-#                 out_file = f"{str(filename.group(1))}/{current_user}_blast_{blast_file_count}.fasta"
-#                 files_to_zip.append(out_file)
+    return f.read()
 
-#     with open(out_file, "w") as f:
-#         f.write(output)
-    
-#     # zip all out_files together
-#     zip_file = zipfile.ZipFile(f"{str(filename.group(1))}/{current_user}_blast.zip", 'w', zipfile.ZIP_DEFLATED)
-#     for filename in files_to_zip:
-#         arcname = filename.rsplit('/', 1)[-1].lower()
-#         zip_file.write(filename, arcname)
-#     zip_file.close()
-    
-#     return blast_file_count
-
-def create_blast_fastas(current_user, fasta_file):
+def create_blast_input(UPLOAD_FOLDER, current_user):
     """Creates fasta file(s) for BLAST input.
 
     If more than one file is created, then each file should be 30 kb.
@@ -608,6 +312,7 @@ def create_blast_fastas(current_user, fasta_file):
     Returns:
         The Number of blast fasta files created.
     """
+    fasta_file = helper.get_file_path("fasta", UPLOAD_FOLDER)
     filename = re.search('(.*/users/.*)/uploads/.*.\w*', fasta_file)
     genome = SeqIO.read(fasta_file, "fasta").seq
     output = ""
@@ -642,14 +347,142 @@ def create_blast_fastas(current_user, fasta_file):
     with open(out_file, "w") as f:
         f.write(output)
     
-    # zip all out_files together
+    # zip all out_files together.
     zip_file = zipfile.ZipFile(f"{str(filename.group(1))}/{current_user}_blast.zip", 'w', zipfile.ZIP_DEFLATED)
     for filename in files_to_zip:
         arcname = filename.rsplit('/', 1)[-1].lower()
         zip_file.write(filename, arcname)
     zip_file.close()
     
+    # delete files that are not in zip folder.
+    for filename in os.listdir(os.path.join(ROOT, 'users', current_user)):
+        if filename.endswith(".fasta"):
+            os.remove(os.path.join(ROOT, 'users', current_user, filename))
+
     return blast_file_count
+
+def dropzone(UPLOAD_FOLDER, request):
+    """Adds the blast output file to the upload directory if of type json.
+
+    Args:
+        UPLOAD_FOLDER:
+            The folder containing all the uploaded files.
+        request:
+            A dictionary containing the files to be uploaded.
+    """
+    file = request.files['file']
+    contents = str(file.read(), 'utf-8')
+    print(request.files)
+    if file:
+        file_name = secure_filename(file.filename)
+        print(file_name)
+        found = False
+        for existing_file in os.listdir(UPLOAD_FOLDER):
+            if existing_file.endswith(file_name):
+                found = True
+                with open(os.path.join(UPLOAD_FOLDER, existing_file), 'a+') as f:
+                    f.write(contents)
+                    if contents[-6:] == "\n]\n}\n\n":
+                        print("yes")
+                        file_data = db.session.query(Files).filter_by(name=file_name).first()
+                        file_data.complete = True
+                        db.session.commit()
+        if not found:
+            with open(os.path.join(UPLOAD_FOLDER, file_name), 'w') as f:
+                f.write(contents)
+            if contents[-6:] == "\n]\n}\n\n":
+                print("yes")
+                file_data = db.session.query(Files).filter_by(name=file_name).first()
+                file_data.complete = True
+                db.session.commit()
+
+def get_blast_output_names(UPLOAD_FOLDER, type_of_call):
+    """Gets the names of all the files of type json in the upload directory.
+
+    Args:
+        UPLOAD_FOLDER:
+            The folder containing all the uploaded files.
+        type_of_call:
+            A string indicating if the if this function is called from vue or from dropzone.
+
+    Returns:
+        A dictionary containing a list of the blast output file names.
+    """
+    file_names = []
+    file_sizes = []
+    file_mods = []
+    bad_files = []
+    for file in os.listdir(UPLOAD_FOLDER):
+        if file.endswith(".json"):
+            file_data = db.session.query(Files).filter_by(name=file).first()
+            if file_data != None and file_data.complete:
+                file_mods.append(file_data.date)
+                file_sizes.append(file_data.size)
+                file_names.append(file_data.name)
+            elif file_data != None:
+                print(file)
+                bad_files.append(file_data.name)
+            else:
+                os.remove(os.path.join(UPLOAD_FOLDER, file))
+    if type_of_call == "refresh":
+        for file_name in bad_files:
+            os.remove(os.path.join(UPLOAD_FOLDER, file_name))
+            delete_file = db.session.query(Files).filter_by(name=file_name).first()
+            db.session.delete(delete_file)
+    response_object["bad_files"] = bad_files
+    response_object["file_names"] = file_names
+    response_object["file_sizes"] = file_sizes
+    response_object["file_mods"] = file_mods
+    response_object["in_process"] = False
+    if (db.session.query(DNAMaster).first() is None):
+        response_object["in_process"] = True
+
+    return response_object
+
+def delete_blast_output(UPLOAD_FOLDER, file_path):
+    """Removes a file from the upload directory given the file path.
+    
+    Args:
+        UPLOAD_FOLDER:
+            The folder containing all the uploaded files.
+        file_path:
+            The path of the file to be removed.
+
+    Returns:
+        A dictionary containing a success message.
+    """
+    try:
+        os.remove(os.path.join(UPLOAD_FOLDER, file_path))
+        delete_file = db.session.query(Files).filter_by(name=file_path).first()
+        db.session.delete(delete_file)
+        response_object["status"] = "success"
+        db.session.query(Blast_Results).delete()
+        try:
+            db.session.commit()
+        except:
+            print("error in clearing table")
+    except:
+        print("error in deleting " + file_path)
+        response_object["status"] = "error in deleting " + file_path
+
+    return response_object
+
+def get_num_blast_files(current_user):
+    """Gets the number of Blast input files in the zip folder.
+
+    Args:
+        current_user:
+            The ID of the current user.
+    
+    Returns:
+        A string containing the number of Blast files or 'None' if not found.
+    """
+    for filename in os.listdir(os.path.join(ROOT, 'users', current_user)):
+        if filename.endswith('.zip'):
+            with closing(ZipFile(os.path.join(ROOT, 'users', current_user, filename))) as archive:
+                num_blast_files = len(archive.infolist())
+                return str(num_blast_files)
+    return "None"
 
 # ----- BLAST CREATION HELPER FUNCTIONS ------
 def get_stop_options(genome, start, strand):
@@ -666,7 +499,8 @@ def get_stop_options(genome, start, strand):
     Returns:
         The stop codon index.
     """
-    bacteria_stop_codons = ["TAG", "TAA", "TGA"]
+    
+    bacteria_stop_codons = ["TAG", "TAA", "TGA", "tag", "taa", "tga"]
     start -= 1
     gene = ""
     if (strand != "-"):
@@ -691,121 +525,20 @@ def get_start_options(genome, maximum, strand, minimum):
         minimum:
             The minimum index to search for start codons.
     """
-    bacteria_start_codons = ["ATG", "GTG", "TTG"]
+
+    bacteria_start_codons = ["ATG", "GTG", "TTG", "atg", "gtg", "ttg"]
     start_options = []
     maximum += 3
     gene = ""
     if (strand != "-"):
         gene = genome[minimum:maximum]
     else:
-        print("complimentary")
         gene = genome.reverse_complement()[minimum:maximum]
     for index in range(0, len(gene)):
         codon = gene[index:index + 3]
-        if (index == 3 or index == 217 or index == 218 or index == 219):
-            print(codon)
         if codon in bacteria_start_codons:
             start_options.append(minimum + index + 1)
     return start_options
-
-def get_starts_stops(cds_id, genome):
-    """Finds alternative, possible start and stop positions for a given CDS. 
-    
-    Args:
-        cds_id:
-            The ID of the CDS.
-        genome:
-            The genome of the phage.
-        genemark_gdata_file:
-            The file containing the genemark gene calls.
-
-    Returns:
-        start_options, stop_options: 
-            list of alternative starts and an associated list of alternative stops.
-    """
-    # gdata_df = pd.read_csv(genemark_gdata_file, sep='\t', skiprows=16)
-    # gdata_df.columns = ['Base', '1', '2', '3', '4', '5', '6']
-    # gdata_df = gdata_df.set_index('Base')
-
-    dnamaster_cds = DNAMaster.query.filter_by(id=cds_id).first()
-    genemark_cds = GeneMark.query.filter_by(stop=dnamaster_cds.stop).first()
-
-    minimum = -300 # 100 base pairs lower than the start position
-    maximum = 100 # 100 base pairs higher than the start position
-    genome_length = len(genome)
-    if dnamaster_cds.strand == '+':
-        if genemark_cds is not None:
-            if (genemark_cds.start < dnamaster_cds.start):
-                minimum += genemark_cds.start
-                if minimum < 0:
-                    minimum = 0
-                maximum += dnamaster_cds.start
-                if maximum >= genome_length:
-                    maximum = genome_length - 1
-            else:
-                minimum += dnamaster_cds.start
-                if minimum < 0:
-                    minimum = 0
-                maximum += genemark_cds.start
-                if maximum >= genome_length:
-                    maximum = genome_length - 1
-        else:
-            minimum += dnamaster_cds.start
-            if minimum < 0:
-                minimum = 0
-            maximum += dnamaster_cds.start
-            if maximum >= genome_length:
-                maximum = genome_length - 1
-    else:
-        d_start = genome_length - dnamaster_cds.stop
-        if genemark_cds is not None:
-            g_start = genome_length - genemark_cds.stop
-            if (g_start < d_start):
-                minimum += g_start
-                if minimum < 0:
-                    minimum = 0
-                maximum += d_start
-                if maximum >= genome_length:
-                    maximum = genome_length - 1
-            else:
-                minimum += d_start
-                if minimum < 0:
-                    minimum = 0
-                maximum += g_start
-                if maximum >= genome_length:
-                    maximum = genome_length - 1
-        else:
-            minimum += d_start
-            if minimum < 0:
-                minimum = 0
-            maximum += d_start
-            if maximum >= genome_length:
-                maximum = genome_length - 1
-
-    possible_start_options = get_start_options(genome, maximum, dnamaster_cds.strand, minimum)
-
-    start_options = []
-    stop_options = []
-    for start in possible_start_options:
-        stop_options.append(get_stop_options(genome, start, dnamaster_cds.strand))
-        if (stop_options[-1] - start < 30 and start != dnamaster_cds.start):
-            stop_options.pop()
-        else:
-            if dnamaster_cds.strand == '+':
-                start_options.append(start)
-            else:
-                start_options.append(genome_length - start + 1)
-                stop = stop_options.pop()
-                stop_options.append(genome_length - stop + 1)
-
-    if len(start_options) == 0:
-        start_options.append(dnamaster_cds.start)
-        stop_options.append(dnamaster_cds.stop)
-
-    if dnamaster_cds.strand == '+':
-        return start_options, stop_options
-    else:
-        return stop_options, start_options
 
 def get_start_stop(strand, genome):
     """Finds alternative, possible start and stop positions for a given CDS. 
@@ -815,16 +548,11 @@ def get_start_stop(strand, genome):
             The ID of the CDS.
         genome:
             The genome of the phage.
-        genemark_gdata_file:
-            The file containing the genemark gene calls.
 
     Returns:
         start_options, stop_options: 
             list of alternative starts and an associated list of alternative stops.
     """
-    # gdata_df = pd.read_csv(genemark_gdata_file, sep='\t', skiprows=16)
-    # gdata_df.columns = ['Base', '1', '2', '3', '4', '5', '6']
-    # gdata_df = gdata_df.set_index('Base')
 
     genome_length = len(genome)
     possible_start_options = get_start_options(genome, genome_length - 1, strand, 0)
@@ -844,10 +572,6 @@ def get_start_stop(strand, genome):
                 start_options.append(genome_length - start + 1)
                 stop = stop_options.pop()
                 stop_options.append(genome_length - stop + 1)
-
-    if len(start_options) == 0:
-        start_options.append(dnamaster_cds.start)
-        stop_options.append(dnamaster_cds.stop)
 
     if strand == '+':
         return start_options, stop_options

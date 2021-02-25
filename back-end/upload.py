@@ -48,7 +48,7 @@ def check_uploaded_files(UPLOAD_FOLDER):
     for filename in os.listdir(UPLOAD_FOLDER):
         ext = os.path.splitext(filename)[1].lower()
         if ext in FASTA_EXTENSIONS:
-            response_object["fasta"] = True
+            response_object["fasta"] = handle_fasta(UPLOAD_FOLDER)
 
     response_object["blast_completed"] = False if db.session.query(Blast_Results).first() is None else True
 
@@ -107,30 +107,23 @@ def delete_file(file_path, UPLOAD_FOLDER):
     return response_object
 
 def dropzone_fasta(UPLOAD_FOLDER, request, current_user):
+    """Uploads the FASTA file. 
+
+    Args:
+        UPLOAD_FOLDER:
+            The directory containing all of the uploaded files.
+        request:
+            The file name and data from the front end.
+        current_user:
+            The ID of the current user.
+    """
+
     file = request.files['file']
     contents = str(file.read(), 'utf-8')
     print(request.files)
     if file:
         with open(os.path.join(UPLOAD_FOLDER, current_user + ".fasta"), 'w') as f:
             f.write(contents)
-        handle_fasta(UPLOAD_FOLDER)
-
-# ------------------------------ UPLOAD HELPER FUNCTIONS ------------------------------
-def overwrite_files(file_type, UPLOAD_FOLDER):
-    """Overwrites existing files with specific extension with newly uploaded files.
-
-    Args:
-        file_type:
-            The type of the file to be overwritten.
-        UPLOAD_FOLDER:
-            The directory containing all of the uploaded files.
-    """
-    for existing_file in os.listdir(UPLOAD_FOLDER):
-        ext = os.path.splitext(existing_file)[1].lower()
-        if (file_type == "fasta" and ext in ['.fasta', '.fna', '.fa', '.ldata', '.gdata', '.lst', '.ps']) or \
-            (file_type == "genbank" and ext in GENBANK_EXTENSIONS):
-            os.remove(os.path.join(UPLOAD_FOLDER, existing_file))
-            print(f" * removed {existing_file}")
 
 # ---------- FASTA FILE HELPER FUNCTIONS ----------
 def handle_fasta(UPLOAD_FOLDER):
@@ -141,112 +134,6 @@ def handle_fasta(UPLOAD_FOLDER):
             The directory containing all of the uploaded files.
     """
     fasta_file = helper.get_file_path("fasta", UPLOAD_FOLDER)
-    # run_genemark(fasta_file)
-    try:
-        ldata_file = helper.get_file_path("ldata", UPLOAD_FOLDER)
-    except FileNotFoundError:
-        print("GeneMark did not save ldata file properly.")
-        print("Check that your GeneMark key is in the correct location.")
-        return("error")
-
-def run_genemark(fasta_file_path):
-    """Invokes the GeneMarkS utilities and adds .gdata and .ldata files.
-
-    Args:
-        fasta_file_path:
-            The path to the fasta file.
-    """
-    result = subprocess.run(["/genemark_suite_linux_64/gmsuite/gc", fasta_file_path], stdout=subprocess.PIPE)
-    gc_percent = result.stdout.decode("utf-8").split(" ")[3]
-    gc_percent = "{:d}".format(round(float(gc_percent)))
-
-    subprocess.run(["/genemark_suite_linux_64/gmsuite/gm", "-D", "-g", "0", "-s", "1", "-m", "/genemark_suite_linux_64/gmsuite/heuristic_mat/heu_11_{}.mat".format(gc_percent), "-v", fasta_file_path])
-
-    gdata_file_path = "{}.gdata".format(fasta_file_path)
-    ldata_file_path = "{}.ldata".format(fasta_file_path)
-
-    glimmer_file = fasta_file_path[0 : -6] + "_glimmer"
-    subprocess.run(["/opt/glimmer3.02/scripts/g3-from-scratch.csh", fasta_file_path, glimmer_file])
-
-    aragorn_file = fasta_file_path[0 : -6] + "_aragorn.txt"
-    subprocess.run(["aragorn", fasta_file_path, aragorn_file])
-
-def parse_genemark_ldata(gm_file):
-    """Parses through GeneMark ldata file to gather CDS calls. 
-
-    Adds each CDS to GeneMark table in user's database. 
-
-    Args:
-        gm_file:
-            The GeneMark ldata file.
-    """
-    genemark_all_genes = dict()
-    with open(gm_file, "r") as handle:
-        for line in handle:
-            if line == '\n':
-                break
-            if line[0] != '#':
-                column = line.strip().split()
-                start = int(column[0])
-                stop = int(column[1])
-                if stop not in genemark_all_genes:
-                    genemark_all_genes[stop] = [start]
-                else:
-                    if start not in genemark_all_genes[stop]:
-                        genemark_all_genes[stop].append(start)
-                curr_keys = get_keys_by_value(genemark_all_genes, start)
-                if len(curr_keys) > 1:
-                    max_right = max(curr_keys)
-                    for key in curr_keys:
-                        if key != max_right:
-                            del genemark_all_genes[key]
-
-    genemark_cdss = dict()
-    with open(gm_file, "r") as handle:
-        for line in handle:
-            if line == '\n':
-                break
-            if line[0] != '#':
-                column = line.strip().split()
-                curr_start = int(column[0])
-                curr_stop = int(column[1])
-                frame = int(column[2])
-                if 1 <= frame <= 3:
-                    curr_frame = "+"
-                elif 4 <= frame <= 6:
-                    curr_frame = "-"
-                id_number = 1
-                for stop in genemark_all_genes:
-                    min_start = min(genemark_all_genes[stop])
-                    if min_start == curr_start and stop == curr_stop:
-                        if (min_start, stop) not in genemark_cdss:
-                            id = "genemark_" + str(id_number)
-                            genemark_cdss[(min_start, stop)] = curr_frame
-                            cds = GeneMark(id=id,
-                                           start=min_start,
-                                           stop=stop,
-                                           strand=curr_frame)
-                            exists = GeneMark.query.filter_by(id=id).first()
-                            if not exists:
-                                db.session.add(cds)
-                                db.session.commit()
-                    id_number += 1
-
-def get_keys_by_value(dict, value_to_find):
-    """Finds the stop location (key) given a start location (value).
-
-    Args:
-        dict:
-            The dictionary containing keys and values to find.
-        value_to_find:
-            The value to be found in the dictionary.
-
-    Returns:
-        A list of the keys associated with the value.
-    """
-    keys = list()
-    items = dict.items()
-    for item in items:
-        if value_to_find in item[1]:
-            keys.append(item[0])
-    return keys
+    with open(fasta_file, "r") as handle:
+        fasta = SeqIO.parse(handle, "fasta")
+        return any(fasta)

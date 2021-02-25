@@ -22,7 +22,8 @@
         :width="100"
       >Creating Genome Map...</loading>
       <h1>Genome Map</h1>
-      <div class="alert alert-primary">
+      <div class="alert alert-secondary">
+        <hr />
         <p><strong>Instructions</strong></p>
         <p>
           This is a visual representation of all of the genes in their current state.<br />
@@ -31,19 +32,51 @@
         <hr />
         <p><strong>Key</strong></p>
         <p>
-          <strong class="orange-text">Orange:</strong> An arrow pointing left indicates a gene on the complimentary strand.<br />
-          <strong class="blue-text">Blue:</strong> An arrow pointing right indicates a gene on the direct strand.<br />
+          <strong style="color:#4B72B9;">Blue:</strong> An arrow pointing right indicates a gene on the direct strand.<br />
+          <strong style="color:#E98B69;">Orange:</strong> An arrow pointing left indicates a gene on the complimentary strand.<br />
         </p>
         <hr />
         <div class="nav-btns-wrapper">
-            <button class="btn btn-light btn-nav" @click="goBack()">
-              <strong>&#129052; Back</strong>
+          <button class="btn btn-dark btn-nav" @click="goBack()">
+            <strong>&#129052; Back</strong>
+          </button>
+          <router-link
+            :to="{
+              name: 'GenBank',
+              params: { phageID: $route.params.phageID },
+            }"
+          >
+            <button class="btn btn-dark btn-nav" id="next-top">
+              <strong>Next &#129054;</strong>
             </button>
+          </router-link>
         </div>
+        <hr />
       </div>
     </div>
     <div style="overflow-x:auto; width=100%;">
       <img v-bind:src="image" />
+    </div>
+    <div class="container">
+      <div class="alert alert-secondary">
+        <hr />
+        <div class="nav-btns-wrapper">
+          <button class="btn btn-dark btn-nav" @click="goBack()">
+            <strong>&#129052; Back</strong>
+          </button>
+          <router-link
+            :to="{
+              name: 'GenBank',
+              params: { phageID: $route.params.phageID },
+            }"
+          >
+            <button class="btn btn-dark btn-nav" id="next-top">
+              <strong>Next &#129054;</strong>
+            </button>
+          </router-link>
+        </div>
+        <hr />
+      </div>
     </div>
   </div>
 </template>
@@ -92,7 +125,7 @@ export default {
     },
 
     navAnnotations: function () {
-      return false;
+      return true;
     },
 
     navGeneMap: function () {
@@ -141,36 +174,22 @@ export default {
 }
 
 .btn-nav {
-  margin: 10px;
+  margin: 0.25em;
 }
 
-.headers {
-  margin: 40px auto;
-}
-
-.alert-primary {
-  text-align: left;
-  margin: 40px auto;
-}
-
-.subheader {
+.alert-secondary {
+  background-color: white;
+  border-color:white;
+  font-size: 1.40em;
   text-align: left;
 }
 
-.info-bottom {
-  margin: 50px auto;
+.btn-dark {
+  font-size: 15pt;
 }
 
-.btn-action {
-  margin: 7px;
-}
-
-.blue-text {
-  color: rgb(75, 114, 185);
-}
-
-.orange-text {
-  color: rgb(233, 139, 105);
+h1 {
+  margin-top: .7em;
 }
 
 </style>

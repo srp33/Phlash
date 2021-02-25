@@ -9,20 +9,31 @@
       :phageID="navPhageID"
     />
     <div class="container">
-      <p>
-        <img id="logo" src="/phlash/images/Logo.png" width="250" />
+      <p style="margin:1em;">
+        <img id="logo" src="/phlash/images/logohome.png" width="250" />
       </p>
-      <div class="alert alert-primary">
-        <p style="text-align:center;"><strong style="font-size:2em;">Phlash</strong></p>
-        <p style="text-align:center;">The first user-friendly bacteriophage genome annotation application.</p>
-        <hr />
-        <p>
-          Enter a unique bacteriophage ID that only contains letters, numbers, and underscores below.<br>
-          <em>Please note that all data associated with this ID will be removed after 90 days.</em>
+      <h1>Phlash</h1>
+      <div class="alert alert-secondary">
+        <p style="text-align: center;">
+          <strong>A user-friendly bacteriophage genome annotation application.</strong>
         </p>
-        <div class="input-group mb-2" style="horizontal-align: center; width: 50%; margin: 0 auto;">
+        <hr />
+        <p style="text-align: left;">
+          Enter an ID that contains only letters, numbers, and underscores
+          below. This ID will uniquely identify your bacteriophage genome
+          annotation.<br />
+          <em
+            >Please note that all data associated with this ID will be removed
+            after 90 days.</em
+          >
+        </p>
+        <div
+          class="input-group mb-2"
+          style="float: center; width: 50%; margin: 0 auto"
+        >
           <input
             class="form-control"
+            style="height: 2em; font-size: 15pt;"
             type="text"
             v-model="phageID"
             v-on:keyup.enter="checkPhageID()"
@@ -33,6 +44,7 @@
           <div class="input-group-append">
             <button
               id="start"
+              style="font-size: 15pt"
               class="btn btn-dark btn-sm disabled"
               type="button"
               @click="checkPhageID()"
@@ -41,35 +53,25 @@
             </button>
           </div>
         </div>
-        <hr v-if="idStatus !== ''" />
+        <hr />
         <p class="id-status" v-if="idStatus !== ''">
           {{ idStatus }}
         </p>
-        <div class="alert alert-warning" v-if="idStatus !== ''">
-          <svg
-            class="bi bi-info-circle-fill"
-            width="1em"
-            height="1em"
-            viewBox="0 0 16 16"
-            fill="currentColor"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              fill-rule="evenodd"
-              d="M8 16A8 8 0 108 0a8 8 0 000 16zm.93-9.412l-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM8 5.5a1 1 0 100-2 1 1 0 000 2z"
-              clip-rule="evenodd"
-            />
-          </svg>
-          You have until <strong>{{ dateToBeDeleted }}</strong> to complete
-          annotations for this phage.
+        <div class="alert alert-primary" v-if="idStatus !== ''">
+          &#128712; You have until <strong>{{ dateToBeDeleted }}</strong> to
+          complete annotations for this phage.
         </div>
         <hr v-if="idStatus !== ''" />
         <div class="nav-btns-wrapper">
           <router-link
             :to="{ name: 'Blast', params: { phageID: phageID } }"
-            v-if="idStatus.includes('ID already exists') && allFilesUploaded && !blastComplete"
+            v-if="
+              idStatus.includes('ID already exists') &&
+              allFilesUploaded &&
+              !blastComplete
+            "
           >
-            <button class="btn btn-light">
+            <button class="btn btn-dark">
               <strong>Next &#129054;</strong>
             </button>
           </router-link>
@@ -77,9 +79,13 @@
         <div class="nav-btns-wrapper">
           <router-link
             :to="{ name: 'Annotations', params: { phageID: phageID } }"
-            v-if="idStatus.includes('ID already exists') && allFilesUploaded && blastComplete"
+            v-if="
+              idStatus.includes('ID already exists') &&
+              allFilesUploaded &&
+              blastComplete
+            "
           >
-            <button class="btn btn-light">
+            <button class="btn btn-dark">
               <strong>Next &#129054;</strong>
             </button>
           </router-link>
@@ -92,7 +98,7 @@
               (idStatus.includes('ID already exists') && !allFilesUploaded)
             "
           >
-            <button class="btn btn-light">
+            <button class="btn btn-dark">
               <strong>Next &#129054;</strong>
             </button>
           </router-link>
@@ -113,7 +119,6 @@ export default {
   },
 
   data() {
-
     return {
       phageID: null,
       idStatus: "",
@@ -121,30 +126,21 @@ export default {
       dateToBeDeleted: null,
       blastComplete: false,
     };
-
   },
 
   watch: {
-
     phageID() {
       this.phageID = this.phageID.replace(/[^a-zA-Z0-9_]/g, "");
       if (this.phageID != null) {
         document.getElementById("start").classList.remove("disabled");
       }
     },
-
   },
   computed: {
-
     navUpload: function () {
       if (this.phageID !== null) return true;
       else return false;
     },
-
-    // navDNAMaster: function () {
-    //   if (this.phageID !== "" && this.allFilesUploaded) return true;
-    //   return false;
-    // },
 
     navBlast: function () {
       if (this.phageID !== null && this.allFilesUploaded) return true;
@@ -167,11 +163,9 @@ export default {
     navPhageID: function () {
       return this.phageID;
     },
-
   },
 
   methods: {
-    
     /**
      * Checks for non expired phage ID.
      * Adds phage ID if non-existant.
@@ -182,7 +176,7 @@ export default {
         axios
           .post(process.env.VUE_APP_BASE_URL + `/home/${this.phageID}`)
           .then((response) => {
-            console.log(response.data)
+            console.log(response.data);
             this.allFilesUploaded = response.data.uploaded_all_files;
             this.blastComplete = response.data.blast_complete;
             this.idStatus = response.data.id_status;
@@ -210,7 +204,6 @@ export default {
           });
       }
     },
-    
   },
 };
 </script>
@@ -221,11 +214,11 @@ export default {
 }
 
 h1 {
-  margin: 40px auto;
+  margin-top: .7em;
 }
 
 .id-status {
-  margin-top: 10px;
+  margin-top: 0.5em;
   font-style: italic;
 }
 
@@ -233,8 +226,14 @@ h1 {
   text-align: center;
 }
 
-.bi-arrow-right {
-  margin-right: 0px;
-  margin-left: 5px;
+.btn-dark {
+  font-size: 15pt;
+}
+
+.alert-secondary {
+  background-color: white;
+  border-color:white;
+  font-size: 1.40em;
+  text-align: left;
 }
 </style>

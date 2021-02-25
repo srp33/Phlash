@@ -1,7 +1,9 @@
 <template>
   <div class="navbar-wrapper">
-    <nav class="navbar sticky-top navbar-expand-lg navbar-light bg-light">
-      <a class="navbar-brand" href="/">Phlash</a>
+    <nav class="navbar sticky-top navbar-expand-lg navbar-dark bg-dark" style="color:white; font-size:1.5em;">
+      <a class="navbar-brand" href="/">
+        <img id="logo" src="/phlash/images/logonav.png" width="35" />
+      </a>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
@@ -16,12 +18,6 @@
               <a class="nav-link" href="#">upload</a>
             </router-link>
           </li>
-          <!-- <li class="nav-item">
-            <router-link :to="{ name: 'DNAMaster', params: {phageID: this.phageID} }"
-                         :event="dnamaster ? 'click' : ''">
-              <a class="nav-link" href="#">dna master</a>
-            </router-link>
-          </li> -->
           <li class="nav-item">
             <router-link :to="{ name: 'Blast', params: {phageID: this.phageID} }"
                          :event="geneMap ? 'click' : ''">
@@ -36,8 +32,14 @@
           </li>
           <li class="nav-item">
             <router-link :to="{ name: 'GeneMap', params: {phageID: this.phageID} }"
-                         :event="blast ? 'click' : ''">
+                         :event="annotations ? 'click' : ''">
               <a class="nav-link" href="#">genome map</a>
+            </router-link>
+          </li>
+          <li class="nav-item">
+            <router-link :to="{ name: 'GenBank', params: {phageID: this.phageID} }"
+                         :event="annotations ? 'click' : ''">
+              <a class="nav-link" href="#">genbank</a>
             </router-link>
           </li>
           <li class="nav-item" v-if="settings">
@@ -120,7 +122,7 @@
             ></b-form-input>
           </b-form-group>
           <hr />
-          <b-button type="submit" class="mt-3" block style="margin-top: 0px">
+          <b-button type="submit" class="mt-3" block style="margin-top: 0em">
             <strong>Submit</strong>
           </b-button>
         </b-form>
@@ -135,7 +137,6 @@ export default {
   name: "Navbar",
   props: {
     upload: Boolean,
-    // dnamaster: Boolean,
     blast: Boolean,
     annotations: Boolean,
     geneMap: Boolean,
@@ -193,7 +194,11 @@ export default {
   opacity: 1;
   visibility: visible;
   border-left-color: #4DB6AC;
-  margin: 10px;
+  margin: 0.25em;
   transition: all 0.25s;
+}
+
+.bg-light {
+  background-color: #e3f2fd;
 }
 </style>

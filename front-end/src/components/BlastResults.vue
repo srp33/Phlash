@@ -21,12 +21,12 @@
         </thead>
         <tbody>
           <tr v-for="alignment in blastResults" :key="alignment.accession">
-            <td>{{ alignment.accession }}</td>
+            <td style="font-size:1.4em;" >{{ alignment.accession }}</td>
             <td>{{ alignment.title }}</td>
-            <td>{{ alignment.evalue }}</td>
-            <td>{{ alignment.percent_identity }}%</td>
-            <td>{{ alignment.query_from }} - {{ alignment.query_to }}</td>
-            <td>{{ alignment.hit_from }} - {{ alignment.hit_to }}</td>
+            <td style="font-size:1.4em;" >{{ alignment.evalue }}</td>
+            <td style="font-size:1.4em;" >{{ alignment.percent_identity }}%</td>
+            <td style="font-size:1.4em;" >{{ alignment.query_from }} - {{ alignment.query_to }}</td>
+            <td style="font-size:1.4em;" >{{ alignment.hit_from }} - {{ alignment.hit_to }}</td>
             <td>
               <button
                 v-if="allowSelect"
@@ -47,7 +47,7 @@
         </tbody>
       </table>
       <div>
-        <h4 v-if="blastResults.length === 0">
+        <h4 v-if="this.blastResults.length === 0">
           <em>No hits found.</em>
         </h4>
       </div>
@@ -84,9 +84,9 @@ export default {
 </script>
 
 <style scoped>
-/* ----- Blast Table ----- */
+
 .table-responsive {
-  max-height: 500px;
+  max-height: 35em;
   overflow-y: auto;
   display: inline-block;
 }
@@ -99,6 +99,13 @@ export default {
   position: sticky;
   top: 0;
   background: #eee;
+  background-color: white;
   border: darkgray;
+  font-size: 1.40em;
 }
+
+.btn-dark {
+  font-size: 15pt;
+}
+
 </style>

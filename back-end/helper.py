@@ -117,6 +117,21 @@ def delete_blast_zip(UPLOAD_FOLDER):
     return "success"
 
 def get_frame_and_status(start, stop, strand, coding_potential):
+    """Finds the frame that a given CDS is on and whether it covers the coding potential.
+
+    Args:
+        start:
+            The start position for a given cds.
+        stop:
+            The stop postition for a given cds.
+        strand:
+            The strand of a given cds.
+        coding_potential:
+            The coding potential created by genemark.
+    
+    Returns:
+        The frame and status of a given CDS.
+    """
     start_index = 0
     find_base = start
     found = False

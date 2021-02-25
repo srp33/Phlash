@@ -10,16 +10,16 @@ from home import *
 import home
 from upload import *
 import upload
-from dna_master import *
-import dna_master
 from blast import *
 import blast
 from annotations import *
 import annotations
 from annotations_cds import *
 import annotations_cds
-from annotations_gene_map import *
-import annotations_gene_map
+from gene_map import *
+import gene_map
+from genbank import *
+import genbank
 from settings import *
 import settings
 import threading
@@ -84,46 +84,20 @@ def upload(current_user, file_method, file_path):
         dropzone_fasta(UPLOAD_FOLDER, request, current_user)
         return jsonify("success")
 
-@app.route('/phlash_api/dnamaster/<current_user>', methods=['GET', 'POST'])
-def dnamaster(current_user):
-    """
-    API endpoint for '/dnamaster/:current_user'.
-    GET method querys database for parsed DNA Master data (from uploaded GenBank file).
-    """
-    DATABASE = "sqlite:///{}".format(os.path.join(ROOT, 'users', current_user, f"{current_user}.db"))
-    app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE
-
-    if request.method == "GET":
-        return jsonify(get_all_cds())
-
-@app.route('/phlash_api/dnamaster/<current_user>/<cds_id>', methods=['PUT', 'DELETE'])
-def dnamaster_cds(current_user, cds_id):
-    """
-    API endpoint for '/dnamaster/:current_user/:cds_id'.
-    PUT method updates a CDS.
-    DELETE method deletes a CDS.
-    """
-    DATABASE = "sqlite:///{}".format(os.path.join(ROOT, 'users', current_user, f"{current_user}.db"))
-    app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE
-    UPLOAD_FOLDER = os.path.join(ROOT, 'users', current_user, 'uploads')
-
-    if request.method == "PUT":
-        return jsonify(update_cds(request, UPLOAD_FOLDER))
-
-    if request.method == 'DELETE':
-        return jsonify(delete_cds(cds_id, UPLOAD_FOLDER))
-
-# TODO: Continue checking code from here.
 @app.route('/phlash_api/blast/<current_user>/<file_method>/<file_path>', methods=['GET', 'POST'])
 def blast(current_user, file_method, file_path):
     """
     API endpoint for '/blast/:current_user/:file_method/:file_path'.
-    GET method determines if the Blast zip has already been downloaded
+    GET method determines if all files have been downloaded and uploaded or
+        auto annotates the genome.
     POST method downloads fasta file for BLAST input or
+        creates the input files or
         uploads json file of BLAST output or
         deletes json file of BLAST output or
-        downloads json file of BLAST output or
-        returns json file names of BLAST output
+        returns json file names of BLAST output or
+        returns the number of needed json files or
+        checks for partially uploaded files.
+
     """
     UPLOAD_FOLDER = os.path.join(ROOT, 'users', current_user, 'uploads')
     DATABASE = "sqlite:///{}".format(os.path.join(ROOT, 'users', current_user, f"{current_user}.db"))
@@ -132,6 +106,7 @@ def blast(current_user, file_method, file_path):
     if request.method == "GET":
         if file_method == "checkFiles":
             return jsonify(find_blast_zip(current_user))
+
         elif file_method == "autoAnnotate":
             auto_annotate(UPLOAD_FOLDER, current_user)
             return jsonify("success")
@@ -143,14 +118,8 @@ def blast(current_user, file_method, file_path):
         elif file_method == "createInput":
             return jsonify(create_blast_input(UPLOAD_FOLDER, current_user))
 
-        elif file_method == "uploadOutput":
-            return jsonify(upload_blast_output(UPLOAD_FOLDER, request))
-
         elif file_method == "displayOutput":
-            return jsonify(get_blast_output_names(UPLOAD_FOLDER))
-
-        elif file_method == "downloadOutput":
-            return jsonify(download_blast_output(UPLOAD_FOLDER, file_path))
+            return jsonify(get_blast_output_names(UPLOAD_FOLDER, file_path))
 
         elif file_method == "deleteOutput":
             return jsonify(delete_blast_output(UPLOAD_FOLDER, file_path))
@@ -170,13 +139,18 @@ def blast(current_user, file_method, file_path):
             print(size2)
             if (size1 == size2):
                 db.session.query(Blast_Results).delete()
+                db.session.query(Files).delete()
                 db.session.commit()
+                for filename in os.listdir(UPLOAD_FOLDER):
+                    if filename.endswith('.json'):
+                        os.remove(os.path.join(UPLOAD_FOLDER, filename))
                 return jsonify("success")
             else:
                 return jsonify("fail")
+
         else:
             index = file_path.find(".json")
-            name = file_path[0:index + 5]
+            name = secure_filename(file_path[0:index + 5])
             size = file_path[index + 5:]
             # file_data = db.session.query(Files).filter_by(name=name).first()
             # if file_data != None:
@@ -196,9 +170,9 @@ def blast(current_user, file_method, file_path):
 @app.route('/phlash_api/annotations/<current_user>/<file_method>', methods=['GET', 'POST', 'PUT'])
 def annotate_data(current_user, file_method):
     """
-    Compares DNA Master's predictions against GeneMark's.
+    Parses blast data and returns annotation data.
     GET method shows all the DNA Master predictions with a status and action item for each.
-    POST method returns the genbank file
+    PUT method adds a CDS
     """
     DATABASE = "sqlite:///{}".format(os.path.join(ROOT,
                                                   'users', current_user, f"{current_user}.db"))
@@ -207,29 +181,35 @@ def annotate_data(current_user, file_method):
     response_object = {'status': 'success'}
 
     if request.method == "GET":
-        print("get")
         if file_method == "delete":
             db.session.query(Blast_Results).delete()
             db.session.commit()
-            print("delete")
             return jsonify("success")
         if file_method == "blast":
             if (db.session.query(Blast_Results).first() is None):
-                print("empty")
-                parse_blast(UPLOAD_FOLDER)
-                return jsonify("empty")
+                return jsonify(parse_blast(UPLOAD_FOLDER))
             else:
                 return jsonify("not empty")
         else:
-            print("CDS")
             return jsonify(get_dnamaster_data())
-        print("done")
-
-    if request.method == "POST":
-        return get_genbank(UPLOAD_FOLDER, current_user, request)
 
     if request.method == "PUT":
         return jsonify(add_cds(request, UPLOAD_FOLDER, current_user))
+
+@app.route('/phlash_api/genbank/<current_user>/<file_method>', methods=['GET', 'POST', 'PUT'])
+def create_genbank(current_user, file_method):
+    """
+    Creates the Genbank file from data stored in database.
+    POST method creates and returns the genbank file.
+    """
+    DATABASE = "sqlite:///{}".format(os.path.join(ROOT,
+                                                  'users', current_user, f"{current_user}.db"))
+    app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE
+    UPLOAD_FOLDER = os.path.join(ROOT, 'users', current_user, 'uploads')
+    response_object = {'status': 'success'}
+
+    if request.method == "POST":
+        return get_genbank(UPLOAD_FOLDER, current_user, request)
 
 @app.route('/phlash_api/annotations/cds/<current_user>/<cds_id>', methods=['GET', 'POST', 'PUT', 'DELETE'])
 def cds_annotation(current_user, cds_id):

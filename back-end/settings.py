@@ -15,9 +15,12 @@ import shutil
 import pandas as pd
 
 def update_settings(payload):
-    """
-    Updates settings given new setting data.
-
+    """Updates settings given new setting data.
+    Args:
+        payload:
+            The new settings.
+    Returns:
+        A dictionary containing a success message.
     """
     response_object = {}
     print(payload)
@@ -34,8 +37,10 @@ def update_settings(payload):
     return response_object
 
 def get_settings():
-    """
-    Returns the current settings.
+    """Returns the current settings.
+
+        Returns:
+            A dictionary containing the current settings.
     """
     response_object = {}
     setting = db.session.query(Settings).order_by(Settings.back_start_range).first()

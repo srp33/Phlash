@@ -1,11 +1,11 @@
+"""Contains the functions for the Genome Map page.
+
+Creates and returns the genome map.
+"""
 from dna_features_viewer import GraphicFeature, GraphicRecord
 from Bio import SeqIO, Seq, SeqFeature
-import helper
-import os
 from werkzeug.utils import secure_filename
 from contextlib import closing
-from zipfile import ZipFile
-from datetime import datetime
 from Bio import SeqIO, Seq, SeqFeature
 from collections import OrderedDict
 from models import *
@@ -20,6 +20,16 @@ import base64
 
 # ------------------------------ MAIN FUNCTIONS ------------------------------
 def get_map(UPLOAD_FOLDER):
+    """Creates and returns a map of the genome.
+
+    Args:
+        UPLOAD_FOLDER:
+            The folder containing all of the uploaded files.
+
+    Returns:
+        A dictionary containing an image of the genome map.
+
+    """
     features = []
     for cds in db.session.query(DNAMaster).order_by(DNAMaster.start):
         if cds.function != 'DELETED':

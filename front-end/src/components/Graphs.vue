@@ -1,12 +1,12 @@
 <template>
   <div id="columns">
     <div class="column">
-      <strong> Direct Sequences </strong>
+      <h4> Direct Sequences </h4>
       <Plotly
         class="graph"
         v-if="frame == 1"
         :data="data1"
-        :layout="layout1b"
+        :layout="layout1Selected"
         :display-mode-bar="false"
       ></Plotly>
       <Plotly
@@ -20,7 +20,7 @@
         class="graph"
         v-if="frame == 2"
         :data="data2"
-        :layout="layout2b"
+        :layout="layout2Selected"
         :display-mode-bar="false"
       ></Plotly>
       <Plotly
@@ -34,7 +34,7 @@
         class="graph"
         v-if="frame == 3"
         :data="data3"
-        :layout="layout3b"
+        :layout="layout3Selected"
         :display-mode-bar="false"
       ></Plotly>
       <Plotly
@@ -46,12 +46,12 @@
       ></Plotly>
     </div>
     <div class="column">
-      <strong> Complementary Sequences </strong>
+      <h4> Complementary Sequences </h4>
       <Plotly
         class="graph"
         v-if="frame == 4"
         :data="data4"
-        :layout="layout4b"
+        :layout="layout4Selected"
         :display-mode-bar="false"
       ></Plotly>
       <Plotly
@@ -65,7 +65,7 @@
         class="graph"
         v-if="frame == 5"
         :data="data5"
-        :layout="layout5b"
+        :layout="layout5Selected"
         :display-mode-bar="false"
       ></Plotly>
       <Plotly
@@ -79,7 +79,7 @@
         class="graph"
         v-if="frame == 6"
         :data="data6"
-        :layout="layout6b"
+        :layout="layout6Selected"
         :display-mode-bar="false"
       ></Plotly>
       <Plotly
@@ -697,8 +697,8 @@ export default {
           },
         ],
       },
-      // ----- LAYOUT 1b -----
-      layout1b: {
+      // ----- LAYOUT 1 Selected -----
+      layout1Selected: {
         autosize: false,
         paper_bgcolor: "rgba(219,219,219,0.5)",
         width: 590,
@@ -852,8 +852,8 @@ export default {
           },
         ],
       },
-      // ----- LAYOUT 2b -----
-      layout2b: {
+      // ----- LAYOUT 2 Selected -----
+      layout2Selected: {
         autosize: false,
         paper_bgcolor: "rgba(219,219,219,0.5)",
         width: 590,
@@ -973,8 +973,8 @@ export default {
           },
         ],
       },
-      // ----- LAYOUT 3b -----
-      layout3b: {
+      // ----- LAYOUT 3 Selected -----
+      layout3Selected: {
         autosize: false,
         paper_bgcolor: "rgba(219,219,219,0.5)",
         width: 590,
@@ -1100,8 +1100,8 @@ export default {
           },
         ],
       },
-      // ----- LAYOUT 4b -----
-      layout4b: {
+      // ----- LAYOUT 4 Selected -----
+      layout4Selected: {
         autosize: false,
         paper_bgcolor: "rgba(219,219,219,0.5)",
         width: 590,
@@ -1253,8 +1253,8 @@ export default {
           },
         ],
       },
-      // ----- LAYOUT 5b -----
-      layout5b: {
+      // ----- LAYOUT 5 Selected -----
+      layout5Selected: {
         autosize: false,
         paper_bgcolor: "rgba(219,219,219,0.5)",
         width: 590,
@@ -1374,8 +1374,8 @@ export default {
           },
         ],
       },
-      // ----- LAYOUT 6b -----
-      layout6b: {
+      // ----- LAYOUT 6 Selected -----
+      layout6Selected: {
         autosize: false,
         paper_bgcolor: "rgba(219,219,219,0.5)",
         width: 590,

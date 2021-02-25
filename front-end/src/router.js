@@ -2,11 +2,11 @@ import Vue from 'vue';
 import Router from 'vue-router';
 import Home from './views/Home.vue';
 import Upload from './views/Upload.vue';
-import DNAMaster from './views/DNAMaster.vue';
 import Blast from './views/Blast.vue';
 import Annotations from './views/Annotations.vue';
 import CDS from './views/CDS.vue';
 import GeneMap from './views/GeneMap.vue';
+import GenBank from './views/GenBank.vue';
 import Contact from './views/Contact.vue';
 
 Vue.use(Router);
@@ -26,11 +26,6 @@ export default new Router({
       component: Upload
     },
     {
-      path: '/dnamaster/:phageID',
-      name: 'DNAMaster',
-      component: DNAMaster,
-    },
-    {
       path: '/blast/:phageID',
       name: 'Blast',
       component: Blast
@@ -46,9 +41,14 @@ export default new Router({
       component: CDS,
     },
     {
-      path: '/annotations/geneMap/:phageID',
+      path: '/geneMap/:phageID',
       name: 'GeneMap',
       component: GeneMap,
+    },
+    {
+      path: '/genBank/:phageID',
+      name: 'GenBank',
+      component: GenBank,
     },
     {
       path: '/contact',

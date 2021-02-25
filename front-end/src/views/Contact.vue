@@ -10,21 +10,25 @@
     />
     <div class="container">
       <h1>Contact</h1>
-      <div class="alert alert-primary">
-        <img id="step-two" src="/phlash/images/Piccolo.jpg" style="float: left; height:7em" />
-        This application was created by the Piccolo Lab at Brigham Young University. <br />
-        To view the source code, report a bug, or suggest a change, click 
-        <a href="#" @click="goToWebsite('GitHub')" class="alert-link"><i>here</i></a>. <br />
-        To contact Doctor Stephen Piccolo, click 
-        <a href="#" @click="goToWebsite('Contact')" class="alert-link"><i>here</i></a>. <br />
-        To view information about the Piccolo Lab, click click 
-        <a href="#" @click="goToWebsite('Home')" class="alert-link"><i>here</i></a>. <br />
+      <div>
         <hr />
-        <div class="nav-btns-wrapper">
-            <button class="btn btn-light btn-nav" @click="goBack()">
-              <strong>&#129052; Back</strong>
-            </button>
+        <div class="alert alert-secondary" style="float:left; height:9em; width:20%">
+          <img id="step-two" src="/phlash/images/Piccolo.jpg" style="float:center; width:100%;" />
         </div>
+        <div class="alert alert-secondary" style="float:right; height:9em; width:80%">
+          This application was created by the Piccolo Lab at Brigham Young University. <br />
+          To view the source code, report a bug, or suggest a change, click 
+          <a href="#" @click="goToWebsite('GitHub')" class="alert-link"><i>here</i></a>. Pull requests are welcomed.<br />
+          To contact Stephen Piccolo, click 
+          <a href="#" @click="goToWebsite('Contact')" class="alert-link"><i>here</i></a>. <br />
+          To view more information about the Piccolo Lab, click  
+          <a href="#" @click="goToWebsite('Home')" class="alert-link"><i>here</i></a>. <br />
+          <hr />
+        </div>
+        <button class="btn btn-dark btn-nav" @click="goBack()">
+          <strong>&#129052; Back</strong>
+        </button>
+        <hr />
       </div>
     </div>
   </div>
@@ -32,7 +36,6 @@
 
 <script>
 import Navbar from "../components/Navbar.vue";
-
 
 export default {
   name: "Contact",
@@ -53,14 +56,10 @@ export default {
     })
   },
 
-  created() {
-    this.getGraph();
-  },
-
   computed: {
 
     navUpload: function () {
-      return true;
+      return false;
     },
 
     navBlast: function () {
@@ -119,41 +118,27 @@ export default {
 
 <style scoped>
 
-.nav-btns-wrapper {
-  text-align: center;
-}
-
 .btn-nav {
-  margin: 10px;
+  margin: 0.25em;
 }
 
-.headers {
-  margin: 40px auto;
-}
-
-.alert-primary {
-  text-align: left;
-  margin: 40px auto;
-}
-
-.subheader {
+.alert-secondary {
   text-align: left;
 }
 
-.info-bottom {
-  margin: 50px auto;
+h1 {
+  margin-top: .7em;
 }
 
-.btn-action {
-  margin: 7px;
+.alert-secondary {
+  background-color: white;
+  border-color:white;
+  font-size: 1.40em;
+  text-align: left;
 }
 
-.blue-text {
-  color: rgb(75, 114, 185);
-}
-
-.orange-text {
-  color: rgb(233, 139, 105);
+.btn-dark {
+  font-size: 15pt;
 }
 
 </style>
