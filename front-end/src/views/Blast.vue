@@ -510,7 +510,7 @@ export default {
      * @return {string} the upload URL for dropzone.
      */
     getUploadUrl() {
-      return `http://daniel.byu.edu:5000/phlash_api/blast/${this.$route.params.phageID}/drop/${this.numFiles}`;
+      return process.env.VUE_APP_BASE_URL + `/blast/${this.$route.params.phageID}/drop/${this.numFiles}`;
     },
 
     /**
