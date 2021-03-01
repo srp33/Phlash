@@ -393,7 +393,7 @@ export default {
         chunking: true,
         maxFiles: null,
         parallelUploads: 5,
-        chunkSize: 10000000,
+        chunkSize: 5000000,
         dictDefaultMessage: "Drag files here or click to browse.",
         dictInvalidFileType: "Only '.json' file types are allowed.",
         dictRemoveFileConfirmation:
