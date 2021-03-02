@@ -21,21 +21,21 @@
         <p><strong>Instructions</strong></p>
         <p>
           Gene calls that have been made from <i>GeneMarkS</i>, <i>Glimmer3</i>,
-          <i>ARAGORN</i>, and <i>PHANOTATE</i> are shown below. To have the
-          most accurate annotation of this genome manual annotation is
-          necessary. The status for each gene is shown below which are mearly
-          guides and suggestions. The status does not actually mean that a gene
-          call is correct or incorrect. The parameters used for creating the
-          status for each gene can be updated in the 'Settings' tab above.
+          <i>ARAGORN</i>, and <i>PHANOTATE</i> are shown below. To have the most
+          accurate annotation of this genome manual annotation is necessary. The
+          status for each gene is shown below which are mearly guides and
+          suggestions. The status does not actually mean that a gene call is
+          correct or incorrect. The parameters used for creating the status for
+          each gene can be updated in the 'Settings' tab above.
         </p>
         <hr />
         <p><strong>Status Definitions</strong></p>
         <p>
-          <strong style="color:#1b9e77;">Green:</strong> Pass, the open reading
+          <strong style="color: #1b9e77">Green:</strong> Pass, the open reading
           frame covers the coding potential.<br />
-          <strong style="color:#d95f02;">Orange:</strong> Fail, the open reading frame
-          does not cover the coding potential.<br />
-          <strong style="color:#7570b3;">Purple:</strong> tRNA, this gene
+          <strong style="color: #d95f02">Orange:</strong> Fail, the open reading
+          frame does not cover the coding potential.<br />
+          <strong style="color: #7570b3">Purple:</strong> tRNA, this gene
           represents a tRNA.<br />
           <strong>S: </strong>Short, the open reading frame is less than
           {{ short }} base pairs.<br />
@@ -60,7 +60,8 @@
         <p>
           <strong>Annotate: </strong>When clicked, a function and alternate open
           reading frame can be added.<br />
-          <strong>Delete: </strong>When clicked, this gene will be temporarily removed.<br />
+          <strong>Delete: </strong>When clicked, this gene will be temporarily
+          removed.<br />
           <strong>Reinstate: </strong>When clicked, the deleted gene will be
           added.<br />
           <strong>White background: </strong>This CDS has already been updated
@@ -103,7 +104,11 @@
         data, you will be brought back to this page.<br />
         A notification will appear when finished.
       </div>
-      <div class="alert alert-secondary" style="text-align:center;" v-if="completedGenes != dnamaster.length">
+      <div
+        class="alert alert-secondary"
+        style="text-align: center"
+        v-if="completedGenes !== dnamaster.length"
+      >
         You have
         <strong
           >{{ dnamaster.length - completedGenes }}/{{
@@ -112,8 +117,12 @@
         >
         genes remaining.
       </div>
-      <div class="alert alert-secondary" v-if="completedGenes == dnamaster.length">
-        Congratulations! You have annotated every CDS. Click 'Next' to see a map of the genome.
+      <div
+        class="alert alert-secondary"
+        v-if="completedGenes === dnamaster.length"
+      >
+        Congratulations! You have annotated every CDS. Click 'Next' to see a map
+        of the genome.
       </div>
       <div id="annotations" align="center">
         <div
@@ -136,7 +145,7 @@
               <tr v-for="(curr, index) in dnamaster" :key="index">
                 <td
                   v-if="
-                    curr.function == '@DELETED' || curr.status == 'trnaDELETED'
+                    curr.function === '@DELETED' || curr.status === 'trnaDELETED'
                   "
                 >
                   {{ curr.id }}
@@ -144,52 +153,60 @@
                 <td v-else>{{ curr.id }}</td>
                 <td
                   v-if="
-                    curr.function == '@DELETED' || curr.status == 'trnaDELETED'
+                    curr.function === '@DELETED' || curr.status === 'trnaDELETED'
                   "
                 ></td>
                 <td v-else>{{ curr.start }}</td>
                 <td
                   v-if="
-                    curr.function == '@DELETED' || curr.status == 'trnaDELETED'
+                    curr.function === '@DELETED' || curr.status === 'trnaDELETED'
                   "
                 ></td>
                 <td v-else>{{ curr.stop }}</td>
                 <td
                   v-if="
-                    curr.function == '@DELETED' || curr.status == 'trnaDELETED'
+                    curr.function === '@DELETED' || curr.status === 'trnaDELETED'
                   "
                 ></td>
-                <td v-else-if="curr.strand == '-'">Complementary</td>
+                <td v-else-if="curr.strand === '-'">Complementary</td>
                 <td v-else>Direct</td>
                 <td
                   v-if="
-                    curr.function == '@DELETED' || curr.status == 'trnaDELETED'
+                    curr.function === '@DELETED' || curr.status === 'trnaDELETED'
                   "
                 ></td>
-                <td v-else-if="curr.function == 'None selected'" style="font-size:1.2em;">
+                <td
+                  v-else-if="curr.function === 'None selected'"
+                  style="font-size: 1.2em"
+                >
                   {{ curr.function }}
                 </td>
-                <td v-else-if="curr.function.length < 17" style="font-size:1.2em;">
+                <td
+                  v-else-if="curr.function.length < 17"
+                  style="font-size: 1.2em"
+                >
                   {{ curr.function.substring(1, curr.function.length) }}
                 </td>
-                <td v-else style="font-size:1.2em;">{{ curr.function.substring(1, 14) }}...</td>
+                <td v-else style="font-size: 1.2em">
+                  {{ curr.function.substring(1, 14) }}...
+                </td>
                 <td
                   v-if="
-                    curr.function == '@DELETED' || curr.status == 'trnaDELETED'
+                    curr.function === '@DELETED' || curr.status === 'trnaDELETED'
                   "
                 ></td>
-                <td v-else-if="curr.status == 'tRNA'" style="color:#7570b3;">
+                <td v-else-if="curr.status === 'tRNA'" style="color: #7570b3">
                   {{ getStatus(index) }}
                 </td>
-                <td v-else-if="curr.status == 'Pass'" style="color:#1b9e77;">
+                <td v-else-if="curr.status === 'Pass'" style="color: #1b9e77">
                   {{ getStatus(index) }}
                 </td>
-                <td v-else-if="curr.status == 'Fail'" style="color:#d95f02;">
+                <td v-else-if="curr.status === 'Fail'" style="color: #d95f02">
                   {{ getStatus(index) }}
                 </td>
                 <td
                   v-if="
-                    curr.function == '@DELETED' || curr.status == 'trnaDELETED'
+                    curr.function === '@DELETED' || curr.status === 'trnaDELETED'
                   "
                 >
                   <button
@@ -200,7 +217,7 @@
                     <strong>Reinstate</strong>
                   </button>
                 </td>
-                <td v-else-if="curr.status == 'tRNA'">
+                <td v-else-if="curr.status === 'tRNA'">
                   <button
                     class="btn btn-outline-dark btn-sm"
                     style="width: 6.25em"
@@ -440,9 +457,9 @@ export default {
           this.short = response.data.short;
           this.pageLoading = false;
           this.genbankAnnotations.phageName = this.$route.params.phageID;
-          for (var i = 0; i < this.dnamaster.length; i++) {
-            if (this.dnamaster[i].function != "None selected")
-              ++this.completedGenes;
+          for (var i = 0; i < this.dnamaster.length; i += 1) {
+            if (this.dnamaster[i].function !== 'None selected')
+              this.completedGenes += 1;
           }
           this.parseBlast();
         })
@@ -462,22 +479,21 @@ export default {
         )
         .then((response) => {
           this.blastLoading = false;
-          if (response.data == "success") {
+          if (response.data === 'success') {
             this.$bvToast.toast(
               `All of the BLAST results have finished being interpretted.`,
               {
-                title: "Finished",
+                title: 'Finished',
                 appendToast: false,
               }
             );
-          }
-          else if (response.data == "error") {
+          } else if (response.data === 'error') {
             this.$bvToast.toast(
               `An unknown error occurred. Try removing and reuploading the BLAST files. 
               If you ignore this error not all of your BLAST results will be shown. 
               If this error continues, please contact us by visiting the 'contact' tab.`,
               {
-                title: "Error",
+                title: 'Error',
                 appendToast: false,
               }
             );
@@ -492,11 +508,11 @@ export default {
      * Changes the function of a deleted gene so that it is now visible.
      */
     reinstate(index) {
-      if (this.dnamaster[index].function == "DELETED") {
+      if (this.dnamaster[index].function === 'DELETED') {
         this.completedGenes -= 1;
-        this.dnamaster[index].function = "None selected";
+        this.dnamaster[index].function = 'None selected';
       } else {
-        this.dnamaster[index].status = "tRNA";
+        this.dnamaster[index].status = 'tRNA';
       }
       const payload = {
         id: this.dnamaster[index].id,
@@ -525,14 +541,14 @@ export default {
      * Temporarily deletes a tRNA gene.
      */
     deleteTRNA(index) {
-      this.dnamaster[index].status = "trnaDELETED";
+      this.dnamaster[index].status = 'trnaDELETED';
       const payload = {
         id: this.dnamaster[index].id,
         start: this.dnamaster[index].start,
         stop: this.dnamaster[index].stop,
         strand: this.dnamaster[index].strand,
         function: this.dnamaster[index].function,
-        status: "trnaDELETED",
+        status: 'trnaDELETED',
         frame: this.dnamaster[index].frame,
       };
       axios
@@ -555,26 +571,26 @@ export default {
      * @return {string} the status of the cds.
      */
     getStatus(index) {
-      if (this.dnamaster[index].status == "tRNA") {
-        return "tRNA";
+      if (this.dnamaster[index].status === 'tRNA') {
+        return 'tRNA';
       }
-      var status = "";
+      var status = '';
       if (
         this.dnamaster[index].stop - this.dnamaster[index].start <
         this.short
       ) {
-        status += "S | ";
+        status += 'S | ';
       }
-      if (index == 0) {
+      if (index === 0) {
         status += this.getTailingOverlap(index);
-      } else if (index == this.dnamaster.length - 1) {
+      } else if (index === this.dnamaster.length - 1) {
         status += this.getLeadingOverlap(index);
       } else {
         status += this.getLeadingOverlap(index);
         status += this.getTailingOverlap(index);
       }
-      if (status == "") {
-        return "R";
+      if (status === '') {
+        return 'R';
       }
       return status.substring(0, status.length - 3);
     },
@@ -585,30 +601,30 @@ export default {
      * @return {string} the status of the cds.
      */
     getTailingOverlap(index) {
-      var status = "";
+      var status = '';
       var nextGene = 1;
       var overlap = -10000;
-      while (overlap == -10000) {
+      while (overlap === -10000) {
         if (index + nextGene >= this.dnamaster.length) {
           return status;
         }
-        if (this.dnamaster[index + nextGene].function != "DELETED") {
+        if (this.dnamaster[index + nextGene].function !== 'DELETED') {
           overlap =
             this.dnamaster[index].stop - this.dnamaster[index + nextGene].start;
         } else {
-          ++nextGene;
+          nextGene += 1;
         }
       }
       if (
-        this.dnamaster[index].strand == this.dnamaster[index + nextGene].strand
+        this.dnamaster[index].strand === this.dnamaster[index + nextGene].strand
       ) {
         if (overlap < this.gap * -1) {
-          status += "LTG | ";
+          status += 'LTG | ';
         } else if (overlap > this.overlap) {
-          status += "LTO | ";
+          status += 'LTO | ';
         }
       } else if (overlap > this.oppositeGap * -1) {
-        status += "STG | ";
+        status += 'STG | ';
       }
       return status;
     },
@@ -619,30 +635,30 @@ export default {
      * @return {string} the status of the cds.
      */
     getLeadingOverlap(index) {
-      var status = "";
+      var status = '';
       var nextGene = 1;
       var leadingOverlap = -10000;
-      while (leadingOverlap == -10000) {
+      while (leadingOverlap === -10000) {
         if (index - nextGene < 0) {
           return status;
         }
-        if (this.dnamaster[index - nextGene].function != "DELETED") {
+        if (this.dnamaster[index - nextGene].function !== 'DELETED') {
           leadingOverlap =
             this.dnamaster[index - nextGene].stop - this.dnamaster[index].start;
         } else {
-          ++nextGene;
+          nextGene += 1;
         }
       }
       if (
-        this.dnamaster[index].strand == this.dnamaster[index - nextGene].strand
+        this.dnamaster[index].strand === this.dnamaster[index - nextGene].strand
       ) {
         if (leadingOverlap < this.gap * -1) {
-          status += "LLG | ";
+          status += 'LLG | ';
         } else if (leadingOverlap > this.overlap) {
-          status += "LLO | ";
+          status += 'LLO | ';
         }
       } else if (leadingOverlap > this.oppositeGap * -1) {
-        status += "SLG | ";
+        status += 'SLG | ';
       }
       return status;
     },
@@ -656,7 +672,7 @@ export default {
       this.$refs.addCDSModal.hide();
       let read = true;
       const payload = {
-        id: "added",
+        id: 'added',
         start: this.addCDS.start,
         stop: this.addCDS.stop,
         strand: this.addCDS.strand,
@@ -671,22 +687,22 @@ export default {
         )
         .then((response) => {
           console.log(response.data.message);
-          if (response.data.message == "ID already exists.") {
+          if (response.data.message === 'ID already exists.') {
             this.$bvToast.toast(
               `The CDS already exists. Try again with a different ORF. To ignore this 
             warning and add the CDS, check the 'Force Add' box.`,
               {
-                title: "ADD FAILED",
+                title: 'ADD FAILED',
                 autoHideDelay: 5000,
                 appendToast: false,
               }
             );
-          } else if (response.data.message == "Not orf.") {
+          } else if (response.data.message === 'Not orf.') {
             this.$bvToast.toast(
               `The inputted start and stop locations do not represent an ORF. To ignore this 
             warning and add the CDS, check the 'Force Add' box.`,
               {
-                title: "ADD FAILED",
+                title: 'ADD FAILED',
                 autoHideDelay: 5000,
                 appendToast: false,
               }
@@ -709,7 +725,7 @@ export default {
 }
 
 h1 {
-  margin-top: .7em;
+  margin-top: 0.7em;
 }
 
 .nav-btns-wrapper {
@@ -720,7 +736,7 @@ td,
 th {
   word-wrap: break-word;
   width: 9.5em;
-  font-size: 1.40em;
+  font-size: 1.4em;
 }
 
 .table-responsive thead th {
@@ -729,7 +745,7 @@ th {
   background: white;
   color: black;
   border: darkgray;
-  font-size: 1.40em;
+  font-size: 1.4em;
 }
 
 .btn-nav {
@@ -750,9 +766,8 @@ th {
 
 .alert-secondary {
   background-color: white;
-  border-color:white;
-  font-size: 1.40em;
+  border-color: white;
+  font-size: 1.4em;
   text-align: left;
 }
-
 </style>

@@ -35,7 +35,11 @@
             }"
             :event="fasta ? 'click' : ''"
           >
-            <button class="btn btn-dark btn-nav disabled" id="next-top" @click="uploadReminder">
+            <button
+              class="btn btn-dark btn-nav disabled"
+              id="next-top"
+              @click="uploadReminder"
+            >
               <strong>Next &#129054;</strong>
             </button>
           </router-link>
@@ -67,7 +71,11 @@
             }"
             :event="fasta ? 'click' : ''"
           >
-            <button class="btn btn-dark btn-nav disabled" id="next-bottom" @click="uploadReminder">
+            <button
+              class="btn btn-dark btn-nav disabled"
+              id="next-bottom"
+              @click="uploadReminder"
+            >
               <strong>Next &#129054;</strong>
             </button>
           </router-link>
@@ -79,19 +87,15 @@
 </template>
 
 <script>
-import axios from "axios";
-import Vue from "vue";
-import Navbar from "../components/Navbar.vue";
-import Loading from "vue-loading-overlay";
-import "vue-loading-overlay/dist/vue-loading.css";
-import vue2Dropzone from "vue2-dropzone";
-import "vue2-dropzone/dist/vue2Dropzone.min.css";
+import axios from 'axios';
+import vue2Dropzone from 'vue2-dropzone';
+import 'vue2-dropzone/dist/vue2Dropzone.min.css';
+import Navbar from '../components/Navbar.vue';
 
 export default {
-  name: "Upload",
+  name: 'Upload',
   components: {
     VueDropzone: vue2Dropzone,
-    Loading,
     Navbar,
   },
 
@@ -113,39 +117,39 @@ export default {
   },
 
   computed: {
-    navUpload: function () {
+    navUpload: function navU() {
       return true;
     },
 
-    navBlast: function () {
+    navBlast: function navB() {
       return this.fasta;
     },
 
-    navGeneMap: function () {
+    navGeneMap: function navG() {
       return this.fasta;
     },
 
-    navAnnotations: function () {
+    navAnnotations: function navA() {
       return this.blastCompleted;
     },
 
-    navSettings: function () {
+    navSettings: function navS() {
       return true;
     },
 
-    navPhageID: function () {
+    navPhageID: function navP() {
       return this.$route.params.phageID;
     },
   },
 
   watch: {
-    fasta: function () {
+    fasta: function fastaCheck() {
       if (this.fasta) {
-        document.getElementById("next-top").classList.remove("disabled");
-        document.getElementById("next-bottom").classList.remove("disabled");
+        document.getElementById('next-top').classList.remove('disabled');
+        document.getElementById('next-bottom').classList.remove('disabled');
       } else {
-        document.getElementById("next-top").classList.add("disabled");
-        document.getElementById("next-bottom").classList.add("disabled");
+        document.getElementById('next-top').classList.add('disabled');
+        document.getElementById('next-bottom').classList.add('disabled');
       }
     },
   },
@@ -159,28 +163,25 @@ export default {
       return {
         url: this.getUploadUrl(),
         addRemoveLinks: true,
-        acceptedFiles: ".fasta, .fna, .fa",
+        acceptedFiles: '.fasta, .fna, .fa',
         chunking: false,
         maxFiles: 1,
-        dictDefaultMessage: "Drag FASTA file here or click to browse.",
+        dictDefaultMessage: 'Drag FASTA file here or click to browse.',
         dictInvalidFileType:
-          "Only '.fasta', '.fna', or '.fa' file types are allowed.",
+          'Only ".fasta", ".fna", or ".fa" file types are allowed.',
         dictRemoveFileConfirmation:
-          "Are you sure you want to remove this file? This will remove all progress that you have made on this phage.",
-        dictMaxFilesExceeded: "You can only upload one file.",
-        init: function () {
+          'Are you sure you want to remove this file? This will remove all progress that you have made on this phage.',
+        dictMaxFilesExceeded: 'You can only upload one file.',
+        init: function initiation() {
+          const postURL = `${this.options.url.slice(
+            0,
+            this.options.url.indexOf('uploadFasta')
+          )}display/none`;
           axios
-            .post(
-              this.options.url.slice(
-                0,
-                this.options.url.indexOf("uploadFasta")
-              ) + `display/none`
-            )
+            .post(postURL)
             .then((response) => {
               console.log(response.data);
-              var fileName = response.data.fasta_file;
-              var fileSize = response.data.fasta_file_size;
-              if (fileName != "Not found") {
+              if (response.data.fasta_file !== 'Not found') {
                 this.addCustomFile(
                   // File options
                   {
@@ -189,18 +190,18 @@ export default {
                     // flag: file is accepted (for limiting maxFiles)
                     accepted: true,
                     // name of file on page
-                    name: fileName,
+                    name: response.data.fasta_file,
                     // image size
-                    size: fileSize,
+                    size: response.data.fasta_file_size,
                     // image type
-                    type: ".gb",
+                    type: '.gb',
                     // flag: status upload
                     status: this.SUCCESS,
-                    lastModifiedDate: "unimportant",
+                    lastModifiedDate: 'unimportant',
                   },
                   // Custom response for event success
                   {
-                    status: "success",
+                    status: 'success',
                   }
                 );
               }
@@ -210,28 +211,28 @@ export default {
               console.log(error);
             });
 
-          this.addCustomFile = function (file, response) {
+          this.addCustomFile = function customFile(file, response) {
             // Push file to collection
             this.files.push(file);
             // Emulate event to create interface
-            this.emit("addedfile", file);
+            this.emit('addedfile', file);
             // Add status processing to file
-            this.emit("processing", file);
+            this.emit('processing', file);
             // Add status success to file AND RUN EVENT success from responce
-            this.emit("success", file, response, false);
+            this.emit('success', file, response, false);
             // Add status complete to file
-            this.emit("complete", file);
+            this.emit('complete', file);
           };
 
-          this.on("removedfile", function (file) {
+          this.on('removedfile', function removedFile(file) {
             console.log(file);
             if (file.processing) {
               axios
                 .post(
-                  this.options.url.slice(
+                  `${this.options.url.slice(
                     0,
-                    this.options.url.indexOf("uploadFasta")
-                  ) + `delete/${file.name}`
+                    this.options.url.indexOf('uploadFasta')
+                  )}delete/${file.name}`
                 )
                 .then((response) => {
                   console.log(response.data);
@@ -249,7 +250,10 @@ export default {
      * Returns the upload URL for dropzone.
      */
     getUploadUrl() {
-      return process.env.VUE_APP_BASE_URL + `/upload/${this.$route.params.phageID}/uploadFasta/none`;
+      return (
+        process.env.VUE_APP_BASE_URL +
+        `/upload/${this.$route.params.phageID}/uploadFasta/none`
+      );
     },
 
     /**
@@ -266,8 +270,8 @@ export default {
      */
     checkIfFilesUploaded() {
       this.interval = setInterval(() => {
-        console.log("test");
-        if (this.$route.params.phageID != undefined)
+        console.log('test');
+        if (this.$route.params.phageID !== undefined)
           axios
             .get(
               process.env.VUE_APP_BASE_URL +
@@ -288,18 +292,18 @@ export default {
      */
     uploadReminder() {
       if (!this.fasta) {
-          this.$bvToast.toast(
-            `You must upload a FASTA file to continue. 
+        this.$bvToast.toast(
+          `You must upload a FASTA file to continue. 
             If you have uploaded a file and still cannot continue it is because the FASTA file is not in the correct FASTA format.`,
-            {
-              title: "UPLOAD FASTA FILE",
-              autoHideDelay: 15000,
-              appendToast: false,
-            }
-          );
-        }
+          {
+            title: 'UPLOAD FASTA FILE',
+            autoHideDelay: 15000,
+            appendToast: false,
+          }
+        );
       }
     },
+  },
 };
 </script>
 
@@ -309,7 +313,7 @@ export default {
 }
 
 h1 {
-  margin-top: .7em;
+  margin-top: 0.7em;
 }
 
 .nav-btns-wrapper {
@@ -327,13 +331,12 @@ h1 {
 
 .alert-secondary {
   background-color: white;
-  border-color:white;
-  font-size: 1.40em;
+  border-color: white;
+  font-size: 1.4em;
   text-align: left;
 }
 
 .btn-dark {
   font-size: 15pt;
 }
-
 </style>

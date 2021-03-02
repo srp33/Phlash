@@ -15,19 +15,22 @@
         :height="100"
         :width="100"
       ></loading>
-        <h1>ID: {{ $route.params.cdsID }}</h1>
+      <h1>ID: {{ $route.params.cdsID }}</h1>
       <div class="alert alert-secondary">
         <hr />
         <p><strong>Instructions</strong></p>
         <p>
-          Here you can make any necessary changes to this CDS by editing its start and stop sites and its function. 
-          Before making any final decisions you should review and consider all of the information below including 
-          the alternative open reading frames, the coding potential graphs, and the BLAST results. 
-          Click 'Save' to save changes made to this CDS or you can click 'Delete' if you wish to remove this CDS. 
-          Above you can see generic information for the current CDS including which auto-annotation programs called that gene.
+          Here you can make any necessary changes to this CDS by editing its
+          start and stop sites and its function. Before making any final
+          decisions you should review and consider all of the information below
+          including the alternative open reading frames, the coding potential
+          graphs, and the BLAST results. Click 'Save' to save changes made to
+          this CDS or you can click 'Delete' if you wish to remove this CDS.
+          Above you can see generic information for the current CDS including
+          which auto-annotation programs called that gene.
         </p>
         <hr />
-        <div style="float: right; width: 50%;">
+        <div style="float: right; width: 50%">
           <p><strong>Notes:</strong></p>
           <b-form-textarea
             id="textarea"
@@ -40,17 +43,15 @@
         <p>
           <strong>Left:</strong> {{ currentCDS.start }}<br />
           <strong>Right:</strong> {{ currentCDS.stop }}<br />
-          <span v-if="currentCDS.strand == '-'"><strong>Strand:</strong> Direct</span>
+          <span v-if="currentCDS.strand === '-'"
+            ><strong>Strand:</strong> Direct</span
+          >
           <span v-else><strong>Strand:</strong> Complementary</span><br />
           <strong>Frame:</strong> {{ this.frame }}<br />
           <strong>Called by:</strong> {{ this.calledBy }}<br />
-          <strong>Product:</strong> {{displayFunction}}
+          <strong>Product:</strong> {{ displayFunction }}
         </p>
-        <button
-          type="button"
-          class="btn btn-dark btn-action"
-          @click="editCDS"
-        >
+        <button type="button" class="btn btn-dark btn-action" @click="editCDS">
           <strong>&#9998; Save</strong>
         </button>
         <button
@@ -79,7 +80,10 @@
         </div>
         <div class="nav-btns-wrapper">
           <router-link
-            :to="{ name: 'Annotations', params: { phageID: $route.params.phageID } }"
+            :to="{
+              name: 'Annotations',
+              params: { phageID: $route.params.phageID },
+            }"
           >
             <button class="btn btn-dark btn-nav">
               <strong>&#129053; Return to Annotations</strong>
@@ -89,10 +93,12 @@
         <hr />
       </div>
       <div class="coding-potential-table">
-        <h4 style="text-align: center; margin: 1em">Alternative Open Reading Frames</h4>
-        <div style="overflow: hidden;">
-          <div style="float: left; width: 40%;">
-            <strong style="font-size:1.4em;">Direct Strand</strong>
+        <h4 style="text-align: center; margin: 1em">
+          Alternative Open Reading Frames
+        </h4>
+        <div style="overflow: hidden">
+          <div style="float: left; width: 40%">
+            <strong style="font-size: 1.4em">Direct Strand</strong>
             <div class="table-responsive">
               <table id="cp-table" class="table table-hover">
                 <tbody>
@@ -100,7 +106,10 @@
                     <th>{{ start }}-{{ dirStopOptions[index] }}</th>
                     <td>
                       <button
-                        v-if="start + dirStopOptions[index] !== currentCDS.start + currentCDS.stop"
+                        v-if="
+                          start + dirStopOptions[index] !==
+                          currentCDS.start + currentCDS.stop
+                        "
                         class="btn btn-dark btn-sm"
                         @click="setORF(start, dirStopOptions[index], '+')"
                       >
@@ -113,7 +122,7 @@
             </div>
           </div>
           <div style="float: right; width: 40%">
-            <strong style="font-size:1.4em;">Complementary Strand</strong>
+            <strong style="font-size: 1.4em">Complementary Strand</strong>
             <div class="table-responsive">
               <table id="cp-table" class="table table-hover">
                 <tbody>
@@ -121,7 +130,10 @@
                     <th>{{ start }}-{{ compStopOptions[index] }}</th>
                     <td>
                       <button
-                        v-if="start + compStopOptions[index] !== currentCDS.start + currentCDS.stop"
+                        v-if="
+                          start + compStopOptions[index] !==
+                          currentCDS.start + currentCDS.stop
+                        "
                         class="btn btn-dark btn-sm"
                         @click="setORF(start, compStopOptions[index], '-')"
                       >
@@ -143,11 +155,14 @@
         <div class="alert alert-secondary">
           <p><strong>Key</strong></p>
           <p>
-            <strong style="color:#2559AA;">Blue Line:</strong> The coding potential in relation to base number.<br />
-            <strong style="color:#d95f02;">Orange Dashed Line:</strong> The selected start and stop positions.<br />
-            <strong style="color:#1b9e77;">Green Line:</strong> A 0.75 coding potential reference line.<br />
-            <strong style="color:#7570b3;">Purple Line:</strong> The previous gene's stop position and the next
-            gene's start position.<br />
+            <strong style="color: #2559aa">Blue Line:</strong> The coding
+            potential in relation to base number.<br />
+            <strong style="color: #d95f02">Orange Dashed Line:</strong> The
+            selected start and stop positions.<br />
+            <strong style="color: #1b9e77">Green Line:</strong> A 0.75 coding
+            potential reference line.<br />
+            <strong style="color: #7570b3">Purple Line:</strong> The previous
+            gene's stop position and the next gene's start position.<br />
           </p>
         </div>
         <div class="coding-potential-graphs">
@@ -175,15 +190,25 @@
         </p>
       </div>
       <hr />
-      <h4 style="text-align: center; margin: 1em">BLAST Results for {{ newStart }} - {{ newStop }}</h4>
+      <h4 style="text-align: center; margin: 1em">
+        BLAST Results for {{ newStart }} - {{ newStop }}
+      </h4>
       <BlastResults
-        :blastResults="allBlastResults[currentCDS.start.toString() + '-' + currentCDS.stop.toString() + '  ' + currentCDS.strand]"
+        :blastResults="
+          allBlastResults[
+            currentCDS.start.toString() +
+              '-' +
+              currentCDS.stop.toString() +
+              '  ' +
+              currentCDS.strand
+          ]
+        "
         :allowSelect="true"
         @newFunction="setFunction"
       />
       <hr />
       <div class="alert alert-secondary">
-        <div style="float: right; width: 50%;">
+        <div style="float: right; width: 50%">
           <p><strong>Notes:</strong></p>
           <b-form-textarea
             id="textarea"
@@ -196,17 +221,15 @@
         <p>
           <strong>Left:</strong> {{ currentCDS.start }}<br />
           <strong>Right:</strong> {{ currentCDS.stop }}<br />
-          <span v-if="currentCDS.strand == '-'"><strong>Strand:</strong> Direct</span>
+          <span v-if="currentCDS.strand === '-'"
+            ><strong>Strand:</strong> Direct</span
+          >
           <span v-else><strong>Strand:</strong> Complementary</span><br />
           <strong>Frame:</strong> {{ this.frame }}<br />
           <strong>Called by:</strong> {{ this.calledBy }}<br />
-          <strong>Product:</strong> {{displayFunction}}
+          <strong>Product:</strong> {{ displayFunction }}
         </p>
-        <button
-          type="button"
-          class="btn btn-dark btn-action"
-          @click="editCDS"
-        >
+        <button type="button" class="btn btn-dark btn-action" @click="editCDS">
           <strong>&#9998; Save</strong>
         </button>
         <button
@@ -235,7 +258,10 @@
         </div>
         <div class="nav-btns-wrapper">
           <router-link
-            :to="{ name: 'Annotations', params: { phageID: $route.params.phageID } }"
+            :to="{
+              name: 'Annotations',
+              params: { phageID: $route.params.phageID },
+            }"
           >
             <button class="btn btn-dark btn-nav">
               <strong>&#129053; Return to Annotations</strong>
@@ -249,15 +275,15 @@
 </template>
 
 <script>
-import axios from "axios";
-import Navbar from "../components/Navbar.vue";
-import BlastResults from "../components/BlastResults.vue";
-import Graphs from "../components/Graphs.vue";
-import Loading from "vue-loading-overlay";
-import "vue-loading-overlay/dist/vue-loading.css";
+import axios from 'axios';
+import Navbar from '../components/Navbar.vue';
+import BlastResults from '../components/BlastResults.vue';
+import Graphs from '../components/Graphs.vue';
+import Loading from 'vue-loading-overlay';
+import 'vue-loading-overlay/dist/vue-loading.css';
 
 export default {
-  name: "CDS",
+  name: 'CDS',
   components: {
     BlastResults,
     Graphs,
@@ -266,7 +292,6 @@ export default {
   },
 
   data() {
-
     return {
       dirStartOptions: [],
       compStartOptions: [],
@@ -276,25 +301,25 @@ export default {
       compBlastResults: [],
       allBlastResults: [],
       currentCDS: {
-        id: "",
-        start: "",
-        stop: "",
-        strand: "",
-        function: "",
-        status: "",
-        frame: "",
+        id: '',
+        start: '',
+        stop: '',
+        strand: '',
+        function: '',
+        status: '',
+        frame: '',
       },
       updatedCDS: {
-        id: "",
-        start: "",
-        stop: "",
-        strand: "",
-        function: "",
-        status: "",
+        id: '',
+        start: '',
+        stop: '',
+        strand: '',
+        function: '',
+        status: '',
       },
       frame: null,
-      newFunction: "None selected",
-      displayFunction: "",
+      newFunction: 'None selected',
+      displayFunction: '',
       newStart: null,
       newStop: null,
       newStrand: null,
@@ -308,18 +333,17 @@ export default {
       prevCDS: null,
       nextStart: null,
       prevStop: null,
-      calledBy: "",
-      glimmer: "",
-      genemark: "",
-      phanotate: "",
-      notes: "",
+      calledBy: '',
+      glimmer: '',
+      genemark: '',
+      phanotate: '',
+      notes: '',
       dataExists: false,
       pageLoading: true,
       showFunction: false,
       showStart: false,
       saved: true,
     };
-
   },
 
   created() {
@@ -328,7 +352,6 @@ export default {
   },
 
   computed: {
-
     dirBlastKeys: function () {
       return Object.keys(this.dirBlastResults);
     },
@@ -360,11 +383,9 @@ export default {
     navPhageID: function () {
       return this.$route.params.phageID;
     },
-
   },
 
   methods: {
-
     /**
      * Gets the GeneMark, Blast, and auto-annotation data for the given CDS.
      * @param {string} cdsID the ID of the CDS.
@@ -376,20 +397,21 @@ export default {
             `/annotations/cds/${this.$route.params.phageID}/${cdsID}`
         )
         .then((response) => {
-          if (response.data.message != "Finished") {
-            this.$router.push(
-              `/annotations/${this.$route.params.phageID}`
-            );
+          if (response.data.message !== 'Finished') {
+            this.$router.push(`/annotations/${this.$route.params.phageID}`);
           }
           this.currentCDS = response.data.cds;
-          if (this.currentCDS.function != "DELETED") {
+          if (this.currentCDS.function !== 'DELETED') {
             this.newFunction = this.currentCDS.function;
             this.displayFunction = this.newFunction;
             let indexSeparation = this.newFunction.indexOf('##');
-            if (indexSeparation != -1) {
-              this.displayFunction = this.displayFunction.substring(0, indexSeparation);
+            if (indexSeparation !== -1) {
+              this.displayFunction = this.displayFunction.substring(
+                0,
+                indexSeparation
+              );
             }
-            if (this.newFunction[0] == '@') {
+            if (this.newFunction[0] === '@') {
               this.displayFunction = this.displayFunction.substring(1);
             }
             console.log(this.displayFunction);
@@ -450,21 +472,32 @@ export default {
           this.genemark = response.data.genemark;
           this.phanotate = response.data.phanotate;
           var called = false;
-          var cds = this.currentCDS.start.toString() + '-' + this.currentCDS.stop.toString() + ' ' + this.currentCDS.strand;
+          var cds =
+            this.currentCDS.start.toString() +
+            '-' +
+            this.currentCDS.stop.toString() +
+            ' ' +
+            this.currentCDS.strand;
           if (this.glimmer.indexOf(cds) > -1) {
             called = true;
-            this.calledBy += "Glimmer, ";
+            this.calledBy += 'Glimmer, ';
           }
           if (this.genemark.indexOf(cds) > -1) {
             called = true;
-            this.calledBy += "GeneMark, ";
+            this.calledBy += 'GeneMark, ';
           }
           if (this.phanotate.indexOf(cds) > -1) {
             called = true;
-            this.calledBy += "Phanotate, ";
+            this.calledBy += 'Phanotate, ';
           }
-          if (called) { this.calledBy = this.calledBy.substring(0, this.calledBy.length - 2); }
-          else { this.calledBy = "None"}
+          if (called) {
+            this.calledBy = this.calledBy.substring(
+              0,
+              this.calledBy.length - 2
+            );
+          } else {
+            this.calledBy = 'None';
+          }
           this.nextCDS = response.data.nextCDS;
           this.prevCDS = response.data.prevCDS;
         })
@@ -479,10 +512,10 @@ export default {
     navNextCDS() {
       var cont = true;
       if (!this.saved) {
-        cont = confirm("Are you sure you want to continue without saving?");
+        cont = confirm('Are you sure you want to continue without saving?');
       }
-      if (cont == true) {
-        if (this.nextCDS != "undefined") {
+      if (cont === true) {
+        if (this.nextCDS !== 'undefined') {
           this.$route.params.cdsID = this.nextCDS;
           this.$router.push(
             `/annotations/cds/${this.$route.params.phageID}/${this.$route.params.cdsID}`
@@ -500,10 +533,10 @@ export default {
     navPrevCDS() {
       var cont = true;
       if (!this.saved) {
-        cont = confirm("Are you sure you want to continue without saving?");
+        cont = confirm('Are you sure you want to continue without saving?');
       }
-      if (cont == true) {
-        if (this.prevCDS != "undefined") {
+      if (cont === true) {
+        if (this.prevCDS !== 'undefined') {
           this.$route.params.cdsID = this.prevCDS;
           this.$router.push(
             `/annotations/cds/${this.$route.params.phageID}/${this.$route.params.cdsID}`
@@ -523,7 +556,7 @@ export default {
       this.updatedCDS = this.currentCDS;
       this.updatedCDS.start = this.newStart;
       this.updatedCDS.stop = this.newStop;
-      this.updatedCDS.function = "@" + this.newFunction;
+      this.updatedCDS.function = '@' + this.newFunction;
       const payload = {
         id: this.updatedCDS.id,
         start: this.updatedCDS.start,
@@ -535,7 +568,7 @@ export default {
       };
       this.updateCDS(payload, this.updatedCDS.id);
     },
-    
+
     /**
      * Updates the database with the new changes on the current cds.
      * @param {dictionary} payload the new CDS data.
@@ -549,25 +582,21 @@ export default {
           payload
         )
         .then(() => {
-          if (this.newFunction != "DELETED") {
+          if (this.newFunction !== 'DELETED') {
+            this.$bvToast.toast(`The CDS ${cdsID} has been saved.`, {
+              title: 'SAVED',
+              autoHideDelay: 5000,
+              appendToast: false,
+            });
+          } else {
             this.$bvToast.toast(
-                `The CDS ${cdsID} has been saved.`,
-                {
-                  title: "SAVED",
-                  autoHideDelay: 5000,
-                  appendToast: false,
-                }
-              );
-          }
-          else {
-            this.$bvToast.toast(
-                `The CDS ${cdsID} has been deleted. You will be re-routed to the next CDS.`,
-                {
-                  title: "DELETED",
-                  autoHideDelay: 5000,
-                  appendToast: false,
-                }
-              );
+              `The CDS ${cdsID} has been deleted. You will be re-routed to the next CDS.`,
+              {
+                title: 'DELETED',
+                autoHideDelay: 5000,
+                appendToast: false,
+              }
+            );
             this.navNextCDS();
           }
         })
@@ -581,7 +610,7 @@ export default {
      * @param {string} cdsID the ID of the CDS to be deleted.
      */
     deleteCDS(cdsID) {
-      this.newFunction = "DELETED";
+      this.newFunction = 'DELETED';
       this.editCDS();
     },
 
@@ -605,51 +634,56 @@ export default {
      */
     setORF(start, stop, strand) {
       this.saved = false;
-      if (start != this.newStart || stop != this.newStop) {
+      if (start !== this.newStart || stop !== this.newStop) {
         this.dataExists = false;
-        this.newFunction = "";
-        this.displayFunction = "None selected";
+        this.newFunction = '';
+        this.displayFunction = 'None selected';
         this.newStop = stop;
         this.currentCDS.stop = stop;
         this.newStart = start;
         this.newStrand = strand;
         this.currentCDS.start = start;
         this.currentCDS.strand = strand;
-        this.calledBy = "";
+        this.calledBy = '';
         var called = false;
-        var cds = this.currentCDS.start.toString() + '-' + this.currentCDS.stop.toString() + ' ' + this.currentCDS.strand;
+        var cds =
+          this.currentCDS.start.toString() +
+          '-' +
+          this.currentCDS.stop.toString() +
+          ' ' +
+          this.currentCDS.strand;
         if (this.glimmer.indexOf(cds) > -1) {
           called = true;
-          this.calledBy += "Glimmer, ";
+          this.calledBy += 'Glimmer, ';
         }
         if (this.genemark.indexOf(cds) > -1) {
           called = true;
-          this.calledBy += "GeneMark, ";
+          this.calledBy += 'GeneMark, ';
         }
         if (this.phanotate.indexOf(cds) > -1) {
           called = true;
-          this.calledBy += "Phanotate, ";
+          this.calledBy += 'Phanotate, ';
         }
-        if (called) { this.calledBy = this.calledBy.substring(0, this.calledBy.length - 2); }
-        else { this.calledBy = "None"}
+        if (called) {
+          this.calledBy = this.calledBy.substring(0, this.calledBy.length - 2);
+        } else {
+          this.calledBy = 'None';
+        }
         this.frame = ((start + 2) % 3) + 1;
-        if (this.currentCDS.strand == "-") {
+        if (this.currentCDS.strand === '-') {
           this.frame = ((this.currentCDS.stop + 2) % 3) + 4;
-        }
-        else this.frame = ((this.currentCDS.start + 2) % 3) + 1;
+        } else this.frame = ((this.currentCDS.start + 2) % 3) + 1;
         console.log(this.frame);
         this.$nextTick().then(() => {
           this.dataExists = true;
         });
       }
     },
-
   },
 };
 </script>
 
 <style scoped>
-
 .blast-results {
   margin: 1em;
   margin-bottom: 3em;
@@ -664,7 +698,7 @@ export default {
 }
 
 h1 {
-  margin-top: .7em;
+  margin-top: 0.7em;
 }
 
 h4 {
@@ -719,8 +753,8 @@ tbody {
 
 .alert-secondary {
   background-color: white;
-  border-color:white;
-  font-size: 1.40em;
+  border-color: white;
+  font-size: 1.4em;
   text-align: left;
 }
 

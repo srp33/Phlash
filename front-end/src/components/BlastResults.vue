@@ -3,8 +3,8 @@
     <div class="table-responsive">
       <div v-if="showWarning" class="alert alert-warning">
         <strong
-          >This function does not correspond to the selected 
-          open reading frame.</strong
+          >This function does not correspond to the selected open reading
+          frame.</strong
         >
       </div>
       <table id="blast-table" class="table table-hover">
@@ -21,12 +21,16 @@
         </thead>
         <tbody>
           <tr v-for="alignment in blastResults" :key="alignment.accession">
-            <td style="font-size:1.4em;" >{{ alignment.accession }}</td>
+            <td style="font-size: 1.4em">{{ alignment.accession }}</td>
             <td>{{ alignment.title }}</td>
-            <td style="font-size:1.4em;" >{{ alignment.evalue }}</td>
-            <td style="font-size:1.4em;" >{{ alignment.percent_identity }}%</td>
-            <td style="font-size:1.4em;" >{{ alignment.query_from }} - {{ alignment.query_to }}</td>
-            <td style="font-size:1.4em;" >{{ alignment.hit_from }} - {{ alignment.hit_to }}</td>
+            <td style="font-size: 1.4em">{{ alignment.evalue }}</td>
+            <td style="font-size: 1.4em">{{ alignment.percent_identity }}%</td>
+            <td style="font-size: 1.4em">
+              {{ alignment.query_from }} - {{ alignment.query_to }}
+            </td>
+            <td style="font-size: 1.4em">
+              {{ alignment.hit_from }} - {{ alignment.hit_to }}
+            </td>
             <td>
               <button
                 v-if="allowSelect"
@@ -57,7 +61,7 @@
 
 <script>
 export default {
-  name: "BlastResults",
+  name: 'BlastResults',
   props: {
     blastResults: Array,
     allowSelect: false,
@@ -69,22 +73,19 @@ export default {
   },
 
   methods: {
-
     /**
      * Sets the CDS function from the blast results.
      * @param {string} funct the function to be added.
      */
     setFunction(funct, accession) {
       let result = funct.match(/(.*) \[.*\]/);
-      this.$emit("newFunction", result[1] + '##' + accession);
+      this.$emit('newFunction', result[1] + '##' + accession);
     },
-
   },
 };
 </script>
 
 <style scoped>
-
 .table-responsive {
   max-height: 35em;
   overflow-y: auto;
@@ -101,11 +102,10 @@ export default {
   background: #eee;
   background-color: white;
   border: darkgray;
-  font-size: 1.40em;
+  font-size: 1.4em;
 }
 
 .btn-dark {
   font-size: 15pt;
 }
-
 </style>
