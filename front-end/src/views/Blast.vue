@@ -14,8 +14,9 @@
         <hr />
         <p><strong>Instructions</strong></p>
         <p v-if="annotating">
-          Phlash is currently auto-annotating the bacteriophage genome. You may not go to the previous or next page until it finishes. Even so,
-          you can continue to work on your phage genome.<br />
+          Phlash is currently auto-annotating the bacteriophage genome. You may
+          not go to the previous or next page until it finishes. Even so, you
+          can continue to work on your phage genome.<br />
           Phlash relies on
           <a href="#" @click="goToWebsite('GeneMarkS')" class="alert-link"
             ><i>GeneMarkS</i></a
@@ -69,7 +70,7 @@
         </div>
         <hr />
       </div>
-      <div class="steps" style="font-size: 1.25em;">
+      <div class="steps" style="font-size: 1.25em">
         <loading
           :active.sync="orfLoading"
           :is-full-page="true"
@@ -116,7 +117,7 @@
                 <strong>Extract:</strong>
                 You must extract all of the FASTA files from the zip folder. If
                 you are unsure how to do this, watch one of the following
-                tutorials: 
+                tutorials:
                 <a href="#" @click="goToWebsite('Windows')" class="alert-link"
                   >Windows OS</a
                 >,
@@ -222,8 +223,8 @@
               varies depending on your internet connection. If a file appears to
               get stuck while uploading simply cancel the upload and re-upload
               that file. Note that if you attempt to upload a duplicate file it
-              will not upload. If you rename the files, do not include any 
-              special characters, including whitespace, as this may result in 
+              will not upload. If you rename the files, do not include any
+              special characters, including whitespace, as this may result in
               errors.
               <vue-dropzone
                 ref="myVueDropzone"
@@ -278,16 +279,15 @@
 </template>
 
 <script>
-import axios from "axios";
-import Vue from "vue";
-import Navbar from "../components/Navbar.vue";
-import Loading from "vue-loading-overlay";
-import "vue-loading-overlay/dist/vue-loading.css";
-import vue2Dropzone from "vue2-dropzone";
-import "vue2-dropzone/dist/vue2Dropzone.min.css";
+import axios from 'axios';
+import Navbar from '../components/Navbar.vue';
+import Loading from 'vue-loading-overlay';
+import 'vue-loading-overlay/dist/vue-loading.css';
+import vue2Dropzone from 'vue2-dropzone';
+import 'vue2-dropzone/dist/vue2Dropzone.min.css';
 
 export default {
-  name: "Blast",
+  name: 'Blast',
   components: {
     VueDropzone: vue2Dropzone,
     Loading,
@@ -350,32 +350,31 @@ export default {
   watch: {
     blastDownloaded: function () {
       if (this.blastDownloaded && this.blastUploaded && this.autoAnnotated) {
-        document.getElementById("next-top").classList.remove("disabled");
-        document.getElementById("next-bottom").classList.remove("disabled");
+        document.getElementById('next-top').classList.remove('disabled');
+        document.getElementById('next-bottom').classList.remove('disabled');
       } else {
-        document.getElementById("next-top").classList.add("disabled");
-        document.getElementById("next-bottom").classList.add("disabled");
+        document.getElementById('next-top').classList.add('disabled');
+        document.getElementById('next-bottom').classList.add('disabled');
       }
     },
 
     blastUploaded: function () {
       if (this.blastDownloaded && this.blastUploaded && this.autoAnnotated) {
-        document.getElementById("next-top").classList.remove("disabled");
-        document.getElementById("next-bottom").classList.remove("disabled");
+        document.getElementById('next-top').classList.remove('disabled');
+        document.getElementById('next-bottom').classList.remove('disabled');
       } else {
-        document.getElementById("next-top").classList.add("disabled");
-        document.getElementById("next-bottom").classList.add("disabled");
+        document.getElementById('next-top').classList.add('disabled');
+        document.getElementById('next-bottom').classList.add('disabled');
       }
     },
 
     autoAnnotated: function () {
       if (this.autoAnnotated && !this.annotating) {
-        document.getElementById("back-top").classList.remove("disabled");
-        document.getElementById("back-bottom").classList.remove("disabled");
-      }
-      else {
-        document.getElementById("back-top").classList.add("disabled");
-        document.getElementById("back-bottom").classList.add("disabled");
+        document.getElementById('back-top').classList.remove('disabled');
+        document.getElementById('back-bottom').classList.remove('disabled');
+      } else {
+        document.getElementById('back-top').classList.add('disabled');
+        document.getElementById('back-bottom').classList.add('disabled');
       }
     },
   },
@@ -389,22 +388,22 @@ export default {
       return {
         url: this.getUploadUrl(),
         addRemoveLinks: true,
-        acceptedFiles: "application/json",
+        acceptedFiles: 'application/json',
         chunking: true,
         maxFiles: null,
         parallelUploads: 5,
         chunkSize: 1000000,
-        dictDefaultMessage: "Drag files here or click to browse.",
-        dictInvalidFileType: "Only '.json' file types are allowed.",
+        dictDefaultMessage: 'Drag files here or click to browse.',
+        dictInvalidFileType: 'Only ".json" file types are allowed.',
         dictRemoveFileConfirmation:
-          "Are you sure you want to remove this file?",
+          'Are you sure you want to remove this file?',
         dictMaxFilesExceeded:
-          "The number of files uploaded exceeds the number of expected blast results.",
+          'The number of files uploaded exceeds the number of expected blast results.',
         retryChunks: true,
         init: function () {
           axios
             .post(
-              this.options.url.slice(0, this.options.url.indexOf("drop")) +
+              this.options.url.slice(0, this.options.url.indexOf('drop')) +
                 `numFiles/none`
             )
             .then((response) => {
@@ -417,7 +416,7 @@ export default {
 
           axios
             .post(
-              this.options.url.slice(0, this.options.url.indexOf("drop")) +
+              this.options.url.slice(0, this.options.url.indexOf('drop')) +
                 `displayOutput/refresh`
             )
             .then((response) => {
@@ -426,7 +425,7 @@ export default {
               // fileNames = fileNames.concat(response.data.bad_files);
               var fileSizes = response.data.file_sizes;
               var fileMods = response.data.file_mods;
-              for (var i = 0; i < fileNames.length; ++i) {
+              for (var i = 0; i < fileNames.length; i += 1) {
                 this.addCustomFile(
                   // File options
                   {
@@ -439,7 +438,7 @@ export default {
                     // image size
                     size: Number(fileSizes[i]),
                     // image type
-                    type: "application/json",
+                    type: 'application/json',
                     // flag: status upload
                     status: this.SUCCESS,
                     // last modification date
@@ -447,7 +446,7 @@ export default {
                   },
                   // Custom response for event success
                   {
-                    status: "success",
+                    status: 'success',
                   }
                 );
               }
@@ -461,21 +460,21 @@ export default {
             // Push file to collection
             this.files.push(file);
             // Emulate event to create interface
-            this.emit("addedfile", file);
+            this.emit('addedfile', file);
             // Add status processing to file
-            this.emit("processing", file);
+            this.emit('processing', file);
             // Add status success to file AND RUN EVENT success from responce
-            this.emit("success", file, response, false);
+            this.emit('success', file, response, false);
             // Add status complete to file
-            this.emit("complete", file);
+            this.emit('complete', file);
           };
 
-          this.on("addedfile", function (file) {
+          this.on('addedfile', function (file) {
             console.log(file.lastModifiedDate);
             console.log(file.size);
             axios
               .post(
-                this.options.url.slice(0, this.options.url.indexOf("drop")) +
+                this.options.url.slice(0, this.options.url.indexOf('drop')) +
                   `${file.lastModifiedDate}/${file.name}${file.size}`
               )
               .then((response) => {
@@ -486,12 +485,12 @@ export default {
               });
           });
 
-          this.on("removedfile", function (file) {
+          this.on('removedfile', function (file) {
             console.log(file);
             if (file.processing) {
               axios
                 .post(
-                  this.options.url.slice(0, this.options.url.indexOf("drop")) +
+                  this.options.url.slice(0, this.options.url.indexOf('drop')) +
                     `deleteOutput/${file.name}`
                 )
                 .then((response) => {
@@ -510,7 +509,10 @@ export default {
      * @return {string} the upload URL for dropzone.
      */
     getUploadUrl() {
-      return process.env.VUE_APP_BASE_URL + `/blast/${this.$route.params.phageID}/drop/${this.numFiles}`;
+      return (
+        process.env.VUE_APP_BASE_URL +
+        `/blast/${this.$route.params.phageID}/drop/${this.numFiles}`
+      );
     },
 
     /**
@@ -545,7 +547,7 @@ export default {
      * Checks to see if the blast input folder has been downloaded.
      */
     checkFiles() {
-      console.log("checkFiles");
+      console.log('checkFiles');
       axios
         .get(
           process.env.VUE_APP_BASE_URL +
@@ -608,15 +610,15 @@ export default {
             `/blast/${this.$route.params.phageID}/downloadInput/none`,
           FormData,
           {
-            responseType: "blob",
+            responseType: 'blob',
           }
         )
         .then((response) => {
           console.log(response.data);
           this.downloadLoading = false;
           let file_data = response.data;
-          const blob = new Blob([file_data], { type: "application/zip" });
-          let link = document.createElement("a");
+          const blob = new Blob([file_data], { type: 'application/zip' });
+          let link = document.createElement('a');
           link.href = window.URL.createObjectURL(blob);
           link.download = `${this.$route.params.phageID}_blast.zip`;
           link.click();
@@ -630,14 +632,14 @@ export default {
      * Sets the number of blast output files that the user must upload.
      */
     setNumFiles() {
-      console.log("setNumFiles");
+      console.log('setNumFiles');
       axios
         .post(
           process.env.VUE_APP_BASE_URL +
             `/blast/${this.$route.params.phageID}/numFiles/none`
         )
         .then((response) => {
-          if (response.data != "None") {
+          if (response.data !== 'None') {
             this.numFiles = Number(response.data);
             this.displayOutputFiles();
           }
@@ -649,49 +651,49 @@ export default {
      * @param {string} site the website to be redirected to.
      */
     goToWebsite(site) {
-      if (site == "Blast") {
-        for (var i = 0; i < this.numFiles; ++i) {
+      if (site === 'Blast') {
+        for (var i = 0; i < this.numFiles; i += 1) {
           window.open(
-            "https://blast.ncbi.nlm.nih.gov/Blast.cgi?PAGE=Proteins",
-            "_blank"
+            'https://blast.ncbi.nlm.nih.gov/Blast.cgi?PAGE=Proteins',
+            '_blank'
           );
         }
         this.clickedNCBI = true;
-      } else if (site == "Help") {
+      } else if (site === 'Help') {
         window.open(
-          "https://blast.ncbi.nlm.nih.gov/Blast.cgi?CMD=Web&PAGE_TYPE=Blastdocs",
-          "_blank"
+          'https://blast.ncbi.nlm.nih.gov/Blast.cgi?CMD=Web&PAGE_TYPE=Blastdocs',
+          '_blank'
         );
-      } else if (site == "GeneMarkS") {
+      } else if (site === 'GeneMarkS') {
         window.open(
-          "https://academic.oup.com/nar/article/29/12/2607/1034721?login=true",
-          "_blank"
+          'https://academic.oup.com/nar/article/29/12/2607/1034721?login=true',
+          '_blank'
         );
-      } else if (site == "Glimmer3") {
-        window.open("http://ccb.jhu.edu/papers/glimmer3.pdf", "_blank");
-      } else if (site == "Aragorn") {
+      } else if (site === 'Glimmer3') {
+        window.open('http://ccb.jhu.edu/papers/glimmer3.pdf', '_blank');
+      } else if (site === 'Aragorn') {
         window.open(
-          "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC373265/",
-          "_blank"
+          'https://www.ncbi.nlm.nih.gov/pmc/articles/PMC373265/',
+          '_blank'
         );
-      } else if (site == "Phanotate") {
+      } else if (site === 'Phanotate') {
         window.open(
-          "https://academic.oup.com/bioinformatics/article/35/22/4537/5480131",
-          "_blank"
+          'https://academic.oup.com/bioinformatics/article/35/22/4537/5480131',
+          '_blank'
         );
-      } else if (site == "Fasta") {
+      } else if (site === 'Fasta') {
         window.open(
-          "http://www.metagenomics.wiki/tools/fastq/multi-fasta-format#:~:text=FASTA%20is%20a%20text-file%20format%20for%20representing%20nucleotide,A%20multi-FASTA%20file%20contains%20multiple%20FASTA%20formated%20sequences.",
-          "_blank"
+          'http://www.metagenomics.wiki/tools/fastq/multi-fasta-format#:~:text=FASTA%20is%20a%20text-file%20format%20for%20representing%20nucleotide,A%20multi-FASTA%20file%20contains%20multiple%20FASTA%20formated%20sequences.',
+          '_blank'
         );
-      } else if (site == "Zip") {
-        window.open("https://www.7-zip.org/", "_blank");
-      } else if (site == "Windows") {
-        window.open("https://www.youtube.com/watch?v=HLBSS3JjAh0", "_blank");
-      } else if (site == "Mac") {
-        window.open("https://www.youtube.com/watch?v=O-zHTZWuakg", "_blank");
-      } else if (site == "Chrome") {
-        window.open("https://www.youtube.com/watch?v=OuaXF19UFsE", "_blank");
+      } else if (site === 'Zip') {
+        window.open('https://www.7-zip.org/', '_blank');
+      } else if (site === 'Windows') {
+        window.open('https://www.youtube.com/watch?v=HLBSS3JjAh0', '_blank');
+      } else if (site === 'Mac') {
+        window.open('https://www.youtube.com/watch?v=O-zHTZWuakg', '_blank');
+      } else if (site === 'Chrome') {
+        window.open('https://www.youtube.com/watch?v=OuaXF19UFsE', '_blank');
       }
     },
 
@@ -702,7 +704,7 @@ export default {
      */
     displayOutputFiles() {
       this.interval = setInterval(() => {
-        console.log("displayOutputFiles");
+        console.log('displayOutputFiles');
         axios
           .post(
             process.env.VUE_APP_BASE_URL +
@@ -712,15 +714,14 @@ export default {
             this.fileNames = response.data.file_names;
             this.badFiles = response.data.bad_files;
             if (
-              this.fileNames.length == this.numFiles &&
-              this.badFiles.length == 0
+              this.fileNames.length === this.numFiles &&
+              this.badFiles.length === 0
             ) {
               this.blastUploaded = true;
             }
             if (response.data.in_process) {
               this.annotating = true;
-            }
-            else {
+            } else {
               this.annotating = false;
             }
           })
@@ -738,7 +739,7 @@ export default {
         this.$bvToast.toast(
           `All ${this.numFiles} files have not been uploaded.`,
           {
-            title: "UPLOAD ALL FILES",
+            title: 'UPLOAD ALL FILES',
             autoHideDelay: 15000,
             appendToast: false,
           }
@@ -758,12 +759,12 @@ export default {
             `/blast/${this.$route.params.phageID}/deleteBlastResults/none`
         )
         .then((response) => {
-          if (response.data == "fail") {
+          if (response.data === 'fail') {
             this.$bvToast.toast(
               `The BLAST results are currently being interpretted which may take several 
             minutes. Removal of the BLAST output files is not possible at this time.`,
               {
-                title: "BLAST OUTPUT FILES IN USE",
+                title: 'BLAST OUTPUT FILES IN USE',
                 autoHideDelay: 5000,
                 appendToast: false,
               }
@@ -787,7 +788,7 @@ export default {
 }
 
 h1 {
-  margin-top: .7em;
+  margin-top: 0.7em;
 }
 
 .alert-primary {
@@ -817,13 +818,12 @@ h1 {
 
 .alert-secondary {
   background-color: white;
-  border-color:white;
-  font-size: 1.40em;
+  border-color: white;
+  font-size: 1.4em;
   text-align: left;
 }
 
 .btn-dark {
   font-size: 15pt;
 }
-
 </style>

@@ -18,17 +18,17 @@ export default new Router({
     {
       path: '/',
       name: 'Home',
-      component: Home
+      component: Home,
     },
     {
       path: '/upload/:phageID',
       name: 'Upload',
-      component: Upload
+      component: Upload,
     },
     {
       path: '/blast/:phageID',
       name: 'Blast',
-      component: Blast
+      component: Blast,
     },
     {
       path: '/annotations/:phageID',
@@ -54,6 +54,6 @@ export default new Router({
       path: '/contact',
       name: 'Contact',
       component: Contact,
-    }
+    },
   ],
 });

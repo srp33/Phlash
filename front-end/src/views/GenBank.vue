@@ -20,20 +20,24 @@
         <hr />
         <p><strong>Instructions</strong></p>
         <p>
-          The GenBank file can be downloaded at anytime by clicking
-          'Download'. You should not submit this file to GenBank until you have
-          reviewed each CDS, made necessary adjustments, and are sure that your
-          annotations are accurate. Please note that any genes that were deleted will not be included in the GenBank file which will result in renumbering of the locus tags. <br />
-          To see a sample GenBank record, click <a href="#" @click="goToWebsite('Example')" class="alert-link"><i>here</i></a>.<br />
-          For instructions on how to submit data to GenBank, click <a href="#" @click="goToWebsite('Instructions')" class="alert-link"><i>here</i></a>.<br />
+          The GenBank file can be downloaded at anytime by clicking 'Download'.
+          You should not submit this file to GenBank until you have reviewed
+          each CDS, made necessary adjustments, and are sure that your
+          annotations are accurate. Please note that any genes that were deleted
+          will not be included in the GenBank file which will result in
+          renumbering of the locus tags. <br />
+          To see a sample GenBank record, click
+          <a href="#" @click="goToWebsite('Example')" class="alert-link"
+            ><i>here</i></a
+          >.<br />
+          For instructions on how to submit data to GenBank, click
+          <a href="#" @click="goToWebsite('Instructions')" class="alert-link"
+            ><i>here</i></a
+          >.<br />
         </p>
         <p>
-          <button
-            class="btn btn-dark"
-            @click="showDownloadGenbank = true"
-          >
-            <strong>&#10515; 
-              Download</strong>
+          <button class="btn btn-dark" @click="showDownloadGenbank = true">
+            <strong>&#10515; Download</strong>
           </button>
         </p>
         <hr />
@@ -193,35 +197,34 @@
 </template>
 
 <script>
-import Navbar from "../components/Navbar.vue";
-import axios from "axios";
-import Loading from "vue-loading-overlay";
-import "vue-loading-overlay/dist/vue-loading.css";
+import Navbar from '../components/Navbar.vue';
+import axios from 'axios';
+import Loading from 'vue-loading-overlay';
+import 'vue-loading-overlay/dist/vue-loading.css';
 
 export default {
-  name: "Contact",
+  name: 'Contact',
   components: {
     Navbar,
     Loading,
   },
 
   data() {
-
     return {
       prevRoute: null,
       genbankAnnotations: {
         phageName: this.navPhageID,
-        source: "",
-        organism: "",
-        isolationSource: "",
-        labHost: "",
-        identifiedBy: "",
-        authors: "",
-        title: "",
-        journal: "",
-        country: "USA",
-        molType: "genomic DNA",
-        notes: "complete genome",
+        source: '',
+        organism: '',
+        isolationSource: '',
+        labHost: '',
+        identifiedBy: '',
+        authors: '',
+        title: '',
+        journal: '',
+        country: 'USA',
+        molType: 'genomic DNA',
+        notes: 'complete genome',
         includeNotes: false,
       },
       showDownloadGenbank: false,
@@ -230,9 +233,9 @@ export default {
   },
 
   beforeRouteEnter(to, from, next) {
-    next(vm => {
-      vm.prevRoute = from
-    })
+    next((vm) => {
+      vm.prevRoute = from;
+    });
   },
 
   created() {
@@ -240,7 +243,6 @@ export default {
   },
 
   computed: {
-
     navUpload: function () {
       return true;
     },
@@ -264,33 +266,26 @@ export default {
     navPhageID: function () {
       return this.$route.params.phageID;
     },
-
   },
 
-
   methods: {
-
     goBack() {
       console.log(this.prevRoute);
       this.$router.push(this.prevRoute);
     },
 
-     goToWebsite(site) {
-      if (site == "Example") {
+    goToWebsite(site) {
+      if (site === 'Example') {
         window.open(
-          "https://www.ncbi.nlm.nih.gov/Sitemap/samplerecord.html",
-          "_blank"
+          'https://www.ncbi.nlm.nih.gov/Sitemap/samplerecord.html',
+          '_blank'
         );
-      }
-      else if (site == "Instructions") {
-        window.open(
-          "https://www.ncbi.nlm.nih.gov/genbank/submit/",
-          "_blank"
-        );
+      } else if (site === 'Instructions') {
+        window.open('https://www.ncbi.nlm.nih.gov/genbank/submit/', '_blank');
       }
     },
 
-     /**
+    /**
      * Downloads the GenBank file.
      */
     onDownloadGenBank(evt) {
@@ -308,7 +303,7 @@ export default {
         .then((response) => {
           let data = response.data;
           const blob = new Blob([data]);
-          let link = document.createElement("a");
+          let link = document.createElement('a');
           link.href = window.URL.createObjectURL(blob);
           link.download = `${this.$route.params.phageID}_modified.gb`;
           link.click();
@@ -316,12 +311,10 @@ export default {
         });
     },
   },
-
-}
+};
 </script>
 
 <style scoped>
-
 .nav-btns-wrapper {
   text-align: center;
 }
@@ -331,18 +324,17 @@ export default {
 }
 
 h1 {
-  margin-top: .7em;
+  margin-top: 0.7em;
 }
 
 .alert-secondary {
   background-color: white;
-  border-color:white;
-  font-size: 1.40em;
+  border-color: white;
+  font-size: 1.4em;
   text-align: left;
 }
 
 .btn-dark {
   font-size: 15pt;
 }
-
 </style>

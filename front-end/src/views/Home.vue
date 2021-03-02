@@ -9,16 +9,19 @@
       :phageID="navPhageID"
     />
     <div class="container">
-      <p style="margin:1em;">
+      <p style="margin: 1em">
         <img id="logo" src="/phlash/images/logohome.png" width="250" />
       </p>
       <h1>Phlash</h1>
       <div class="alert alert-secondary">
-        <p style="text-align: center;">
-          <strong>A user-friendly bacteriophage genome annotation application.</strong>
+        <p style="text-align: center">
+          <strong
+            >A user-friendly bacteriophage genome annotation
+            application.</strong
+          >
         </p>
         <hr />
-        <p style="text-align: left;">
+        <p style="text-align: left">
           Enter an ID that contains only letters, numbers, and underscores
           below. This ID will uniquely identify your bacteriophage genome
           annotation.<br />
@@ -33,7 +36,7 @@
         >
           <input
             class="form-control"
-            style="height: 2em; font-size: 15pt;"
+            style="height: 2em; font-size: 15pt"
             type="text"
             v-model="phageID"
             v-on:keyup.enter="checkPhageID()"
@@ -109,11 +112,11 @@
 </template>
 
 <script>
-import axios from "axios";
-import Navbar from "../components/Navbar.vue";
+import axios from 'axios';
+import Navbar from '../components/Navbar.vue';
 
 export default {
-  name: "Home",
+  name: 'Home',
   components: {
     Navbar,
   },
@@ -121,7 +124,7 @@ export default {
   data() {
     return {
       phageID: null,
-      idStatus: "",
+      idStatus: '',
       allFilesUploaded: false,
       dateToBeDeleted: null,
       blastComplete: false,
@@ -130,9 +133,9 @@ export default {
 
   watch: {
     phageID() {
-      this.phageID = this.phageID.replace(/[^a-zA-Z0-9_]/g, "");
-      if (this.phageID != null) {
-        document.getElementById("start").classList.remove("disabled");
+      this.phageID = this.phageID.replace(/[^a-zA-Z0-9_]/g, '');
+      if (this.phageID !== null) {
+        document.getElementById('start').classList.remove('disabled');
       }
     },
   },
@@ -172,7 +175,7 @@ export default {
      * @param {string} phageID the ID of the phage to be logged in or registered.
      */
     checkPhageID() {
-      if (this.phageID != "" && this.phageID != null) {
+      if (this.phageID !== '' && this.phageID !== null) {
         axios
           .post(process.env.VUE_APP_BASE_URL + `/home/${this.phageID}`)
           .then((response) => {
@@ -181,18 +184,18 @@ export default {
             this.blastComplete = response.data.blast_complete;
             this.idStatus = response.data.id_status;
             const monthNames = [
-              "January",
-              "February",
-              "March",
-              "April",
-              "May",
-              "June",
-              "July",
-              "August",
-              "September",
-              "October",
-              "November",
-              "December",
+              'January',
+              'February',
+              'March',
+              'April',
+              'May',
+              'June',
+              'July',
+              'August',
+              'September',
+              'October',
+              'November',
+              'December',
             ];
             let date = new Date(response.data.delete_time);
             this.dateToBeDeleted = `${
@@ -214,7 +217,7 @@ export default {
 }
 
 h1 {
-  margin-top: .7em;
+  margin-top: 0.7em;
 }
 
 .id-status {
@@ -232,8 +235,8 @@ h1 {
 
 .alert-secondary {
   background-color: white;
-  border-color:white;
-  font-size: 1.40em;
+  border-color: white;
+  font-size: 1.4em;
   text-align: left;
 }
 </style>

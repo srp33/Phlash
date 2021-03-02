@@ -97,7 +97,7 @@ def auto_annotate(UPLOAD_FOLDER, current_user):
     db.session.commit()
 
     phanotate_file = os.path.join(UPLOAD_FOLDER, current_user + "_phanotate.txt")
-    subprocess.run(["/usr/local/lib/python3.7/site-packages/phanotate.py", fasta_file_path, "-o" + phanotate_file])
+    subprocess.run(["/usr/local/lib/python3.7/site-packages/phanotate.py", fasta_file_path, "-o" + phanotate_file], timeout=300)
 
     id_index = 0
     glimmer_calls = ""
