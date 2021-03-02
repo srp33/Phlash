@@ -33,12 +33,12 @@ for id, seq in my_contigs.items():
 
 	#-------------------------------Find the ORFs----------------------------------------------#
 	my_orfs = functions.get_orfs(seq)
-
+	print("Find the ORFs")
 
 
 	#-------------------------------Create the Graph-------------------------------------------#
 	my_graph = functions.get_graph(my_orfs)
-
+	print("Create the Graph")
 
 
 	#-------------------------------Run Bellman-Ford-------------------------------------------#
@@ -53,10 +53,11 @@ for id, seq in my_contigs.items():
 	if args.dump: sys.exit()
 
 	shortest_path = fz.get_path(source=source, target=target)
-
+	print("Run Bellman-Ford")
 
 	
 	#-------------------------------Write Output ----------------------------------------------#
+	print("Write Output")
 	file_handling.write_output(id, args, shortest_path, my_graph, my_orfs)
 
 #--------------------------------------------------------------------------------------------------#
