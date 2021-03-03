@@ -13,6 +13,7 @@
         <img id="logo" src="/phlash/images/logohome.png" width="250" />
       </p>
       <h1>Phlash</h1>
+      <button v-google-signin-button="clientID" class="google-signin-button"> Continue with Google</button>
       <div class="alert alert-secondary">
         <p style="text-align: center">
           <strong
@@ -111,18 +112,23 @@
   </div>
 </template>
 
+<script src="https://apis.google.com/js/platform.js" async defer></script>
+
 <script>
 import axios from 'axios';
 import Navbar from '../components/Navbar.vue';
+import GoogleSignInButton from 'vue-google-signin-button-directive'
 
 export default {
   name: 'Home',
   components: {
     Navbar,
+    GoogleSignInButton,
   },
 
   data() {
     return {
+      clientID: "780981769382-dqnlo6b9j3cdbug5u672t31l70g5gg9d.apps.googleusercontent.com",
       phageID: null,
       idStatus: '',
       allFilesUploaded: false,
@@ -169,6 +175,29 @@ export default {
   },
 
   methods: {
+    OnGoogleAuthSuccess (idToken) {
+      console.log(idToken)
+      // Receive the idToken and make your magic with the backend
+    },
+    OnGoogleAuthFail (error) {
+      console.log(error)
+    },
+
+    onSignIn(googleUser) {
+      var profile = googleUser.getBasicProfile();
+      console.log('ID: ' + profile.getId()); // Do not send to your backend! Use an ID token instead.
+      console.log('Name: ' + profile.getName());
+      console.log('Image URL: ' + profile.getImageUrl());
+      console.log('Email: ' + profile.getEmail()); // This is null if the 'email' scope is not present.
+    },
+
+    signOut() {
+      var auth2 = gapi.auth2.getAuthInstance();
+      auth2.signOut().then(function () {
+        console.log('User signed out.');
+      });
+    },
+
     /**
      * Checks for non expired phage ID.
      * Adds phage ID if non-existant.
@@ -239,4 +268,15 @@ h1 {
   font-size: 1.4em;
   text-align: left;
 }
+
+/* .google-signin-button {
+  color: white;
+  background-color: red;
+  height: 50px;
+  font-size: 16px;
+  border-radius: 10px;
+  padding: 10px 20px 25px 20px;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+} */
+
 </style>

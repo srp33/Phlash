@@ -71,14 +71,17 @@ def auto_annotate(UPLOAD_FOLDER, current_user):
     gc_percent = result.stdout.decode("utf-8").split(" ")[3]
     gc_percent = "{:d}".format(round(float(gc_percent)))
 
+    print("\n\nGeneMark\n")
     subprocess.run(["/genemark_suite_linux_64/gmsuite/gm", "-D", "-g", "0", "-s", "1", "-m", "/genemark_suite_linux_64/gmsuite/heuristic_mat/heu_11_{}.mat".format(gc_percent), "-v", fasta_file_path])
 
     gdata_file_path = "{}.gdata".format(fasta_file_path)
     ldata_file_path = "{}.ldata".format(fasta_file_path)
 
+    print("\n\nGlimmer\n")
     glimmer_file = os.path.join(UPLOAD_FOLDER, current_user + "_glimmer")
     subprocess.run(["/opt/glimmer3.02/scripts/g3-from-scratch.csh", fasta_file_path, glimmer_file])
 
+    print("\n\nAragorn\n")
     aragorn_file = os.path.join(UPLOAD_FOLDER, current_user + "_aragorn.txt")
     subprocess.run(["aragorn", fasta_file_path, aragorn_file])
     
@@ -96,8 +99,9 @@ def auto_annotate(UPLOAD_FOLDER, current_user):
     DNAMaster.query.delete()
     db.session.commit()
 
+    print("\n\nPhanotate\n")
     phanotate_file = os.path.join(UPLOAD_FOLDER, current_user + "_phanotate.txt")
-    subprocess.run(["/usr/local/lib/python3.7/site-packages/phanotate.py", fasta_file_path, "-o" + phanotate_file], timeout=300)
+    subprocess.run(["/usr/local/lib/python3.7/site-packages/phanotate.py", fasta_file_path, "-o" + phanotate_file], timeout=1000)
 
     id_index = 0
     glimmer_calls = ""

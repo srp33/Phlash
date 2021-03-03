@@ -2,26 +2,27 @@
 import os
 import sys
 import getopt
-
+print("os")
 #from subprocess import Popen, PIPE, STDOUT
 import fastpathz as fz
-
+print("fastapathz")
 from phanotate_modules import file_handling
 from phanotate_modules import functions
 from phanotate_modules.nodes import Node
-
+print("phanotate_modules")
 
 #--------------------------------------------------------------------------------------------------#
 #                               ARGUMENTS                                                          #
 #--------------------------------------------------------------------------------------------------#
 
+print("Arguments")
 args = file_handling.get_args()
 
 #--------------------------------------------------------------------------------------------------#
 #                               FILE INPUT                                                         #
 #--------------------------------------------------------------------------------------------------#
-
-my_contigs = file_handling.read_fasta(args.infile);
+print("File Input")
+my_contigs = file_handling.read_fasta(args.infile)
 if not my_contigs:
 	sys.stdout.write("Error: no sequences found in infile\n")
 	sys.exit()
@@ -29,6 +30,7 @@ if not my_contigs:
 #--------------------------------------------------------------------------------------------------#
 #                               MAIN ROUTINE                                                       #
 #--------------------------------------------------------------------------------------------------#
+print("Main")
 for id, seq in my_contigs.items():
 
 	#-------------------------------Find the ORFs----------------------------------------------#
