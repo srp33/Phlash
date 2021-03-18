@@ -98,8 +98,8 @@
         <a href="#" class="close" data-dismiss="alert" aria-label="close"
           >&times;</a
         >
-        The Blast results are being interpretted which can take several
-        minutes.<br />
+        {{waitMessage}}<br />
+        You may continue to work on this phage's genome, but keep in mind that all the Blast results will not be shown. 
         If 'Annotate' is clicked for a CDS that does not currently have any
         data, you will be brought back to this page.<br />
         A notification will appear when finished.
@@ -107,19 +107,19 @@
       <div
         class="alert alert-secondary"
         style="text-align: center"
-        v-if="completedGenes !== dnamaster.length"
+        v-if="completedGenes !== phageAnnotations.length"
       >
         You have
         <strong
-          >{{ dnamaster.length - completedGenes }}/{{
-            dnamaster.length
+          >{{ phageAnnotations.length - completedGenes }}/{{
+            phageAnnotations.length
           }}</strong
         >
         genes remaining.
       </div>
       <div
         class="alert alert-secondary"
-        v-if="completedGenes === dnamaster.length"
+        v-if="completedGenes === phageAnnotations.length"
       >
         Congratulations! You have annotated every CDS. Click 'Next' to see a map
         of the genome.
@@ -142,7 +142,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="(curr, index) in dnamaster" :key="index">
+              <tr v-for="(curr, index) in phageAnnotations" :key="index">
                 <td
                   v-if="
                     curr.function === '@DELETED' || curr.status === 'trnaDELETED'
@@ -156,13 +156,13 @@
                     curr.function === '@DELETED' || curr.status === 'trnaDELETED'
                   "
                 ></td>
-                <td v-else>{{ curr.start }}</td>
+                <td v-else>{{ curr.left }}</td>
                 <td
                   v-if="
                     curr.function === '@DELETED' || curr.status === 'trnaDELETED'
                   "
                 ></td>
-                <td v-else>{{ curr.stop }}</td>
+                <td v-else>{{ curr.right }}</td>
                 <td
                   v-if="
                     curr.function === '@DELETED' || curr.status === 'trnaDELETED'
@@ -299,20 +299,20 @@
       hide-footer
     >
       <b-form @submit="onSubmitAdd" align="left">
-        <b-form-group label="Left:" label-size="lg" label-for="add-start-input">
+        <b-form-group label="Left:" label-size="lg" label-for="add-left-input">
           <b-form-input
-            id="add-start-input"
+            id="add-left-input"
             type="number"
-            v-model="addCDS.start"
+            v-model="addCDS.left"
             required
             placeholder="Enter left position"
           ></b-form-input>
         </b-form-group>
-        <b-form-group label="Right:" label-size="lg" label-for="add-stop-input">
+        <b-form-group label="Right:" label-size="lg" label-for="add-right-input">
           <b-form-input
-            id="add-stop-input"
+            id="add-right-input"
             type="number"
-            v-model="addCDS.stop"
+            v-model="addCDS.right"
             required
             placeholder="Enter right position"
           ></b-form-input>
@@ -365,8 +365,8 @@ export default {
     return {
       addCDS: {
         id: "",
-        start: "",
-        stop: "",
+        left: "",
+        right: "",
         strand: null,
         force: false,
         read: [],
@@ -391,26 +391,32 @@ export default {
         { value: "+", text: "+ (Direct)" },
         { value: "-", text: "- (Complementary)" },
       ],
-      dnamaster: [],
+      phageAnnotations: [],
       currCDS: {
         id: "",
-        start: "",
-        stop: "",
+        left: "",
+        right: "",
         strand: "",
       },
       showAddCDS: false,
       pageLoading: true,
-      blastLoading: true,
+      blastLoading: false,
       completedGenes: 0,
       gap: 10,
       overlap: 10,
       oppositeGap: 50,
       short: 200,
+      interval: null,
+      waitMessage: null,
     };
   },
 
   created() {
     this.getData();
+  },
+
+  destroyed() {
+    this.stopChecking();
   },
 
   computed: {
@@ -441,7 +447,7 @@ export default {
 
   methods: {
     /**
-     * Populates dnamaster with data.
+     * Populates phageAnnotations with data.
      */
     getData() {
       axios
@@ -450,15 +456,15 @@ export default {
             `/annotations/${this.$route.params.phageID}/none`
         )
         .then((response) => {
-          this.dnamaster = response.data.dnamaster;
+          this.phageAnnotations = response.data.annotations;
           this.gap = response.data.gap;
           this.overlap = response.data.overlap;
           this.oppositeGap = response.data.opposite_gap;
           this.short = response.data.short;
           this.pageLoading = false;
           this.genbankAnnotations.phageName = this.$route.params.phageID;
-          for (var i = 0; i < this.dnamaster.length; i += 1) {
-            if (this.dnamaster[i].function !== 'None selected')
+          for (var i = 0; i < this.phageAnnotations.length; i += 1) {
+            if (this.phageAnnotations[i].function !== 'None selected')
               this.completedGenes += 1;
           }
           this.parseBlast();
@@ -472,31 +478,15 @@ export default {
      * Calls method on back-end that parses and stores all of the BLAST results.
      */
     parseBlast() {
-      axios
-        .get(
-          process.env.VUE_APP_BASE_URL +
-            `/annotations/${this.$route.params.phageID}/blast`
-        )
+      axios({
+        method: 'get',
+        url: process.env.VUE_APP_BASE_URL + `/annotations/${this.$route.params.phageID}/blast`,
+      })
         .then((response) => {
-          this.blastLoading = false;
-          if (response.data === 'success') {
-            this.$bvToast.toast(
-              `All of the BLAST results have finished being interpretted.`,
-              {
-                title: 'Finished',
-                appendToast: false,
-              }
-            );
-          } else if (response.data === 'error') {
-            this.$bvToast.toast(
-              `An unknown error occurred. Try removing and reuploading the BLAST files. 
-              If you ignore this error not all of your BLAST results will be shown. 
-              If this error continues, please contact us by visiting the 'contact' tab.`,
-              {
-                title: 'Error',
-                appendToast: false,
-              }
-            );
+          console.log(response.data);
+          if (response.data === "empty") {
+            this.blastLoading = true;
+            this.checkIfParseComplete();
           }
         })
         .catch((error) => {
@@ -505,32 +495,104 @@ export default {
     },
 
     /**
+     * Stops the interval loop for checkIfFilesUploaded().
+     */
+    stopChecking() {
+      clearInterval(this.interval);
+    },
+
+    /**
+     * Checks to see if the fasta file has been uploaded.
+     */
+    checkIfParseComplete() {
+      this.interval = setInterval(() => {
+        axios
+          .get(
+            process.env.VUE_APP_BASE_URL +
+              `/annotations/${this.$route.params.phageID}/check`
+          )
+          .then((response) => {
+            console.log(response.data);
+            if (response.data === 'success') {
+              this.blastLoading = false;
+              this.stopChecking();
+              this.$bvToast.toast(
+                `All of the BLAST results have finished being interpretted.`,
+                {
+                  title: 'Finished',
+                  appendToast: false,
+                }
+              );
+            } else if (response.data === 'error') {
+              this.blastLoading = false;
+              this.stopChecking();
+              this.$bvToast.toast(
+                `An unknown error occurred. Try removing and reuploading the BLAST files. 
+                If you ignore this error not all of your BLAST results will be shown. 
+                If this error continues, please contact us by visiting the 'contact' tab.`,
+                {
+                  title: 'Error',
+                  appendToast: false,
+                }
+              );
+            } else if (response.data !== 'complete') {
+              if (response.data === '0') {
+                this.waitMessage = "Your Blast results are currently being interpretted. This may take several minutes."
+              } else {
+                this.waitMessage = "Your Blast results are number " + response.data + " in line to be interpretted."
+              }
+            }
+          })
+          .catch((error) => {
+            console.error(error);
+          });
+      }, 5000);
+    },
+
+    /**
+     * If the next button is clicked prematurely a reminder appears.
+     */
+    uploadReminder() {
+      if (!this.fasta) {
+        this.$bvToast.toast(
+          `You must upload a FASTA file to continue. 
+            If you have uploaded a file and still cannot continue it is because the FASTA file is not in the correct FASTA format.`,
+          {
+            title: 'UPLOAD FASTA FILE',
+            autoHideDelay: 15000,
+            appendToast: false,
+          }
+        );
+      }
+    },
+
+    /**
      * Changes the function of a deleted gene so that it is now visible.
      */
     reinstate(index) {
-      if (this.dnamaster[index].function === 'DELETED') {
+      if (this.phageAnnotations[index].function === '@DELETED') {
         this.completedGenes -= 1;
-        this.dnamaster[index].function = 'None selected';
+        this.phageAnnotations[index].function = 'None selected';
       } else {
-        this.dnamaster[index].status = 'tRNA';
+        this.phageAnnotations[index].status = 'tRNA';
       }
       const payload = {
-        id: this.dnamaster[index].id,
-        start: this.dnamaster[index].start,
-        stop: this.dnamaster[index].stop,
-        strand: this.dnamaster[index].strand,
-        function: this.dnamaster[index].function,
-        status: this.dnamaster[index].status,
-        frame: this.dnamaster[index].frame,
+        id: this.phageAnnotations[index].id,
+        left: this.phageAnnotations[index].left,
+        right: this.phageAnnotations[index].right,
+        strand: this.phageAnnotations[index].strand,
+        function: this.phageAnnotations[index].function,
+        status: this.phageAnnotations[index].status,
+        frame: this.phageAnnotations[index].frame,
       };
       axios
         .put(
           process.env.VUE_APP_BASE_URL +
-            `/annotations/cds/${this.$route.params.phageID}/${this.dnamaster[index].id}`,
+            `/annotations/cds/${this.$route.params.phageID}/${this.phageAnnotations[index].id}`,
           payload
         )
         .then(() => {
-          console.log(this.dnamaster[index].function);
+          console.log(this.phageAnnotations[index].function);
         })
         .catch((error) => {
           console.error(error);
@@ -541,24 +603,24 @@ export default {
      * Temporarily deletes a tRNA gene.
      */
     deleteTRNA(index) {
-      this.dnamaster[index].status = 'trnaDELETED';
+      this.phageAnnotations[index].status = 'trnaDELETED';
       const payload = {
-        id: this.dnamaster[index].id,
-        start: this.dnamaster[index].start,
-        stop: this.dnamaster[index].stop,
-        strand: this.dnamaster[index].strand,
-        function: this.dnamaster[index].function,
+        id: this.phageAnnotations[index].id,
+        left: this.phageAnnotations[index].left,
+        right: this.phageAnnotations[index].right,
+        strand: this.phageAnnotations[index].strand,
+        function: this.phageAnnotations[index].function,
         status: 'trnaDELETED',
-        frame: this.dnamaster[index].frame,
+        frame: this.phageAnnotations[index].frame,
       };
       axios
         .put(
           process.env.VUE_APP_BASE_URL +
-            `/annotations/cds/${this.$route.params.phageID}/${this.dnamaster[index].id}`,
+            `/annotations/cds/${this.$route.params.phageID}/${this.phageAnnotations[index].id}`,
           payload
         )
         .then(() => {
-          console.log(this.dnamaster[index].function);
+          console.log(this.phageAnnotations[index].function);
         })
         .catch((error) => {
           console.error(error);
@@ -571,19 +633,19 @@ export default {
      * @return {string} the status of the cds.
      */
     getStatus(index) {
-      if (this.dnamaster[index].status === 'tRNA') {
+      if (this.phageAnnotations[index].status === 'tRNA') {
         return 'tRNA';
       }
       var status = '';
       if (
-        this.dnamaster[index].stop - this.dnamaster[index].start <
+        this.phageAnnotations[index].right - this.phageAnnotations[index].left <
         this.short
       ) {
         status += 'S | ';
       }
       if (index === 0) {
         status += this.getTailingOverlap(index);
-      } else if (index === this.dnamaster.length - 1) {
+      } else if (index === this.phageAnnotations.length - 1) {
         status += this.getLeadingOverlap(index);
       } else {
         status += this.getLeadingOverlap(index);
@@ -605,18 +667,18 @@ export default {
       var nextGene = 1;
       var overlap = -10000;
       while (overlap === -10000) {
-        if (index + nextGene >= this.dnamaster.length) {
+        if (index + nextGene >= this.phageAnnotations.length) {
           return status;
         }
-        if (this.dnamaster[index + nextGene].function !== 'DELETED') {
+        if (this.phageAnnotations[index + nextGene].function !== 'DELETED') {
           overlap =
-            this.dnamaster[index].stop - this.dnamaster[index + nextGene].start;
+            this.phageAnnotations[index].right - this.phageAnnotations[index + nextGene].left;
         } else {
           nextGene += 1;
         }
       }
       if (
-        this.dnamaster[index].strand === this.dnamaster[index + nextGene].strand
+        this.phageAnnotations[index].strand === this.phageAnnotations[index + nextGene].strand
       ) {
         if (overlap < this.gap * -1) {
           status += 'LTG | ';
@@ -642,15 +704,15 @@ export default {
         if (index - nextGene < 0) {
           return status;
         }
-        if (this.dnamaster[index - nextGene].function !== 'DELETED') {
+        if (this.phageAnnotations[index - nextGene].function !== 'DELETED') {
           leadingOverlap =
-            this.dnamaster[index - nextGene].stop - this.dnamaster[index].start;
+            this.phageAnnotations[index - nextGene].right - this.phageAnnotations[index].left;
         } else {
           nextGene += 1;
         }
       }
       if (
-        this.dnamaster[index].strand === this.dnamaster[index - nextGene].strand
+        this.phageAnnotations[index].strand === this.phageAnnotations[index - nextGene].strand
       ) {
         if (leadingOverlap < this.gap * -1) {
           status += 'LLG | ';
@@ -673,8 +735,8 @@ export default {
       let read = true;
       const payload = {
         id: 'added',
-        start: this.addCDS.start,
-        stop: this.addCDS.stop,
+        left: this.addCDS.left,
+        right: this.addCDS.right,
         strand: this.addCDS.strand,
         force: this.addCDS.force,
         read, // property shorthand
@@ -699,7 +761,7 @@ export default {
             );
           } else if (response.data.message === 'Not orf.') {
             this.$bvToast.toast(
-              `The inputted start and stop locations do not represent an ORF. To ignore this 
+              `The inputted left and right locations do not represent an ORF. To ignore this 
             warning and add the CDS, check the 'Force Add' box.`,
               {
                 title: 'ADD FAILED',

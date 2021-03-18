@@ -41,8 +41,8 @@
           ></b-form-textarea>
         </div>
         <p>
-          <strong>Left:</strong> {{ currentCDS.start }}<br />
-          <strong>Right:</strong> {{ currentCDS.stop }}<br />
+          <strong>Left:</strong> {{ currentCDS.left }}<br />
+          <strong>Right:</strong> {{ currentCDS.right }}<br />
           <span v-if="currentCDS.strand === '-'"
             ><strong>Strand:</strong> Direct</span
           >
@@ -102,16 +102,16 @@
             <div class="table-responsive">
               <table id="cp-table" class="table table-hover">
                 <tbody>
-                  <tr v-for="(start, index) in dirStartOptions" :key="index">
-                    <th>{{ start }}-{{ dirStopOptions[index] }}</th>
+                  <tr v-for="(left, index) in dirLeftOptions" :key="index">
+                    <th>{{ left }}-{{ dirRightOptions[index] }}</th>
                     <td>
                       <button
                         v-if="
-                          start + dirStopOptions[index] !==
-                          currentCDS.start + currentCDS.stop
+                          left + dirRightOptions[index] !==
+                          currentCDS.left + currentCDS.right
                         "
                         class="btn btn-dark btn-sm"
-                        @click="setORF(start, dirStopOptions[index], '+')"
+                        @click="setORF(left, dirRightOptions[index], '+')"
                       >
                         <strong>Select</strong>
                       </button>
@@ -126,16 +126,16 @@
             <div class="table-responsive">
               <table id="cp-table" class="table table-hover">
                 <tbody>
-                  <tr v-for="(start, index) in compStartOptions" :key="index">
-                    <th>{{ start }}-{{ compStopOptions[index] }}</th>
+                  <tr v-for="(left, index) in compLeftOptions" :key="index">
+                    <th>{{ left }}-{{ compRightOptions[index] }}</th>
                     <td>
                       <button
                         v-if="
-                          start + compStopOptions[index] !==
-                          currentCDS.start + currentCDS.stop
+                          left + compRightOptions[index] !==
+                          currentCDS.left + currentCDS.right
                         "
                         class="btn btn-dark btn-sm"
-                        @click="setORF(start, compStopOptions[index], '-')"
+                        @click="setORF(left, compRightOptions[index], '-')"
                       >
                         <strong>Select</strong>
                       </button>
@@ -174,11 +174,11 @@
               :data4="data4"
               :data5="data5"
               :data6="data6"
-              :start="currentCDS.start"
-              :stop="currentCDS.stop"
+              :left="currentCDS.left"
+              :right="currentCDS.right"
               :frame="frame"
-              :prevStop="prevStop"
-              :nextStart="nextStart"
+              :prevRight="prevRight"
+              :nextLeft="nextLeft"
             />
           </div>
           <div v-else>
@@ -191,14 +191,14 @@
       </div>
       <hr />
       <h4 style="text-align: center; margin: 1em">
-        BLAST Results for {{ newStart }} - {{ newStop }}
+        BLAST Results for {{ newLeft }} - {{ newRight }}
       </h4>
       <BlastResults
         :blastResults="
           allBlastResults[
-            currentCDS.start.toString() +
+            currentCDS.left.toString() +
               '-' +
-              currentCDS.stop.toString() +
+              currentCDS.right.toString() +
               '  ' +
               currentCDS.strand
           ]
@@ -219,8 +219,8 @@
           ></b-form-textarea>
         </div>
         <p>
-          <strong>Left:</strong> {{ currentCDS.start }}<br />
-          <strong>Right:</strong> {{ currentCDS.stop }}<br />
+          <strong>Left:</strong> {{ currentCDS.left }}<br />
+          <strong>Right:</strong> {{ currentCDS.right }}<br />
           <span v-if="currentCDS.strand === '-'"
             ><strong>Strand:</strong> Direct</span
           >
@@ -293,17 +293,17 @@ export default {
 
   data() {
     return {
-      dirStartOptions: [],
-      compStartOptions: [],
-      dirStopOptions: [],
-      compStopOptions: [],
+      dirLeftOptions: [],
+      compLeftOptions: [],
+      dirRightOptions: [],
+      compRightOptions: [],
       dirBlastResults: [],
       compBlastResults: [],
       allBlastResults: [],
       currentCDS: {
         id: '',
-        start: '',
-        stop: '',
+        left: '',
+        right: '',
         strand: '',
         function: '',
         status: '',
@@ -311,8 +311,8 @@ export default {
       },
       updatedCDS: {
         id: '',
-        start: '',
-        stop: '',
+        left: '',
+        right: '',
         strand: '',
         function: '',
         status: '',
@@ -320,8 +320,8 @@ export default {
       frame: null,
       newFunction: 'None selected',
       displayFunction: '',
-      newStart: null,
-      newStop: null,
+      newLeft: null,
+      newRight: null,
       newStrand: null,
       data1: [{ x: [], y: [] }],
       data2: [{ x: [], y: [] }],
@@ -331,8 +331,8 @@ export default {
       data6: [{ x: [], y: [] }],
       nextCDS: null,
       prevCDS: null,
-      nextStart: null,
-      prevStop: null,
+      nextLeft: null,
+      prevRight: null,
       calledBy: '',
       glimmer: '',
       genemark: '',
@@ -341,7 +341,7 @@ export default {
       dataExists: false,
       pageLoading: true,
       showFunction: false,
-      showStart: false,
+      showLeft: false,
       saved: true,
     };
   },
@@ -397,6 +397,7 @@ export default {
             `/annotations/cds/${this.$route.params.phageID}/${cdsID}`
         )
         .then((response) => {
+          console.log(response.data);
           if (response.data.message !== 'Finished') {
             this.$router.push(`/annotations/${this.$route.params.phageID}`);
           }
@@ -419,15 +420,15 @@ export default {
           this.dirBlastResults = response.data.dir_blast;
           this.compBlastResults = response.data.comp_blast;
           this.allBlastResults = response.data.all_blast;
-          this.dirStartOptions = response.data.dir_start_options;
-          this.dirStopOptions = response.data.dir_stop_options;
-          this.compStartOptions = response.data.comp_start_options;
-          this.compStopOptions = response.data.comp_stop_options;
-          this.newStart = this.currentCDS.start;
-          this.newStop = this.currentCDS.stop;
+          this.dirLeftOptions = response.data.dir_left_options;
+          this.dirRightOptions = response.data.dir_right_options;
+          this.compLeftOptions = response.data.comp_left_options;
+          this.compRightOptions = response.data.comp_right_options;
+          this.newLeft = this.currentCDS.left;
+          this.newRight = this.currentCDS.right;
           this.newStrand = this.currentCDS.strand;
-          this.prevStop = response.data.prev_stop;
-          this.nextStart = response.data.next_start;
+          this.prevRight = response.data.prev_right;
+          this.nextLeft = response.data.next_left;
           this.data1 = [
             {
               x: response.data.x_data,
@@ -473,9 +474,9 @@ export default {
           this.phanotate = response.data.phanotate;
           var called = false;
           var cds =
-            this.currentCDS.start.toString() +
+            this.currentCDS.left.toString() +
             '-' +
-            this.currentCDS.stop.toString() +
+            this.currentCDS.right.toString() +
             ' ' +
             this.currentCDS.strand;
           if (this.glimmer.indexOf(cds) > -1) {
@@ -554,13 +555,13 @@ export default {
     editCDS() {
       this.saved = true;
       this.updatedCDS = this.currentCDS;
-      this.updatedCDS.start = this.newStart;
-      this.updatedCDS.stop = this.newStop;
+      this.updatedCDS.left = this.newLeft;
+      this.updatedCDS.right = this.newRight;
       this.updatedCDS.function = '@' + this.newFunction;
       const payload = {
         id: this.updatedCDS.id,
-        start: this.updatedCDS.start,
-        stop: this.updatedCDS.stop,
+        left: this.updatedCDS.left,
+        right: this.updatedCDS.right,
         strand: this.updatedCDS.strand,
         function: this.updatedCDS.function,
         notes: this.notes,
@@ -628,28 +629,28 @@ export default {
     },
 
     /**
-     * Updates the start and stop postions to what the user selected.
-     * @param {number} start the user selected start.
-     * @param {number} stop the user selected stop.
+     * Updates the left and right postions to what the user selected.
+     * @param {number} left the user selected left.
+     * @param {number} right the user selected right.
      */
-    setORF(start, stop, strand) {
+    setORF(left, right, strand) {
       this.saved = false;
-      if (start !== this.newStart || stop !== this.newStop) {
+      if (left !== this.newLeft || right !== this.newRight) {
         this.dataExists = false;
         this.newFunction = '';
         this.displayFunction = 'None selected';
-        this.newStop = stop;
-        this.currentCDS.stop = stop;
-        this.newStart = start;
+        this.newRight = right;
+        this.currentCDS.right = right;
+        this.newLeft = left;
         this.newStrand = strand;
-        this.currentCDS.start = start;
+        this.currentCDS.left = left;
         this.currentCDS.strand = strand;
         this.calledBy = '';
         var called = false;
         var cds =
-          this.currentCDS.start.toString() +
+          this.currentCDS.left.toString() +
           '-' +
-          this.currentCDS.stop.toString() +
+          this.currentCDS.right.toString() +
           ' ' +
           this.currentCDS.strand;
         if (this.glimmer.indexOf(cds) > -1) {
@@ -669,10 +670,10 @@ export default {
         } else {
           this.calledBy = 'None';
         }
-        this.frame = ((start + 2) % 3) + 1;
+        this.frame = ((left + 2) % 3) + 1;
         if (this.currentCDS.strand === '-') {
-          this.frame = ((this.currentCDS.stop + 2) % 3) + 4;
-        } else this.frame = ((this.currentCDS.start + 2) % 3) + 1;
+          this.frame = ((this.currentCDS.right + 2) % 3) + 4;
+        } else this.frame = ((this.currentCDS.left + 2) % 3) + 1;
         console.log(this.frame);
         this.$nextTick().then(() => {
           this.dataExists = true;

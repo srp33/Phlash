@@ -63,6 +63,7 @@ def create_genbank(fasta_file, UPLOAD_FOLDER, current_user, payload):
     genome = SeqIO.read(fasta_file, "fasta").seq
     genome = Seq(str(genome), IUPAC.unambiguous_dna)
     record = SeqRecord(genome, id='', name=headers["phageName"], description=headers["source"])
+    ##FIXME
     record.annotations["AUTHORS"] = "Becker, L.W."
     record.annotations["Reference"] = "whole thing"
 
@@ -78,44 +79,43 @@ def create_genbank(fasta_file, UPLOAD_FOLDER, current_user, payload):
     record.features.append(feature)
 
     idNumber = 0
-    for cds in DNAMaster.query.order_by(DNAMaster.start).all():
-        if (cds.function == "DELETED" or cds.status == "trnaDELETED"):
+    for cds in Annotations.query.filter_by(phage_id=current_user).order_by(Annotations.left).all():
+        if (cds.function == "@DELETED" or cds.status == "trnaDELETED"):
             continue
         idNumber += 1
         if cds.strand == '-':
             qualifiers = {}
             qualifiers["gene"] = str(idNumber)
-            qualifiers["locus_tag"] = cds.id[0:-1] + str(idNumber)
+            qualifiers["locus_tag"] = str(idNumber)
             if headers["includeNotes"]:
                 qualifiers["note"] = cds.notes
-            feature = SeqFeature(FeatureLocation(start=cds.start - 1, end=cds.stop, strand=-1), id=cds.id[0:-1] + str(idNumber), type='gene', qualifiers=qualifiers)
+            feature = SeqFeature(FeatureLocation(start=cds.left - 1, end=cds.right, strand=-1), id=cds.id[0:-1] + str(idNumber), type='gene', qualifiers=qualifiers)
             record.features.append(feature)
             if cds.status == "tRNA":
                 qualifiers = {}
                 qualifiers["gene"] = str(idNumber)
                 qualifiers["locus_tag"] = headers["phageName"] + '_' + str(idNumber)
                 qualifiers["note"] = cds.function
-                feature = SeqFeature(FeatureLocation(start=cds.start - 1, end=cds.stop, strand=-1), id=cds.id[0:-1] + str(idNumber), type='tRNA', qualifiers=qualifiers)
+                feature = SeqFeature(FeatureLocation(start=cds.left - 1, end=cds.right, strand=-1), id=cds.id[0:-1] + str(idNumber), type='tRNA', qualifiers=qualifiers)
                 record.features.append(feature)
             else:
                 qualifiers = {}
                 qualifiers["gene"] = str(idNumber)
                 qualifiers["locus_tag"] = headers["phageName"] + '_' + str(idNumber)
-                qualifiers["codon_start"] = [1]
+                qualifiers["codon_left"] = [1]
                 qualifiers["transl_table"] = [11]
-                pattern = re.compile("@*(.*)##(.*)")
+                pattern = re.compile("@(.*)##(.*)")
                 matches = pattern.search(cds.function)
                 if matches:
                     qualifiers["product"] = matches.group(1)
                     qualifiers["protein_id"] = matches.group(2)
-                    print(qualifiers)
                 else:
                     qualifiers["product"] = "Hypothetical Protein"
                     qualifiers["protein_id"] = "unknown:" + qualifiers["locus_tag"]
-                start = len(genome) - cds.stop
-                stop = len(genome) - cds.start + 1
-                qualifiers["translation"] = Seq.translate(helper.get_sequence(genome, cds.strand, start, stop), table=11)[0:-1]
-                feature = SeqFeature(FeatureLocation(start=cds.start - 1, end=cds.stop, strand=-1), id=cds.id[0:-1] + str(idNumber), type='CDS', qualifiers=qualifiers)
+                left = len(genome) - cds.right
+                right = len(genome) - cds.left + 1
+                qualifiers["translation"] = Seq.translate(helper.get_sequence(genome, cds.strand, left, right), table=11)[0:-1]
+                feature = SeqFeature(FeatureLocation(start=cds.left - 1, end=cds.right, strand=-1), id=cds.id[0:-1] + str(idNumber), type='CDS', qualifiers=qualifiers)
                 record.features.append(feature)
         else:
             qualifiers = {}
@@ -123,28 +123,31 @@ def create_genbank(fasta_file, UPLOAD_FOLDER, current_user, payload):
             qualifiers["locus_tag"] = headers["phageName"] + '_' + str(idNumber)
             if headers["includeNotes"]:
                 qualifiers["note"] = cds.notes
-            feature = SeqFeature(FeatureLocation(start=cds.start - 1, end=cds.stop), id=cds.id[0:-1] + str(idNumber), type='gene', qualifiers=qualifiers)
+            feature = SeqFeature(FeatureLocation(start=cds.left - 1, end=cds.right), id=cds.id[0:-1] + str(idNumber), type='gene', qualifiers=qualifiers)
             record.features.append(feature)
             if cds.status == "tRNA":
                 qualifiers = {}
                 qualifiers["gene"] = str(idNumber)
                 qualifiers["locus_tag"] = headers["phageName"] + '_' + str(idNumber)
                 qualifiers["note"] = cds.function
-                feature = SeqFeature(FeatureLocation(start=cds.start - 1, end=cds.stop), id=cds.id[0:-1] + str(idNumber), type='tRNA', qualifiers=qualifiers)
+                feature = SeqFeature(FeatureLocation(start=cds.left - 1, end=cds.right), id=cds.id[0:-1] + str(idNumber), type='tRNA', qualifiers=qualifiers)
                 record.features.append(feature)
             else:
                 qualifiers = {}
                 qualifiers["gene"] = str(idNumber)
                 qualifiers["locus_tag"] = headers["phageName"] + '_' + str(idNumber)
-                qualifiers["codon_start"] = [1]
+                qualifiers["codon_left"] = [1]
                 qualifiers["transl_table"] = [11]
-                pattern = re.compile("(.*)##(.*)")
+                pattern = re.compile("@(.*)##(.*)")
                 matches = pattern.search(cds.function)
                 if matches:
                     qualifiers["product"] = matches.group(1)
                     qualifiers["protein_id"] = matches.group(2)
-                qualifiers["translation"] = Seq.translate(helper.get_sequence(genome, cds.strand, cds.start - 1, cds.stop), table=11)[0:-1]
-                feature = SeqFeature(FeatureLocation(start=cds.start - 1, end=cds.stop), id=cds.id[0:-1] + str(idNumber), type='CDS', qualifiers=qualifiers)
+                else:
+                    qualifiers["product"] = "Hypothetical Protein"
+                    qualifiers["protein_id"] = "unknown:" + qualifiers["locus_tag"]
+                qualifiers["translation"] = Seq.translate(helper.get_sequence(genome, cds.strand, cds.left - 1, cds.right), table=11)[0:-1]
+                feature = SeqFeature(FeatureLocation(start=cds.left - 1, end=cds.right), id=cds.id[0:-1] + str(idNumber), type='CDS', qualifiers=qualifiers)
                 record.features.append(feature)
     with open(gb_file, 'w') as genbank:
         SeqIO.write(record, genbank, 'genbank')

@@ -44,11 +44,14 @@ def find_blast_zip(current_user):
     response_object["blast_downloaded"] = False
     response_object["uploaded"] = True
     response_object["annotated"] = False
+    response_object["annotation_in_progress"] = False
+    if db.session.query(Tasks).filter_by(phage_id=current_user).filter_by(function="auto_annotate").first() is not None:
+        response_object["annotation_in_progress"] = True
     for filename in os.listdir(os.path.join(ROOT, 'users', current_user, 'uploads')):
         if (filename.endswith('.gdata')):
             response_object["annotated"] = True
             break
-    if (db.session.query(Blast_Results).first() is None):
+    if (db.session.query(Blast_Results).filter_by(phage_id=current_user).first() is None):
         response_object["uploaded"] = False
     for filename in os.listdir(os.path.join(ROOT, 'users', current_user)):
         if filename.endswith('.zip'):
@@ -96,7 +99,7 @@ def auto_annotate(UPLOAD_FOLDER, current_user):
     coding_potential['y_data_4'] = gdata_df["4"].to_list()
     coding_potential['y_data_5'] = gdata_df["5"].to_list()
     coding_potential['y_data_6'] = gdata_df["6"].to_list()
-    DNAMaster.query.delete()
+    Annotations.query.filter_by(phage_id=current_user).delete()
     db.session.commit()
 
     print("\n\nPhanotate\n")
@@ -112,33 +115,35 @@ def auto_annotate(UPLOAD_FOLDER, current_user):
             id_index += 1
             column = line.strip().split()
             frame = int(column[3])
-            start = int(column[1])
-            stop = int(column[2])
+            left = int(column[1])
+            right = int(column[2])
             strand = '+'
             if frame < 0:
-                stop = int(column[1])
-                start = int(column[2])
+                right = int(column[1])
+                left = int(column[2])
                 strand = '-'
-            frame, status = helper.get_frame_and_status(start, stop, strand, coding_potential)
-            cds = DNAMaster(id = 'Glimmer_' + str(id_index),
-                            start = start,
-                            stop = stop,
+            frame, status = helper.get_frame_and_status(left, right, strand, coding_potential)
+            cds = Annotations(phage_id = current_user,
+                            id = 'Glimmer_' + str(id_index),
+                            left = left,
+                            right = right,
                             strand = strand,
                             function = "None selected",
                             status = status,
                             frame = frame)
             db.session.add(cds)
-            glimmer_calls += (str(start) + '-' + str(stop) + ' ' + strand + ',')
-    calls = Gene_Calls(id = 'Glimmer',
-                       calls = glimmer_calls)
+            glimmer_calls += (str(left) + '-' + str(right) + ' ' + strand + ',')
+    calls = Gene_Calls(phage_id = current_user,
+                        id = 'Glimmer',
+                        calls = glimmer_calls)
     db.session.add(calls)
     db.session.commit()
     with open(os.path.join(UPLOAD_FOLDER, current_user + "_aragorn.txt"), 'r') as aragorn:
         pattern1 = re.compile("tRNA-.*")
         pattern2 = re.compile("Sequence (.*)\[(.*),(.*)\]")
         function = ""
-        stop = ""
-        start = ""
+        right = ""
+        left = ""
         strand = ""
         id_index = 0
         for line in aragorn:
@@ -148,15 +153,16 @@ def auto_annotate(UPLOAD_FOLDER, current_user):
             if re.match(pattern2, line) != None:
                 id_index += 1
                 orf = re.search(pattern2, line)
-                start = orf.group(2)
-                stop = orf.group(3)
+                left = orf.group(2)
+                right = orf.group(3)
                 if (orf.group(1)) == 'c':
                     strand = '-'
                 else:
                     strand = '+'
-                cds = DNAMaster(id = "Aragorn_" + str(id_index),
-                                start = int(start),
-                                stop = int(stop),
+                cds = Annotations(phage_id = current_user,
+                                id = "Aragorn_" + str(id_index),
+                                left = int(left),
+                                right = int(right),
                                 strand = strand,
                                 function = function,
                                 status = "tRNA",
@@ -165,8 +171,8 @@ def auto_annotate(UPLOAD_FOLDER, current_user):
     db.session.commit()
     genemark_calls = ""
     with open(os.path.join(UPLOAD_FOLDER, current_user + ".fasta.ldata"), 'r') as genemark:
-        start = 0
-        stop = 0
+        left = 0
+        right = 0
         frame = 0
         prob = 0.0
         id_index = 0
@@ -181,30 +187,31 @@ def auto_annotate(UPLOAD_FOLDER, current_user):
                     new_prob = (float(column[3]) + float(column[4])) / 2
                 except:
                     new_prob = 0.0
-                if frame > 3 and start == int(column[0]) and new_prob < prob:
+                if frame > 3 and left == int(column[0]) and new_prob < prob:
                     continue
-                if frame < 3 and stop == int(column[1]) and new_prob < prob:
+                if frame < 3 and right == int(column[1]) and new_prob < prob:
                     continue
-                if (first) or (frame > 3 and start == int(column[0])) or (frame < 3 and stop == int(column[1])):
+                if (first) or (frame > 3 and left == int(column[0])) or (frame < 3 and right == int(column[1])):
                     first = False
-                    start = int(column[0])
-                    stop = int(column[1])
+                    left = int(column[0])
+                    right = int(column[1])
                     frame = int(column[2])
                     prob = new_prob
                 else:
                     found = False
                     if frame > 3:
-                        genemark_calls += (str(start) + '-' + str(stop) + ' ' + '-' + ',')
-                        cds = DNAMaster.query.filter_by(start=start).first()
+                        genemark_calls += (str(left) + '-' + str(right) + ' ' + '-' + ',')
+                        cds = Annotations.query.filter_by(phage_id=current_user).filter_by(left=left).first()
                         if cds == None or cds.status == 'Fail':
-                            frame, status = helper.get_frame_and_status(start, stop, '-', coding_potential)
+                            frame, status = helper.get_frame_and_status(left, right, '-', coding_potential)
                             if cds == None or (cds.status == 'Fail' and status == 'Pass'):
                                 if cds != None:
                                     db.session.delete(cds)
                                 id_index += 1
-                                cds = DNAMaster(id = "Genemark_" + str(id_index),
-                                                start = int(start),
-                                                stop = int(stop),
+                                cds = Annotations(phage_id = current_user,
+                                                id = "Genemark_" + str(id_index),
+                                                left = int(left),
+                                                right = int(right),
                                                 strand = '-',
                                                 function = "None selected",
                                                 status = status,
@@ -212,28 +219,30 @@ def auto_annotate(UPLOAD_FOLDER, current_user):
                             db.session.add(cds)
                             db.session.commit()
                     else:
-                        genemark_calls += (str(start) + '-' + str(stop) + ' ' + '+' + ',')
-                        cds = DNAMaster.query.filter_by(stop=stop).first()
+                        genemark_calls += (str(left) + '-' + str(right) + ' ' + '+' + ',')
+                        cds = Annotations.query.filter_by(phage_id=current_user).filter_by(right=right).first()
                         if cds == None or cds.status == 'Fail':
-                            frame, status = helper.get_frame_and_status(start, stop, '+', coding_potential)
+                            frame, status = helper.get_frame_and_status(left, right, '+', coding_potential)
                             if cds == None or (cds.status == 'Fail' and status == 'Pass'):
                                 if cds != None:
                                     db.session.delete(cds)
                                 id_index += 1
-                                cds = DNAMaster(id = "Genemark_" + str(id_index),
-                                                start = int(start),
-                                                stop = int(stop),
+                                cds = Annotations(phage_id = current_user,
+                                                id = "Genemark_" + str(id_index),
+                                                left = int(left),
+                                                right = int(right),
                                                 strand = '+',
                                                 function = "None selected",
                                                 status = status,
                                                 frame = frame)
                                 db.session.add(cds)
                                 db.session.commit()
-                    start = int(column[0])
-                    stop = int(column[1])
+                    left = int(column[0])
+                    right = int(column[1])
                     frame = int(column[2])
                     prob = new_prob
-    calls = Gene_Calls(id = 'GeneMark',
+    calls = Gene_Calls(phage_id = current_user,
+                       id = 'GeneMark',
                        calls = genemark_calls)
     db.session.add(calls)
     db.session.commit()
@@ -247,43 +256,45 @@ def auto_annotate(UPLOAD_FOLDER, current_user):
             id_index += 1
             column = line.strip().split()
             strand = str(column[2])
-            start = int(column[1])
-            stop = int(column[0])
-            cds = DNAMaster.query.filter_by(start=start).first()
+            left = int(column[1])
+            right = int(column[0])
+            cds = Annotations.query.filter_by(phage_id=current_user).filter_by(left=left).first()
             if strand == '+':
-                start = int(column[0])
-                stop = int(column[1])
-                cds = DNAMaster.query.filter_by(stop=stop).first()
-            phanotate_calls += (str(start) + '-' + str(stop) + ' ' + strand + ',')
+                left = int(column[0])
+                right = int(column[1])
+                cds = Annotations.query.filter_by(phage_id=current_user).filter_by(right=right).first()
+            phanotate_calls += (str(left) + '-' + str(right) + ' ' + strand + ',')
             if cds == None or cds.status == 'Fail':
-                frame, status = helper.get_frame_and_status(start, stop, strand, coding_potential)
+                frame, status = helper.get_frame_and_status(left, right, strand, coding_potential)
                 if cds == None or (cds.status == 'Fail' and status == 'Pass'):
                     if cds != None:
                         db.session.delete(cds)
-                    cds = DNAMaster(id = 'Phanotate_' + str(id_index),
-                                    start = start,
-                                    stop = stop,
+                    cds = Annotations(phage_id = current_user,
+                                    id = 'Phanotate_' + str(id_index),
+                                    left = left,
+                                    right = right,
                                     strand = strand,
                                     function = "None selected",
                                     status = status,
                                     frame = frame)
                     db.session.add(cds)
-    calls = Gene_Calls(id = 'Phanotate',
+    calls = Gene_Calls(phage_id = current_user,
+                       id = 'Phanotate',
                        calls = phanotate_calls)
     db.session.add(calls)
     db.session.commit()
     id_index = 0
 
-    for cds in db.session.query(DNAMaster).order_by(DNAMaster.start):
+    for cds in db.session.query(Annotations).filter_by(phage_id=current_user).order_by(Annotations.left):
         id_index += 1
         cds.id = current_user + '_' + str(id_index)
-        if (cds.stop < cds.start) or (Blast_Results.query.filter_by(start=cds.start, stop=cds.stop, strand=cds.strand).first()):
+        if (cds.right < cds.left) or (Blast_Results.query.filter_by(phage_id=current_user).filter_by(left=cds.left, right=cds.right, strand=cds.strand).first()):
             db.session.delete(cds)
     db.session.commit()
 
     # Remove files created for autoannotation.
     for filename in os.listdir(UPLOAD_FOLDER):
-        if not filename.endswith(".fasta") and not filename.endswith(".gdata"):
+        if not filename.endswith(".fasta") and not filename.endswith(".gdata") and not filename.endswith(".json"):
             os.remove(os.path.join(UPLOAD_FOLDER, filename))
 
 def download_blast_input(current_user):
@@ -323,10 +334,10 @@ def create_blast_input(UPLOAD_FOLDER, current_user):
     blast_file_count = 1  # keep track of num blast files created
     out_file = f"{str(filename.group(1))}/{current_user}_blast_{blast_file_count}.fasta"
     files_to_zip = [out_file]
-    starts, stops = get_start_stop('+', genome)
-    for i in range(len(starts)):
-        output += f">+, {starts[i]}-{stops[i]}\n"
-        output += f"{Seq.translate(sequence=helper.get_sequence(genome, '+', starts[i]-1, stops[i]), table=11)}\n"
+    lefts, rights = get_starts_stops('+', genome)
+    for i in range(len(lefts)):
+        output += f">+, {lefts[i]}-{rights[i]}\n"
+        output += f"{Seq.translate(sequence=helper.get_sequence(genome, '+', lefts[i]-1, rights[i]), table=11)}\n"
         if getsizeof(output) > 30000:  # only file size to reach 30 kb, else you get a CPU limit from NCBI blast
             with open(out_file, "w") as f:
                 f.write(output)
@@ -334,12 +345,12 @@ def create_blast_input(UPLOAD_FOLDER, current_user):
             blast_file_count += 1
             out_file = f"{str(filename.group(1))}/{current_user}_blast_{blast_file_count}.fasta"
             files_to_zip.append(out_file)
-    starts, stops = get_start_stop('-', genome)
-    for i in range(len(starts)):
-        output += f">-, {starts[i]}-{stops[i]}\n"
-        start = len(genome) - stops[i]
-        stop = len(genome) - starts[i] + 1
-        output += f"{Seq.translate(sequence=helper.get_sequence(genome, '-', start, stop), table=11)}\n"
+    lefts, rights = get_starts_stops('-', genome)
+    for i in range(len(lefts)):
+        output += f">-, {lefts[i]}-{rights[i]}\n"
+        left = len(genome) - rights[i]
+        right = len(genome) - lefts[i] + 1
+        output += f"{Seq.translate(sequence=helper.get_sequence(genome, '-', left, right), table=11)}\n"
         if getsizeof(output) > 30000:  # only file size to reach 30 kb, else you get a CPU limit from NCBI blast
             with open(out_file, "w") as f:
                 f.write(output)
@@ -365,7 +376,7 @@ def create_blast_input(UPLOAD_FOLDER, current_user):
 
     return blast_file_count
 
-def dropzone(UPLOAD_FOLDER, request):
+def dropzone(current_user, UPLOAD_FOLDER, request):
     """Adds the blast output file to the upload directory if of type json.
 
     Args:
@@ -388,7 +399,7 @@ def dropzone(UPLOAD_FOLDER, request):
                     f.write(contents)
                     if contents[-6:] == "\n]\n}\n\n":
                         print("yes")
-                        file_data = db.session.query(Files).filter_by(name=file_name).first()
+                        file_data = db.session.query(Files).filter_by(phage_id=current_user).filter_by(name=file_name).first()
                         file_data.complete = True
                         db.session.commit()
         if not found:
@@ -396,11 +407,11 @@ def dropzone(UPLOAD_FOLDER, request):
                 f.write(contents)
             if contents[-6:] == "\n]\n}\n\n":
                 print("yes")
-                file_data = db.session.query(Files).filter_by(name=file_name).first()
+                file_data = db.session.query(Files).filter_by(phage_id=current_user).filter_by(name=file_name).first()
                 file_data.complete = True
                 db.session.commit()
 
-def get_blast_output_names(UPLOAD_FOLDER, type_of_call):
+def get_blast_output_names(current_user, UPLOAD_FOLDER, type_of_call):
     """Gets the names of all the files of type json in the upload directory.
 
     Args:
@@ -418,7 +429,7 @@ def get_blast_output_names(UPLOAD_FOLDER, type_of_call):
     bad_files = []
     for file in os.listdir(UPLOAD_FOLDER):
         if file.endswith(".json"):
-            file_data = db.session.query(Files).filter_by(name=file).first()
+            file_data = db.session.query(Files).filter_by(phage_id=current_user).filter_by(name=file).first()
             if file_data != None and file_data.complete:
                 file_mods.append(file_data.date)
                 file_sizes.append(file_data.size)
@@ -431,19 +442,32 @@ def get_blast_output_names(UPLOAD_FOLDER, type_of_call):
     if type_of_call == "refresh":
         for file_name in bad_files:
             os.remove(os.path.join(UPLOAD_FOLDER, file_name))
-            delete_file = db.session.query(Files).filter_by(name=file_name).first()
+            delete_file = db.session.query(Files).filter_by(phage_id=current_user).filter_by(name=file_name).first()
             db.session.delete(delete_file)
     response_object["bad_files"] = bad_files
     response_object["file_names"] = file_names
     response_object["file_sizes"] = file_sizes
     response_object["file_mods"] = file_mods
     response_object["in_process"] = False
-    if (db.session.query(DNAMaster).first() is None):
+    response_object["position"] = -1
+    task = db.session.query(Tasks).filter_by(phage_id=current_user).filter_by(function="auto_annotate").first()
+    if (task is not None):
+        curr_tasks = db.session.query(Tasks).filter_by(complete=False).order_by(Tasks.time)
+        counter = 0
+        for curr_task in curr_tasks:
+            if curr_task.phage_id == current_user:
+                break
+            counter += 1
+        response_object["position"] = counter
         response_object["in_process"] = True
+        if (task.complete):
+            response_object["in_process"] = False
+            db.session.delete(task)
+            db.session.commit()
 
     return response_object
 
-def delete_blast_output(UPLOAD_FOLDER, file_path):
+def delete_blast_output(current_user, UPLOAD_FOLDER, file_path):
     """Removes a file from the upload directory given the file path.
     
     Args:
@@ -457,10 +481,10 @@ def delete_blast_output(UPLOAD_FOLDER, file_path):
     """
     try:
         os.remove(os.path.join(UPLOAD_FOLDER, file_path))
-        delete_file = db.session.query(Files).filter_by(name=file_path).first()
+        delete_file = db.session.query(Files).filter_by(phage_id=current_user).filter_by(name=file_path).first()
         db.session.delete(delete_file)
         response_object["status"] = "success"
-        db.session.query(Blast_Results).delete()
+        db.session.query(Blast_Results).filter_by(phage_id=current_user).delete()
         try:
             db.session.commit()
         except:
@@ -544,7 +568,7 @@ def get_start_options(genome, maximum, strand, minimum):
             start_options.append(minimum + index + 1)
     return start_options
 
-def get_start_stop(strand, genome):
+def get_starts_stops(strand, genome):
     """Finds alternative, possible start and stop positions for a given CDS. 
     
     Args:

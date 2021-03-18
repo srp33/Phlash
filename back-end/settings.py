@@ -14,7 +14,7 @@ import helper
 import shutil
 import pandas as pd
 
-def update_settings(payload):
+def update_settings(current_user, payload):
     """Updates settings given new setting data.
     Args:
         payload:
@@ -25,9 +25,9 @@ def update_settings(payload):
     response_object = {}
     print(payload)
     new_settings_data = payload.split(',')
-    setting = db.session.query(Settings).order_by(Settings.back_start_range).first()
-    setting.back_start_range = new_settings_data[3]
-    setting.forward_start_range = new_settings_data[4]
+    setting = db.session.query(Settings).filter_by(phage_id=current_user).order_by(Settings.back_left_range).first()
+    setting.back_left_range = new_settings_data[3]
+    setting.forward_left_range = new_settings_data[4]
     setting.gap = new_settings_data[0]
     setting.overlap = new_settings_data[1]
     setting.opposite_gap = new_settings_data[2]
@@ -36,16 +36,16 @@ def update_settings(payload):
     response_object['message'] = 'Settings updated!'
     return response_object
 
-def get_settings():
+def get_settings(current_user):
     """Returns the current settings.
 
         Returns:
             A dictionary containing the current settings.
     """
     response_object = {}
-    setting = db.session.query(Settings).order_by(Settings.back_start_range).first()
-    response_object['back_start_range'] = setting.back_start_range
-    response_object['forward_start_range'] = setting.forward_start_range
+    setting = db.session.query(Settings).filter_by(phage_id=current_user).order_by(Settings.back_left_range).first()
+    response_object['back_left_range'] = setting.back_left_range
+    response_object['forward_left_range'] = setting.forward_left_range
     response_object['gap'] = setting.gap
     response_object['opposite_gap'] = setting.opposite_gap
     response_object['overlap'] = setting.overlap

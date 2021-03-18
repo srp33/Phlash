@@ -14,8 +14,8 @@
         <hr />
         <p><strong>Instructions</strong></p>
         <p v-if="annotating">
-          Phlash is currently auto-annotating the bacteriophage genome. You may
-          not go to the previous or next page until it finishes. Even so, you
+          {{waitMessage}} You may
+          not go to the previous or next page until your genome has been auto-annotated. Even so, you
           can continue to work on your phage genome.<br />
           Phlash relies on
           <a href="#" @click="goToWebsite('GeneMarkS')" class="alert-link"
@@ -57,7 +57,7 @@
               name: 'Annotations',
               params: { phageID: $route.params.phageID },
             }"
-            :event="blastDownloaded && blastUploaded ? 'click' : ''"
+            :event="blastDownloaded && blastUploaded && autoAnnotated ? 'click' : ''"
           >
             <button
               class="btn btn-dark btn-nav disabled"
@@ -261,7 +261,7 @@
               name: 'Annotations',
               params: { phageID: $route.params.phageID },
             }"
-            :event="blastDownloaded && blastUploaded ? 'click' : ''"
+            :event="blastDownloaded && blastUploaded && autoAnnotated ? 'click' : ''"
           >
             <button
               class="btn btn-dark btn-nav disabled"
@@ -308,6 +308,7 @@ export default {
       badFiles: [],
       dropzoneOptions: this.setDropzone(),
       interval: null,
+      waitMessage: null,
     };
   },
 
@@ -375,6 +376,10 @@ export default {
       } else {
         document.getElementById('back-top').classList.add('disabled');
         document.getElementById('back-bottom').classList.add('disabled');
+      }
+      if (this.blastDownloaded && this.blastUploaded && this.autoAnnotated) {
+        document.getElementById('next-top').classList.remove('disabled');
+        document.getElementById('next-bottom').classList.remove('disabled');
       }
     },
   },
@@ -527,8 +532,6 @@ export default {
         )
         .then((response) => {
           console.log(response.data);
-          this.autoAnnotated = true;
-          this.annotating = false;
         })
         .catch((error) => {
           console.log(error);
@@ -567,7 +570,7 @@ export default {
           if (response.data.annotated) {
             this.autoAnnotated = true;
           }
-          if (!this.autoAnnotated) {
+          if (!this.autoAnnotated && !response.data.annotation_in_progress) {
             this.autoAnnotate();
           }
           console.log(this.blastUploaded);
@@ -641,8 +644,8 @@ export default {
         .then((response) => {
           if (response.data !== 'None') {
             this.numFiles = Number(response.data);
-            this.displayOutputFiles();
           }
+          this.displayOutputFiles();
         });
     },
 
@@ -721,8 +724,15 @@ export default {
             }
             if (response.data.in_process) {
               this.annotating = true;
+              if (response.data.position === 0) {
+                this.waitMessage = "Phlash is currently auto-annotating your bacteriophage genome."
+              }
+              else {
+                this.waitMessage = "Your bacteriophage genome is currently number " + response.data.position + " in line to be auto-annotated."
+              }
             } else {
               this.annotating = false;
+              this.autoAnnotated = true;
             }
           })
           .catch((error) => {
@@ -735,7 +745,16 @@ export default {
      * If the next button is clicked prematurely a reminder appears.
      */
     uploadReminder() {
-      if (!this.blastUploaded) {
+      if (!this.autoAnnotated) {
+        this.$bvToast.toast(
+          `You must wait for auto-annotation to be completed before continuing.`,
+          {
+            title: 'INCOMPLETE AUTO-ANNOTATION',
+            autoHideDelay: 15000,
+            appendToast: false,
+          }
+        );
+      } else if (!this.blastUploaded) {
         this.$bvToast.toast(
           `All ${this.numFiles} files have not been uploaded.`,
           {

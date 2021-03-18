@@ -224,8 +224,8 @@ export default {
           )
           .then((response) => {
             console.log(response.data);
-            this.backStartRange = response.data.back_start_range;
-            this.forwardStartRange = response.data.forward_start_range;
+            this.backStartRange = response.data.back_left_range;
+            this.forwardStartRange = response.data.forward_left_range;
             this.gap = response.data.gap;
             this.overlap = response.data.overlap;
             this.oppositeGap = response.data.opposite_gap;

@@ -71,7 +71,7 @@ def display_files(UPLOAD_FOLDER):
             response_object["fasta_file_size"] = os.path.getsize(os.path.join(UPLOAD_FOLDER, file))
     return response_object
 
-def delete_file(file_path, UPLOAD_FOLDER):
+def delete_file(current_user, file_path, UPLOAD_FOLDER):
     """Deletes a file given the file_path.
 
     Removes all data that has been saved associated with that file.
@@ -86,13 +86,15 @@ def delete_file(file_path, UPLOAD_FOLDER):
         A dictionary containing a success message.
     """
     try:
-        if (file_path.endswith(".fasta") or file_path.endswith(".fna") or file.endswith(".fa")):
-            db.session.query(Files).delete()
-            db.session.query(DNAMaster).delete()
-            db.session.query(Blast_Results).delete()
-            db.session.query(Gene_Calls).delete()
-            for file in os.listdir(UPLOAD_FOLDER):
-                os.remove(os.path.join(UPLOAD_FOLDER, file))
+        if (db.session.query(Tasks).filter_by(phage_id=current_user).first() is None):
+            if (file_path.endswith(".fasta") or file_path.endswith(".fna") or file_path.endswith(".fa")):
+                db.session.query(Files).filter_by(phage_id=current_user).delete()
+                db.session.query(Annotations).filter_by(phage_id=current_user).delete()
+                db.session.query(Blast_Results).filter_by(phage_id=current_user).delete()
+                db.session.query(Gene_Calls).filter_by(phage_id=current_user).delete()
+                db.session.query(Tasks).filter_by(phage_id=current_user).delete()
+                for file in os.listdir(UPLOAD_FOLDER):
+                    os.remove(os.path.join(UPLOAD_FOLDER, file))
     except:
         print("error")
         response_object["status"] = "error in deleting files"

@@ -102,16 +102,16 @@ export default {
   },
   props: {
     frame: Number,
-    start: Number,
-    stop: Number,
+    left: Number,
+    right: Number,
     data1: Array,
     data2: Array,
     data3: Array,
     data4: Array,
     data5: Array,
     data6: Array,
-    prevStop: Number,
-    nextStart: Number,
+    prevRight: Number,
+    nextLeft: Number,
   },
 
   data() {
@@ -175,9 +175,9 @@ export default {
         shapes: [
           {
             type: 'line',
-            x0: this.start,
+            x0: this.left,
             y0: 0,
-            x1: this.start,
+            x1: this.left,
             yref: 'paper',
             y1: 1,
             line: {
@@ -188,9 +188,9 @@ export default {
           },
           {
             type: 'line',
-            x0: this.stop,
+            x0: this.right,
             y0: 0,
-            x1: this.stop,
+            x1: this.right,
             yref: 'paper',
             y1: 1,
             line: {
@@ -202,11 +202,11 @@ export default {
         ],
         annotations: [
           {
-            x: this.start,
+            x: this.left,
             y: 1,
             xref: 'x',
             yref: 'y',
-            text: 'current<br>start',
+            text: 'current<br>left',
             font: {
               family: 'Avenir, Helvetica, Arial, sans-serif',
               size: 11,
@@ -217,11 +217,11 @@ export default {
             ay: -20,
           },
           {
-            x: this.stop,
+            x: this.right,
             y: 1,
             xref: 'x',
             yref: 'y',
-            text: 'current<br>stop',
+            text: 'current<br>right',
             font: {
               family: 'Avenir, Helvetica, Arial, sans-serif',
               size: 11,
@@ -291,9 +291,9 @@ export default {
         shapes: [
           {
             type: 'line',
-            x0: this.start,
+            x0: this.left,
             y0: 0,
-            x1: this.start,
+            x1: this.left,
             yref: 'paper',
             y1: 1,
             line: {
@@ -304,9 +304,9 @@ export default {
           },
           {
             type: 'line',
-            x0: this.stop,
+            x0: this.right,
             y0: 0,
-            x1: this.stop,
+            x1: this.right,
             yref: 'paper',
             y1: 1,
             line: {
@@ -381,9 +381,9 @@ export default {
         shapes: [
           {
             type: 'line',
-            x0: this.start,
+            x0: this.left,
             y0: 0,
-            x1: this.start,
+            x1: this.left,
             yref: 'paper',
             y1: 1,
             line: {
@@ -394,9 +394,9 @@ export default {
           },
           {
             type: 'line',
-            x0: this.stop,
+            x0: this.right,
             y0: 0,
-            x1: this.stop,
+            x1: this.right,
             yref: 'paper',
             y1: 1,
             line: {
@@ -465,9 +465,9 @@ export default {
         shapes: [
           {
             type: 'line',
-            x0: this.start,
+            x0: this.left,
             y0: 0,
-            x1: this.start,
+            x1: this.left,
             yref: 'paper',
             y1: 1,
             line: {
@@ -478,9 +478,9 @@ export default {
           },
           {
             type: 'line',
-            x0: this.stop,
+            x0: this.right,
             y0: 0,
-            x1: this.stop,
+            x1: this.right,
             yref: 'paper',
             y1: 1,
             line: {
@@ -492,11 +492,11 @@ export default {
         ],
         annotations: [
           {
-            x: this.start,
+            x: this.left,
             y: 1,
             xref: 'x',
             yref: 'y',
-            text: 'current<br>start',
+            text: 'current<br>left',
             font: {
               family: 'Avenir, Helvetica, Arial, sans-serif',
               size: 11,
@@ -507,11 +507,11 @@ export default {
             ay: -20,
           },
           {
-            x: this.stop,
+            x: this.right,
             y: 1,
             xref: 'x',
             yref: 'y',
-            text: 'current<br>stop',
+            text: 'current<br>right',
             font: {
               family: 'Avenir, Helvetica, Arial, sans-serif',
               size: 11,
@@ -581,9 +581,9 @@ export default {
         shapes: [
           {
             type: 'line',
-            x0: this.start,
+            x0: this.left,
             y0: 0,
-            x1: this.start,
+            x1: this.left,
             yref: 'paper',
             y1: 1,
             line: {
@@ -594,9 +594,9 @@ export default {
           },
           {
             type: 'line',
-            x0: this.stop,
+            x0: this.right,
             y0: 0,
-            x1: this.stop,
+            x1: this.right,
             yref: 'paper',
             y1: 1,
             line: {
@@ -671,9 +671,9 @@ export default {
         shapes: [
           {
             type: 'line',
-            x0: this.start,
+            x0: this.left,
             y0: 0,
-            x1: this.start,
+            x1: this.left,
             yref: 'paper',
             y1: 1,
             line: {
@@ -684,9 +684,9 @@ export default {
           },
           {
             type: 'line',
-            x0: this.stop,
+            x0: this.right,
             y0: 0,
-            x1: this.stop,
+            x1: this.right,
             yref: 'paper',
             y1: 1,
             line: {
@@ -758,9 +758,9 @@ export default {
         shapes: [
           {
             type: 'line',
-            x0: this.start,
+            x0: this.left,
             y0: 0,
-            x1: this.start,
+            x1: this.left,
             yref: 'paper',
             y1: 1,
             line: {
@@ -771,9 +771,9 @@ export default {
           },
           {
             type: 'line',
-            x0: this.stop,
+            x0: this.right,
             y0: 0,
-            x1: this.stop,
+            x1: this.right,
             yref: 'paper',
             y1: 1,
             line: {
@@ -784,9 +784,9 @@ export default {
           },
           {
             type: 'line',
-            x0: this.start,
+            x0: this.left,
             y0: 0.75,
-            x1: this.stop,
+            x1: this.right,
             yref: 'paper',
             y1: 0.75,
             line: {
@@ -796,9 +796,9 @@ export default {
           },
           {
             type: 'line',
-            x0: this.prevStop,
+            x0: this.prevRight,
             y0: 0,
-            x1: this.prevStop,
+            x1: this.prevRight,
             yref: 'paper',
             y1: 1,
             line: {
@@ -808,9 +808,9 @@ export default {
           },
           {
             type: 'line',
-            x0: this.nextStart,
+            x0: this.nextLeft,
             y0: 0,
-            x1: this.nextStart,
+            x1: this.nextLeft,
             yref: 'paper',
             y1: 1,
             line: {
@@ -821,11 +821,11 @@ export default {
         ],
         annotations: [
           {
-            x: this.start,
+            x: this.left,
             y: 1,
             xref: 'x',
             yref: 'y',
-            text: 'current<br>start',
+            text: 'current<br>left',
             font: {
               family: 'Avenir, Helvetica, Arial, sans-serif',
               size: 11,
@@ -836,11 +836,11 @@ export default {
             ay: -20,
           },
           {
-            x: this.stop,
+            x: this.right,
             y: 1,
             xref: 'x',
             yref: 'y',
-            text: 'current<br>stop',
+            text: 'current<br>right',
             font: {
               family: 'Avenir, Helvetica, Arial, sans-serif',
               size: 11,
@@ -911,9 +911,9 @@ export default {
         shapes: [
           {
             type: 'line',
-            x0: this.start,
+            x0: this.left,
             y0: 0,
-            x1: this.start,
+            x1: this.left,
             yref: 'paper',
             y1: 1,
             line: {
@@ -924,9 +924,9 @@ export default {
           },
           {
             type: 'line',
-            x0: this.stop,
+            x0: this.right,
             y0: 0,
-            x1: this.stop,
+            x1: this.right,
             yref: 'paper',
             y1: 1,
             line: {
@@ -937,9 +937,9 @@ export default {
           },
           {
             type: 'line',
-            x0: this.start,
+            x0: this.left,
             y0: 0.75,
-            x1: this.stop,
+            x1: this.right,
             yref: 'paper',
             y1: 0.75,
             line: {
@@ -949,9 +949,9 @@ export default {
           },
           {
             type: 'line',
-            x0: this.prevStop,
+            x0: this.prevRight,
             y0: 0,
-            x1: this.prevStop,
+            x1: this.prevRight,
             yref: 'paper',
             y1: 1,
             line: {
@@ -961,9 +961,9 @@ export default {
           },
           {
             type: 'line',
-            x0: this.nextStart,
+            x0: this.nextLeft,
             y0: 0,
-            x1: this.nextStart,
+            x1: this.nextLeft,
             yref: 'paper',
             y1: 1,
             line: {
@@ -1038,9 +1038,9 @@ export default {
         shapes: [
           {
             type: 'line',
-            x0: this.start,
+            x0: this.left,
             y0: 0,
-            x1: this.start,
+            x1: this.left,
             yref: 'paper',
             y1: 1,
             line: {
@@ -1051,9 +1051,9 @@ export default {
           },
           {
             type: 'line',
-            x0: this.stop,
+            x0: this.right,
             y0: 0,
-            x1: this.stop,
+            x1: this.right,
             yref: 'paper',
             y1: 1,
             line: {
@@ -1064,9 +1064,9 @@ export default {
           },
           {
             type: 'line',
-            x0: this.start,
+            x0: this.left,
             y0: 0.75,
-            x1: this.stop,
+            x1: this.right,
             yref: 'paper',
             y1: 0.75,
             line: {
@@ -1076,9 +1076,9 @@ export default {
           },
           {
             type: 'line',
-            x0: this.prevStop,
+            x0: this.prevRight,
             y0: 0,
-            x1: this.prevStop,
+            x1: this.prevRight,
             yref: 'paper',
             y1: 1,
             line: {
@@ -1088,9 +1088,9 @@ export default {
           },
           {
             type: 'line',
-            x0: this.nextStart,
+            x0: this.nextLeft,
             y0: 0,
-            x1: this.nextStart,
+            x1: this.nextLeft,
             yref: 'paper',
             y1: 1,
             line: {
@@ -1159,9 +1159,9 @@ export default {
         shapes: [
           {
             type: 'line',
-            x0: this.start,
+            x0: this.left,
             y0: 0,
-            x1: this.start,
+            x1: this.left,
             yref: 'paper',
             y1: 1,
             line: {
@@ -1172,9 +1172,9 @@ export default {
           },
           {
             type: 'line',
-            x0: this.stop,
+            x0: this.right,
             y0: 0,
-            x1: this.stop,
+            x1: this.right,
             yref: 'paper',
             y1: 1,
             line: {
@@ -1185,9 +1185,9 @@ export default {
           },
           {
             type: 'line',
-            x0: this.start,
+            x0: this.left,
             y0: 0.75,
-            x1: this.stop,
+            x1: this.right,
             yref: 'paper',
             y1: 0.75,
             line: {
@@ -1197,9 +1197,9 @@ export default {
           },
           {
             type: 'line',
-            x0: this.prevStop,
+            x0: this.prevRight,
             y0: 0,
-            x1: this.prevStop,
+            x1: this.prevRight,
             yref: 'paper',
             y1: 1,
             line: {
@@ -1209,9 +1209,9 @@ export default {
           },
           {
             type: 'line',
-            x0: this.nextStart,
+            x0: this.nextLeft,
             y0: 0,
-            x1: this.nextStart,
+            x1: this.nextLeft,
             yref: 'paper',
             y1: 1,
             line: {
@@ -1222,11 +1222,11 @@ export default {
         ],
         annotations: [
           {
-            x: this.start,
+            x: this.left,
             y: 1,
             xref: 'x',
             yref: 'y',
-            text: 'current<br>start',
+            text: 'current<br>left',
             font: {
               family: 'Avenir, Helvetica, Arial, sans-serif',
               size: 11,
@@ -1237,11 +1237,11 @@ export default {
             ay: -20,
           },
           {
-            x: this.stop,
+            x: this.right,
             y: 1,
             xref: 'x',
             yref: 'y',
-            text: 'current<br>stop',
+            text: 'current<br>right',
             font: {
               family: 'Avenir, Helvetica, Arial, sans-serif',
               size: 11,
@@ -1312,9 +1312,9 @@ export default {
         shapes: [
           {
             type: 'line',
-            x0: this.start,
+            x0: this.left,
             y0: 0,
-            x1: this.start,
+            x1: this.left,
             yref: 'paper',
             y1: 1,
             line: {
@@ -1325,9 +1325,9 @@ export default {
           },
           {
             type: 'line',
-            x0: this.stop,
+            x0: this.right,
             y0: 0,
-            x1: this.stop,
+            x1: this.right,
             yref: 'paper',
             y1: 1,
             line: {
@@ -1338,9 +1338,9 @@ export default {
           },
           {
             type: 'line',
-            x0: this.start,
+            x0: this.left,
             y0: 0.75,
-            x1: this.stop,
+            x1: this.right,
             yref: 'paper',
             y1: 0.75,
             line: {
@@ -1350,9 +1350,9 @@ export default {
           },
           {
             type: 'line',
-            x0: this.prevStop,
+            x0: this.prevRight,
             y0: 0,
-            x1: this.prevStop,
+            x1: this.prevRight,
             yref: 'paper',
             y1: 1,
             line: {
@@ -1362,9 +1362,9 @@ export default {
           },
           {
             type: 'line',
-            x0: this.nextStart,
+            x0: this.nextLeft,
             y0: 0,
-            x1: this.nextStart,
+            x1: this.nextLeft,
             yref: 'paper',
             y1: 1,
             line: {
@@ -1439,9 +1439,9 @@ export default {
         shapes: [
           {
             type: 'line',
-            x0: this.start,
+            x0: this.left,
             y0: 0,
-            x1: this.start,
+            x1: this.left,
             yref: 'paper',
             y1: 1,
             line: {
@@ -1452,9 +1452,9 @@ export default {
           },
           {
             type: 'line',
-            x0: this.stop,
+            x0: this.right,
             y0: 0,
-            x1: this.stop,
+            x1: this.right,
             yref: 'paper',
             y1: 1,
             line: {
@@ -1465,9 +1465,9 @@ export default {
           },
           {
             type: 'line',
-            x0: this.start,
+            x0: this.left,
             y0: 0.75,
-            x1: this.stop,
+            x1: this.right,
             yref: 'paper',
             y1: 0.75,
             line: {
@@ -1477,9 +1477,9 @@ export default {
           },
           {
             type: 'line',
-            x0: this.prevStop,
+            x0: this.prevRight,
             y0: 0,
-            x1: this.prevStop,
+            x1: this.prevRight,
             yref: 'paper',
             y1: 1,
             line: {
@@ -1489,9 +1489,9 @@ export default {
           },
           {
             type: 'line',
-            x0: this.nextStart,
+            x0: this.nextLeft,
             y0: 0,
-            x1: this.nextStart,
+            x1: this.nextLeft,
             yref: 'paper',
             y1: 1,
             line: {

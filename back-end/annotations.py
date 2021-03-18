@@ -3,7 +3,7 @@
 Returns autoannotation data.
 Modifies and returns the GenBank file.
 Adds a CDS.
-Parses BLASt data.
+Parses BLAST data.
 
 Attributes:
     response_object:
@@ -26,31 +26,31 @@ import time
 response_object = {}
 
 # ------------------------------ MAIN FUNCTIONS ------------------------------
-def get_dnamaster_data():
-    """Queries and returns all CDS data created by DNAMaster.
+def get_annotations_data(current_user):
+    """Queries and returns all CDS data created by Annotations.
 
     Returns:
-        A dictionary containing the DNAMaster data.
+        A dictionary containing the Annotations data.
     """
-    setting = db.session.query(Settings).order_by(Settings.back_start_range).first()
+    setting = db.session.query(Settings).filter_by(phage_id=current_user).order_by(Settings.back_left_range).first()
     response_object['gap'] = setting.gap
     response_object['opposite_gap'] = setting.opposite_gap
     response_object['overlap'] = setting.overlap
     response_object['short'] = setting.short
-    dnamaster = []
-    for cds in db.session.query(DNAMaster).order_by(DNAMaster.start):
-        dnamaster.append({'id': cds.id,
-                            'start': cds.start,
-                            'stop': cds.stop,
+    annotations = []
+    for cds in db.session.query(Annotations).filter_by(phage_id=current_user).order_by(Annotations.left):
+        annotations.append({'id': cds.id,
+                            'left': cds.left,
+                            'right': cds.right,
                             'strand': cds.strand,
                             'function': cds.function,
                             'status': cds.status,
                             'frame': cds.frame})
-    response_object['dnamaster'] = dnamaster
+    response_object['annotations'] = annotations
 
     return response_object
 
-def parse_blast(UPLOAD_FOLDER):
+def parse_blast(current_user, UPLOAD_FOLDER):
     """Parses through the blast results and returns a dictionary containing data.
 
     Removes instances of CREATE_VIEW created by BLAST.
@@ -68,7 +68,7 @@ def parse_blast(UPLOAD_FOLDER):
         A dictionary containing all of the blast data for the CDS.
     """
 
-    db.session.query(Blast_Results).delete()
+    db.session.query(Blast_Results).filter_by(phage_id=current_user).delete()
     print(datetime.now())
     blast_files = helper.get_file_path("blast", UPLOAD_FOLDER)
     E_VALUE_THRESH = 1e-7
@@ -104,8 +104,8 @@ def parse_blast(UPLOAD_FOLDER):
                         "(.), (\d+)-(\d+)", search["query_title"])
                     if title:
                         curr_strand = title.group(1)
-                        curr_start = title.group(2)
-                        curr_stop = title.group(3)
+                        curr_left = title.group(2)
+                        curr_right = title.group(3)
                         results = []
                         hits = search["hits"]
                         for hit in hits:
@@ -125,9 +125,10 @@ def parse_blast(UPLOAD_FOLDER):
                                     hsps["identity"] / hsps["align_len"] * 100, 2)
                                 results.append(alignment)
                         counter += 1
-                        blast_result = Blast_Results(id = counter,
-                                                    start = curr_start,
-                                                    stop = curr_stop,
+                        blast_result = Blast_Results(phage_id = current_user,
+                                                    id = counter,
+                                                    left = curr_left,
+                                                    right = curr_right,
                                                     strand = curr_strand,
                                                     results = str(results))
                         try:
@@ -138,7 +139,7 @@ def parse_blast(UPLOAD_FOLDER):
                             return("error")
     except:
         print("An error occured while parsing blast results.")
-        db.session.query(Blast_Results).delete()
+        db.session.query(Blast_Results).filter_by(phage_id=current_user).delete()
         return("error")
         
     for filename in os.listdir(UPLOAD_FOLDER):
@@ -179,28 +180,29 @@ def add_cds(request, UPLOAD_FOLDER, current_user):
     coding_potential['y_data_4'] = gdata_df["4"].to_list()
     coding_potential['y_data_5'] = gdata_df["5"].to_list()
     coding_potential['y_data_6'] = gdata_df["6"].to_list()
-    frame, status = helper.get_frame_and_status(int(new_cds_data.get('start')), int(new_cds_data.get('stop')), new_cds_data.get('strand'), coding_potential)
-    cds = DNAMaster(id = new_cds_data.get('id'),
-                    start = new_cds_data.get('start'),
-                    stop = new_cds_data.get('stop'),
+    frame, status = helper.get_frame_and_status(int(new_cds_data.get('left')), int(new_cds_data.get('right')), new_cds_data.get('strand'), coding_potential)
+    cds = Annotations(phage_id = current_user,
+                    id = new_cds_data.get('id'),
+                    left = new_cds_data.get('left'),
+                    right = new_cds_data.get('right'),
                     strand = new_cds_data.get('strand'),
                     function = "None selected",
                     status = status,
                     frame = frame)
 
-    exists = DNAMaster.query.filter_by(start=new_cds_data.get('start'), stop=new_cds_data.get('stop'), strand=new_cds_data.get('strand')).first()
-    orf = Blast_Results.query.filter_by(start=new_cds_data.get('start'), stop=new_cds_data.get('stop'), strand=new_cds_data.get('strand')).first()
+    exists = Annotations.query.filter_by(phage_id=current_user).filter_by(left=new_cds_data.get('left'), right=new_cds_data.get('right'), strand=new_cds_data.get('strand')).first()
+    orf = Blast_Results.query.filter_by(phage_id=current_user).filter_by(left=new_cds_data.get('left'), right=new_cds_data.get('right'), strand=new_cds_data.get('strand')).first()
     if force:
         db.session.add(cds)
         db.session.commit()
         response_object['message'] = "Added succesfully."
         id_index = 0
-        for cds in db.session.query(DNAMaster).order_by(DNAMaster.start):
+        for cds in db.session.query(Annotations).filter_by(phage_id=current_user).order_by(Annotations.left):
             id_index += 1
             cds.id = str(id_index)
         db.session.commit()
         id_index = 0
-        for cds in db.session.query(DNAMaster).order_by(DNAMaster.start):
+        for cds in db.session.query(Annotations).filter_by(phage_id=current_user).order_by(Annotations.left):
             id_index += 1
             cds.id = current_user + '_' + str(id_index)
         db.session.commit()
@@ -214,12 +216,12 @@ def add_cds(request, UPLOAD_FOLDER, current_user):
         db.session.commit()
         response_object['message'] = "Added succesfully."
         id_index = 0
-        for cds in db.session.query(DNAMaster).order_by(DNAMaster.start):
+        for cds in db.session.query(Annotations).filter_by(phage_id=current_user).order_by(Annotations.left):
             id_index += 1
             cds.id = str(id_index)
         db.session.commit()
         id_index = 0
-        for cds in db.session.query(DNAMaster).order_by(DNAMaster.start):
+        for cds in db.session.query(Annotations).filter_by(phage_id=current_user).order_by(Annotations.left):
             id_index += 1
             cds.id = current_user + '_' + str(id_index)
         db.session.commit()

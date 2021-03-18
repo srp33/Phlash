@@ -5,14 +5,17 @@ from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
 
-class DNAMaster(db.Model):
-    __tablename__ = "dnamaster"
+class Annotations(db.Model):
+    __tablename__ = "annotations"
+    phage_id = db.Column(db.Text,
+                         nullable=False,
+                         primary_key=True)
     id = db.Column(db.Text,
                    nullable=False,
                    primary_key=True)
-    start = db.Column(db.Integer,
+    left = db.Column(db.Integer,
                       nullable=False)
-    stop = db.Column(db.Integer,
+    right = db.Column(db.Integer,
                      nullable=False)
     strand = db.Column(db.Text,
                        nullable=False)
@@ -27,6 +30,9 @@ class DNAMaster(db.Model):
 
 class Gene_Calls(db.Model):
     __tablename__ = "gene_calls"
+    phage_id = db.Column(db.Text,
+                         nullable=False,
+                         primary_key=True)
     id = db.Column(db.Text,
                    nullable=False,
                    primary_key=True)
@@ -35,12 +41,15 @@ class Gene_Calls(db.Model):
 
 class Blast_Results(db.Model):
     __tablename__ = "blast_results"
+    phage_id = db.Column(db.Text,
+                         nullable=False,
+                         primary_key=True)
     id = db.Column(db.Text,
                    nullable=False,
                    primary_key=True)
-    start = db.Column(db.Integer,
+    left = db.Column(db.Integer,
                       nullable=False)
-    stop = db.Column(db.Integer,
+    right = db.Column(db.Integer,
                      nullable=False)
     strand = db.Column(db.Text,
                        nullable=False)
@@ -49,10 +58,13 @@ class Blast_Results(db.Model):
 
 class Settings(db.Model):
     __tablename__ = "settings"
-    back_start_range = db.Column(db.Integer,
+    phage_id = db.Column(db.Text,
+                         nullable=False,
+                         primary_key=True)
+    back_left_range = db.Column(db.Integer,
                                 nullable=False,
                                 primary_key=True)
-    forward_start_range = db.Column(db.Integer,
+    forward_left_range = db.Column(db.Integer,
                                     nullable=False)
     opposite_gap = db.Column(db.Integer,
                             nullable=False)
@@ -64,6 +76,9 @@ class Settings(db.Model):
                       nullable=False)
 class Files(db.Model):
     __tablename__ = "files"
+    phage_id = db.Column(db.Text,
+                         nullable=False,
+                         primary_key=True)
     name = db.Column(db.Text,
                      nullable=False,
                      primary_key=True)
@@ -73,3 +88,21 @@ class Files(db.Model):
                      nullable=False)
     complete = db.Column(db.Boolean,
                          nullable=True)
+
+class Tasks(db.Model):
+    __tablename__ = "tasks"
+    phage_id = db.Column(db.Text,
+                         nullable=False,
+                         primary_key=True)
+    function = db.Column(db.Text,
+                         nullable=False,
+                         primary_key=True)
+    arguments = db.Column(db.Text,
+                          nullable=True)
+    complete = db.Column(db.Boolean,
+                         nullable=False)
+    result = db.Column(db.Text,
+                       nullable=True)
+    time = db.Column(db.Text,
+                     nullable=False)
+

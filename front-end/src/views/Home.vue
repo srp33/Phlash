@@ -13,7 +13,16 @@
         <img id="logo" src="/phlash/images/logohome.png" width="250" />
       </p>
       <h1>Phlash</h1>
-      <button v-google-signin-button="clientID" class="google-signin-button"> Continue with Google</button>
+      <meta name="google-signin-client_id" content="780981769382-odbkfqn6mr1f2d9kkeaokbks7eqfrvu7.apps.googleusercontent.com">
+      <div class="g-signin2" data-onsuccess="onSignIn"></div>
+      <g-signin-button
+        class="btn btn-dark"
+        :params="googleSignInParams"
+        @success="onSignInSuccess"
+        @error="onSignInError">
+        Sign in with Google
+      </g-signin-button>
+      <button v-google-signin-button="clientID" class="btn btn-dark" @success="onSignIn"> Continue with Google</button>
       <div class="alert alert-secondary">
         <p style="text-align: center">
           <strong
@@ -111,29 +120,34 @@
     </div>
   </div>
 </template>
-
+<script src="https://apis.google.com/js/api:client.js" async defer></script>
 <script src="https://apis.google.com/js/platform.js" async defer></script>
-
 <script>
+// https://apis.google.com/js/780981769382-odbkfqn6mr1f2d9kkeaokbks7eqfrvu7.apps.googleusercontent.com
 import axios from 'axios';
 import Navbar from '../components/Navbar.vue';
 import GoogleSignInButton from 'vue-google-signin-button-directive'
+import GSignInButton from 'vue-google-signin-button'
 
 export default {
   name: 'Home',
   components: {
     Navbar,
     GoogleSignInButton,
+    GSignInButton,
   },
 
   data() {
     return {
-      clientID: "780981769382-dqnlo6b9j3cdbug5u672t31l70g5gg9d.apps.googleusercontent.com",
+      clientID: "780981769382-odbkfqn6mr1f2d9kkeaokbks7eqfrvu7.apps.googleusercontent.com",
       phageID: null,
       idStatus: '',
       allFilesUploaded: false,
       dateToBeDeleted: null,
       blastComplete: false,
+      googleSignInParams: {
+        client_id: this.clientID
+      }
     };
   },
 
@@ -178,17 +192,37 @@ export default {
     OnGoogleAuthSuccess (idToken) {
       console.log(idToken)
       // Receive the idToken and make your magic with the backend
+      axios.get(`https://www.googleapis.com/oauth2/v3/userinfo?access_token=${idToken}`)
+      .then((response) => {
+            console.log(response.data);
+          })
+          .catch((error) => {
+            console.error(error);
+          });
     },
     OnGoogleAuthFail (error) {
       console.log(error)
     },
 
-    onSignIn(googleUser) {
+    onSignIn (googleUser) {
       var profile = googleUser.getBasicProfile();
       console.log('ID: ' + profile.getId()); // Do not send to your backend! Use an ID token instead.
       console.log('Name: ' + profile.getName());
       console.log('Image URL: ' + profile.getImageUrl());
       console.log('Email: ' + profile.getEmail()); // This is null if the 'email' scope is not present.
+    },
+
+    onSignInSuccess (googleUser) {
+      var profile = googleUser.getBasicProfile();
+      console.log('ID: ' + profile.getId()); // Do not send to your backend! Use an ID token instead.
+      console.log('Name: ' + profile.getName());
+      console.log('Image URL: ' + profile.getImageUrl());
+      console.log('Email: ' + profile.getEmail()); // This is null if the 'email' scope is not present.
+    },
+
+    onSignInError (error) {
+      // `error` contains any error occurred.
+      console.log('OH NOES', error)
     },
 
     signOut() {
@@ -268,6 +302,15 @@ h1 {
   font-size: 1.4em;
   text-align: left;
 }
+
+/* .g-signin-button {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 3px;
+  background-color: #3c82f7;
+  color: #fff;
+  box-shadow: 0 3px 0 #0f69ff;
+} */
 
 /* .google-signin-button {
   color: white;

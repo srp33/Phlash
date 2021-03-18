@@ -25,6 +25,8 @@ import shutil
 import arrow
 from builtins import FileExistsError
 import models
+# from google.oauth2 import id_token
+# from google.auth.transport import requests
 
 response_object = {}
 USERS = []
@@ -100,11 +102,9 @@ def handle_new_users(phage_id, app):
     """
     create_directory(os.path.join(ROOT, 'users', phage_id))
     create_directory(os.path.join(ROOT, 'users', phage_id, 'uploads'))
-    with app.app_context():
-        db.drop_all()
-        db.create_all()
-    setting = Settings(back_start_range = 300,
-                        forward_start_range = 100,
+    setting = Settings(phage_id = phage_id,
+                        back_left_range = 300,
+                        forward_left_range = 100,
                         gap = 10,
                         overlap = 10,
                         opposite_gap = 50,
