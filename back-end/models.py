@@ -4,7 +4,21 @@ Declaring models (tables) using Flask-SQLAlchemy for use in each phage's databas
 from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
-
+class Users(db.Model):
+    __tablename__="users"
+    user = db.Column(db.Text,
+                             nullable=False,
+                             primary_key=True)
+    phage_id = db.Column(db.Text,
+                         nullable=False,
+                         primary_key=True)
+    creation_date = db.Column(db.Text,
+                              nullable=True)
+    deletion_date = db.Column(db.Text,
+                              nullable=True)
+    id = db.Column(db.Text,
+                   primary_key=True,
+                   nullable=False)
 class Annotations(db.Model):
     __tablename__ = "annotations"
     phage_id = db.Column(db.Text,
@@ -105,4 +119,5 @@ class Tasks(db.Model):
                        nullable=True)
     time = db.Column(db.Text,
                      nullable=False)
+
 

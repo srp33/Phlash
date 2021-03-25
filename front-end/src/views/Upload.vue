@@ -7,6 +7,7 @@
       :geneMap="navGeneMap"
       :settings="navSettings"
       :phageID="navPhageID"
+      :logout="true"
     />
     <div class="container">
       <h1>Upload</h1>
@@ -91,6 +92,8 @@ import axios from 'axios';
 import vue2Dropzone from 'vue2-dropzone';
 import 'vue2-dropzone/dist/vue2Dropzone.min.css';
 import Navbar from '../components/Navbar.vue';
+import { LoaderPlugin } from 'vue-google-login';
+import Vue from 'vue';
 
 export default {
   name: 'Upload',
@@ -106,6 +109,27 @@ export default {
       blastCompleted: false,
       interval: null,
     };
+  },
+
+  beforeCreate() {
+    Vue.use(LoaderPlugin, {
+      client_id: process.env.GOOGLE_CLIENT_ID
+    });
+    Vue.GoogleAuth.then(auth2 => {
+      if (!auth2.isSignedIn.get()) {
+        this.$router.push('/');
+      }
+      axios
+        .get(process.env.VUE_APP_BASE_URL + `/check_user/${auth2.currentUser.get().Qs.zt}/${this.$route.params.phageID}`)
+        .then((response) => {
+          if (response.data === "fail") {
+            this.$router.push('/');
+          }
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    })
   },
 
   created() {
@@ -296,6 +320,7 @@ export default {
           `You must upload a FASTA file to continue. 
             If you have uploaded a file and still cannot continue it is because the FASTA file is not in the correct FASTA format.`,
           {
+            variant: 'primary',
             title: 'UPLOAD FASTA FILE',
             autoHideDelay: 15000,
             appendToast: false,

@@ -71,7 +71,7 @@ def display_files(UPLOAD_FOLDER):
             response_object["fasta_file_size"] = os.path.getsize(os.path.join(UPLOAD_FOLDER, file))
     return response_object
 
-def delete_file(current_user, file_path, UPLOAD_FOLDER):
+def delete_file(phage_id, file_path, UPLOAD_FOLDER):
     """Deletes a file given the file_path.
 
     Removes all data that has been saved associated with that file.
@@ -86,15 +86,15 @@ def delete_file(current_user, file_path, UPLOAD_FOLDER):
         A dictionary containing a success message.
     """
     try:
-        if (db.session.query(Tasks).filter_by(phage_id=current_user).first() is None):
-            if (file_path.endswith(".fasta") or file_path.endswith(".fna") or file_path.endswith(".fa")):
-                db.session.query(Files).filter_by(phage_id=current_user).delete()
-                db.session.query(Annotations).filter_by(phage_id=current_user).delete()
-                db.session.query(Blast_Results).filter_by(phage_id=current_user).delete()
-                db.session.query(Gene_Calls).filter_by(phage_id=current_user).delete()
-                db.session.query(Tasks).filter_by(phage_id=current_user).delete()
-                for file in os.listdir(UPLOAD_FOLDER):
-                    os.remove(os.path.join(UPLOAD_FOLDER, file))
+        # if (db.session.query(Tasks).filter_by(phage_id=phage_id).first() is None):
+        if (file_path.endswith(".fasta") or file_path.endswith(".fna") or file_path.endswith(".fa")):
+            db.session.query(Files).filter_by(phage_id=phage_id).delete()
+            db.session.query(Annotations).filter_by(phage_id=phage_id).delete()
+            db.session.query(Blast_Results).filter_by(phage_id=phage_id).delete()
+            db.session.query(Gene_Calls).filter_by(phage_id=phage_id).delete()
+            db.session.query(Tasks).filter_by(phage_id=phage_id).delete()
+            for file in os.listdir(UPLOAD_FOLDER):
+                os.remove(os.path.join(UPLOAD_FOLDER, file))
     except:
         print("error")
         response_object["status"] = "error in deleting files"
@@ -108,7 +108,7 @@ def delete_file(current_user, file_path, UPLOAD_FOLDER):
 
     return response_object
 
-def dropzone_fasta(UPLOAD_FOLDER, request, current_user):
+def dropzone_fasta(UPLOAD_FOLDER, request, phage_id):
     """Uploads the FASTA file. 
 
     Args:
@@ -116,7 +116,7 @@ def dropzone_fasta(UPLOAD_FOLDER, request, current_user):
             The directory containing all of the uploaded files.
         request:
             The file name and data from the front end.
-        current_user:
+        phage_id:
             The ID of the current user.
     """
 
@@ -124,7 +124,7 @@ def dropzone_fasta(UPLOAD_FOLDER, request, current_user):
     contents = str(file.read(), 'utf-8')
     print(request.files)
     if file:
-        with open(os.path.join(UPLOAD_FOLDER, current_user + ".fasta"), 'w') as f:
+        with open(os.path.join(UPLOAD_FOLDER, phage_id + ".fasta"), 'w') as f:
             f.write(contents)
 
 # ---------- FASTA FILE HELPER FUNCTIONS ----------

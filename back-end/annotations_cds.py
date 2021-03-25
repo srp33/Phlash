@@ -19,7 +19,7 @@ from datetime import datetime
 response_object = {}
 
 # ------------------------------ MAIN FUNCTIONS ------------------------------
-def annotate_cds(current_user, request, cds_id, UPLOAD_FOLDER):
+def annotate_cds(phage_id, request, cds_id, UPLOAD_FOLDER):
     """Updates a CDS given the data and the ID.
 
     Updates the left, right, and function of a given CDS.
@@ -36,7 +36,7 @@ def annotate_cds(current_user, request, cds_id, UPLOAD_FOLDER):
         A dictionary containing a pass or fail message.
     """
     put_data = request.get_json()
-    cds = Annotations.query.filter_by(phage_id=current_user).filter_by(id=cds_id).first()
+    cds = Annotations.query.filter_by(phage_id=phage_id).filter_by(id=cds_id).first()
     if cds:
         cds.strand = put_data.get('strand')
         cds.left = put_data.get('left')
@@ -71,7 +71,7 @@ def annotate_cds(current_user, request, cds_id, UPLOAD_FOLDER):
 
     return response_object
 
-def get_cds_data(current_user, UPLOAD_FOLDER, cds_id):
+def get_cds_data(phage_id, UPLOAD_FOLDER, cds_id):
     """Queries and returns all of the data for a CDS given the ID.
 
     Gets left, right, function, and status for the CDS.
@@ -94,9 +94,9 @@ def get_cds_data(current_user, UPLOAD_FOLDER, cds_id):
     index = int(index)
     prev_id = cds_id[:num_begins] + str(index - 1)
     next_id = cds_id[:num_begins] + str(index + 1)
-    cds = Annotations.query.filter_by(phage_id=current_user).filter_by(id=cds_id).first()
-    prev_cds = Annotations.query.filter_by(phage_id=current_user).filter_by(id=prev_id).first()
-    next_cds = Annotations.query.filter_by(phage_id=current_user).filter_by(id=next_id).first()
+    cds = Annotations.query.filter_by(phage_id=phage_id).filter_by(id=cds_id).first()
+    prev_cds = Annotations.query.filter_by(phage_id=phage_id).filter_by(id=prev_id).first()
+    next_cds = Annotations.query.filter_by(phage_id=phage_id).filter_by(id=next_id).first()
     if prev_cds is not None:
         response_object['prevCDS'] = prev_id
         response_object['prev_right'] = prev_cds.right
@@ -116,7 +116,7 @@ def get_cds_data(current_user, UPLOAD_FOLDER, cds_id):
                                 'frame': cds.frame,
                                 'notes': cds.notes}
     
-    left_positions, right_positions = get_blasts(current_user, cds.left)
+    left_positions, right_positions = get_blasts(phage_id, cds.left)
 
     genemark_gdata_file = helper.get_file_path("gdata", UPLOAD_FOLDER)
     gdata_df = pd.read_csv(genemark_gdata_file, sep='\t', skiprows=16)
@@ -138,7 +138,7 @@ def get_cds_data(current_user, UPLOAD_FOLDER, cds_id):
 
     reached_CDS = False
     response_object['nextCDS'] = 'undefined'
-    for cds in db.session.query(Annotations).filter_by(phage_id=current_user).order_by(Annotations.left):
+    for cds in db.session.query(Annotations).filter_by(phage_id=phage_id).order_by(Annotations.left):
         if reached_CDS and cds.function != "@DELETED" and cds.status != "tRNA":
             response_object['nextCDS'] = cds.id
             break
@@ -147,21 +147,21 @@ def get_cds_data(current_user, UPLOAD_FOLDER, cds_id):
 
     reached_CDS = False
     response_object['prevCDS'] = 'undefined'
-    for cds in db.session.query(Annotations).filter_by(phage_id=current_user).order_by(Annotations.left.desc()):
+    for cds in db.session.query(Annotations).filter_by(phage_id=phage_id).order_by(Annotations.left.desc()):
         if reached_CDS and cds.function != "@DELETED" and cds.status != "tRNA":
             response_object['prevCDS'] = cds.id
             break
         elif cds.id == cds_id:
             reached_CDS = True
-    response_object['glimmer'] = Gene_Calls.query.filter_by(phage_id=current_user).filter_by(id='Glimmer').first().calls.split(',')
-    response_object['genemark'] = Gene_Calls.query.filter_by(phage_id=current_user).filter_by(id='GeneMark').first().calls.split(',')
-    response_object['phanotate'] = Gene_Calls.query.filter_by(phage_id=current_user).filter_by(id='Phanotate').first().calls.split(',')
+    response_object['glimmer'] = Gene_Calls.query.filter_by(phage_id=phage_id).filter_by(id='Glimmer').first().calls.split(',')
+    response_object['genemark'] = Gene_Calls.query.filter_by(phage_id=phage_id).filter_by(id='GeneMark').first().calls.split(',')
+    response_object['phanotate'] = Gene_Calls.query.filter_by(phage_id=phage_id).filter_by(id='Phanotate').first().calls.split(',')
 
 
     return response_object
 
 # ---------- BLAST HELPER FUNCTIONS ----------
-def get_blasts(current_user, left):
+def get_blasts(phage_id, left):
     """Queries and returns all of the data for a CDS given the current left position.
 
     Gets alternate lefts and rights within range defined in settings
@@ -186,7 +186,7 @@ def get_blasts(current_user, left):
     setting = db.session.query(Settings).order_by(Settings.back_left_range).first()
     minimum = left - setting.back_left_range
     maximum = left + setting.forward_left_range
-    for blast in db.session.query(Blast_Results).filter_by(phage_id=current_user).filter_by(strand='+').order_by(Blast_Results.left):
+    for blast in db.session.query(Blast_Results).filter_by(phage_id=phage_id).filter_by(strand='+').order_by(Blast_Results.left):
         if blast.left > minimum and blast.left < maximum:
             lefts.append(blast.left)
             rights.append(blast.right)
@@ -194,7 +194,7 @@ def get_blasts(current_user, left):
             dir_rights.append(blast.right)
             dir_blasts[str(blast.left) + '-' + str(blast.right) + '  ' + blast.strand] = eval(blast.results)
             all_blasts[str(blast.left) + '-' + str(blast.right) + '  ' + blast.strand] = eval(blast.results)
-    for blast in db.session.query(Blast_Results).filter_by(phage_id=current_user).filter_by(strand='-').order_by(Blast_Results.left):
+    for blast in db.session.query(Blast_Results).filter_by(phage_id=phage_id).filter_by(strand='-').order_by(Blast_Results.left):
         if blast.left > minimum and blast.left < maximum:
             lefts.append(blast.left)
             rights.append(blast.right)

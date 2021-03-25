@@ -14,7 +14,7 @@ import helper
 import shutil
 import pandas as pd
 
-def update_settings(current_user, payload):
+def update_settings(phage_id, payload):
     """Updates settings given new setting data.
     Args:
         payload:
@@ -25,7 +25,7 @@ def update_settings(current_user, payload):
     response_object = {}
     print(payload)
     new_settings_data = payload.split(',')
-    setting = db.session.query(Settings).filter_by(phage_id=current_user).order_by(Settings.back_left_range).first()
+    setting = db.session.query(Settings).filter_by(phage_id=phage_id).order_by(Settings.back_left_range).first()
     setting.back_left_range = new_settings_data[3]
     setting.forward_left_range = new_settings_data[4]
     setting.gap = new_settings_data[0]
@@ -36,14 +36,14 @@ def update_settings(current_user, payload):
     response_object['message'] = 'Settings updated!'
     return response_object
 
-def get_settings(current_user):
+def get_settings(phage_id):
     """Returns the current settings.
 
         Returns:
             A dictionary containing the current settings.
     """
     response_object = {}
-    setting = db.session.query(Settings).filter_by(phage_id=current_user).order_by(Settings.back_left_range).first()
+    setting = db.session.query(Settings).filter_by(phage_id=phage_id).order_by(Settings.back_left_range).first()
     response_object['back_left_range'] = setting.back_left_range
     response_object['forward_left_range'] = setting.forward_left_range
     response_object['gap'] = setting.gap

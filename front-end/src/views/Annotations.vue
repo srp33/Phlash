@@ -7,6 +7,7 @@
       :geneMap="navGeneMap"
       :settings="navSettings"
       :phageID="navPhageID"
+      :logout="true"
     />
     <div class="container">
       <loading
@@ -353,6 +354,8 @@ import axios from "axios";
 import Navbar from "../components/Navbar.vue";
 import Loading from "vue-loading-overlay";
 import "vue-loading-overlay/dist/vue-loading.css";
+import { LoaderPlugin } from 'vue-google-login';
+import Vue from 'vue';
 
 export default {
   name: "Annotations",
@@ -407,8 +410,29 @@ export default {
       oppositeGap: 50,
       short: 200,
       interval: null,
-      waitMessage: null,
+      waitMessage: "Your Blast results will be interpretted.",
     };
+  },
+
+  beforeCreate() {
+    Vue.use(LoaderPlugin, {
+      client_id: process.env.GOOGLE_CLIENT_ID
+    });
+    Vue.GoogleAuth.then(auth2 => {
+      if (!auth2.isSignedIn.get()) {
+        this.$router.push('/');
+      }
+      axios
+        .get(process.env.VUE_APP_BASE_URL + `/check_user/${auth2.currentUser.get().Qs.zt}/${this.$route.params.phageID}`)
+        .then((response) => {
+          if (response.data === "fail") {
+            this.$router.push('/');
+          }
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    })
   },
 
   created() {
@@ -519,6 +543,7 @@ export default {
               this.$bvToast.toast(
                 `All of the BLAST results have finished being interpretted.`,
                 {
+                  variant: 'primary',
                   title: 'Finished',
                   appendToast: false,
                 }
@@ -531,6 +556,7 @@ export default {
                 If you ignore this error not all of your BLAST results will be shown. 
                 If this error continues, please contact us by visiting the 'contact' tab.`,
                 {
+                  variant: 'primary',
                   title: 'Error',
                   appendToast: false,
                 }
@@ -549,22 +575,23 @@ export default {
       }, 5000);
     },
 
-    /**
-     * If the next button is clicked prematurely a reminder appears.
-     */
-    uploadReminder() {
-      if (!this.fasta) {
-        this.$bvToast.toast(
-          `You must upload a FASTA file to continue. 
-            If you have uploaded a file and still cannot continue it is because the FASTA file is not in the correct FASTA format.`,
-          {
-            title: 'UPLOAD FASTA FILE',
-            autoHideDelay: 15000,
-            appendToast: false,
-          }
-        );
-      }
-    },
+    // /**
+    //  * If the next button is clicked prematurely a reminder appears.
+    //  */
+    // uploadReminder() {
+    //   if (!this.fasta) {
+    //     this.$bvToast.toast(
+    //       `You must upload a FASTA file to continue. 
+    //         If you have uploaded a file and still cannot continue it is because the FASTA file is not in the correct FASTA format.`,
+    //       {
+    //         variant: 'primary',
+    //         title: 'UPLOAD FASTA FILE',
+    //         autoHideDelay: 15000,
+    //         appendToast: false,
+    //       }
+    //     );
+    //   }
+    // },
 
     /**
      * Changes the function of a deleted gene so that it is now visible.
@@ -754,6 +781,7 @@ export default {
               `The CDS already exists. Try again with a different ORF. To ignore this 
             warning and add the CDS, check the 'Force Add' box.`,
               {
+                variant: 'primary',
                 title: 'ADD FAILED',
                 autoHideDelay: 5000,
                 appendToast: false,
@@ -764,6 +792,7 @@ export default {
               `The inputted left and right locations do not represent an ORF. To ignore this 
             warning and add the CDS, check the 'Force Add' box.`,
               {
+                variant: 'primary',
                 title: 'ADD FAILED',
                 autoHideDelay: 5000,
                 appendToast: false,

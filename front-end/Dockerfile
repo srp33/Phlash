@@ -7,6 +7,7 @@ RUN npm audit fix
 COPY ./ .
 # COPY .env.production .
 COPY .env.development .env.production
+COPY .google_client_id .
 RUN npm run build
 
 FROM nginx as production-stage

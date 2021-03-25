@@ -13,7 +13,6 @@ Attributes:
 from werkzeug.utils import secure_filename
 from contextlib import closing
 from zipfile import ZipFile
-from datetime import datetime
 import time
 from Bio import SeqIO, Seq, SeqFeature
 from collections import OrderedDict
@@ -31,11 +30,11 @@ response_object = {}
 ROOT = os.path.dirname(os.path.abspath(__file__))
 
 # ------------------------------ MAIN FUNCTIONS ------------------------------
-def find_blast_zip(current_user):
+def find_blast_zip(phage_id):
     """Finds if the blast zip exists.
 
     Args:
-        current_user:
+        phage_id:
             The current user ID.
     
     Returns:
@@ -45,28 +44,30 @@ def find_blast_zip(current_user):
     response_object["uploaded"] = True
     response_object["annotated"] = False
     response_object["annotation_in_progress"] = False
-    if db.session.query(Tasks).filter_by(phage_id=current_user).filter_by(function="auto_annotate").first() is not None:
+    if db.session.query(Tasks).filter_by(phage_id=phage_id).filter_by(function="auto_annotate").first() is not None:
         response_object["annotation_in_progress"] = True
-    for filename in os.listdir(os.path.join(ROOT, 'users', current_user, 'uploads')):
+    for filename in os.listdir(os.path.join(ROOT, 'users', phage_id, 'uploads')):
         if (filename.endswith('.gdata')):
             response_object["annotated"] = True
             break
-    if (db.session.query(Blast_Results).filter_by(phage_id=current_user).first() is None):
+    if (db.session.query(Blast_Results).filter_by(phage_id=phage_id).first() is None):
         response_object["uploaded"] = False
-    for filename in os.listdir(os.path.join(ROOT, 'users', current_user)):
+    for filename in os.listdir(os.path.join(ROOT, 'users', phage_id)):
         if filename.endswith('.zip'):
             response_object["blast_downloaded"] = True
     return response_object
 
-def auto_annotate(UPLOAD_FOLDER, current_user):
+def auto_annotate(UPLOAD_FOLDER, phage_id):
     """Auto annotates the entire genome.
 
     Args:
         UPLOAD_FOLDER:
             The path to the folder containing all files associated with the current user.
-        current_user:
+        phage_id:
             The ID of the current user.
     """
+    db.session.query(Gene_Calls).filter_by(phage_id=phage_id).delete()
+    db.session.query(Annotations).filter_by(phage_id=phage_id).delete()
 
     fasta_file_path = helper.get_file_path("fasta", UPLOAD_FOLDER)
     
@@ -81,11 +82,12 @@ def auto_annotate(UPLOAD_FOLDER, current_user):
     ldata_file_path = "{}.ldata".format(fasta_file_path)
 
     print("\n\nGlimmer\n")
-    glimmer_file = os.path.join(UPLOAD_FOLDER, current_user + "_glimmer")
+    glimmer_file = os.path.join(UPLOAD_FOLDER, phage_id + "_glimmer")
+    print(glimmer_file)
     subprocess.run(["/opt/glimmer3.02/scripts/g3-from-scratch.csh", fasta_file_path, glimmer_file])
-
+    
     print("\n\nAragorn\n")
-    aragorn_file = os.path.join(UPLOAD_FOLDER, current_user + "_aragorn.txt")
+    aragorn_file = os.path.join(UPLOAD_FOLDER, phage_id + "_aragorn.txt")
     subprocess.run(["aragorn", fasta_file_path, aragorn_file])
     
     coding_potential = {}
@@ -99,16 +101,16 @@ def auto_annotate(UPLOAD_FOLDER, current_user):
     coding_potential['y_data_4'] = gdata_df["4"].to_list()
     coding_potential['y_data_5'] = gdata_df["5"].to_list()
     coding_potential['y_data_6'] = gdata_df["6"].to_list()
-    Annotations.query.filter_by(phage_id=current_user).delete()
+    Annotations.query.filter_by(phage_id=phage_id).delete()
     db.session.commit()
 
     print("\n\nPhanotate\n")
-    phanotate_file = os.path.join(UPLOAD_FOLDER, current_user + "_phanotate.txt")
+    phanotate_file = os.path.join(UPLOAD_FOLDER, phage_id + "_phanotate.txt")
     subprocess.run(["/usr/local/lib/python3.7/site-packages/phanotate.py", fasta_file_path, "-o" + phanotate_file], timeout=1000)
 
     id_index = 0
     glimmer_calls = ""
-    with open(os.path.join(UPLOAD_FOLDER, current_user + "_glimmer.predict"), 'r') as glimmer:
+    with open(os.path.join(UPLOAD_FOLDER, phage_id + "_glimmer.predict"), 'r') as glimmer:
         for line in glimmer:
             if line[0] == '>':
                 continue
@@ -123,7 +125,7 @@ def auto_annotate(UPLOAD_FOLDER, current_user):
                 left = int(column[2])
                 strand = '-'
             frame, status = helper.get_frame_and_status(left, right, strand, coding_potential)
-            cds = Annotations(phage_id = current_user,
+            cds = Annotations(phage_id = phage_id,
                             id = 'Glimmer_' + str(id_index),
                             left = left,
                             right = right,
@@ -133,12 +135,12 @@ def auto_annotate(UPLOAD_FOLDER, current_user):
                             frame = frame)
             db.session.add(cds)
             glimmer_calls += (str(left) + '-' + str(right) + ' ' + strand + ',')
-    calls = Gene_Calls(phage_id = current_user,
+    calls = Gene_Calls(phage_id = phage_id,
                         id = 'Glimmer',
                         calls = glimmer_calls)
     db.session.add(calls)
     db.session.commit()
-    with open(os.path.join(UPLOAD_FOLDER, current_user + "_aragorn.txt"), 'r') as aragorn:
+    with open(os.path.join(UPLOAD_FOLDER, phage_id + "_aragorn.txt"), 'r') as aragorn:
         pattern1 = re.compile("tRNA-.*")
         pattern2 = re.compile("Sequence (.*)\[(.*),(.*)\]")
         function = ""
@@ -159,7 +161,7 @@ def auto_annotate(UPLOAD_FOLDER, current_user):
                     strand = '-'
                 else:
                     strand = '+'
-                cds = Annotations(phage_id = current_user,
+                cds = Annotations(phage_id = phage_id,
                                 id = "Aragorn_" + str(id_index),
                                 left = int(left),
                                 right = int(right),
@@ -170,7 +172,7 @@ def auto_annotate(UPLOAD_FOLDER, current_user):
                 db.session.add(cds)
     db.session.commit()
     genemark_calls = ""
-    with open(os.path.join(UPLOAD_FOLDER, current_user + ".fasta.ldata"), 'r') as genemark:
+    with open(os.path.join(UPLOAD_FOLDER, phage_id + ".fasta.ldata"), 'r') as genemark:
         left = 0
         right = 0
         frame = 0
@@ -201,14 +203,14 @@ def auto_annotate(UPLOAD_FOLDER, current_user):
                     found = False
                     if frame > 3:
                         genemark_calls += (str(left) + '-' + str(right) + ' ' + '-' + ',')
-                        cds = Annotations.query.filter_by(phage_id=current_user).filter_by(left=left).first()
+                        cds = Annotations.query.filter_by(phage_id=phage_id).filter_by(left=left).first()
                         if cds == None or cds.status == 'Fail':
                             frame, status = helper.get_frame_and_status(left, right, '-', coding_potential)
                             if cds == None or (cds.status == 'Fail' and status == 'Pass'):
                                 if cds != None:
                                     db.session.delete(cds)
                                 id_index += 1
-                                cds = Annotations(phage_id = current_user,
+                                cds = Annotations(phage_id = phage_id,
                                                 id = "Genemark_" + str(id_index),
                                                 left = int(left),
                                                 right = int(right),
@@ -220,14 +222,14 @@ def auto_annotate(UPLOAD_FOLDER, current_user):
                             db.session.commit()
                     else:
                         genemark_calls += (str(left) + '-' + str(right) + ' ' + '+' + ',')
-                        cds = Annotations.query.filter_by(phage_id=current_user).filter_by(right=right).first()
+                        cds = Annotations.query.filter_by(phage_id=phage_id).filter_by(right=right).first()
                         if cds == None or cds.status == 'Fail':
                             frame, status = helper.get_frame_and_status(left, right, '+', coding_potential)
                             if cds == None or (cds.status == 'Fail' and status == 'Pass'):
                                 if cds != None:
                                     db.session.delete(cds)
                                 id_index += 1
-                                cds = Annotations(phage_id = current_user,
+                                cds = Annotations(phage_id = phage_id,
                                                 id = "Genemark_" + str(id_index),
                                                 left = int(left),
                                                 right = int(right),
@@ -241,7 +243,7 @@ def auto_annotate(UPLOAD_FOLDER, current_user):
                     right = int(column[1])
                     frame = int(column[2])
                     prob = new_prob
-    calls = Gene_Calls(phage_id = current_user,
+    calls = Gene_Calls(phage_id = phage_id,
                        id = 'GeneMark',
                        calls = genemark_calls)
     db.session.add(calls)
@@ -258,18 +260,18 @@ def auto_annotate(UPLOAD_FOLDER, current_user):
             strand = str(column[2])
             left = int(column[1])
             right = int(column[0])
-            cds = Annotations.query.filter_by(phage_id=current_user).filter_by(left=left).first()
+            cds = Annotations.query.filter_by(phage_id=phage_id).filter_by(left=left).first()
             if strand == '+':
                 left = int(column[0])
                 right = int(column[1])
-                cds = Annotations.query.filter_by(phage_id=current_user).filter_by(right=right).first()
+                cds = Annotations.query.filter_by(phage_id=phage_id).filter_by(right=right).first()
             phanotate_calls += (str(left) + '-' + str(right) + ' ' + strand + ',')
             if cds == None or cds.status == 'Fail':
                 frame, status = helper.get_frame_and_status(left, right, strand, coding_potential)
                 if cds == None or (cds.status == 'Fail' and status == 'Pass'):
                     if cds != None:
                         db.session.delete(cds)
-                    cds = Annotations(phage_id = current_user,
+                    cds = Annotations(phage_id = phage_id,
                                     id = 'Phanotate_' + str(id_index),
                                     left = left,
                                     right = right,
@@ -278,17 +280,19 @@ def auto_annotate(UPLOAD_FOLDER, current_user):
                                     status = status,
                                     frame = frame)
                     db.session.add(cds)
-    calls = Gene_Calls(phage_id = current_user,
+    calls = Gene_Calls(phage_id = phage_id,
                        id = 'Phanotate',
                        calls = phanotate_calls)
     db.session.add(calls)
     db.session.commit()
     id_index = 0
 
-    for cds in db.session.query(Annotations).filter_by(phage_id=current_user).order_by(Annotations.left):
+    user = db.session.query(Users).filter_by(id=phage_id).first()
+    print(user.phage_id)
+    for cds in db.session.query(Annotations).filter_by(phage_id=phage_id).order_by(Annotations.left):
         id_index += 1
-        cds.id = current_user + '_' + str(id_index)
-        if (cds.right < cds.left) or (Blast_Results.query.filter_by(phage_id=current_user).filter_by(left=cds.left, right=cds.right, strand=cds.strand).first()):
+        cds.id = user.phage_id + '_' + str(id_index)
+        if (cds.right < cds.left) or (Blast_Results.query.filter_by(phage_id=phage_id).filter_by(left=cds.left, right=cds.right, strand=cds.strand).first()):
             db.session.delete(cds)
     db.session.commit()
 
@@ -297,27 +301,27 @@ def auto_annotate(UPLOAD_FOLDER, current_user):
         if not filename.endswith(".fasta") and not filename.endswith(".gdata") and not filename.endswith(".json"):
             os.remove(os.path.join(UPLOAD_FOLDER, filename))
 
-def download_blast_input(current_user):
+def download_blast_input(phage_id):
     """Returns the blast input zip folder.
 
     Args:
-        current_user:
+        phage_id:
             The current user ID.
 
     Returns:
         The blast input files in a zip folder.
     """
-    f = open(os.path.join(ROOT, 'users', current_user, f"{current_user}_blast.zip"), "rb")
+    f = open(os.path.join(ROOT, 'users', phage_id, f"{phage_id}_blast.zip"), "rb")
 
     return f.read()
 
-def create_blast_input(UPLOAD_FOLDER, current_user):
+def create_blast_input(UPLOAD_FOLDER, phage_id):
     """Creates fasta file(s) for BLAST input.
 
     If more than one file is created, then each file should be 30 kb.
 
     Args:
-        current_user:
+        phage_id:
             The ID of the current user.
         fasta_file:
             The file containing the DNA sequence of the phage.
@@ -332,7 +336,7 @@ def create_blast_input(UPLOAD_FOLDER, current_user):
     genome = SeqIO.read(fasta_file, "fasta").seq
     output = ""
     blast_file_count = 1  # keep track of num blast files created
-    out_file = f"{str(filename.group(1))}/{current_user}_blast_{blast_file_count}.fasta"
+    out_file = f"{str(filename.group(1))}/{phage_id}_blast_{blast_file_count}.fasta"
     files_to_zip = [out_file]
     lefts, rights = get_starts_stops('+', genome)
     for i in range(len(lefts)):
@@ -343,7 +347,7 @@ def create_blast_input(UPLOAD_FOLDER, current_user):
                 f.write(output)
             output = ""
             blast_file_count += 1
-            out_file = f"{str(filename.group(1))}/{current_user}_blast_{blast_file_count}.fasta"
+            out_file = f"{str(filename.group(1))}/{phage_id}_blast_{blast_file_count}.fasta"
             files_to_zip.append(out_file)
     lefts, rights = get_starts_stops('-', genome)
     for i in range(len(lefts)):
@@ -356,27 +360,27 @@ def create_blast_input(UPLOAD_FOLDER, current_user):
                 f.write(output)
             output = ""
             blast_file_count += 1
-            out_file = f"{str(filename.group(1))}/{current_user}_blast_{blast_file_count}.fasta"
+            out_file = f"{str(filename.group(1))}/{phage_id}_blast_{blast_file_count}.fasta"
             files_to_zip.append(out_file)
 
     with open(out_file, "w") as f:
         f.write(output)
     
     # zip all out_files together.
-    zip_file = zipfile.ZipFile(f"{str(filename.group(1))}/{current_user}_blast.zip", 'w', zipfile.ZIP_DEFLATED)
+    zip_file = zipfile.ZipFile(f"{str(filename.group(1))}/{phage_id}_blast.zip", 'w', zipfile.ZIP_DEFLATED)
     for filename in files_to_zip:
         arcname = filename.rsplit('/', 1)[-1].lower()
         zip_file.write(filename, arcname)
     zip_file.close()
     
     # delete files that are not in zip folder.
-    for filename in os.listdir(os.path.join(ROOT, 'users', current_user)):
+    for filename in os.listdir(os.path.join(ROOT, 'users', phage_id)):
         if filename.endswith(".fasta"):
-            os.remove(os.path.join(ROOT, 'users', current_user, filename))
+            os.remove(os.path.join(ROOT, 'users', phage_id, filename))
 
     return blast_file_count
 
-def dropzone(current_user, UPLOAD_FOLDER, request):
+def dropzone(phage_id, UPLOAD_FOLDER, request):
     """Adds the blast output file to the upload directory if of type json.
 
     Args:
@@ -399,7 +403,7 @@ def dropzone(current_user, UPLOAD_FOLDER, request):
                     f.write(contents)
                     if contents[-6:] == "\n]\n}\n\n":
                         print("yes")
-                        file_data = db.session.query(Files).filter_by(phage_id=current_user).filter_by(name=file_name).first()
+                        file_data = db.session.query(Files).filter_by(phage_id=phage_id).filter_by(name=file_name).first()
                         file_data.complete = True
                         db.session.commit()
         if not found:
@@ -407,11 +411,11 @@ def dropzone(current_user, UPLOAD_FOLDER, request):
                 f.write(contents)
             if contents[-6:] == "\n]\n}\n\n":
                 print("yes")
-                file_data = db.session.query(Files).filter_by(phage_id=current_user).filter_by(name=file_name).first()
+                file_data = db.session.query(Files).filter_by(phage_id=phage_id).filter_by(name=file_name).first()
                 file_data.complete = True
                 db.session.commit()
 
-def get_blast_output_names(current_user, UPLOAD_FOLDER, type_of_call):
+def get_blast_output_names(phage_id, UPLOAD_FOLDER, type_of_call):
     """Gets the names of all the files of type json in the upload directory.
 
     Args:
@@ -429,7 +433,7 @@ def get_blast_output_names(current_user, UPLOAD_FOLDER, type_of_call):
     bad_files = []
     for file in os.listdir(UPLOAD_FOLDER):
         if file.endswith(".json"):
-            file_data = db.session.query(Files).filter_by(phage_id=current_user).filter_by(name=file).first()
+            file_data = db.session.query(Files).filter_by(phage_id=phage_id).filter_by(name=file).first()
             if file_data != None and file_data.complete:
                 file_mods.append(file_data.date)
                 file_sizes.append(file_data.size)
@@ -442,7 +446,7 @@ def get_blast_output_names(current_user, UPLOAD_FOLDER, type_of_call):
     if type_of_call == "refresh":
         for file_name in bad_files:
             os.remove(os.path.join(UPLOAD_FOLDER, file_name))
-            delete_file = db.session.query(Files).filter_by(phage_id=current_user).filter_by(name=file_name).first()
+            delete_file = db.session.query(Files).filter_by(phage_id=phage_id).filter_by(name=file_name).first()
             db.session.delete(delete_file)
     response_object["bad_files"] = bad_files
     response_object["file_names"] = file_names
@@ -450,12 +454,12 @@ def get_blast_output_names(current_user, UPLOAD_FOLDER, type_of_call):
     response_object["file_mods"] = file_mods
     response_object["in_process"] = False
     response_object["position"] = -1
-    task = db.session.query(Tasks).filter_by(phage_id=current_user).filter_by(function="auto_annotate").first()
+    task = db.session.query(Tasks).filter_by(phage_id=phage_id).filter_by(function="auto_annotate").first()
     if (task is not None):
         curr_tasks = db.session.query(Tasks).filter_by(complete=False).order_by(Tasks.time)
         counter = 0
         for curr_task in curr_tasks:
-            if curr_task.phage_id == current_user:
+            if curr_task.phage_id == phage_id:
                 break
             counter += 1
         response_object["position"] = counter
@@ -467,7 +471,7 @@ def get_blast_output_names(current_user, UPLOAD_FOLDER, type_of_call):
 
     return response_object
 
-def delete_blast_output(current_user, UPLOAD_FOLDER, file_path):
+def delete_blast_output(phage_id, UPLOAD_FOLDER, file_path):
     """Removes a file from the upload directory given the file path.
     
     Args:
@@ -481,10 +485,10 @@ def delete_blast_output(current_user, UPLOAD_FOLDER, file_path):
     """
     try:
         os.remove(os.path.join(UPLOAD_FOLDER, file_path))
-        delete_file = db.session.query(Files).filter_by(phage_id=current_user).filter_by(name=file_path).first()
+        delete_file = db.session.query(Files).filter_by(phage_id=phage_id).filter_by(name=file_path).first()
         db.session.delete(delete_file)
         response_object["status"] = "success"
-        db.session.query(Blast_Results).filter_by(phage_id=current_user).delete()
+        db.session.query(Blast_Results).filter_by(phage_id=phage_id).delete()
         try:
             db.session.commit()
         except:
@@ -495,19 +499,19 @@ def delete_blast_output(current_user, UPLOAD_FOLDER, file_path):
 
     return response_object
 
-def get_num_blast_files(current_user):
+def get_num_blast_files(phage_id):
     """Gets the number of Blast input files in the zip folder.
 
     Args:
-        current_user:
+        phage_id:
             The ID of the current user.
     
     Returns:
         A string containing the number of Blast files or 'None' if not found.
     """
-    for filename in os.listdir(os.path.join(ROOT, 'users', current_user)):
+    for filename in os.listdir(os.path.join(ROOT, 'users', phage_id)):
         if filename.endswith('.zip'):
-            with closing(ZipFile(os.path.join(ROOT, 'users', current_user, filename))) as archive:
+            with closing(ZipFile(os.path.join(ROOT, 'users', phage_id, filename))) as archive:
                 num_blast_files = len(archive.infolist())
                 return str(num_blast_files)
     return "None"

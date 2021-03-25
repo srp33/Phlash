@@ -7,6 +7,7 @@
       :geneMap="navGeneMap"
       :settings="navSettings"
       :phageID="navPhageID"
+      :logout="true"
     />
     <div class="container">
       <h1>Blast</h1>
@@ -285,6 +286,8 @@ import Loading from 'vue-loading-overlay';
 import 'vue-loading-overlay/dist/vue-loading.css';
 import vue2Dropzone from 'vue2-dropzone';
 import 'vue2-dropzone/dist/vue2Dropzone.min.css';
+import { LoaderPlugin } from 'vue-google-login';
+import Vue from 'vue';
 
 export default {
   name: 'Blast',
@@ -310,6 +313,27 @@ export default {
       interval: null,
       waitMessage: null,
     };
+  },
+
+  beforeCreate() {
+    Vue.use(LoaderPlugin, {
+      client_id: process.env.GOOGLE_CLIENT_ID
+    });
+    Vue.GoogleAuth.then(auth2 => {
+      if (!auth2.isSignedIn.get()) {
+        this.$router.push('/');
+      }
+      axios
+        .get(process.env.VUE_APP_BASE_URL + `/check_user/${auth2.currentUser.get().Qs.zt}/${this.$route.params.phageID}`)
+        .then((response) => {
+          if (response.data === "fail") {
+            this.$router.push('/');
+          }
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    })
   },
 
   created() {
@@ -730,9 +754,17 @@ export default {
               else {
                 this.waitMessage = "Your bacteriophage genome is currently number " + response.data.position + " in line to be auto-annotated."
               }
-            } else {
+            } else if (this.annotating === true || this.autoAnnotated === false) {
               this.annotating = false;
               this.autoAnnotated = true;
+              this.$bvToast.toast(
+                `Phlash has finished auto-annotating this phage's genome.`,
+                {
+                  variant: 'primary',
+                  title: 'Finished',
+                  appendToast: false,
+                }
+              );
             }
           })
           .catch((error) => {
@@ -749,6 +781,7 @@ export default {
         this.$bvToast.toast(
           `You must wait for auto-annotation to be completed before continuing.`,
           {
+            variant: 'primary',
             title: 'INCOMPLETE AUTO-ANNOTATION',
             autoHideDelay: 15000,
             appendToast: false,
@@ -758,6 +791,7 @@ export default {
         this.$bvToast.toast(
           `All ${this.numFiles} files have not been uploaded.`,
           {
+            variant: 'primary',
             title: 'UPLOAD ALL FILES',
             autoHideDelay: 15000,
             appendToast: false,
@@ -783,6 +817,7 @@ export default {
               `The BLAST results are currently being interpretted which may take several 
             minutes. Removal of the BLAST output files is not possible at this time.`,
               {
+                variant: 'primary',
                 title: 'BLAST OUTPUT FILES IN USE',
                 autoHideDelay: 5000,
                 appendToast: false,

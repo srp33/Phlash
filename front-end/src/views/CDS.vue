@@ -7,6 +7,7 @@
       :geneMap="navGeneMap"
       :settings="navSettings"
       :phageID="navPhageID"
+      :logout="true"
     />
     <div class="container">
       <loading
@@ -281,6 +282,8 @@ import BlastResults from '../components/BlastResults.vue';
 import Graphs from '../components/Graphs.vue';
 import Loading from 'vue-loading-overlay';
 import 'vue-loading-overlay/dist/vue-loading.css';
+import { LoaderPlugin } from 'vue-google-login';
+import Vue from 'vue';
 
 export default {
   name: 'CDS',
@@ -344,6 +347,27 @@ export default {
       showLeft: false,
       saved: true,
     };
+  },
+
+  beforeCreate() {
+    Vue.use(LoaderPlugin, {
+      client_id: process.env.GOOGLE_CLIENT_ID
+    });
+    Vue.GoogleAuth.then(auth2 => {
+      if (!auth2.isSignedIn.get()) {
+        this.$router.push('/');
+      }
+      axios
+        .get(process.env.VUE_APP_BASE_URL + `/check_user/${auth2.currentUser.get().Qs.zt}/${this.$route.params.phageID}`)
+        .then((response) => {
+          if (response.data === "fail") {
+            this.$router.push('/');
+          }
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    })
   },
 
   created() {
@@ -585,6 +609,7 @@ export default {
         .then(() => {
           if (this.newFunction !== 'DELETED') {
             this.$bvToast.toast(`The CDS ${cdsID} has been saved.`, {
+              variant: 'primary',
               title: 'SAVED',
               autoHideDelay: 5000,
               appendToast: false,
@@ -593,6 +618,7 @@ export default {
             this.$bvToast.toast(
               `The CDS ${cdsID} has been deleted. You will be re-routed to the next CDS.`,
               {
+                variant: 'primary',
                 title: 'DELETED',
                 autoHideDelay: 5000,
                 appendToast: false,

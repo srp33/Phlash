@@ -21,13 +21,13 @@ import os
 
 response_object = {}
 
-def get_genbank(UPLOAD_FOLDER, current_user, payload):
+def get_genbank(UPLOAD_FOLDER, phage_id, payload):
     """Calls function to create the genbank file and returns it.
 
     Args:
         UPLOAD_FOLDER:
             The folder containing all of the uploaded files.
-        current_user:
+        phage_id:
             The current user's ID.
         payload:
             The data sent from the front-end.
@@ -37,18 +37,18 @@ def get_genbank(UPLOAD_FOLDER, current_user, payload):
     """
     gb_file = helper.get_file_path("genbank", UPLOAD_FOLDER)
     fasta_file = helper.get_file_path("fasta", UPLOAD_FOLDER)
-    gb_file = create_genbank(fasta_file, UPLOAD_FOLDER, current_user, payload)
+    gb_file = create_genbank(fasta_file, UPLOAD_FOLDER, phage_id, payload)
     f = open(gb_file, "r")
     return f.read()
 
-def create_genbank(fasta_file, UPLOAD_FOLDER, current_user, payload):
+def create_genbank(fasta_file, UPLOAD_FOLDER, phage_id, payload):
     """Creates and returns the genbank file.
     Args:
         fasta_file:
             The file containing the phage's dna sequence.
         UPLOAD_FOLDER:
             The folder containing all of the uploaded files.
-        current_user:
+        phage_id:
             The current user's ID.
         payload:
             The data sent from the front-end.
@@ -59,7 +59,7 @@ def create_genbank(fasta_file, UPLOAD_FOLDER, current_user, payload):
     """
     headers = payload.get_json()
     print(headers)
-    gb_file = os.path.join(UPLOAD_FOLDER, current_user + ".gb")
+    gb_file = os.path.join(UPLOAD_FOLDER, phage_id + ".gb")
     genome = SeqIO.read(fasta_file, "fasta").seq
     genome = Seq(str(genome), IUPAC.unambiguous_dna)
     record = SeqRecord(genome, id='', name=headers["phageName"], description=headers["source"])
@@ -79,7 +79,7 @@ def create_genbank(fasta_file, UPLOAD_FOLDER, current_user, payload):
     record.features.append(feature)
 
     idNumber = 0
-    for cds in Annotations.query.filter_by(phage_id=current_user).order_by(Annotations.left).all():
+    for cds in Annotations.query.filter_by(phage_id=phage_id).order_by(Annotations.left).all():
         if (cds.function == "@DELETED" or cds.status == "trnaDELETED"):
             continue
         idNumber += 1

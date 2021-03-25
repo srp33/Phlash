@@ -7,38 +7,44 @@
       :geneMap="navGeneMap"
       :settings="navSettings"
       :phageID="navPhageID"
+      :logout="loggedIn"
     />
     <div class="container">
-      <p style="margin: 1em">
-        <img id="logo" src="/phlash/images/logohome.png" width="250" />
-      </p>
-      <h1>Phlash</h1>
-      <meta name="google-signin-client_id" content="780981769382-odbkfqn6mr1f2d9kkeaokbks7eqfrvu7.apps.googleusercontent.com">
-      <div class="g-signin2" data-onsuccess="onSignIn"></div>
-      <g-signin-button
-        class="btn btn-dark"
-        :params="googleSignInParams"
-        @success="onSignInSuccess"
-        @error="onSignInError">
-        Sign in with Google
-      </g-signin-button>
-      <button v-google-signin-button="clientID" class="btn btn-dark" @success="onSignIn"> Continue with Google</button>
-      <div class="alert alert-secondary">
-        <p style="text-align: center">
-          <strong
-            >A user-friendly bacteriophage genome annotation
-            application.</strong
-          >
+      <div v-if="!loggedIn">
+        <p style="margin: 1em">
+          <img id="logo" src="/phlash/images/logohome.png" width="250" />
         </p>
-        <hr />
-        <p style="text-align: left">
+        <h1>Phlash</h1>
+        <div class="alert alert-secondary">
+          <p style="text-align: center">
+            <strong
+              >A user-friendly bacteriophage genome annotation
+              application.</strong
+            >
+          </p>
+          <hr />
+          <div style="text-align:center; max-height:2em;">
+          <GoogleLogin class="btn btn-dark" style="margin-top: 0px; font-size: 1em;" :params="params" :onSuccess="onSuccess" :onFailure="onFailure">To get started, continue with Google.</GoogleLogin>
+          </div>
+        </div>
+      </div>
+      <div v-if="loggedIn">
+        <h1>Home</h1>
+        <p style="margin: 1em">
+          <img id="userImage" src="/phlash/images/logohome.png" width="100" />
+        </p>
+        <h2>{{userName}}</h2>
+        <div class="alert alert-secondary">
+          <hr />
+        <p v-if="phageNames.length !== 0" style="text-align: left">
           Enter an ID that contains only letters, numbers, and underscores
-          below. This ID will uniquely identify your bacteriophage genome
+          below or continue with an existing ID. Each ID uniquely identifies a bacteriophage genome
           annotation.<br />
-          <em
-            >Please note that all data associated with this ID will be removed
-            after 90 days.</em
-          >
+        </p>
+        <p v-if="phageNames.length === 0" style="text-align: left">
+          Enter an ID that contains only letters, numbers, and underscores
+          below. Each ID uniquely identifies a bacteriophage genome
+          annotation.<br />
         </p>
         <div
           class="input-group mb-2"
@@ -62,18 +68,14 @@
               type="button"
               @click="checkPhageID()"
             >
-              <strong>Start</strong>
+              <strong>Create</strong>
             </button>
           </div>
         </div>
-        <hr />
-        <p class="id-status" v-if="idStatus !== ''">
+        <!-- <hr /> -->
+        <!-- <p class="id-status" v-if="idStatus !== ''">
           {{ idStatus }}
         </p>
-        <div class="alert alert-primary" v-if="idStatus !== ''">
-          &#128712; You have until <strong>{{ dateToBeDeleted }}</strong> to
-          complete annotations for this phage.
-        </div>
         <hr v-if="idStatus !== ''" />
         <div class="nav-btns-wrapper">
           <router-link
@@ -115,40 +117,143 @@
               <strong>Next &#129054;</strong>
             </button>
           </router-link>
+        </div> -->
+        <!-- <h2 v-if="phageNames.length !== 0" style="text-align:center;">Existing Annotations</h2> -->
+        <!-- <h3 v-if="phageNames.length === 0">You have not started any annotations. Get started by creating a phage ID above.</h3> -->
+        <div v-if="phageNames.length !== 0"
+          class="table table-responsive table-secondary"
+          style="overflow-y: auto; max-height: 50em"
+        >
+          <table class="table table-hover" align="center">
+            <thead>
+              <tr>
+                <th scope="col">Phage ID</th>
+                <th scope="col">Creation Date</th>
+                <th scope="col">Deletion Date</th>
+                <th scope="col">Delete Phage</th>
+                <th scope="col">Continue Annotations</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="(curr, index) in phageNames" :key="index">
+                <td>{{curr}}</td>
+                <td>{{phageCreationDates[index]}}</td>
+                <td>{{phageDeletionDates[index]}}</td>
+                <td>
+                  <button
+                    type="button"
+                    class="btn btn-dark"
+                    @click="deletePhage(curr, index)"
+                  >
+                    <strong>&#128465; Delete</strong>
+                  </button>
+                </td>
+                <td>
+                  <button
+                    type="button"
+                    class="btn btn-dark"
+                    @click="nextPage(index)"
+                  >
+                    <strong>Continue &#129054;</strong>
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
+      </div>
+        <em>Please note that all data associated with each Phage ID will be removed after 90 days.</em>
       </div>
     </div>
   </div>
 </template>
-<script src="https://apis.google.com/js/api:client.js" async defer></script>
-<script src="https://apis.google.com/js/platform.js" async defer></script>
+
 <script>
-// https://apis.google.com/js/780981769382-odbkfqn6mr1f2d9kkeaokbks7eqfrvu7.apps.googleusercontent.com
 import axios from 'axios';
 import Navbar from '../components/Navbar.vue';
-import GoogleSignInButton from 'vue-google-signin-button-directive'
-import GSignInButton from 'vue-google-signin-button'
+import GoogleLogin from 'vue-google-login';
+import { LoaderPlugin } from 'vue-google-login';
+import Vue from 'vue';
 
 export default {
   name: 'Home',
   components: {
     Navbar,
-    GoogleSignInButton,
-    GSignInButton,
+    GoogleLogin,
+    LoaderPlugin,
   },
 
   data() {
     return {
+      user: null,
+      imageURL: null,
+      userName: null,
+      phageNames: [],
+      phageDeletionDates: [],
+      phageCreationDates: [],
+      phageIDs: [],
+      phagePages: [],
       clientID: "780981769382-odbkfqn6mr1f2d9kkeaokbks7eqfrvu7.apps.googleusercontent.com",
+      loggedIn: false,
       phageID: null,
       idStatus: '',
       allFilesUploaded: false,
       dateToBeDeleted: null,
       blastComplete: false,
-      googleSignInParams: {
-        client_id: this.clientID
-      }
+      params: {
+        client_id: process.env.GOOGLE_CLIENT_ID,
+      },
+      renderParams: {
+        width: 250,
+        height: 50,
+        longtitle: true
+      },
     };
+  },
+
+  beforeCreate() {
+    Vue.use(LoaderPlugin, {
+      client_id: process.env.GOOGLE_CLIENT_ID
+    });
+    Vue.GoogleAuth.then(auth2 => {
+      if (auth2.isSignedIn.get()) {
+        this.loggedIn = true;
+      }
+    })
+  },
+
+  created() {
+    Vue.use(LoaderPlugin, {
+      client_id: process.env.GOOGLE_CLIENT_ID
+    });
+    Vue.GoogleAuth.then(auth2 => {
+      if (auth2.isSignedIn.get()) {
+        this.loggedIn = true;
+        console.log(this.loggedIn);
+        this.user = auth2.currentUser.get().Qs.zt;
+        this.userName = auth2.currentUser.get().Qs.Te;
+        this.imageURL = auth2.currentUser.get().Qs.getImageUrl();
+        console.log(this.imageURL);
+        axios
+          .get(process.env.VUE_APP_BASE_URL + `/get_user_data/${auth2.currentUser.get().Qs.zt}`)
+          .then((response) => {
+            console.log(response.data);
+            this.loggedIn = true;
+            console.log(this.loggedIn);
+            if (response.data !== "empty") {
+              this.phageNames = response.data.phage_id_list;
+              this.phageCreationDates = response.data.phage_creation_date_list;
+              this.phageDeletionDates = response.data.phage_deletion_date_list;
+              this.phageIDs = response.data.id_list;
+              this.phagePages = response.data.phage_pages;
+            }
+            document.getElementById('userImage').src = auth2.currentUser.get().Qs.getImageUrl();
+          })
+          .catch((error) => {
+            console.error(error);
+          });
+      }
+    })
   },
 
   watch: {
@@ -159,6 +264,7 @@ export default {
       }
     },
   },
+  
   computed: {
     navUpload: function () {
       if (this.phageID !== null) return true;
@@ -189,47 +295,59 @@ export default {
   },
 
   methods: {
-    OnGoogleAuthSuccess (idToken) {
-      console.log(idToken)
-      // Receive the idToken and make your magic with the backend
-      axios.get(`https://www.googleapis.com/oauth2/v3/userinfo?access_token=${idToken}`)
-      .then((response) => {
+    /**
+     * Refreshes the page when the user logs in successfully.
+     * @param {object} googleUser the account that was logged in.
+     */
+    onSuccess(googleUser) {
+      window.location.reload();
+    },
+
+    /** 
+     * Handles a failed user login.
+     */
+    onFailure() {
+      this.$bvToast.toast(
+        `Google sign in failed. Please try again.`,
+        {
+          variant: 'primary',
+          title: 'Login Failed',
+          autoHideDelay: 15000,
+          appendToast: false,
+        }
+      );
+    },
+
+    /**
+     * Removes a phage.
+     * @param {string} phageName the name of the phage to be removed.
+     * @param {int} index the index of the phage to be removed.
+     */
+    deletePhage(phageName, index) {
+      var cont = confirm('Are you sure you want to permanently delete this phage ID? This will remove all progress that you have made on this phage.');
+      if (cont === true) {
+        axios
+          .delete(process.env.VUE_APP_BASE_URL + `/home/${this.user}/${phageName}`)
+          .then((response) => {
             console.log(response.data);
+            this.phageNames.splice(index,1);
+            this.phageCreationDates.splice(index,1);
+            this.phageIDs.splice(index,1);
+            this.phageDeletionDates.splice(index,1);
+            this.phagePages.splice(index,1);
           })
           .catch((error) => {
             console.error(error);
           });
-    },
-    OnGoogleAuthFail (error) {
-      console.log(error)
+      }
     },
 
-    onSignIn (googleUser) {
-      var profile = googleUser.getBasicProfile();
-      console.log('ID: ' + profile.getId()); // Do not send to your backend! Use an ID token instead.
-      console.log('Name: ' + profile.getName());
-      console.log('Image URL: ' + profile.getImageUrl());
-      console.log('Email: ' + profile.getEmail()); // This is null if the 'email' scope is not present.
-    },
-
-    onSignInSuccess (googleUser) {
-      var profile = googleUser.getBasicProfile();
-      console.log('ID: ' + profile.getId()); // Do not send to your backend! Use an ID token instead.
-      console.log('Name: ' + profile.getName());
-      console.log('Image URL: ' + profile.getImageUrl());
-      console.log('Email: ' + profile.getEmail()); // This is null if the 'email' scope is not present.
-    },
-
-    onSignInError (error) {
-      // `error` contains any error occurred.
-      console.log('OH NOES', error)
-    },
-
-    signOut() {
-      var auth2 = gapi.auth2.getAuthInstance();
-      auth2.signOut().then(function () {
-        console.log('User signed out.');
-      });
+    /**
+     * Navigates to the next page.
+     * @param {int} index the index of the phage to be annotated.
+     */
+    nextPage(index) {
+      this.$router.push(`/${this.phagePages[index]}/${this.phageIDs[index]}`);
     },
 
     /**
@@ -240,30 +358,55 @@ export default {
     checkPhageID() {
       if (this.phageID !== '' && this.phageID !== null) {
         axios
-          .post(process.env.VUE_APP_BASE_URL + `/home/${this.phageID}`)
+          .post(process.env.VUE_APP_BASE_URL + `/home/${this.user}/${this.phageID}`)
           .then((response) => {
             console.log(response.data);
-            this.allFilesUploaded = response.data.uploaded_all_files;
-            this.blastComplete = response.data.blast_complete;
             this.idStatus = response.data.id_status;
-            const monthNames = [
-              'January',
-              'February',
-              'March',
-              'April',
-              'May',
-              'June',
-              'July',
-              'August',
-              'September',
-              'October',
-              'November',
-              'December',
-            ];
-            let date = new Date(response.data.delete_time);
-            this.dateToBeDeleted = `${
-              monthNames[date.getUTCMonth()]
-            } ${date.getUTCDate()}, ${date.getUTCFullYear()}`;
+            if (!this.idStatus.includes('ID already exists')) {
+              this.phageIDs.push(response.data.id);
+              this.phageNames.push(response.data.phage_id);
+              this.phageDeletionDates.push(response.data.deletion_date);
+              this.phageCreationDates.push(response.data.creation_date);
+              this.phagePages.push(response.data.phage_page);
+              this.$bvToast.toast(
+                `${this.idStatus}`,
+                {
+                  variant: 'primary',
+                  title: 'ID Created',
+                  autoHideDelay: 5000,
+                  appendToast: false,
+                }
+              );
+            }
+            else {
+              this.$bvToast.toast(
+                `${this.idStatus}`,
+                {
+                  variant: 'primary',
+                  title: 'ID Already Exists',
+                  autoHideDelay: 5000,
+                  appendToast: false,
+                }
+              );
+            }
+            // const monthNames = [
+            //   'January',
+            //   'February',
+            //   'March',
+            //   'April',
+            //   'May',
+            //   'June',
+            //   'July',
+            //   'August',
+            //   'September',
+            //   'October',
+            //   'November',
+            //   'December',
+            // ];
+            // let date = new Date(response.data.delete_time);
+            // this.dateToBeDeleted = `${
+            //   monthNames[date.getUTCMonth()]
+            // } ${date.getUTCDate()}, ${date.getUTCFullYear()}`;
           })
           .catch((error) => {
             console.error(error);
@@ -301,6 +444,18 @@ h1 {
   border-color: white;
   font-size: 1.4em;
   text-align: left;
+}
+
+.table-responsive thead th {
+  position: sticky;
+  top: 0;
+  background: white;
+  color: black;
+  font-size: 1em;
+}
+
+h1 {
+  margin-top: 0.7em;
 }
 
 /* .g-signin-button {

@@ -5,14 +5,14 @@
       style="color: white; font-size: 1.5em"
     >
       <a class="navbar-brand" href="/">
-        <img id="logo" src="/phlash/images/logonav.png" width="35" />
+        <img id="logo" src="/phlash/images/logonav.png" width="50" />
       </a>
       <button
         class="navbar-toggler"
         type="button"
         data-toggle="collapse"
-        data-target="#navbarNav"
-        aria-controls="navbarNav"
+        data-target="#navbarNavDropdown"
+        aria-controls="navbarNavDropdown"
         aria-expanded="false"
         aria-label="Toggle navigation"
       >
@@ -20,12 +20,19 @@
       </button>
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav">
-          <li class="nav-item">
-            <router-link to="/"
-              ><a class="nav-link" href="#">home</a></router-link
-            >
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              phlash
+            </a>
+            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+              <a class="dropdown-item" href="#"><router-link to="/" style="color: black">home</router-link></a>
+              <a class="dropdown-item" href="#"><router-link to="/contact" style="color: black">contact</router-link></a>
+              <a v-if="settings" class="dropdown-item" href="#" @click="getSettings">settings</a>
+              <div v-if="logout" class="dropdown-divider"></div>
+              <a v-if="logout" class="dropdown-item" style="margin-left:0px; text-align:left;" href="#"><GoogleLogin class="btn btn-dark btn-block" :params="params" :onSuccess="onSuccess" :logoutButton=true>logout</GoogleLogin></a>
+            </div>
           </li>
-          <li class="nav-item">
+          <li class="nav-item" v-if="upload">
             <router-link
               :to="{ name: 'Upload', params: { phageID: this.phageID } }"
               :event="upload ? 'click' : ''"
@@ -33,7 +40,7 @@
               <a class="nav-link" href="#">upload</a>
             </router-link>
           </li>
-          <li class="nav-item">
+          <li class="nav-item" v-if="geneMap">
             <router-link
               :to="{ name: 'Blast', params: { phageID: this.phageID } }"
               :event="geneMap ? 'click' : ''"
@@ -41,7 +48,7 @@
               <a class="nav-link" href="#">blast</a>
             </router-link>
           </li>
-          <li class="nav-item">
+          <li class="nav-item" v-if="annotations">
             <router-link
               :to="{ name: 'Annotations', params: { phageID: this.phageID } }"
               :event="annotations ? 'click' : ''"
@@ -49,7 +56,7 @@
               <a class="nav-link" href="#">annotations</a>
             </router-link>
           </li>
-          <li class="nav-item">
+          <li class="nav-item" v-if="annotations">
             <router-link
               :to="{ name: 'GeneMap', params: { phageID: this.phageID } }"
               :event="annotations ? 'click' : ''"
@@ -57,21 +64,13 @@
               <a class="nav-link" href="#">genome map</a>
             </router-link>
           </li>
-          <li class="nav-item">
+          <li class="nav-item" v-if="annotations">
             <router-link
               :to="{ name: 'GenBank', params: { phageID: this.phageID } }"
               :event="annotations ? 'click' : ''"
             >
               <a class="nav-link" href="#">genbank</a>
             </router-link>
-          </li>
-          <li class="nav-item" v-if="settings">
-            <a class="nav-link" href="#" @click="getSettings">settings</a>
-          </li>
-          <li class="nav-item">
-            <router-link to="/contact"
-              ><a class="nav-link" href="#">contact</a></router-link
-            >
           </li>
         </ul>
       </div>
@@ -189,9 +188,13 @@
 
 <script>
 import axios from 'axios';
+import GoogleLogin from 'vue-google-login';
 
 export default {
   name: 'Navbar',
+  components: {
+    GoogleLogin,
+  },
   props: {
     upload: Boolean,
     blast: Boolean,
@@ -199,6 +202,7 @@ export default {
     geneMap: Boolean,
     settings: Boolean,
     phageID: String,
+    logout: Boolean,
   },
 
   data() {
@@ -211,6 +215,9 @@ export default {
       backStartRange: null,
       forwardStartRange: null,
       short: null,
+      params: {
+        client_id: "780981769382-odbkfqn6mr1f2d9kkeaokbks7eqfrvu7.apps.googleusercontent.com",
+      },
     };
   },
 
@@ -259,6 +266,10 @@ export default {
         .catch((error) => {
           console.error(error);
         });
+    },
+
+    onSuccess() {
+      window.location.reload();
     },
   },
 };

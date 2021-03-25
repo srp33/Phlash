@@ -7,6 +7,7 @@
       :geneMap="navGeneMap"
       :settings="navSettings"
       :phageID="navPhageID"
+      :logout="true"
     />
     <div class="container">
       <loading
@@ -201,6 +202,8 @@ import Navbar from '../components/Navbar.vue';
 import axios from 'axios';
 import Loading from 'vue-loading-overlay';
 import 'vue-loading-overlay/dist/vue-loading.css';
+import { LoaderPlugin } from 'vue-google-login';
+import Vue from 'vue';
 
 export default {
   name: 'Contact',
@@ -238,9 +241,33 @@ export default {
     });
   },
 
-  created() {
-    this.genbankAnnotations.phageName = this.$route.params.phageID;
+  beforeCreate() {
+    Vue.use(LoaderPlugin, {
+      client_id: process.env.GOOGLE_CLIENT_ID
+    });
+    Vue.GoogleAuth.then(auth2 => {
+      if (!auth2.isSignedIn.get()) {
+        this.$router.push('/');
+      }
+      axios
+        .get(process.env.VUE_APP_BASE_URL + `/check_user/${auth2.currentUser.get().Qs.zt}/${this.$route.params.phageID}`)
+        .then((response) => {
+          if (response.data === "fail") {
+            this.$router.push('/');
+          }
+          else {
+            this.genbankAnnotations.phageName = response.data;
+          }
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    })
   },
+
+  // created() {
+  //   this.genbankAnnotations.phageName = this.$route.params.phageID;
+  // },
 
   computed: {
     navUpload: function () {

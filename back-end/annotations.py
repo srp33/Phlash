@@ -26,31 +26,34 @@ import time
 response_object = {}
 
 # ------------------------------ MAIN FUNCTIONS ------------------------------
-def get_annotations_data(current_user):
+def get_annotations_data(phage_id):
     """Queries and returns all CDS data created by Annotations.
 
     Returns:
         A dictionary containing the Annotations data.
     """
-    setting = db.session.query(Settings).filter_by(phage_id=current_user).order_by(Settings.back_left_range).first()
+    setting = db.session.query(Settings).filter_by(phage_id=phage_id).order_by(Settings.back_left_range).first()
     response_object['gap'] = setting.gap
     response_object['opposite_gap'] = setting.opposite_gap
     response_object['overlap'] = setting.overlap
     response_object['short'] = setting.short
     annotations = []
-    for cds in db.session.query(Annotations).filter_by(phage_id=current_user).order_by(Annotations.left):
+    for cds in db.session.query(Annotations).filter_by(phage_id=phage_id).order_by(Annotations.left):
+        function = cds.function[:cds.function.find('#')]
+        if cds.function == "None selected":
+            function = "None selected"
         annotations.append({'id': cds.id,
                             'left': cds.left,
                             'right': cds.right,
                             'strand': cds.strand,
-                            'function': cds.function,
+                            'function': function,
                             'status': cds.status,
                             'frame': cds.frame})
     response_object['annotations'] = annotations
 
     return response_object
 
-def parse_blast(current_user, UPLOAD_FOLDER):
+def parse_blast(phage_id, UPLOAD_FOLDER):
     """Parses through the blast results and returns a dictionary containing data.
 
     Removes instances of CREATE_VIEW created by BLAST.
@@ -67,8 +70,8 @@ def parse_blast(current_user, UPLOAD_FOLDER):
     Returns:
         A dictionary containing all of the blast data for the CDS.
     """
-
-    db.session.query(Blast_Results).filter_by(phage_id=current_user).delete()
+    message = "success"
+    db.session.query(Blast_Results).filter_by(phage_id=phage_id).delete()
     print(datetime.now())
     blast_files = helper.get_file_path("blast", UPLOAD_FOLDER)
     E_VALUE_THRESH = 1e-7
@@ -96,6 +99,7 @@ def parse_blast(current_user, UPLOAD_FOLDER):
                 try:
                     blasts = json.load(f)["BlastOutput2"]
                 except:
+                    message = "error"
                     print("Not in correct json format.")
                     continue
                 for blast in blasts:
@@ -125,7 +129,7 @@ def parse_blast(current_user, UPLOAD_FOLDER):
                                     hsps["identity"] / hsps["align_len"] * 100, 2)
                                 results.append(alignment)
                         counter += 1
-                        blast_result = Blast_Results(phage_id = current_user,
+                        blast_result = Blast_Results(phage_id = phage_id,
                                                     id = counter,
                                                     left = curr_left,
                                                     right = curr_right,
@@ -136,10 +140,13 @@ def parse_blast(current_user, UPLOAD_FOLDER):
                             db.session.commit()
                         except:
                             print("An error occured while adding a blast result. Probably a duplicate.")
+                            db.session.query(Blast_Results).filter_by(phage_id=phage_id).delete()
+                            db.session.commit()
                             return("error")
     except:
         print("An error occured while parsing blast results.")
-        db.session.query(Blast_Results).filter_by(phage_id=current_user).delete()
+        db.session.query(Blast_Results).filter_by(phage_id=phage_id).delete()
+        db.session.commit()
         return("error")
         
     for filename in os.listdir(UPLOAD_FOLDER):
@@ -147,9 +154,9 @@ def parse_blast(current_user, UPLOAD_FOLDER):
             os.remove(os.path.join(UPLOAD_FOLDER, filename))
             
     print(datetime.now())
-    return("success")
+    return(message)
 
-def add_cds(request, UPLOAD_FOLDER, current_user):
+def add_cds(request, UPLOAD_FOLDER, phage_id):
     """Adds a new CDS to the database.
 
     Checks to see if the CDS is an ORF.
@@ -159,7 +166,7 @@ def add_cds(request, UPLOAD_FOLDER, current_user):
             The data sent from the front-end.
         UPLOAD_FOLDER:
             The folder containing all of the uploaded files.
-        current_user:
+        phage_id:
             The current user's ID.
     
     Returns:
@@ -181,7 +188,7 @@ def add_cds(request, UPLOAD_FOLDER, current_user):
     coding_potential['y_data_5'] = gdata_df["5"].to_list()
     coding_potential['y_data_6'] = gdata_df["6"].to_list()
     frame, status = helper.get_frame_and_status(int(new_cds_data.get('left')), int(new_cds_data.get('right')), new_cds_data.get('strand'), coding_potential)
-    cds = Annotations(phage_id = current_user,
+    cds = Annotations(phage_id = phage_id,
                     id = new_cds_data.get('id'),
                     left = new_cds_data.get('left'),
                     right = new_cds_data.get('right'),
@@ -190,21 +197,21 @@ def add_cds(request, UPLOAD_FOLDER, current_user):
                     status = status,
                     frame = frame)
 
-    exists = Annotations.query.filter_by(phage_id=current_user).filter_by(left=new_cds_data.get('left'), right=new_cds_data.get('right'), strand=new_cds_data.get('strand')).first()
-    orf = Blast_Results.query.filter_by(phage_id=current_user).filter_by(left=new_cds_data.get('left'), right=new_cds_data.get('right'), strand=new_cds_data.get('strand')).first()
+    exists = Annotations.query.filter_by(phage_id=phage_id).filter_by(left=new_cds_data.get('left'), right=new_cds_data.get('right'), strand=new_cds_data.get('strand')).first()
+    orf = Blast_Results.query.filter_by(phage_id=phage_id).filter_by(left=new_cds_data.get('left'), right=new_cds_data.get('right'), strand=new_cds_data.get('strand')).first()
     if force:
         db.session.add(cds)
         db.session.commit()
         response_object['message'] = "Added succesfully."
         id_index = 0
-        for cds in db.session.query(Annotations).filter_by(phage_id=current_user).order_by(Annotations.left):
+        for cds in db.session.query(Annotations).filter_by(phage_id=phage_id).order_by(Annotations.left):
             id_index += 1
             cds.id = str(id_index)
         db.session.commit()
         id_index = 0
-        for cds in db.session.query(Annotations).filter_by(phage_id=current_user).order_by(Annotations.left):
+        for cds in db.session.query(Annotations).filter_by(phage_id=phage_id).order_by(Annotations.left):
             id_index += 1
-            cds.id = current_user + '_' + str(id_index)
+            cds.id = phage_id + '_' + str(id_index)
         db.session.commit()
         return response_object
     if exists:
@@ -216,13 +223,13 @@ def add_cds(request, UPLOAD_FOLDER, current_user):
         db.session.commit()
         response_object['message'] = "Added succesfully."
         id_index = 0
-        for cds in db.session.query(Annotations).filter_by(phage_id=current_user).order_by(Annotations.left):
+        for cds in db.session.query(Annotations).filter_by(phage_id=phage_id).order_by(Annotations.left):
             id_index += 1
             cds.id = str(id_index)
         db.session.commit()
         id_index = 0
-        for cds in db.session.query(Annotations).filter_by(phage_id=current_user).order_by(Annotations.left):
+        for cds in db.session.query(Annotations).filter_by(phage_id=phage_id).order_by(Annotations.left):
             id_index += 1
-            cds.id = current_user + '_' + str(id_index)
+            cds.id = phage_id + '_' + str(id_index)
         db.session.commit()
     return response_object
