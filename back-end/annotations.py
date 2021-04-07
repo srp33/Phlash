@@ -53,114 +53,61 @@ def get_annotations_data(phage_id):
 
     return response_object
 
-def parse_blast(phage_id, UPLOAD_FOLDER):
-    """Parses through the blast results and returns a dictionary containing data.
-
-    Removes instances of CREATE_VIEW created by BLAST.
-    Finds the associated blast results for the CDS.
+def add_blast_task(phage_id, UPLOAD_FOLDER):
+    """Adds task to database to be executed.
 
     Args:
-        blast_files:
-            The files containing the blast results.
-        cds_id:
-            The ID of the CDS to be found.
-        e_value_thresh:
-            The blast similarity threshold.
-
-    Returns:
-        A dictionary containing all of the blast data for the CDS.
+        phage_id:
+            The ID of the current user.
+        UPLOAD_FOLDER:
+            The folder containing all the uploaded files.
     """
-    message = "success"
-    db.session.query(Blast_Results).filter_by(phage_id=phage_id).delete()
-    print(datetime.now())
-    blast_files = helper.get_file_path("blast", UPLOAD_FOLDER)
-    E_VALUE_THRESH = 1e-7
+    if db.session.query(Blast_Results).filter_by(phage_id=phage_id).first() is None and db.session.query(Tasks).filter_by(phage_id=phage_id).filter_by(function="parse_blast").filter_by(complete=False).first() is None:
+        args = phage_id + " " + UPLOAD_FOLDER
+        task = Tasks(phage_id=phage_id,
+                        function="parse_blast",
+                        arguments=args,
+                        complete=False,
+                        result="waiting",
+                        time=datetime.now())
+        try:
+            db.session.add(task)
+            db.session.commit()
+        except:
+            return "Error in adding task to queue"
+        return "empty"
+    if db.session.query(Tasks).filter_by(phage_id=phage_id).filter_by(function="parse_blast").first() is not None:
+        return "empty"
+    else:
+        return "not empty"
+
+def check_blast_task(phage_id):
+    """Checks the task's status.
+
+    Args:
+        phage_id:
+            The ID of the current user.
+    """
+    curr_tasks = db.session.query(Tasks).filter_by(complete=False).order_by(Tasks.time)
     counter = 0
-    try:
-        for blast_file in blast_files:
-            print(blast_file)
-            newLines = []
-            with open(blast_file, 'r') as f:
-                lines = f.readlines()
-                skip = 0
-                for i, line in enumerate(lines):
-                    if skip <= 0:
-                        if line.endswith("CREATE_VIEW\n"):
-                            line = line[0:-12] + lines[i + 3]
-                            newLines.append(line)
-                            skip = 4
-                        else:
-                            newLines.append(line)
-                    skip -= 1
-            with open(blast_file, 'w') as f:
-                f.writelines(newLines)    
-                
-            with open(blast_file) as f:
-                try:
-                    blasts = json.load(f)["BlastOutput2"]
-                except:
-                    message = "error"
-                    print("Not in correct json format.")
-                    continue
-                for blast in blasts:
-                    search = blast["report"]["results"]["search"]
-                    title = re.search(
-                        "(.), (\d+)-(\d+)", search["query_title"])
-                    if title:
-                        curr_strand = title.group(1)
-                        curr_left = title.group(2)
-                        curr_right = title.group(3)
-                        results = []
-                        hits = search["hits"]
-                        for hit in hits:
-                            hsps = hit["hsps"][0]
-                            if hsps["evalue"] <= E_VALUE_THRESH:
-                                alignment = {}
-                                description = hit["description"][0]
-                                alignment['accession'] = description["accession"]
-                                alignment["title"] = description["title"]
-                                alignment["evalue"] = '{:0.2e}'.format(
-                                    hsps["evalue"])
-                                alignment["query_from"] = hsps["query_from"]
-                                alignment["query_to"] = hsps["query_to"]
-                                alignment["hit_from"] = hsps["hit_from"]
-                                alignment["hit_to"] = hsps["hit_to"]
-                                alignment["percent_identity"] = round(
-                                    hsps["identity"] / hsps["align_len"] * 100, 2)
-                                results.append(alignment)
-                        counter += 1
-                        blast_result = Blast_Results(phage_id = phage_id,
-                                                    id = counter,
-                                                    left = curr_left,
-                                                    right = curr_right,
-                                                    strand = curr_strand,
-                                                    results = str(results))
-                        try:
-                            db.session.add(blast_result)
-                            db.session.commit()
-                        except:
-                            print("An error occured while adding a blast result. Probably a duplicate.")
-                            db.session.query(Blast_Results).filter_by(phage_id=phage_id).delete()
-                            db.session.commit()
-                            return("error")
-    except:
-        print("An error occured while parsing blast results.")
-        db.session.query(Blast_Results).filter_by(phage_id=phage_id).delete()
+    for curr_task in curr_tasks:
+        if curr_task.phage_id == phage_id:
+            break
+        counter += 1
+    task = db.session.query(Tasks).filter_by(phage_id=phage_id).filter_by(function="parse_blast").first()
+    if task is not None and task.complete:
+        result = task.result
+        db.session.delete(task)
         db.session.commit()
-        return("error")
-        
-    for filename in os.listdir(UPLOAD_FOLDER):
-        if filename.endswith('.json'):
-            os.remove(os.path.join(UPLOAD_FOLDER, filename))
-            
-    print(datetime.now())
-    return(message)
+        return result
+    elif task is None:
+        return "complete"
+    else:
+        return str(counter)
 
 def add_cds(request, UPLOAD_FOLDER, phage_id):
     """Adds a new CDS to the database.
-
     Checks to see if the CDS is an ORF.
-
     Args:
         request:
             The data sent from the front-end.
@@ -203,15 +150,16 @@ def add_cds(request, UPLOAD_FOLDER, phage_id):
         db.session.add(cds)
         db.session.commit()
         response_object['message'] = "Added succesfully."
+        # id_index = 0
+        # for cds in db.session.query(Annotations).filter_by(phage_id=phage_id).order_by(Annotations.left):
+        #     id_index += 1
+        #     cds.id = str(id_index)
+        # db.session.commit()
         id_index = 0
+        phage_name = db.session.query(Users).filter_by(id=phage_id).first().phage_id
         for cds in db.session.query(Annotations).filter_by(phage_id=phage_id).order_by(Annotations.left):
             id_index += 1
-            cds.id = str(id_index)
-        db.session.commit()
-        id_index = 0
-        for cds in db.session.query(Annotations).filter_by(phage_id=phage_id).order_by(Annotations.left):
-            id_index += 1
-            cds.id = phage_id + '_' + str(id_index)
+            cds.id = phage_name + '_' + str(id_index)
         db.session.commit()
         return response_object
     if exists:
@@ -222,14 +170,15 @@ def add_cds(request, UPLOAD_FOLDER, phage_id):
         db.session.add(cds)
         db.session.commit()
         response_object['message'] = "Added succesfully."
+        # id_index = 0
+        # for cds in db.session.query(Annotations).filter_by(phage_id=phage_id).order_by(Annotations.left):
+        #     id_index += 1
+        #     cds.id = str(id_index)
+        # db.session.commit()
         id_index = 0
+        phage_name = db.session.query(Users).filter_by(id=phage_id).first().phage_id
         for cds in db.session.query(Annotations).filter_by(phage_id=phage_id).order_by(Annotations.left):
             id_index += 1
-            cds.id = str(id_index)
-        db.session.commit()
-        id_index = 0
-        for cds in db.session.query(Annotations).filter_by(phage_id=phage_id).order_by(Annotations.left):
-            id_index += 1
-            cds.id = phage_id + '_' + str(id_index)
+            cds.id = phage_name + '_' + str(id_index)
         db.session.commit()
     return response_object

@@ -24,7 +24,7 @@
           </p>
           <hr />
           <div style="text-align:center; max-height:2em;">
-          <GoogleLogin class="btn btn-dark" style="margin-top: 0px; font-size: 1em;" :params="params" :onSuccess="onSuccess" :onFailure="onFailure">To get started, continue with Google.</GoogleLogin>
+          <GoogleLogin class="btn btn-dark" style="margin-top: 0px; font-size: 1em;" :params="params" :onSuccess="onSuccess" :onFailure="onFailure">To get started, login with Google.</GoogleLogin>
           </div>
         </div>
       </div>
@@ -71,55 +71,10 @@
               <strong>Create</strong>
             </button>
           </div>
+          <hr />
         </div>
-        <!-- <hr /> -->
-        <!-- <p class="id-status" v-if="idStatus !== ''">
-          {{ idStatus }}
-        </p>
-        <hr v-if="idStatus !== ''" />
-        <div class="nav-btns-wrapper">
-          <router-link
-            :to="{ name: 'Blast', params: { phageID: phageID } }"
-            v-if="
-              idStatus.includes('ID already exists') &&
-              allFilesUploaded &&
-              !blastComplete
-            "
-          >
-            <button class="btn btn-dark">
-              <strong>Next &#129054;</strong>
-            </button>
-          </router-link>
-        </div>
-        <div class="nav-btns-wrapper">
-          <router-link
-            :to="{ name: 'Annotations', params: { phageID: phageID } }"
-            v-if="
-              idStatus.includes('ID already exists') &&
-              allFilesUploaded &&
-              blastComplete
-            "
-          >
-            <button class="btn btn-dark">
-              <strong>Next &#129054;</strong>
-            </button>
-          </router-link>
-        </div>
-        <div class="nav-btns-wrapper">
-          <router-link
-            :to="{ name: 'Upload', params: { phageID: phageID } }"
-            v-if="
-              idStatus.includes('ID created') ||
-              (idStatus.includes('ID already exists') && !allFilesUploaded)
-            "
-          >
-            <button class="btn btn-dark">
-              <strong>Next &#129054;</strong>
-            </button>
-          </router-link>
-        </div> -->
-        <!-- <h2 v-if="phageNames.length !== 0" style="text-align:center;">Existing Annotations</h2> -->
-        <!-- <h3 v-if="phageNames.length === 0">You have not started any annotations. Get started by creating a phage ID above.</h3> -->
+        <hr v-if="phageNames.length > 0" />
+        <h4 style="text-align:center;" v-if="phageNames.length > 0">My Annotations</h4>
         <div v-if="phageNames.length !== 0"
           class="table table-responsive table-secondary"
           style="overflow-y: auto; max-height: 50em"
@@ -130,7 +85,7 @@
                 <th scope="col">Phage ID</th>
                 <th scope="col">Creation Date</th>
                 <th scope="col">Deletion Date</th>
-                <th scope="col">Delete Phage</th>
+                <th scope="col">Delete</th>
                 <th scope="col">Continue Annotations</th>
               </tr>
             </thead>
@@ -143,7 +98,7 @@
                   <button
                     type="button"
                     class="btn btn-dark"
-                    @click="deletePhage(curr, index)"
+                    @click="deletePhage(index)"
                   >
                     <strong>&#128465; Delete</strong>
                   </button>
@@ -161,10 +116,57 @@
             </tbody>
           </table>
         </div>
+        <hr v-if="phageViewNames.length > 0" />
+        <h4 style="text-align:center;" v-if="phageViewNames.length > 0">Shared Annotations</h4>
+        <div v-if="phageViewNames.length > 0"
+          class="table table-responsive table-secondary"
+          style="overflow-y: auto; max-height: 50em"
+        >
+          <table v-if="phageViewNames.length > 0" class="table table-hover" align="center">
+            <thead>
+              <tr>
+                <th scope="col">Phage ID</th>
+                <th scope="col">Shared By</th>
+                <th scope="col">Delete</th>
+                <th scope="col">View Annotations</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="(curr, index) in phageViewNames" :key="index">
+                <td>{{curr}}</td>
+                <td>{{phageViewEmails[index]}}</td>
+                <td>
+                  <button
+                    type="button"
+                    class="btn btn-dark"
+                    @click="deleteViewPhage(index)"
+                  >
+                    <strong>&#128465; Delete</strong>
+                  </button>
+                </td>
+                <td>
+                  <button
+                    type="button"
+                    class="btn btn-dark"
+                    @click="nextViewPage(index)"
+                  >
+                    <strong>&#128065; View</strong>
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
         <em>Please note that all data associated with each Phage ID will be removed after 90 days.</em>
       </div>
     </div>
+    <b-toast id="home-status" variant="primary" no-auto-hide>
+      <template #toast-title>
+        <strong class="text-size"> {{statusTitle}} </strong>
+      </template>
+      <div class="text-size">{{ statusMessage }}</div>
+    </b-toast>
   </div>
 </template>
 
@@ -193,7 +195,10 @@ export default {
       phageCreationDates: [],
       phageIDs: [],
       phagePages: [],
-      clientID: "780981769382-odbkfqn6mr1f2d9kkeaokbks7eqfrvu7.apps.googleusercontent.com",
+      phageViewNames: [],
+      phageViewEmails: [],
+      phageViewIDs: [],
+      phageViewPages: [],
       loggedIn: false,
       phageID: null,
       idStatus: '',
@@ -208,6 +213,8 @@ export default {
         height: 50,
         longtitle: true
       },
+      statusMessage: "",
+      statusTitle: "",
     };
   },
 
@@ -246,6 +253,10 @@ export default {
               this.phageDeletionDates = response.data.phage_deletion_date_list;
               this.phageIDs = response.data.id_list;
               this.phagePages = response.data.phage_pages;
+              this.phageViewNames = response.data.phage_view_id_list;
+              this.phageViewEmails = response.data.phage_view_email_list;
+              this.phageViewIDs = response.data.id_view_list;
+              this.phageViewPages = response.data.phage_view_pages;
             }
             document.getElementById('userImage').src = auth2.currentUser.get().Qs.getImageUrl();
           })
@@ -307,27 +318,20 @@ export default {
      * Handles a failed user login.
      */
     onFailure() {
-      this.$bvToast.toast(
-        `Google sign in failed. Please try again.`,
-        {
-          variant: 'primary',
-          title: 'Login Failed',
-          autoHideDelay: 15000,
-          appendToast: false,
-        }
-      );
+      this.statusMessage = `Google sign in failed. Please try again.`;
+      this.statusTitle = "LOGIN FAILED";
+      this.$bvToast.show('home-status');
     },
 
     /**
      * Removes a phage.
-     * @param {string} phageName the name of the phage to be removed.
      * @param {int} index the index of the phage to be removed.
      */
-    deletePhage(phageName, index) {
+    deletePhage(index) {
       var cont = confirm('Are you sure you want to permanently delete this phage ID? This will remove all progress that you have made on this phage.');
       if (cont === true) {
         axios
-          .delete(process.env.VUE_APP_BASE_URL + `/home/${this.user}/${phageName}`)
+          .delete(process.env.VUE_APP_BASE_URL + `/home/${this.user}/${this.phageIDs[index]}`)
           .then((response) => {
             console.log(response.data);
             this.phageNames.splice(index,1);
@@ -343,11 +347,41 @@ export default {
     },
 
     /**
+     * Removes view access for a phage.
+     * @param {int} index the index of the phage to be removed.
+     */
+    deleteViewPhage(index) {
+      var cont = confirm('Are you sure you want to remove your view access for this phage?');
+      if (cont === true) {
+        axios
+          .delete(process.env.VUE_APP_BASE_URL + `/home/${this.user}/${this.phageViewIDs[index]}`)
+          .then((response) => {
+            console.log(response.data);
+            this.phageViewNames.splice(index,1);
+            this.phageViewEmails.splice(index,1);
+            this.phageViewIDs.splice(index,1);
+            this.phageViewPages.splice(index,1);
+          })
+          .catch((error) => {
+            console.error(error);
+          });
+      }
+    },
+
+    /**
      * Navigates to the next page.
      * @param {int} index the index of the phage to be annotated.
      */
     nextPage(index) {
       this.$router.push(`/${this.phagePages[index]}/${this.phageIDs[index]}`);
+    },
+
+    nextViewPage(index) {
+      console.log(this.phageViewPages);
+      console.log(this.phageViewIDs);
+      console.log(this.phageViewPages[index]);
+      console.log(this.phageViewIDs[index]);
+      this.$router.push(`/${this.phageViewPages[index]}/${this.phageViewIDs[index]}`);
     },
 
     /**
@@ -368,45 +402,15 @@ export default {
               this.phageDeletionDates.push(response.data.deletion_date);
               this.phageCreationDates.push(response.data.creation_date);
               this.phagePages.push(response.data.phage_page);
-              this.$bvToast.toast(
-                `${this.idStatus}`,
-                {
-                  variant: 'primary',
-                  title: 'ID Created',
-                  autoHideDelay: 5000,
-                  appendToast: false,
-                }
-              );
+              this.statusMessage = `${this.idStatus}`;
+              this.statusTitle = "ID CREATED";
+              this.$bvToast.show('home-status');
             }
             else {
-              this.$bvToast.toast(
-                `${this.idStatus}`,
-                {
-                  variant: 'primary',
-                  title: 'ID Already Exists',
-                  autoHideDelay: 5000,
-                  appendToast: false,
-                }
-              );
+              this.statusMessage = `${this.idStatus}`;
+              this.statusTitle = "ID ALREADY EXISTS";
+              this.$bvToast.show('home-status');
             }
-            // const monthNames = [
-            //   'January',
-            //   'February',
-            //   'March',
-            //   'April',
-            //   'May',
-            //   'June',
-            //   'July',
-            //   'August',
-            //   'September',
-            //   'October',
-            //   'November',
-            //   'December',
-            // ];
-            // let date = new Date(response.data.delete_time);
-            // this.dateToBeDeleted = `${
-            //   monthNames[date.getUTCMonth()]
-            // } ${date.getUTCDate()}, ${date.getUTCFullYear()}`;
           })
           .catch((error) => {
             console.error(error);
@@ -458,23 +462,8 @@ h1 {
   margin-top: 0.7em;
 }
 
-/* .g-signin-button {
-  display: inline-block;
-  padding: 4px 8px;
-  border-radius: 3px;
-  background-color: #3c82f7;
-  color: #fff;
-  box-shadow: 0 3px 0 #0f69ff;
-} */
-
-/* .google-signin-button {
-  color: white;
-  background-color: red;
-  height: 50px;
-  font-size: 16px;
-  border-radius: 10px;
-  padding: 10px 20px 25px 20px;
-  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
-} */
+.text-size {
+  font-size: 1.2em;
+}
 
 </style>

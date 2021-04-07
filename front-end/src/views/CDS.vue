@@ -25,7 +25,8 @@
           start and stop sites and its function. Before making any final
           decisions you should review and consider all of the information below
           including the alternative open reading frames, the coding potential
-          graphs, and the BLAST results. Click 'Save' to save changes made to
+          graphs, and the BLAST results. The range of alternate open reading frames 
+          and BLAST results shown can be changed in 'Settings'  Click 'Save' to save changes made to
           this CDS or you can click 'Delete' if you wish to remove this CDS.
           Above you can see generic information for the current CDS including
           which auto-annotation programs called that gene.
@@ -272,6 +273,12 @@
         <hr />
       </div>
     </div>
+    <b-toast id="cds-status" variant="primary">
+      <template #toast-title>
+        <strong class="text-size"> {{statusTitle}} </strong>
+      </template>
+      <div class="text-size">{{ statusMessage }}</div>
+    </b-toast>
   </div>
 </template>
 
@@ -296,6 +303,7 @@ export default {
 
   data() {
     return {
+      viewOnly: false,
       dirLeftOptions: [],
       compLeftOptions: [],
       dirRightOptions: [],
@@ -346,6 +354,8 @@ export default {
       showFunction: false,
       showLeft: false,
       saved: true,
+      statusMessage: "",
+      statusTitle: "",
     };
   },
 
@@ -362,6 +372,9 @@ export default {
         .then((response) => {
           if (response.data === "fail") {
             this.$router.push('/');
+          }
+          else if (response.data.view) {
+            this.viewOnly = true
           }
         })
         .catch((error) => {
@@ -385,11 +398,11 @@ export default {
     },
 
     navUpload: function () {
-      return true;
+      return !this.viewOnly;
     },
 
     navBlast: function () {
-      return true;
+      return !this.viewOnly;
     },
 
     navAnnotations: function () {
@@ -608,22 +621,13 @@ export default {
         )
         .then(() => {
           if (this.newFunction !== 'DELETED') {
-            this.$bvToast.toast(`The CDS ${cdsID} has been saved.`, {
-              variant: 'primary',
-              title: 'SAVED',
-              autoHideDelay: 5000,
-              appendToast: false,
-            });
+            this.statusMessage = `The CDS ${cdsID} has been saved.`;
+            this.statusTitle = "SAVED";
+            this.$bvToast.show('cds-status');
           } else {
-            this.$bvToast.toast(
-              `The CDS ${cdsID} has been deleted. You will be re-routed to the next CDS.`,
-              {
-                variant: 'primary',
-                title: 'DELETED',
-                autoHideDelay: 5000,
-                appendToast: false,
-              }
-            );
+            this.statusMessage = `The CDS ${cdsID} has been deleted. You will be re-routed to the next CDS.`;
+            this.statusTitle = "DELETED";
+            this.$bvToast.show('cds-status')
             this.navNextCDS();
           }
         })
@@ -774,7 +778,7 @@ tbody {
 
 .graphs-caption {
   margin-top: 1em;
-  text-align: left;
+  text-align: center;
   color: grey;
 }
 
@@ -787,6 +791,10 @@ tbody {
 
 .btn-dark {
   font-size: 15pt;
+}
+
+.text-size {
+  font-size: 1.2em;
 }
 
 @media only screen and (max-width: 50em) {

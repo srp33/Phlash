@@ -43,9 +43,7 @@ def annotate_cds(phage_id, request, cds_id, UPLOAD_FOLDER):
         cds.right = put_data.get('right')
         cds.function = put_data.get('function')
         cds.notes = put_data.get('notes')
-        print(cds.notes)
         response_object['message'] = 'CDS updated!'
-        print(cds)
     else:
         response_object['message'] = 'CDS did not update.'
     coding_potential = {}

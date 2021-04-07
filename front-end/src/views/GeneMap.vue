@@ -42,9 +42,13 @@
         </p>
         <hr />
         <div class="nav-btns-wrapper">
-          <button class="btn btn-dark btn-nav" @click="goBack()">
-            <strong>&#129052; Back</strong>
-          </button>
+          <router-link
+            :to="{ name: 'Annotations', params: { phageID: $route.params.phageID } }"
+          >
+            <button class="btn btn-dark btn-nav">
+              <strong>&#129052; Back</strong>
+            </button>
+          </router-link>
           <router-link
             :to="{
               name: 'GenBank',
@@ -66,9 +70,13 @@
       <div class="alert alert-secondary">
         <hr />
         <div class="nav-btns-wrapper">
-          <button class="btn btn-dark btn-nav" @click="goBack()">
-            <strong>&#129052; Back</strong>
-          </button>
+          <router-link
+            :to="{ name: 'Annotations', params: { phageID: $route.params.phageID } }"
+          >
+            <button class="btn btn-dark btn-nav">
+              <strong>&#129052; Back</strong>
+            </button>
+          </router-link>
           <router-link
             :to="{
               name: 'GenBank',
@@ -103,16 +111,11 @@ export default {
 
   data() {
     return {
+      viewOnly: false,
       pageLoading: true,
       image: null,
       prevRoute: null,
     };
-  },
-
-  beforeRouteEnter(to, from, next) {
-    next((vm) => {
-      vm.prevRoute = from;
-    });
   },
 
   beforeCreate() {
@@ -129,6 +132,9 @@ export default {
           if (response.data === "fail") {
             this.$router.push('/');
           }
+          else if (response.data.view) {
+            this.viewOnly = true
+          }
         })
         .catch((error) => {
           console.error(error);
@@ -142,11 +148,11 @@ export default {
 
   computed: {
     navUpload: function () {
-      return true;
+      return !this.viewOnly;
     },
 
     navBlast: function () {
-      return true;
+      return !this.viewOnly;
     },
 
     navAnnotations: function () {
@@ -158,7 +164,7 @@ export default {
     },
 
     navSettings: function () {
-      return true;
+      return !this.viewOnly;
     },
 
     navPhageID: function () {
@@ -167,10 +173,6 @@ export default {
   },
 
   methods: {
-    goBack() {
-      console.log(this.prevRoute);
-      this.$router.push(this.prevRoute);
-    },
 
     getGraph() {
       axios

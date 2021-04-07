@@ -92,19 +92,33 @@ def get_phage_data(email):
     phage_creation_date_list = []
     phage_deletion_date_list = []
     id_list = []
+    phage_view_id_list = []
+    phage_view_email_list = []
+    id_view_list = []
+    phage_view_pages = []
     print(email)
     phages = db.session.query(Users).filter_by(user=email)
     if phages is not None:
         for phage in phages:
-            phage_id_list.append(phage.phage_id)
-            phage_creation_date_list.append(phage.creation_date)
-            phage_deletion_date_list.append(phage.deletion_date)
-            id_list.append(phage.id)
+            if phage.creation_date == 'view':
+                phage_view_id_list.append(phage.phage_id)
+                phage_view_email_list.append(phage.deletion_date)
+                id_view_list.append(phage.id)
+                phage_view_pages.append('annotations')
+            else:    
+                phage_id_list.append(phage.phage_id)
+                phage_creation_date_list.append(phage.creation_date)
+                phage_deletion_date_list.append(phage.deletion_date)
+                id_list.append(phage.id)
         response_object["phage_id_list"] = phage_id_list
         response_object["phage_creation_date_list"] = phage_creation_date_list
         response_object["phage_deletion_date_list"] = phage_deletion_date_list
         response_object["id_list"] = id_list
         response_object["phage_pages"] = find_current_page(id_list)
+        response_object["phage_view_id_list"] = phage_view_id_list
+        response_object["phage_view_email_list"] = phage_view_email_list
+        response_object["id_view_list"] = id_view_list
+        response_object["phage_view_pages"] = phage_view_pages
         return response_object
     return "empty"
 
@@ -125,7 +139,7 @@ def remove_old_users():
             db.session.query(Users).filter_by(id=phage_id).delete()
             db.session.commit()
 
-def remove_user(phage_id):
+def remove_user(phage_id, user):
     """Removes all data associated with a phage ID.
 
     Args:
@@ -135,17 +149,21 @@ def remove_user(phage_id):
     Returns:
         A success message.
     """
-    for user in Path(os.path.join(ROOT, 'users')).glob('*'):
-        if phage_id == str(user)[str(user).rfind('/') + 1:]:
-            shutil.rmtree(user)
-            db.session.query(Files).filter_by(phage_id=phage_id).delete()
-            db.session.query(Annotations).filter_by(phage_id=phage_id).delete()
-            db.session.query(Blast_Results).filter_by(phage_id=phage_id).delete()
-            db.session.query(Gene_Calls).filter_by(phage_id=phage_id).delete()
-            db.session.query(Tasks).filter_by(phage_id=phage_id).delete()
-            db.session.query(Users).filter_by(id=phage_id).delete()
-            db.session.commit()
-            break
+    if user.creation_date == 'view':
+        db.session.delete(user)
+        db.session.commit()
+    else:
+        for user in Path(os.path.join(ROOT, 'users')).glob('*'):
+            if phage_id == str(user)[str(user).rfind('/') + 1:]:
+                shutil.rmtree(user)
+                db.session.query(Files).filter_by(phage_id=phage_id).delete()
+                db.session.query(Annotations).filter_by(phage_id=phage_id).delete()
+                db.session.query(Blast_Results).filter_by(phage_id=phage_id).delete()
+                db.session.query(Gene_Calls).filter_by(phage_id=phage_id).delete()
+                db.session.query(Tasks).filter_by(phage_id=phage_id).delete()
+                db.session.query(Users).filter_by(id=phage_id).delete()
+                db.session.commit()
+                break
     return("success")
 
 def get_users():

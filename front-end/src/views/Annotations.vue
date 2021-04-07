@@ -16,6 +16,7 @@
         :height="100"
         :width="100"
       ></loading>
+      <h2 v-if="viewOnly">&#128065; VIEW ONLY &#128065;</h2>
       <h1>Annotations</h1>
       <div class="alert alert-secondary">
         <hr />
@@ -27,7 +28,7 @@
           status for each gene is shown below which are mearly guides and
           suggestions. The status does not actually mean that a gene call is
           correct or incorrect. The parameters used for creating the status for
-          each gene can be updated in the 'Settings' tab above.
+          each gene can be updated in the 'settings' tab above.
         </p>
         <hr />
         <p><strong>Status Definitions</strong></p>
@@ -58,7 +59,7 @@
         </p>
         <hr />
         <p><strong>Actions</strong></p>
-        <p>
+        <p v-if="!viewOnly">
           <strong>Annotate: </strong>When clicked, a function and alternate open
           reading frame can be added.<br />
           <strong>Delete: </strong>When clicked, this gene will be temporarily
@@ -69,9 +70,13 @@
           but can still be edited.<br />
           In rare occasions when a needed coding sequence is not shown, the 'Add
           CDS' button may be clicked to add a new custom CDS.<br />
-          <button class="btn btn-dark btn-action" @click="showAddCDS = true">
+          <button v-if="!viewOnly" class="btn btn-dark btn-action" @click="showAddCDS = true">
             <strong>&#43; Add CDS</strong>
           </button>
+        </p>
+        <p v-if="!viewOnly">
+          <strong>View: </strong>When clicked, the annotations for this CDS may be viewed.<br />
+          <strong>White background: </strong>This CDS has already been updated by the owner.
         </p>
         <hr />
         <div class="nav-btns-wrapper">
@@ -207,7 +212,7 @@
                 </td>
                 <td
                   v-if="
-                    curr.function === '@DELETED' || curr.status === 'trnaDELETED'
+                    (curr.function === '@DELETED' || curr.status === 'trnaDELETED') && !viewOnly
                   "
                 >
                   <button
@@ -218,7 +223,14 @@
                     <strong>Reinstate</strong>
                   </button>
                 </td>
-                <td v-else-if="curr.status === 'tRNA'">
+                <td
+                  v-else-if="
+                    curr.function === '@DELETED' || curr.status === 'trnaDELETED'
+                  "
+                >
+                  Deleted
+                </td>
+                <td v-else-if="curr.status === 'tRNA' && !viewOnly">
                   <button
                     class="btn btn-outline-dark btn-sm"
                     style="width: 6.25em"
@@ -226,6 +238,9 @@
                   >
                     <strong>Delete</strong>
                   </button>
+                </td>
+                <td v-else-if="curr.status === 'tRNA'">
+                  tRNA
                 </td>
                 <td v-else>
                   <router-link
@@ -240,12 +255,33 @@
                     <button
                       class="btn btn-outline-dark btn-sm"
                       style="width: 6.25em"
-                      v-if="curr.function[0] === '@'"
+                      v-if="curr.function[0] === '@' && !viewOnly"
                     >
                       <strong>Annotate</strong>
                     </button>
+                    <button
+                      class="btn btn-outline-dark btn-sm"
+                      style="width: 6.25em"
+                      v-else-if="curr.function[0] === '@'"
+                    >
+                      <strong>View</strong>
+                    </button>
+                    <button
+                      class="btn btn-dark btn-sm"
+                      style="width: 6.25em"
+                      v-else-if="curr.function === 'None selected' && !viewOnly"
+                    >
+                      <strong>Annotate</strong>
+                    </button>
+                    <button
+                      class="btn btn-dark btn-sm"
+                      style="width: 6.25em"
+                      v-else-if="curr.function === 'None selected'"
+                    >
+                      <strong>View</strong>
+                    </button>
                   </router-link>
-                  <router-link
+                  <!-- <router-link
                     :to="{
                       name: 'CDS',
                       params: {
@@ -261,7 +297,7 @@
                     >
                       <strong>Annotate</strong>
                     </button>
-                  </router-link>
+                  </router-link> -->
                 </td>
               </tr>
             </tbody>
@@ -293,15 +329,19 @@
       </div>
     </div>
     <b-modal
+      class="text-size"
       v-model="showAddCDS"
       ref="addCDSModal"
       id="addCDS-modal"
-      title="Add CDS"
       hide-footer
     >
+      <template #modal-title>
+        <div class="text-size">Add CDS</div>
+      </template>
       <b-form @submit="onSubmitAdd" align="left">
         <b-form-group label="Left:" label-size="lg" label-for="add-left-input">
           <b-form-input
+            class="form-input"
             id="add-left-input"
             type="number"
             v-model="addCDS.left"
@@ -311,6 +351,7 @@
         </b-form-group>
         <b-form-group label="Right:" label-size="lg" label-for="add-right-input">
           <b-form-input
+            class="form-input"
             id="add-right-input"
             type="number"
             v-model="addCDS.right"
@@ -320,6 +361,7 @@
         </b-form-group>
         <b-form-group label="Strand:" label-size="lg">
           <b-form-select
+            class="form-input"
             v-model="addCDS.strand"
             required
             :options="strandOptions"
@@ -346,6 +388,18 @@
         </b-button>
       </b-form>
     </b-modal>
+    <b-toast id="annotations-status" variant="primary" no-auto-hide>
+      <template #toast-title>
+        <strong class="text-size"> {{statusTitle}} </strong>
+      </template>
+      <div class="text-size">{{ statusMessage }}</div>
+    </b-toast>
+    <!-- <b-toast id="view-only-annotations" toaster="b-toaster-top-center" no-auto-hide>
+      <template #toast-title>
+        <strong class="text-size" style="text-align:center;">&#128065; View Only &#128065;</strong>
+      </template>
+      <div class="text-size" style="text-align:center;">You may not edit anything.</div>
+    </b-toast> -->
   </div>
 </template>
 
@@ -366,6 +420,7 @@ export default {
 
   data() {
     return {
+      viewOnly: false,
       addCDS: {
         id: "",
         left: "",
@@ -411,6 +466,8 @@ export default {
       short: 200,
       interval: null,
       waitMessage: "Your Blast results will be interpretted.",
+      statusMessage: "",
+      statusTitle: "",
     };
   },
 
@@ -427,6 +484,9 @@ export default {
         .then((response) => {
           if (response.data === "fail") {
             this.$router.push('/');
+          }
+          else if (response.data.view) {
+            this.viewOnly = true
           }
         })
         .catch((error) => {
@@ -445,11 +505,11 @@ export default {
 
   computed: {
     navUpload: function () {
-      return true;
+      return !this.viewOnly;
     },
 
     navBlast: function () {
-      return true;
+      return !this.viewOnly;
     },
 
     navAnnotations: function () {
@@ -491,6 +551,7 @@ export default {
             if (this.phageAnnotations[i].function !== 'None selected')
               this.completedGenes += 1;
           }
+          // if (this.viewOnly) { this.$bvToast.show('view-only-annotations'); }
           this.parseBlast();
         })
         .catch((error) => {
@@ -540,27 +601,18 @@ export default {
             if (response.data === 'success') {
               this.blastLoading = false;
               this.stopChecking();
-              this.$bvToast.toast(
-                `All of the BLAST results have finished being interpretted.`,
-                {
-                  variant: 'primary',
-                  title: 'Finished',
-                  appendToast: false,
-                }
-              );
+              this.statusTitle = "FINISHED";
+              this.statusMessage = "All of the BLAST results have finished being interpretted.";
+              this.$bvToast.show('annotations-status');
             } else if (response.data === 'error') {
               this.blastLoading = false;
               this.stopChecking();
-              this.$bvToast.toast(
-                `An unknown error occurred. Try removing and reuploading the BLAST files. 
-                If you ignore this error not all of your BLAST results will be shown. 
-                If this error continues, please contact us by visiting the 'contact' tab.`,
-                {
-                  variant: 'primary',
-                  title: 'Error',
-                  appendToast: false,
-                }
-              );
+              this.statusTitle = "ERROR";
+              this.statusMessage = `An unknown error occurred. 
+                                    Try removing and reuploading the BLAST files. 
+                                    If you ignore this error not all of your BLAST results will be shown. 
+                                    If this error continues, please contact us by visiting the 'about' page.`;
+              this.$bvToast.show('annotations-status');
             } else if (response.data !== 'complete') {
               if (response.data === '0') {
                 this.waitMessage = "Your Blast results are currently being interpretted. This may take several minutes."
@@ -574,24 +626,6 @@ export default {
           });
       }, 5000);
     },
-
-    // /**
-    //  * If the next button is clicked prematurely a reminder appears.
-    //  */
-    // uploadReminder() {
-    //   if (!this.fasta) {
-    //     this.$bvToast.toast(
-    //       `You must upload a FASTA file to continue. 
-    //         If you have uploaded a file and still cannot continue it is because the FASTA file is not in the correct FASTA format.`,
-    //       {
-    //         variant: 'primary',
-    //         title: 'UPLOAD FASTA FILE',
-    //         autoHideDelay: 15000,
-    //         appendToast: false,
-    //       }
-    //     );
-    //   }
-    // },
 
     /**
      * Changes the function of a deleted gene so that it is now visible.
@@ -777,27 +811,15 @@ export default {
         .then((response) => {
           console.log(response.data.message);
           if (response.data.message === 'ID already exists.') {
-            this.$bvToast.toast(
-              `The CDS already exists. Try again with a different ORF. To ignore this 
-            warning and add the CDS, check the 'Force Add' box.`,
-              {
-                variant: 'primary',
-                title: 'ADD FAILED',
-                autoHideDelay: 5000,
-                appendToast: false,
-              }
-            );
+            this.statusTitle = "ADD FAILED";
+            this.statusMessage = `The CDS already exists. Try again with a different ORF. 
+                                  To ignore this warning and add the CDS, check the 'Force Add' box.`;
+            this.$bvToast.show('annotations-status');
           } else if (response.data.message === 'Not orf.') {
-            this.$bvToast.toast(
-              `The inputted left and right locations do not represent an ORF. To ignore this 
-            warning and add the CDS, check the 'Force Add' box.`,
-              {
-                variant: 'primary',
-                title: 'ADD FAILED',
-                autoHideDelay: 5000,
-                appendToast: false,
-              }
-            );
+            this.statusTitle = "ADD FAILED";
+            this.statusMessage = `The inputted left and right locations do not represent an ORF. 
+                                  To ignore this warning and add the CDS, check the 'Force Add' box.`;
+            this.$bvToast.show('annotations-status');
           } else {
             window.location.reload();
           }
@@ -860,5 +882,14 @@ th {
   border-color: white;
   font-size: 1.4em;
   text-align: left;
+}
+
+.text-size {
+  font-size: 1.2em;
+}
+
+.form-input {
+  height: 2em; 
+  font-size: 15pt;
 }
 </style>

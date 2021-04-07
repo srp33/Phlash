@@ -13,7 +13,8 @@ class Users(db.Model):
                          nullable=False,
                          primary_key=True)
     creation_date = db.Column(db.Text,
-                              nullable=True)
+                              nullable=False,
+                              primary_key=True)
     deletion_date = db.Column(db.Text,
                               nullable=True)
     id = db.Column(db.Text,

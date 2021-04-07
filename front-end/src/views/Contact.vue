@@ -10,7 +10,7 @@
       :logout="loggedIn"
     />
     <div class="container">
-      <h1>Contact</h1>
+      <h1>About</h1>
       <div>
         <hr />
         <div
@@ -105,7 +105,7 @@ export default {
     },
 
     navSettings: function () {
-      return this.loggedIn;
+      return false;
     },
 
     navPhageID: function () {

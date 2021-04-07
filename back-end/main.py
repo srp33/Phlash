@@ -26,7 +26,6 @@ import threading
 import time
 import subprocess
 import asyncio
-from datetime import datetime
 
 # Configuration
 ROOT = os.path.dirname(os.path.abspath(__file__))
@@ -46,32 +45,6 @@ with app.app_context():
     # db.drop_all()
     db.create_all()
 
-def run_tasks():
-    print("checking")
-    print(datetime.now())
-    app.app_context().push()
-    task = db.session.query(Tasks).filter_by(complete=False).filter_by(result="waiting").order_by(Tasks.time).first()
-    print(task)
-    if task is not None:
-        task.result = "executing"
-        db.session.commit()
-        args = list(task.arguments.split(" "))
-        if task.function == "parse_blast":
-            print("parse")
-            task.result = parse_blast(args[0], args[1])
-            print("parse_complete")
-        elif task.function == "auto_annotate":
-            print("auto_annotate")
-            auto_annotate(args[0], args[1])
-            print("auto-annotate_complete")
-        task.complete = True
-        db.session.commit()
-    print("finished")  
-    t = threading.Timer(2.0, run_tasks)
-    t.daemon = True
-    t.start()
-run_tasks()
-
 # routers ------------------------------------------------------------------
 @app.route('/phlash_api/test', methods=['GET'])
 def test():
@@ -86,16 +59,23 @@ def check_phage(phage_id, current_user):
                 else gets informations for existing user.
     DELETE method removes all data associated with a phage ID.
     """
-    user = db.session.query(Users).filter_by(phage_id=phage_id).filter_by(user=current_user).first()
-    if (request.method == "POST"):
-        if (user is None):
+    exists = False
+    users = db.session.query(Users).filter_by(phage_id=phage_id).filter_by(user=current_user)
+    if users:
+        for user in users:
+            if user.creation_date != 'view':
+                exists = True
+                break
+    if request.method == "POST":
+        if not exists:
             return jsonify(home.check_phage_id(current_user, phage_id, app))
         else:
             response_object['id_status'] = "ID already exists. Please continue below."
             return jsonify(response_object)
     else:
+        user = db.session.query(Users).filter_by(id=phage_id).filter_by(user=current_user).first()
         if user is not None:
-            return jsonify(remove_user(user.id))
+            return jsonify(remove_user(user.id, user))
 
 @app.route('/phlash_api/check_upload/<phage_id>', methods=['GET'])
 def check_upload(phage_id):
@@ -115,6 +95,11 @@ def check_user(current_user, phage_id):
     """
     if db.session.query(Users).filter_by(id=phage_id).filter_by(user=current_user).first() is None:
         return jsonify("fail")
+    elif db.session.query(Users).filter_by(id=phage_id).filter_by(user=current_user).first().creation_date == "view":
+        response_object = {}
+        response_object['view'] = True
+        response_object['phage_id'] = db.session.query(Users).filter_by(id=phage_id).filter_by(user=current_user).first().phage_id
+        return jsonify(response_object)
     return jsonify(db.session.query(Users).filter_by(id=phage_id).filter_by(user=current_user).first().phage_id)
 
 @app.route('/phlash_api/get_user_data/<email>', methods=['GET'])
@@ -165,20 +150,7 @@ def blast(phage_id, file_method, file_path):
             return jsonify(find_blast_zip(phage_id))
 
         elif file_method == "autoAnnotate":
-            args = UPLOAD_FOLDER + " " + phage_id
-            task = Tasks(phage_id=phage_id,
-                        function="auto_annotate",
-                        arguments=args,
-                        complete=False,
-                        result="waiting",
-                        time=datetime.now())
-            try:
-                db.session.add(task)
-                db.session.commit()
-            except:
-                return jsonify("Error in adding task to queue")
-            # auto_annotate(UPLOAD_FOLDER, phage_id)
-            return jsonify("success")
+            return jsonify(add_annotation_task(phage_id, UPLOAD_FOLDER))
         
     if request.method == "POST":
         if file_method == "downloadInput":
@@ -201,36 +173,11 @@ def blast(phage_id, file_method, file_path):
             return jsonify("success")
 
         elif file_method == "deleteBlastResults":
-            if db.session.query(Tasks).filter_by(phage_id=phage_id).filter_by(function="parse_blast").first() is None:
-                db.session.query(Blast_Results).filter_by(phage_id=phage_id).delete()
-                db.session.query(Files).filter_by(phage_id=phage_id).delete()
-                db.session.commit()
-                for filename in os.listdir(UPLOAD_FOLDER):
-                    if filename.endswith('.json'):
-                        os.remove(os.path.join(UPLOAD_FOLDER, filename))
-                return jsonify("success")
-            else:
-                return jsonify("fail")
+            return jsonify(delete_all_blast(phage_id, UPLOAD_FOLDER))
 
         else:
-            index = file_path.find(".json")
-            name = secure_filename(file_path[0:index + 5])
-            size = file_path[index + 5:]
-            # file_data = db.session.query(Files).filter_by(name=name).first()
-            # if file_data != None:
-            #     db.session.delete(file_data)
-            #     db.session.commit()
-            file_data = Files(phage_id=phage_id,
-                            name=name,
-                            date=file_method,
-                            size=size,
-                            complete=False)
-            try:
-                db.session.add(file_data)
-                db.session.commit()
-            except:
-                return jsonify("already added")
-            return jsonify("success")
+            return jsonify(new_file(phage_id, file_path, file_method))
+
 @app.route('/phlash_api/annotations/<phage_id>/<file_method>', methods=['GET', 'POST', 'PUT'])
 def annotate_data(phage_id, file_method):
     """
@@ -239,51 +186,12 @@ def annotate_data(phage_id, file_method):
     PUT method adds a CDS
     """
     UPLOAD_FOLDER = os.path.join(ROOT, 'users', phage_id, 'uploads')
-    response_object = {'status': 'success'}
 
     if request.method == "GET":
         if file_method == "check":
-            curr_tasks = db.session.query(Tasks).filter_by(complete=False).order_by(Tasks.time)
-            counter = 0
-            for curr_task in curr_tasks:
-                if curr_task.phage_id == phage_id:
-                    break
-                counter += 1
-            task = db.session.query(Tasks).filter_by(phage_id=phage_id).filter_by(function="parse_blast").first()
-            if task is not None and task.complete:
-                result = task.result
-                db.session.delete(task)
-                db.session.commit()
-                return jsonify(result)
-            elif task is None:
-                return jsonify("complete")
-            else:
-                return jsonify(str(counter))
-        elif file_method == "delete":
-            db.session.query(Blast_Results).filter_by(phage_id=phage_id).delete()
-            db.session.commit()
-            return jsonify("success")
+            return jsonify(check_blast_task(phage_id))
         elif file_method == "blast":
-            print(db.session.query(Blast_Results).filter_by(phage_id=phage_id).first())
-            print(db.session.query(Tasks).filter_by(phage_id=phage_id).filter_by(function="parse_blast").first())
-            if db.session.query(Blast_Results).filter_by(phage_id=phage_id).first() is None and db.session.query(Tasks).filter_by(phage_id=phage_id).filter_by(function="parse_blast").filter_by(complete=False).first() is None:
-                args = phage_id + " " + UPLOAD_FOLDER
-                task = Tasks(phage_id=phage_id,
-                                function="parse_blast",
-                                arguments=args,
-                                complete=False,
-                                result="waiting",
-                                time=datetime.now())
-                try:
-                    db.session.add(task)
-                    db.session.commit()
-                except:
-                    return jsonify("Error in adding task to queue")
-                return jsonify("empty")
-            if db.session.query(Tasks).filter_by(phage_id=phage_id).filter_by(function="parse_blast").first() is not None:
-                return jsonify("empty")
-            else:
-                return jsonify("not empty")
+            return jsonify(add_blast_task(phage_id, UPLOAD_FOLDER))
         else:
             return jsonify(get_annotations_data(phage_id))
 
@@ -327,7 +235,7 @@ def gene_map(phage_id):
     if request.method == "GET":
         return jsonify(get_map(phage_id, UPLOAD_FOLDER))
 
-@app.route('/phlash_api/settings/<phage_id>/<payload>/', methods=['PUT', 'GET'])
+@app.route('/phlash_api/settings/<phage_id>/<payload>/', methods=['GET'])
 def settings(phage_id, payload):
     """
     Updates default settings.
@@ -337,6 +245,31 @@ def settings(phage_id, payload):
             return jsonify(get_settings(phage_id))
         else:
             return jsonify(update_settings(phage_id, payload))
+
+@app.route('/phlash_api/share/<phage_id>/<email>/', methods=['POST'])
+def share(phage_id, email):
+    """
+    Adds another user to the phage_id for view access only.
+    """
+    if request.method == "POST":
+        original_user = db.session.query(Users).filter_by(id=phage_id).first()
+        if original_user != None and db.session.query(Users).filter_by(user=email).first() and not db.session.query(Users).filter_by(user=email).filter_by(id=phage_id).first():
+            new_user = Users(user = email,
+                        phage_id = original_user.phage_id,
+                        creation_date = "view",
+                        deletion_date = original_user.user,
+                        id = phage_id)
+            db.session.add(new_user)
+            db.session.commit()
+            message = "The user " + email + " was successfully given view permissions."
+            return jsonify(message)
+        elif db.session.query(Users).filter_by(user=email).filter_by(id=phage_id).first():
+            message = "The user " + email + " already has permission to view this phage."
+            return jsonify(message)
+        else:
+            message = "The user " + email + " does not have an account."
+            return jsonify(message)
+
 
 if __name__ == '__main__':
     app.run(debug=False)

@@ -276,6 +276,12 @@
         <hr />
       </div>
     </div>
+    <b-toast id="blast-status" variant="primary" no-auto-hide>
+      <template #toast-title>
+        <strong class="text-size"> {{statusTitle}} </strong>
+      </template>
+      <div class="text-size">{{ statusMessage }}</div>
+    </b-toast>
   </div>
 </template>
 
@@ -312,6 +318,8 @@ export default {
       dropzoneOptions: this.setDropzone(),
       interval: null,
       waitMessage: null,
+      statusMessage: "",
+      statusTitle: "",
     };
   },
 
@@ -327,6 +335,9 @@ export default {
         .get(process.env.VUE_APP_BASE_URL + `/check_user/${auth2.currentUser.get().Qs.zt}/${this.$route.params.phageID}`)
         .then((response) => {
           if (response.data === "fail") {
+            this.$router.push('/');
+          }
+          else if (response.data.view) {
             this.$router.push('/');
           }
         })
@@ -359,7 +370,7 @@ export default {
     },
 
     navAnnotations: function () {
-      if (this.blastDownloaded && this.blastUploaded) return true;
+      if (this.blastDownloaded && this.blastUploaded && this.autoAnnotated) return true;
       else return false;
     },
 
@@ -749,22 +760,26 @@ export default {
             if (response.data.in_process) {
               this.annotating = true;
               if (response.data.position === 0) {
-                this.waitMessage = "Phlash is currently auto-annotating your bacteriophage genome."
+                this.waitMessage = "Phlash is currently auto-annotating your bacteriophage genome.";
               }
               else {
-                this.waitMessage = "Your bacteriophage genome is currently number " + response.data.position + " in line to be auto-annotated."
+                this.waitMessage = "Your bacteriophage genome is currently number " + response.data.position + " in line to be auto-annotated.";
               }
             } else if (this.annotating === true || this.autoAnnotated === false) {
               this.annotating = false;
               this.autoAnnotated = true;
-              this.$bvToast.toast(
-                `Phlash has finished auto-annotating this phage's genome.`,
-                {
-                  variant: 'primary',
-                  title: 'Finished',
-                  appendToast: false,
-                }
-              );
+              if (response.data.result == "success") {
+                this.statusMessage = "Phlash has finished auto-annotating this phage's genome.";
+                this.statusTitle = "FINISHED";
+                this.$bvToast.show('blast-status');
+              }
+              else {
+                this.statusMessage = `An unknown error occured while auto-annotating. 
+                                      Please reupload your FASTA file and try again. 
+                                      If this problem persits please contact us by visiting the 'about' page.`;
+                this.statusTitle = "ERROR";
+                this.$bvToast.show('blast-status');
+              }
             }
           })
           .catch((error) => {
@@ -778,25 +793,13 @@ export default {
      */
     uploadReminder() {
       if (!this.autoAnnotated) {
-        this.$bvToast.toast(
-          `You must wait for auto-annotation to be completed before continuing.`,
-          {
-            variant: 'primary',
-            title: 'INCOMPLETE AUTO-ANNOTATION',
-            autoHideDelay: 15000,
-            appendToast: false,
-          }
-        );
+        this.statusMessage = "You must wait for auto-annotation to be completed before continuing.";
+        this.statusTitle = "INCOMPLETE AUTO-ANNOTATION";
+        this.$bvToast.show('blast-status');
       } else if (!this.blastUploaded) {
-        this.$bvToast.toast(
-          `All ${this.numFiles} files have not been uploaded.`,
-          {
-            variant: 'primary',
-            title: 'UPLOAD ALL FILES',
-            autoHideDelay: 15000,
-            appendToast: false,
-          }
-        );
+        this.statusMessage = `All ${this.numFiles} files have not been uploaded.`;
+        this.statusTitle = "UPLOAD ALL FILES";
+        this.$bvToast.show('blast-status');
       } else {
         clearInterval(this.interval);
       }
@@ -813,16 +816,10 @@ export default {
         )
         .then((response) => {
           if (response.data === 'fail') {
-            this.$bvToast.toast(
-              `The BLAST results are currently being interpretted which may take several 
-            minutes. Removal of the BLAST output files is not possible at this time.`,
-              {
-                variant: 'primary',
-                title: 'BLAST OUTPUT FILES IN USE',
-                autoHideDelay: 5000,
-                appendToast: false,
-              }
-            );
+            this.statusMessage = `The BLAST results are currently being interpretted which may take several minutes. 
+                                  Removal of the BLAST output files is not possible at this time.`;
+            this.statusTitle = "BLAST OUTPUT FILES IN USE";
+            this.$bvToast.show('blast-status');
           } else {
             this.blastUploaded = false;
           }
@@ -879,5 +876,9 @@ h1 {
 
 .btn-dark {
   font-size: 15pt;
+}
+
+.text-size {
+  font-size: 1.2em;
 }
 </style>

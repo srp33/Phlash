@@ -84,6 +84,12 @@
         <hr />
       </div>
     </div>
+    <b-toast id="upload-status" variant="primary" no-auto-hide>
+      <template #toast-title>
+        <strong class="text-size"> {{statusTitle}} </strong>
+      </template>
+      <div class="text-size">{{ statusMessage }}</div>
+    </b-toast>
   </div>
 </template>
 
@@ -108,6 +114,8 @@ export default {
       dropzoneOptions: this.setDropzone(),
       blastCompleted: false,
       interval: null,
+      statusMessage: "",
+      statusTitle: "",
     };
   },
 
@@ -123,6 +131,9 @@ export default {
         .get(process.env.VUE_APP_BASE_URL + `/check_user/${auth2.currentUser.get().Qs.zt}/${this.$route.params.phageID}`)
         .then((response) => {
           if (response.data === "fail") {
+            this.$router.push('/');
+          }
+          else if (response.data.view) {
             this.$router.push('/');
           }
         })
@@ -316,16 +327,10 @@ export default {
      */
     uploadReminder() {
       if (!this.fasta) {
-        this.$bvToast.toast(
-          `You must upload a FASTA file to continue. 
-            If you have uploaded a file and still cannot continue it is because the FASTA file is not in the correct FASTA format.`,
-          {
-            variant: 'primary',
-            title: 'UPLOAD FASTA FILE',
-            autoHideDelay: 15000,
-            appendToast: false,
-          }
-        );
+        this.statusMessage = `You must upload a FASTA file to continue. 
+                              If you have uploaded a file and still cannot continue it is because the FASTA file is not in the correct FASTA format.`;
+        this.statusTitle = "UPLOAD FASTA FILE";
+        this.$bvToast.show('upload-status');
       }
     },
   },
@@ -363,5 +368,9 @@ h1 {
 
 .btn-dark {
   font-size: 15pt;
+}
+
+.text-size {
+  font-size: 1.2em;
 }
 </style>
