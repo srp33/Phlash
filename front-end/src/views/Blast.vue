@@ -7,6 +7,7 @@
       :geneMap="navGeneMap"
       :settings="navSettings"
       :phageID="navPhageID"
+      :logout="true"
     />
     <div class="container">
       <h1>Blast</h1>
@@ -14,8 +15,8 @@
         <hr />
         <p><strong>Instructions</strong></p>
         <p v-if="annotating">
-          Phlash is currently auto-annotating the bacteriophage genome. You may
-          not go to the previous or next page until it finishes. Even so, you
+          {{waitMessage}} You may
+          not go to the previous or next page until your genome has been auto-annotated. Even so, you
           can continue to work on your phage genome.<br />
           Phlash relies on
           <a href="#" @click="goToWebsite('GeneMarkS')" class="alert-link"
@@ -57,7 +58,7 @@
               name: 'Annotations',
               params: { phageID: $route.params.phageID },
             }"
-            :event="blastDownloaded && blastUploaded ? 'click' : ''"
+            :event="blastDownloaded && blastUploaded && autoAnnotated ? 'click' : ''"
           >
             <button
               class="btn btn-dark btn-nav disabled"
@@ -159,7 +160,7 @@
               </li>
               <li>
                 <strong>Standard Protein BLAST:</strong>
-                On the BLaST page ensure that the main heading says
+                On the BLAST page ensure that the main heading says
                 <i>'Standard Protein BLAST'</i>. If it does not, select the
                 <i>'blastp'</i> tab.
               </li>
@@ -225,7 +226,8 @@
               that file. Note that if you attempt to upload a duplicate file it
               will not upload. If you rename the files, do not include any
               special characters, including whitespace, as this may result in
-              errors.
+              errors. <div style="color:red">Please, DO NOT leave this page while the files are uploading 
+              as this may result in errors.</div>
               <vue-dropzone
                 ref="myVueDropzone"
                 id="dropzone"
@@ -261,7 +263,7 @@
               name: 'Annotations',
               params: { phageID: $route.params.phageID },
             }"
-            :event="blastDownloaded && blastUploaded ? 'click' : ''"
+            :event="blastDownloaded && blastUploaded && autoAnnotated ? 'click' : ''"
           >
             <button
               class="btn btn-dark btn-nav disabled"
@@ -275,6 +277,12 @@
         <hr />
       </div>
     </div>
+    <b-toast id="blast-status" variant="primary" no-auto-hide>
+      <template #toast-title>
+        <strong class="text-size"> {{statusTitle}} </strong>
+      </template>
+      <div class="text-size">{{ statusMessage }}</div>
+    </b-toast>
   </div>
 </template>
 
@@ -285,6 +293,8 @@ import Loading from 'vue-loading-overlay';
 import 'vue-loading-overlay/dist/vue-loading.css';
 import vue2Dropzone from 'vue2-dropzone';
 import 'vue2-dropzone/dist/vue2Dropzone.min.css';
+import { LoaderPlugin } from 'vue-google-login';
+import Vue from 'vue';
 
 export default {
   name: 'Blast',
@@ -308,7 +318,31 @@ export default {
       badFiles: [],
       dropzoneOptions: this.setDropzone(),
       interval: null,
+      waitMessage: null,
+      statusMessage: "",
+      statusTitle: "",
     };
+  },
+
+  beforeCreate() {
+    Vue.GoogleAuth.then(auth2 => {
+      if (!auth2.isSignedIn.get()) {
+        this.$router.push('/');
+      }
+      axios
+        .get(process.env.VUE_APP_BASE_URL + `/check_user/${auth2.currentUser.get().Qs.zt}/${this.$route.params.phageID}`)
+        .then((response) => {
+          if (response.data === "fail") {
+            this.$router.push('/');
+          }
+          else if (response.data.view) {
+            this.$router.push('/');
+          }
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    })
   },
 
   created() {
@@ -318,6 +352,8 @@ export default {
   destroyed() {
     this.stopChecking();
   },
+
+  
 
   computed: {
     navUpload: function () {
@@ -334,7 +370,7 @@ export default {
     },
 
     navAnnotations: function () {
-      if (this.blastDownloaded && this.blastUploaded) return true;
+      if (this.blastDownloaded && this.blastUploaded && this.autoAnnotated) return true;
       else return false;
     },
 
@@ -375,6 +411,10 @@ export default {
       } else {
         document.getElementById('back-top').classList.add('disabled');
         document.getElementById('back-bottom').classList.add('disabled');
+      }
+      if (this.blastDownloaded && this.blastUploaded && this.autoAnnotated) {
+        document.getElementById('next-top').classList.remove('disabled');
+        document.getElementById('next-bottom').classList.remove('disabled');
       }
     },
   },
@@ -527,8 +567,6 @@ export default {
         )
         .then((response) => {
           console.log(response.data);
-          this.autoAnnotated = true;
-          this.annotating = false;
         })
         .catch((error) => {
           console.log(error);
@@ -556,9 +594,9 @@ export default {
         .then((response) => {
           console.log(response.data);
           this.blastDownloaded = response.data.blast_downloaded;
-          if (!this.blastDownloaded) {
+          if (!this.blastDownloaded && !response.data.blast_input_in_progress) {
             this.createInputFiles();
-          } else {
+          } else if (!response.data.blast_input_in_progress) {
             this.orfLoading = false;
           }
           if (response.data.uploaded) {
@@ -567,7 +605,7 @@ export default {
           if (response.data.annotated) {
             this.autoAnnotated = true;
           }
-          if (!this.autoAnnotated) {
+          if (!this.autoAnnotated && !response.data.annotation_in_progress) {
             this.autoAnnotate();
           }
           console.log(this.blastUploaded);
@@ -590,9 +628,6 @@ export default {
         )
         .then((response) => {
           console.log(response.data);
-          this.numFiles = response.data;
-          this.orfLoading = false;
-          this.blastDownloaded = true;
         })
         .catch((error) => {
           console.log(error);
@@ -641,8 +676,8 @@ export default {
         .then((response) => {
           if (response.data !== 'None') {
             this.numFiles = Number(response.data);
-            this.displayOutputFiles();
           }
+          this.displayOutputFiles();
         });
     },
 
@@ -701,28 +736,53 @@ export default {
      * Gets all of the names of all of the blast output files that have been uploaded.
      * Gets all of the names of blast files that failed to upload correctly.
      * Determines if the needed number of files have been uploaded.
+     * Determines if auto-annotation is complete.
      */
     displayOutputFiles() {
       this.interval = setInterval(() => {
-        console.log('displayOutputFiles');
         axios
           .post(
             process.env.VUE_APP_BASE_URL +
               `/blast/${this.$route.params.phageID}/displayOutput/standard`
           )
           .then((response) => {
+            console.log(response.data);
             this.fileNames = response.data.file_names;
             this.badFiles = response.data.bad_files;
             if (
-              this.fileNames.length === this.numFiles &&
+              this.fileNames.length == this.numFiles &&
               this.badFiles.length === 0
             ) {
               this.blastUploaded = true;
             }
             if (response.data.in_process) {
               this.annotating = true;
-            } else {
+              if (response.data.position === 0) {
+                this.waitMessage = "Phlash is currently auto-annotating your bacteriophage genome.";
+              }
+              else {
+                this.waitMessage = "Your bacteriophage genome is currently number " + response.data.position + " in line to be auto-annotated.";
+              }
+            } else if (this.annotating === true || this.autoAnnotated === false) {
               this.annotating = false;
+              this.autoAnnotated = true;
+              if (response.data.result == "success") {
+                this.statusMessage = "Phlash has finished auto-annotating this phage's genome.";
+                this.statusTitle = "FINISHED";
+                this.$bvToast.show('blast-status');
+              }
+              else if (response.data.result != "not complete") {
+                this.statusMessage = `An unknown error occured while auto-annotating. 
+                                      Please reupload your FASTA file and try again. 
+                                      If this problem persits please contact us by visiting the 'about' page.`;
+                this.statusTitle = "ERROR";
+                this.$bvToast.show('blast-status');
+              }
+            }
+            if (response.data.blast_input_complete) {
+              this.numFiles = response.data.num_files;
+              this.orfLoading = false;
+              this.blastDownloaded = true;
             }
           })
           .catch((error) => {
@@ -735,15 +795,14 @@ export default {
      * If the next button is clicked prematurely a reminder appears.
      */
     uploadReminder() {
-      if (!this.blastUploaded) {
-        this.$bvToast.toast(
-          `All ${this.numFiles} files have not been uploaded.`,
-          {
-            title: 'UPLOAD ALL FILES',
-            autoHideDelay: 15000,
-            appendToast: false,
-          }
-        );
+      if (!this.autoAnnotated) {
+        this.statusMessage = "You must wait for auto-annotation to be completed before continuing.";
+        this.statusTitle = "INCOMPLETE AUTO-ANNOTATION";
+        this.$bvToast.show('blast-status');
+      } else if (!this.blastUploaded) {
+        this.statusMessage = `All ${this.numFiles} files have not been uploaded.`;
+        this.statusTitle = "UPLOAD ALL FILES";
+        this.$bvToast.show('blast-status');
       } else {
         clearInterval(this.interval);
       }
@@ -760,15 +819,10 @@ export default {
         )
         .then((response) => {
           if (response.data === 'fail') {
-            this.$bvToast.toast(
-              `The BLAST results are currently being interpretted which may take several 
-            minutes. Removal of the BLAST output files is not possible at this time.`,
-              {
-                title: 'BLAST OUTPUT FILES IN USE',
-                autoHideDelay: 5000,
-                appendToast: false,
-              }
-            );
+            this.statusMessage = `The BLAST results are currently being interpreted which may take several minutes. 
+                                  Removal of the BLAST output files is not possible at this time.`;
+            this.statusTitle = "BLAST OUTPUT FILES IN USE";
+            this.$bvToast.show('blast-status');
           } else {
             this.blastUploaded = false;
           }
@@ -825,5 +879,9 @@ h1 {
 
 .btn-dark {
   font-size: 15pt;
+}
+
+.text-size {
+  font-size: 1.2em;
 }
 </style>

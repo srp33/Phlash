@@ -7,21 +7,9 @@
       :geneMap="navGeneMap"
       :settings="navSettings"
       :phageID="navPhageID"
+      :logout="true"
     />
     <div class="container">
-      <loading
-        :active.sync="pageLoading"
-        :is-full-page="true"
-        :height="100"
-        :width="100"
-      ></loading>
-      <loading
-        :active.sync="pageLoading"
-        :is-full-page="true"
-        :height="100"
-        :width="100"
-        >Creating Genome Map...</loading
-      >
       <h1>Genome Map</h1>
       <div class="alert alert-secondary">
         <hr />
@@ -41,9 +29,13 @@
         </p>
         <hr />
         <div class="nav-btns-wrapper">
-          <button class="btn btn-dark btn-nav" @click="goBack()">
-            <strong>&#129052; Back</strong>
-          </button>
+          <router-link
+            :to="{ name: 'Annotations', params: { phageID: $route.params.phageID } }"
+          >
+            <button class="btn btn-dark btn-nav">
+              <strong>&#129052; Back</strong>
+            </button>
+          </router-link>
           <router-link
             :to="{
               name: 'GenBank',
@@ -59,15 +51,32 @@
       </div>
     </div>
     <div style="overflow-x:auto; width=100%;">
+      <loading
+        :active.sync="pageLoading"
+        :is-full-page="true"
+        :height="100"
+        :width="100"
+      ></loading>
+      <loading
+        :active.sync="pageLoading"
+        :is-full-page="true"
+        :height="100"
+        :width="100"
+        >Creating Genome Map...</loading
+      >
       <img v-bind:src="image" />
     </div>
     <div class="container">
       <div class="alert alert-secondary">
         <hr />
         <div class="nav-btns-wrapper">
-          <button class="btn btn-dark btn-nav" @click="goBack()">
-            <strong>&#129052; Back</strong>
-          </button>
+          <router-link
+            :to="{ name: 'Annotations', params: { phageID: $route.params.phageID } }"
+          >
+            <button class="btn btn-dark btn-nav">
+              <strong>&#129052; Back</strong>
+            </button>
+          </router-link>
           <router-link
             :to="{
               name: 'GenBank',
@@ -90,6 +99,8 @@ import axios from 'axios';
 import Loading from 'vue-loading-overlay';
 import 'vue-loading-overlay/dist/vue-loading.css';
 import Navbar from '../components/Navbar.vue';
+import { LoaderPlugin } from 'vue-google-login';
+import Vue from 'vue';
 
 export default {
   name: 'GeneMap',
@@ -100,16 +111,32 @@ export default {
 
   data() {
     return {
+      viewOnly: false,
       pageLoading: true,
       image: null,
       prevRoute: null,
     };
   },
 
-  beforeRouteEnter(to, from, next) {
-    next((vm) => {
-      vm.prevRoute = from;
-    });
+  beforeCreate() {
+    Vue.GoogleAuth.then(auth2 => {
+      if (!auth2.isSignedIn.get()) {
+        this.$router.push('/');
+      }
+      axios
+        .get(process.env.VUE_APP_BASE_URL + `/check_user/${auth2.currentUser.get().Qs.zt}/${this.$route.params.phageID}`)
+        .then((response) => {
+          if (response.data === "fail") {
+            this.$router.push('/');
+          }
+          else if (response.data.view) {
+            this.viewOnly = true
+          }
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    })
   },
 
   created() {
@@ -118,11 +145,11 @@ export default {
 
   computed: {
     navUpload: function () {
-      return true;
+      return !this.viewOnly;
     },
 
     navBlast: function () {
-      return true;
+      return !this.viewOnly;
     },
 
     navAnnotations: function () {
@@ -134,7 +161,7 @@ export default {
     },
 
     navSettings: function () {
-      return true;
+      return !this.viewOnly;
     },
 
     navPhageID: function () {
@@ -143,10 +170,6 @@ export default {
   },
 
   methods: {
-    goBack() {
-      console.log(this.prevRoute);
-      this.$router.push(this.prevRoute);
-    },
 
     getGraph() {
       axios

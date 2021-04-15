@@ -7,29 +7,44 @@
       :geneMap="navGeneMap"
       :settings="navSettings"
       :phageID="navPhageID"
+      :logout="loggedIn"
     />
     <div class="container">
-      <p style="margin: 1em">
-        <img id="logo" src="/phlash/images/logohome.png" width="250" />
-      </p>
-      <h1>Phlash</h1>
-      <button v-google-signin-button="clientID" class="google-signin-button"> Continue with Google</button>
-      <div class="alert alert-secondary">
-        <p style="text-align: center">
-          <strong
-            >A user-friendly bacteriophage genome annotation
-            application.</strong
-          >
+      <div v-if="!loggedIn">
+        <p style="margin: 1em">
+          <img id="logo" src="/phlash/images/logohome.png" width="250" />
         </p>
-        <hr />
-        <p style="text-align: left">
+        <h1>Phlash</h1>
+        <div class="alert alert-secondary">
+          <p style="text-align: center">
+            <strong
+              >A user-friendly bacteriophage genome annotation
+              application.</strong
+            >
+          </p>
+          <hr />
+          <div style="text-align:center; max-height:2em;">
+          <GoogleLogin class="btn btn-dark" style="margin-top: 0px; font-size: 1em;" :params="params" :onSuccess="onSuccess" :onFailure="onFailure">To get started, login with Google.</GoogleLogin>
+          </div>
+        </div>
+      </div>
+      <div v-if="loggedIn">
+        <h1>Home</h1>
+        <p style="margin: 1em">
+          <img id="userImage" src="/phlash/images/logohome.png" width="100" />
+        </p>
+        <h2>{{userName}}</h2>
+        <div class="alert alert-secondary">
+          <hr />
+        <p v-if="phageNames.length !== 0" style="text-align: left">
           Enter an ID that contains only letters, numbers, and underscores
-          below. This ID will uniquely identify your bacteriophage genome
+          below or continue with an existing ID. Each ID uniquely identifies a bacteriophage genome
           annotation.<br />
-          <em
-            >Please note that all data associated with this ID will be removed
-            after 90 days.</em
-          >
+        </p>
+        <p v-if="phageNames.length === 0" style="text-align: left">
+          Enter an ID that contains only letters, numbers, and underscores
+          below. Each ID uniquely identifies a bacteriophage genome
+          annotation.<br />
         </p>
         <div
           class="input-group mb-2"
@@ -53,88 +68,200 @@
               type="button"
               @click="checkPhageID()"
             >
-              <strong>Start</strong>
+              <strong>Create</strong>
             </button>
           </div>
+          <hr />
         </div>
-        <hr />
-        <p class="id-status" v-if="idStatus !== ''">
-          {{ idStatus }}
-        </p>
-        <div class="alert alert-primary" v-if="idStatus !== ''">
-          &#128712; You have until <strong>{{ dateToBeDeleted }}</strong> to
-          complete annotations for this phage.
+        <hr v-if="phageNames.length > 0" />
+        <h4 style="text-align:center;" v-if="phageNames.length > 0">My Annotations</h4>
+        <div v-if="phageNames.length !== 0"
+          class="table table-responsive table-secondary"
+          style="overflow-y: auto; max-height: 50em"
+        >
+          <table class="table table-hover" align="center">
+            <thead>
+              <tr>
+                <th scope="col">Phage ID</th>
+                <th scope="col">Creation Date</th>
+                <th scope="col">Deletion Date</th>
+                <th scope="col">Delete</th>
+                <th scope="col">Continue Annotations</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="(curr, index) in phageNames" :key="index">
+                <td>{{curr}}</td>
+                <td>{{phageCreationDates[index]}}</td>
+                <td>{{phageDeletionDates[index]}}</td>
+                <td>
+                  <button
+                    type="button"
+                    class="btn btn-dark"
+                    @click="deletePhage(index)"
+                  >
+                    <strong>&#128465; Delete</strong>
+                  </button>
+                </td>
+                <td>
+                  <button
+                    type="button"
+                    class="btn btn-dark"
+                    @click="nextPage(index)"
+                  >
+                    <strong>Continue &#129054;</strong>
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
-        <hr v-if="idStatus !== ''" />
-        <div class="nav-btns-wrapper">
-          <router-link
-            :to="{ name: 'Blast', params: { phageID: phageID } }"
-            v-if="
-              idStatus.includes('ID already exists') &&
-              allFilesUploaded &&
-              !blastComplete
-            "
-          >
-            <button class="btn btn-dark">
-              <strong>Next &#129054;</strong>
-            </button>
-          </router-link>
-        </div>
-        <div class="nav-btns-wrapper">
-          <router-link
-            :to="{ name: 'Annotations', params: { phageID: phageID } }"
-            v-if="
-              idStatus.includes('ID already exists') &&
-              allFilesUploaded &&
-              blastComplete
-            "
-          >
-            <button class="btn btn-dark">
-              <strong>Next &#129054;</strong>
-            </button>
-          </router-link>
-        </div>
-        <div class="nav-btns-wrapper">
-          <router-link
-            :to="{ name: 'Upload', params: { phageID: phageID } }"
-            v-if="
-              idStatus.includes('ID created') ||
-              (idStatus.includes('ID already exists') && !allFilesUploaded)
-            "
-          >
-            <button class="btn btn-dark">
-              <strong>Next &#129054;</strong>
-            </button>
-          </router-link>
+        <hr v-if="phageViewNames.length > 0" />
+        <h4 style="text-align:center;" v-if="phageViewNames.length > 0">Shared Annotations</h4>
+        <div v-if="phageViewNames.length > 0"
+          class="table table-responsive table-secondary"
+          style="overflow-y: auto; max-height: 50em"
+        >
+          <table v-if="phageViewNames.length > 0" class="table table-hover" align="center">
+            <thead>
+              <tr>
+                <th scope="col">Phage ID</th>
+                <th scope="col">Shared By</th>
+                <th scope="col">Delete</th>
+                <th scope="col">View Annotations</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="(curr, index) in phageViewNames" :key="index">
+                <td>{{curr}}</td>
+                <td>{{phageViewEmails[index]}}</td>
+                <td>
+                  <button
+                    type="button"
+                    class="btn btn-dark"
+                    @click="deleteViewPhage(index)"
+                  >
+                    <strong>&#128465; Delete</strong>
+                  </button>
+                </td>
+                <td>
+                  <button
+                    type="button"
+                    class="btn btn-dark"
+                    @click="nextViewPage(index)"
+                  >
+                    <strong>&#128065; View</strong>
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
+        <em>Please note that all data associated with each Phage ID will be removed after 90 days.</em>
+      </div>
     </div>
+    <b-toast id="home-status" variant="primary" no-auto-hide>
+      <template #toast-title>
+        <strong class="text-size"> {{statusTitle}} </strong>
+      </template>
+      <div class="text-size">{{ statusMessage }}</div>
+    </b-toast>
   </div>
 </template>
-
-<script src="https://apis.google.com/js/platform.js" async defer></script>
 
 <script>
 import axios from 'axios';
 import Navbar from '../components/Navbar.vue';
-import GoogleSignInButton from 'vue-google-signin-button-directive'
+import GoogleLogin from 'vue-google-login';
+import { LoaderPlugin } from 'vue-google-login';
+import Vue from 'vue';
 
 export default {
   name: 'Home',
   components: {
     Navbar,
-    GoogleSignInButton,
+    GoogleLogin,
+    LoaderPlugin,
   },
 
   data() {
     return {
-      clientID: "780981769382-dqnlo6b9j3cdbug5u672t31l70g5gg9d.apps.googleusercontent.com",
+      user: null,
+      imageURL: null,
+      userName: null,
+      phageNames: [],
+      phageDeletionDates: [],
+      phageCreationDates: [],
+      phageIDs: [],
+      phagePages: [],
+      phageViewNames: [],
+      phageViewEmails: [],
+      phageViewIDs: [],
+      phageViewPages: [],
+      loggedIn: false,
       phageID: null,
       idStatus: '',
       allFilesUploaded: false,
       dateToBeDeleted: null,
       blastComplete: false,
+      params: {
+        client_id: process.env.GOOGLE_CLIENT_ID,
+      },
+      renderParams: {
+        width: 250,
+        height: 50,
+        longtitle: true
+      },
+      statusMessage: "",
+      statusTitle: "",
     };
+  },
+
+  beforeCreate() {
+    Vue.use(LoaderPlugin, {
+      client_id: process.env.GOOGLE_CLIENT_ID
+    });
+    Vue.GoogleAuth.then(auth2 => {
+      if (auth2.isSignedIn.get()) {
+        this.loggedIn = true;
+      }
+    })
+  },
+
+  created() {
+    Vue.GoogleAuth.then(auth2 => {
+      if (auth2.isSignedIn.get()) {
+        this.loggedIn = true;
+        console.log(this.loggedIn);
+        this.user = auth2.currentUser.get().Qs.zt;
+        this.userName = auth2.currentUser.get().Qs.Te;
+        this.imageURL = auth2.currentUser.get().Qs.getImageUrl();
+        console.log(this.imageURL);
+        axios
+          .get(process.env.VUE_APP_BASE_URL + `/get_user_data/${auth2.currentUser.get().Qs.zt}`)
+          .then((response) => {
+            console.log(response.data);
+            this.loggedIn = true;
+            console.log(this.loggedIn);
+            if (response.data !== "empty") {
+              this.phageNames = response.data.phage_id_list;
+              this.phageCreationDates = response.data.phage_creation_date_list;
+              this.phageDeletionDates = response.data.phage_deletion_date_list;
+              this.phageIDs = response.data.id_list;
+              this.phagePages = response.data.phage_pages;
+              this.phageViewNames = response.data.phage_view_id_list;
+              this.phageViewEmails = response.data.phage_view_email_list;
+              this.phageViewIDs = response.data.id_view_list;
+              this.phageViewPages = response.data.phage_view_pages;
+            }
+            document.getElementById('userImage').src = auth2.currentUser.get().Qs.getImageUrl();
+          })
+          .catch((error) => {
+            console.error(error);
+          });
+      }
+    })
   },
 
   watch: {
@@ -145,6 +272,7 @@ export default {
       }
     },
   },
+  
   computed: {
     navUpload: function () {
       if (this.phageID !== null) return true;
@@ -175,27 +303,82 @@ export default {
   },
 
   methods: {
-    OnGoogleAuthSuccess (idToken) {
-      console.log(idToken)
-      // Receive the idToken and make your magic with the backend
-    },
-    OnGoogleAuthFail (error) {
-      console.log(error)
-    },
-
-    onSignIn(googleUser) {
-      var profile = googleUser.getBasicProfile();
-      console.log('ID: ' + profile.getId()); // Do not send to your backend! Use an ID token instead.
-      console.log('Name: ' + profile.getName());
-      console.log('Image URL: ' + profile.getImageUrl());
-      console.log('Email: ' + profile.getEmail()); // This is null if the 'email' scope is not present.
+    /**
+     * Refreshes the page when the user logs in successfully.
+     * @param {object} googleUser the account that was logged in.
+     */
+    onSuccess(googleUser) {
+      window.location.reload();
     },
 
-    signOut() {
-      var auth2 = gapi.auth2.getAuthInstance();
-      auth2.signOut().then(function () {
-        console.log('User signed out.');
-      });
+    /** 
+     * Handles a failed user login.
+     */
+    onFailure() {
+      this.statusMessage = `Google sign in failed. Please try again.`;
+      this.statusTitle = "LOGIN FAILED";
+      this.$bvToast.show('home-status');
+    },
+
+    /**
+     * Removes a phage.
+     * @param {int} index the index of the phage to be removed.
+     */
+    deletePhage(index) {
+      var cont = confirm('Are you sure you want to permanently delete this phage ID? This will remove all progress that you have made on this phage.');
+      if (cont === true) {
+        axios
+          .delete(process.env.VUE_APP_BASE_URL + `/home/${this.user}/${this.phageIDs[index]}`)
+          .then((response) => {
+            console.log(response.data);
+            this.phageNames.splice(index,1);
+            this.phageCreationDates.splice(index,1);
+            this.phageIDs.splice(index,1);
+            this.phageDeletionDates.splice(index,1);
+            this.phagePages.splice(index,1);
+          })
+          .catch((error) => {
+            console.error(error);
+          });
+      }
+    },
+
+    /**
+     * Removes view access for a phage.
+     * @param {int} index the index of the phage to be removed.
+     */
+    deleteViewPhage(index) {
+      var cont = confirm('Are you sure you want to remove your view access for this phage?');
+      if (cont === true) {
+        axios
+          .delete(process.env.VUE_APP_BASE_URL + `/home/${this.user}/${this.phageViewIDs[index]}`)
+          .then((response) => {
+            console.log(response.data);
+            this.phageViewNames.splice(index,1);
+            this.phageViewEmails.splice(index,1);
+            this.phageViewIDs.splice(index,1);
+            this.phageViewPages.splice(index,1);
+          })
+          .catch((error) => {
+            console.error(error);
+          });
+      }
+    },
+
+    /**
+     * Navigates to the next page.
+     * @param {int} index the index of the phage to be annotated.
+     */
+    nextPage(index) {
+      this.$router.push(`/${this.phagePages[index]}/${this.phageIDs[index]}`);
+    },
+
+    nextViewPage(index) {
+      console.log(this.phageViewPages);
+      console.log(this.phageViewIDs);
+      console.log(this.phageViewPages[index]);
+      console.log(this.phageViewIDs[index]);
+      this.$router.push(`/${this.phageViewPages[index]}/${this.phageViewIDs[index]}`);
     },
 
     /**
@@ -206,30 +389,25 @@ export default {
     checkPhageID() {
       if (this.phageID !== '' && this.phageID !== null) {
         axios
-          .post(process.env.VUE_APP_BASE_URL + `/home/${this.phageID}`)
+          .post(process.env.VUE_APP_BASE_URL + `/home/${this.user}/${this.phageID}`)
           .then((response) => {
             console.log(response.data);
-            this.allFilesUploaded = response.data.uploaded_all_files;
-            this.blastComplete = response.data.blast_complete;
             this.idStatus = response.data.id_status;
-            const monthNames = [
-              'January',
-              'February',
-              'March',
-              'April',
-              'May',
-              'June',
-              'July',
-              'August',
-              'September',
-              'October',
-              'November',
-              'December',
-            ];
-            let date = new Date(response.data.delete_time);
-            this.dateToBeDeleted = `${
-              monthNames[date.getUTCMonth()]
-            } ${date.getUTCDate()}, ${date.getUTCFullYear()}`;
+            if (!this.idStatus.includes('ID already exists')) {
+              this.phageIDs.push(response.data.id);
+              this.phageNames.push(response.data.phage_id);
+              this.phageDeletionDates.push(response.data.deletion_date);
+              this.phageCreationDates.push(response.data.creation_date);
+              this.phagePages.push(response.data.phage_page);
+              this.statusMessage = `${this.idStatus}`;
+              this.statusTitle = "ID CREATED";
+              this.$bvToast.show('home-status');
+            }
+            else {
+              this.statusMessage = `${this.idStatus}`;
+              this.statusTitle = "ID ALREADY EXISTS";
+              this.$bvToast.show('home-status');
+            }
           })
           .catch((error) => {
             console.error(error);
@@ -269,14 +447,20 @@ h1 {
   text-align: left;
 }
 
-/* .google-signin-button {
-  color: white;
-  background-color: red;
-  height: 50px;
-  font-size: 16px;
-  border-radius: 10px;
-  padding: 10px 20px 25px 20px;
-  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
-} */
+.table-responsive thead th {
+  position: sticky;
+  top: 0;
+  background: white;
+  color: black;
+  font-size: 1em;
+}
+
+h1 {
+  margin-top: 0.7em;
+}
+
+.text-size {
+  font-size: 1.2em;
+}
 
 </style>

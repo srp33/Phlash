@@ -19,7 +19,7 @@ import helper
 import base64
 
 # ------------------------------ MAIN FUNCTIONS ------------------------------
-def get_map(UPLOAD_FOLDER):
+def get_map(phage_id, UPLOAD_FOLDER):
     """Creates and returns a map of the genome.
 
     Args:
@@ -31,12 +31,12 @@ def get_map(UPLOAD_FOLDER):
 
     """
     features = []
-    for cds in db.session.query(DNAMaster).order_by(DNAMaster.start):
+    for cds in db.session.query(Annotations).filter_by(phage_id=phage_id).order_by(Annotations.left):
         if cds.function != 'DELETED':
             if cds.strand == '+':
-                features.append(GraphicFeature(start=cds.start, end=cds.stop, strand=+1, color="#add8e6", label=cds.id))
+                features.append(GraphicFeature(start=cds.left, end=cds.right, strand=+1, color="#add8e6", label=cds.id))
             else:
-                features.append(GraphicFeature(start=cds.start, end=cds.stop, strand=-1, color="#fed8b1", label=cds.id))
+                features.append(GraphicFeature(start=cds.left, end=cds.right, strand=-1, color="#fed8b1", label=cds.id))
     fasta_file = helper.get_file_path("fasta", UPLOAD_FOLDER)
     genome = SeqIO.read(fasta_file, "fasta").seq
     sequence = str(genome)

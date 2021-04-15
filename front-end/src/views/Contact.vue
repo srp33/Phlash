@@ -7,9 +7,10 @@
       :geneMap="navGeneMap"
       :settings="navSettings"
       :phageID="navPhageID"
+      :logout="loggedIn"
     />
     <div class="container">
-      <h1>Contact</h1>
+      <h1>About</h1>
       <div>
         <hr />
         <div
@@ -53,6 +54,8 @@
 
 <script>
 import Navbar from '../components/Navbar.vue';
+import Vue from 'vue';
+import { LoaderPlugin } from 'vue-google-login';
 
 export default {
   name: 'Contact',
@@ -63,6 +66,7 @@ export default {
   data() {
     return {
       prevRoute: null,
+      loggedIn: false,
     };
   },
 
@@ -70,6 +74,17 @@ export default {
     next((vm) => {
       vm.prevRoute = from;
     });
+  },
+
+  beforeCreate() {
+    Vue.use(LoaderPlugin, {
+      client_id: process.env.GOOGLE_CLIENT_ID
+    });
+    Vue.GoogleAuth.then(auth2 => {
+      if (auth2.isSignedIn.get()) {
+        this.loggedIn = true;
+      }
+    })
   },
 
   computed: {
@@ -90,7 +105,7 @@ export default {
     },
 
     navSettings: function () {
-      return true;
+      return false;
     },
 
     navPhageID: function () {

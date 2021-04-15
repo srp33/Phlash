@@ -8,7 +8,6 @@ COPY ./ .
 # COPY .env.production .
 COPY .env.development .env.production
 RUN npm run build
-
 FROM nginx as production-stage
 RUN mkdir /app
 COPY --from=build-stage /app/dist /app/phlash

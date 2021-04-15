@@ -7,6 +7,7 @@
       :geneMap="navGeneMap"
       :settings="navSettings"
       :phageID="navPhageID"
+      :logout="true"
     />
     <div class="container">
       <loading
@@ -19,16 +20,19 @@
       <div class="alert alert-secondary">
         <hr />
         <p><strong>Instructions</strong></p>
-        <p>
-          Here you can make any necessary changes to this CDS by editing its
+        <div>
+          <div v-if="!viewOnly">Here you can make any necessary changes to this CDS by editing its
           start and stop sites and its function. Before making any final
           decisions you should review and consider all of the information below
           including the alternative open reading frames, the coding potential
-          graphs, and the BLAST results. Click 'Save' to save changes made to
-          this CDS or you can click 'Delete' if you wish to remove this CDS.
-          Above you can see generic information for the current CDS including
+          graphs, and the BLAST results. Click 'Save' to save changes made to this CDS 
+          or you can click 'Delete' if you wish to remove this CDS.</div>
+          <div v-else>Here you can view alternative open reading frames, the coding potential
+          graphs, and the BLAST results. Click 'Save Notes' to save any edits that are made to the notes.
+          The range of alternate open reading frames and BLAST results shown can be changed in 'Settings'.</div>
+          Below you can see generic information for the current CDS including
           which auto-annotation programs called that gene.
-        </p>
+        </div>
         <hr />
         <div style="float: right; width: 50%">
           <p><strong>Notes:</strong></p>
@@ -41,8 +45,8 @@
           ></b-form-textarea>
         </div>
         <p>
-          <strong>Left:</strong> {{ currentCDS.start }}<br />
-          <strong>Right:</strong> {{ currentCDS.stop }}<br />
+          <strong>Left:</strong> {{ currentCDS.left }}<br />
+          <strong>Right:</strong> {{ currentCDS.right }}<br />
           <span v-if="currentCDS.strand === '-'"
             ><strong>Strand:</strong> Direct</span
           >
@@ -51,10 +55,14 @@
           <strong>Called by:</strong> {{ this.calledBy }}<br />
           <strong>Product:</strong> {{ displayFunction }}
         </p>
-        <button type="button" class="btn btn-dark btn-action" @click="editCDS">
+        <button v-if="!viewOnly" type="button" class="btn btn-dark btn-action" @click="editCDS">
           <strong>&#9998; Save</strong>
         </button>
+        <button v-else type="button" class="btn btn-dark btn-action" @click="editNotes">
+          <strong>&#9998; Save Notes</strong>
+        </button>
         <button
+          v-if="!viewOnly"
           type="button"
           class="btn btn-dark btn-action"
           @click="deleteCDS($route.params.cdsID)"
@@ -102,18 +110,19 @@
             <div class="table-responsive">
               <table id="cp-table" class="table table-hover">
                 <tbody>
-                  <tr v-for="(start, index) in dirStartOptions" :key="index">
-                    <th>{{ start }}-{{ dirStopOptions[index] }}</th>
+                  <tr v-for="(left, index) in dirLeftOptions" :key="index">
+                    <th>{{ left }}-{{ dirRightOptions[index] }}</th>
                     <td>
                       <button
                         v-if="
-                          start + dirStopOptions[index] !==
-                          currentCDS.start + currentCDS.stop
+                          left + dirRightOptions[index] !==
+                          currentCDS.left + currentCDS.right
                         "
                         class="btn btn-dark btn-sm"
-                        @click="setORF(start, dirStopOptions[index], '+')"
+                        @click="setORF(left, dirRightOptions[index], '+')"
                       >
-                        <strong>Select</strong>
+                        <strong v-if="!viewOnly">Select</strong>
+                        <strong v-else>View</strong>
                       </button>
                     </td>
                   </tr>
@@ -126,18 +135,19 @@
             <div class="table-responsive">
               <table id="cp-table" class="table table-hover">
                 <tbody>
-                  <tr v-for="(start, index) in compStartOptions" :key="index">
-                    <th>{{ start }}-{{ compStopOptions[index] }}</th>
+                  <tr v-for="(left, index) in compLeftOptions" :key="index">
+                    <th>{{ left }}-{{ compRightOptions[index] }}</th>
                     <td>
                       <button
                         v-if="
-                          start + compStopOptions[index] !==
-                          currentCDS.start + currentCDS.stop
+                          left + compRightOptions[index] !==
+                          currentCDS.left + currentCDS.right
                         "
                         class="btn btn-dark btn-sm"
-                        @click="setORF(start, compStopOptions[index], '-')"
+                        @click="setORF(left, compRightOptions[index], '-')"
                       >
-                        <strong>Select</strong>
+                        <strong v-if="!viewOnly">Select</strong>
+                        <strong v-else>View</strong>
                       </button>
                     </td>
                   </tr>
@@ -174,11 +184,11 @@
               :data4="data4"
               :data5="data5"
               :data6="data6"
-              :start="currentCDS.start"
-              :stop="currentCDS.stop"
+              :left="currentCDS.left"
+              :right="currentCDS.right"
               :frame="frame"
-              :prevStop="prevStop"
-              :nextStart="nextStart"
+              :prevRight="prevRight"
+              :nextLeft="nextLeft"
             />
           </div>
           <div v-else>
@@ -191,19 +201,19 @@
       </div>
       <hr />
       <h4 style="text-align: center; margin: 1em">
-        BLAST Results for {{ newStart }} - {{ newStop }}
+        BLAST Results for {{ newLeft }} - {{ newRight }}
       </h4>
       <BlastResults
         :blastResults="
           allBlastResults[
-            currentCDS.start.toString() +
+            currentCDS.left.toString() +
               '-' +
-              currentCDS.stop.toString() +
+              currentCDS.right.toString() +
               '  ' +
               currentCDS.strand
           ]
         "
-        :allowSelect="true"
+        :viewOnly="viewOnly"
         @newFunction="setFunction"
       />
       <hr />
@@ -219,8 +229,8 @@
           ></b-form-textarea>
         </div>
         <p>
-          <strong>Left:</strong> {{ currentCDS.start }}<br />
-          <strong>Right:</strong> {{ currentCDS.stop }}<br />
+          <strong>Left:</strong> {{ currentCDS.left }}<br />
+          <strong>Right:</strong> {{ currentCDS.right }}<br />
           <span v-if="currentCDS.strand === '-'"
             ><strong>Strand:</strong> Direct</span
           >
@@ -229,10 +239,14 @@
           <strong>Called by:</strong> {{ this.calledBy }}<br />
           <strong>Product:</strong> {{ displayFunction }}
         </p>
-        <button type="button" class="btn btn-dark btn-action" @click="editCDS">
+        <button v-if="!viewOnly" type="button" class="btn btn-dark btn-action" @click="editCDS">
           <strong>&#9998; Save</strong>
         </button>
+        <button v-else type="button" class="btn btn-dark btn-action" @click="editNotes">
+          <strong>&#9998; Save Notes</strong>
+        </button>
         <button
+          v-if="!viewOnly"
           type="button"
           class="btn btn-dark btn-action"
           @click="deleteCDS($route.params.cdsID)"
@@ -271,6 +285,12 @@
         <hr />
       </div>
     </div>
+    <b-toast id="cds-status" variant="primary">
+      <template #toast-title>
+        <strong class="text-size"> {{statusTitle}} </strong>
+      </template>
+      <div class="text-size">{{ statusMessage }}</div>
+    </b-toast>
   </div>
 </template>
 
@@ -281,6 +301,7 @@ import BlastResults from '../components/BlastResults.vue';
 import Graphs from '../components/Graphs.vue';
 import Loading from 'vue-loading-overlay';
 import 'vue-loading-overlay/dist/vue-loading.css';
+import Vue from 'vue';
 
 export default {
   name: 'CDS',
@@ -293,17 +314,18 @@ export default {
 
   data() {
     return {
-      dirStartOptions: [],
-      compStartOptions: [],
-      dirStopOptions: [],
-      compStopOptions: [],
+      viewOnly: false,
+      dirLeftOptions: [],
+      compLeftOptions: [],
+      dirRightOptions: [],
+      compRightOptions: [],
       dirBlastResults: [],
       compBlastResults: [],
       allBlastResults: [],
       currentCDS: {
         id: '',
-        start: '',
-        stop: '',
+        left: '',
+        right: '',
         strand: '',
         function: '',
         status: '',
@@ -311,8 +333,8 @@ export default {
       },
       updatedCDS: {
         id: '',
-        start: '',
-        stop: '',
+        left: '',
+        right: '',
         strand: '',
         function: '',
         status: '',
@@ -320,8 +342,8 @@ export default {
       frame: null,
       newFunction: 'None selected',
       displayFunction: '',
-      newStart: null,
-      newStop: null,
+      newLeft: null,
+      newRight: null,
       newStrand: null,
       data1: [{ x: [], y: [] }],
       data2: [{ x: [], y: [] }],
@@ -331,8 +353,8 @@ export default {
       data6: [{ x: [], y: [] }],
       nextCDS: null,
       prevCDS: null,
-      nextStart: null,
-      prevStop: null,
+      nextLeft: null,
+      prevRight: null,
       calledBy: '',
       glimmer: '',
       genemark: '',
@@ -341,9 +363,32 @@ export default {
       dataExists: false,
       pageLoading: true,
       showFunction: false,
-      showStart: false,
+      showLeft: false,
       saved: true,
+      statusMessage: "",
+      statusTitle: "",
     };
+  },
+
+  beforeCreate() {
+    Vue.GoogleAuth.then(auth2 => {
+      if (!auth2.isSignedIn.get()) {
+        this.$router.push('/');
+      }
+      axios
+        .get(process.env.VUE_APP_BASE_URL + `/check_user/${auth2.currentUser.get().Qs.zt}/${this.$route.params.phageID}`)
+        .then((response) => {
+          if (response.data === "fail") {
+            this.$router.push('/');
+          }
+          else if (response.data.view) {
+            this.viewOnly = true
+          }
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    })
   },
 
   created() {
@@ -361,11 +406,11 @@ export default {
     },
 
     navUpload: function () {
-      return true;
+      return !this.viewOnly;
     },
 
     navBlast: function () {
-      return true;
+      return !this.viewOnly;
     },
 
     navAnnotations: function () {
@@ -397,11 +442,18 @@ export default {
             `/annotations/cds/${this.$route.params.phageID}/${cdsID}`
         )
         .then((response) => {
+          console.log(response.data);
           if (response.data.message !== 'Finished') {
             this.$router.push(`/annotations/${this.$route.params.phageID}`);
           }
           this.currentCDS = response.data.cds;
-          if (this.currentCDS.function !== 'DELETED') {
+          this.updatedCDS.id = this.currentCDS.id;
+          this.updatedCDS.left = this.currentCDS.left;
+          this.updatedCDS.right = this.currentCDS.right;
+          this.updatedCDS.strand = this.currentCDS.strand;
+          this.updatedCDS.status = this.currentCDS.status;
+          this.updatedCDS.function = this.currentCDS.function;
+          if (this.currentCDS.function !== '@DELETED') {
             this.newFunction = this.currentCDS.function;
             this.displayFunction = this.newFunction;
             let indexSeparation = this.newFunction.indexOf('##');
@@ -419,15 +471,15 @@ export default {
           this.dirBlastResults = response.data.dir_blast;
           this.compBlastResults = response.data.comp_blast;
           this.allBlastResults = response.data.all_blast;
-          this.dirStartOptions = response.data.dir_start_options;
-          this.dirStopOptions = response.data.dir_stop_options;
-          this.compStartOptions = response.data.comp_start_options;
-          this.compStopOptions = response.data.comp_stop_options;
-          this.newStart = this.currentCDS.start;
-          this.newStop = this.currentCDS.stop;
+          this.dirLeftOptions = response.data.dir_left_options;
+          this.dirRightOptions = response.data.dir_right_options;
+          this.compLeftOptions = response.data.comp_left_options;
+          this.compRightOptions = response.data.comp_right_options;
+          this.newLeft = this.currentCDS.left;
+          this.newRight = this.currentCDS.right;
           this.newStrand = this.currentCDS.strand;
-          this.prevStop = response.data.prev_stop;
-          this.nextStart = response.data.next_start;
+          this.prevRight = response.data.prev_right;
+          this.nextLeft = response.data.next_left;
           this.data1 = [
             {
               x: response.data.x_data,
@@ -473,9 +525,9 @@ export default {
           this.phanotate = response.data.phanotate;
           var called = false;
           var cds =
-            this.currentCDS.start.toString() +
+            this.currentCDS.left.toString() +
             '-' +
-            this.currentCDS.stop.toString() +
+            this.currentCDS.right.toString() +
             ' ' +
             this.currentCDS.strand;
           if (this.glimmer.indexOf(cds) > -1) {
@@ -511,7 +563,7 @@ export default {
      */
     navNextCDS() {
       var cont = true;
-      if (!this.saved) {
+      if (!this.saved && !this.viewOnly) {
         cont = confirm('Are you sure you want to continue without saving?');
       }
       if (cont === true) {
@@ -532,7 +584,7 @@ export default {
      */
     navPrevCDS() {
       var cont = true;
-      if (!this.saved) {
+      if (!this.saved && !this.viewOnly) {
         cont = confirm('Are you sure you want to continue without saving?');
       }
       if (cont === true) {
@@ -554,19 +606,44 @@ export default {
     editCDS() {
       this.saved = true;
       this.updatedCDS = this.currentCDS;
-      this.updatedCDS.start = this.newStart;
-      this.updatedCDS.stop = this.newStop;
-      this.updatedCDS.function = '@' + this.newFunction;
+      this.updatedCDS.left = this.newLeft;
+      this.updatedCDS.right = this.newRight;
+      if (this.newFunction === 'None selected') {
+        this.newFunction = '@' + this.newFunction;
+      }
       const payload = {
         id: this.updatedCDS.id,
-        start: this.updatedCDS.start,
-        stop: this.updatedCDS.stop,
+        left: this.updatedCDS.left,
+        right: this.updatedCDS.right,
         strand: this.updatedCDS.strand,
-        function: this.updatedCDS.function,
+        function: this.newFunction,
         notes: this.notes,
         status: this.currentCDS.status,
       };
       this.updateCDS(payload, this.updatedCDS.id);
+    },
+
+    /**
+     * Changes the CDS data to reflect the user's changes.
+     */
+    editNotes() {
+      const payload = {
+        notes: this.notes,
+      };
+      axios
+        .put(
+          process.env.VUE_APP_BASE_URL +
+            `/annotations/cds/${this.$route.params.phageID}/${this.updatedCDS.id}`,
+          payload
+        )
+        .then(() => {
+          this.statusMessage = `The CDS ${this.updatedCDS.id} has been saved.`;
+          this.statusTitle = "SAVED";
+          this.$bvToast.show('cds-status');
+        })
+        .catch((error) => {
+          console.error(error);
+        });
     },
 
     /**
@@ -582,21 +659,14 @@ export default {
           payload
         )
         .then(() => {
-          if (this.newFunction !== 'DELETED') {
-            this.$bvToast.toast(`The CDS ${cdsID} has been saved.`, {
-              title: 'SAVED',
-              autoHideDelay: 5000,
-              appendToast: false,
-            });
+          if (this.newFunction !== '@DELETED') {
+            this.statusMessage = `The CDS ${cdsID} has been saved.`;
+            this.statusTitle = "SAVED";
+            this.$bvToast.show('cds-status');
           } else {
-            this.$bvToast.toast(
-              `The CDS ${cdsID} has been deleted. You will be re-routed to the next CDS.`,
-              {
-                title: 'DELETED',
-                autoHideDelay: 5000,
-                appendToast: false,
-              }
-            );
+            this.statusMessage = `The CDS ${cdsID} has been deleted. You will be re-routed to the next CDS.`;
+            this.statusTitle = "DELETED";
+            this.$bvToast.show('cds-status')
             this.navNextCDS();
           }
         })
@@ -610,7 +680,7 @@ export default {
      * @param {string} cdsID the ID of the CDS to be deleted.
      */
     deleteCDS(cdsID) {
-      this.newFunction = 'DELETED';
+      this.newFunction = '@DELETED';
       this.editCDS();
     },
 
@@ -624,32 +694,32 @@ export default {
       let match = funct.match(/(.*)##(.*)/);
       this.displayFunction = match[1];
       console.log(this.displayFunction);
-      this.newFunction = funct;
+      this.newFunction = '@' + funct;
     },
 
     /**
-     * Updates the start and stop postions to what the user selected.
-     * @param {number} start the user selected start.
-     * @param {number} stop the user selected stop.
+     * Updates the left and right postions to what the user selected.
+     * @param {number} left the user selected left.
+     * @param {number} right the user selected right.
      */
-    setORF(start, stop, strand) {
+    setORF(left, right, strand) {
       this.saved = false;
-      if (start !== this.newStart || stop !== this.newStop) {
+      if (left !== this.newLeft || right !== this.newRight) {
         this.dataExists = false;
-        this.newFunction = '';
+        this.newFunction = '@None selected';
         this.displayFunction = 'None selected';
-        this.newStop = stop;
-        this.currentCDS.stop = stop;
-        this.newStart = start;
+        this.newRight = right;
+        this.currentCDS.right = right;
+        this.newLeft = left;
         this.newStrand = strand;
-        this.currentCDS.start = start;
+        this.currentCDS.left = left;
         this.currentCDS.strand = strand;
         this.calledBy = '';
         var called = false;
         var cds =
-          this.currentCDS.start.toString() +
+          this.currentCDS.left.toString() +
           '-' +
-          this.currentCDS.stop.toString() +
+          this.currentCDS.right.toString() +
           ' ' +
           this.currentCDS.strand;
         if (this.glimmer.indexOf(cds) > -1) {
@@ -669,10 +739,10 @@ export default {
         } else {
           this.calledBy = 'None';
         }
-        this.frame = ((start + 2) % 3) + 1;
+        this.frame = ((left + 2) % 3) + 1;
         if (this.currentCDS.strand === '-') {
-          this.frame = ((this.currentCDS.stop + 2) % 3) + 4;
-        } else this.frame = ((this.currentCDS.start + 2) % 3) + 1;
+          this.frame = ((this.currentCDS.right + 2) % 3) + 4;
+        } else this.frame = ((this.currentCDS.left + 2) % 3) + 1;
         console.log(this.frame);
         this.$nextTick().then(() => {
           this.dataExists = true;
@@ -747,7 +817,7 @@ tbody {
 
 .graphs-caption {
   margin-top: 1em;
-  text-align: left;
+  text-align: center;
   color: grey;
 }
 
@@ -760,6 +830,10 @@ tbody {
 
 .btn-dark {
   font-size: 15pt;
+}
+
+.text-size {
+  font-size: 1.2em;
 }
 
 @media only screen and (max-width: 50em) {

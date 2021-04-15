@@ -17,7 +17,9 @@
       "vue-plotly": "^1.1.0",
       "vue-router": "^3.0.3",
       "vue2-dropzone": "3.6.0",
-      "vue-google-signin-button-directive": "1.0.3"
+      "vue-google-signin-button-directive": "1.0.3",
+      "vue-google-signin-button": "1.0.4",
+      "vue-google-login": "2.0.5"
     },
     "devDependencies": {
       "@vue/cli-plugin-babel": "^3.11.0",

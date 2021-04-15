@@ -25,10 +25,7 @@ from builtins import FileNotFoundError
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 FASTA_EXTENSIONS = set(['.fasta', '.fna', '.fa'])
-GENBANK_EXTENSIONS = set(['.gb', '.gbk', '.gbf'])
 GDATA_EXTENSIONS = set(['.gdata'])
-LDATA_EXTENSIONS = set(['.ldata'])
-BLAST_EXTENSIONS = set(['.json'])
 
 def allowed_file(filename, allowed_extensions):
     """Checks if file extension is acceptable.
@@ -60,42 +57,33 @@ def get_file_path(preference, upload_directory):
         if preference == "fasta":
             if file_ext in FASTA_EXTENSIONS:
                 return os.path.join(upload_directory, filename)
-        elif preference == "genbank":
-            if file_ext in GENBANK_EXTENSIONS:
-                return os.path.join(upload_directory, filename)
-        elif preference == "ldata":
-            if file_ext in LDATA_EXTENSIONS:
-                return os.path.join(upload_directory, filename)
         elif preference == "gdata":
             if file_ext in GDATA_EXTENSIONS:
                 return os.path.join(upload_directory, filename)
-        elif preference == "blast":
-            if file_ext in BLAST_EXTENSIONS:
-                blast_files.append(os.path.join(upload_directory, filename))
         else:
             return("Couldn't find file.")
     return blast_files
 
-def get_sequence(genome, strand, start, stop):
-    """Gets sequence (ranging from start to stop) of the direct or complementary strand of genome.
+def get_sequence(genome, strand, left, right):
+    """Gets sequence (ranging from left to right) of the direct or complementary strand of genome.
 
     Args:
         genome:
             The genome of the phage.
         strand:
             Direct or complimentary strand.
-        start:
-            The index of the start codon.
-        stop:
-            The index of the stop codon.
+        left:
+            The index of the left codon.
+        right:
+            The index of the right codon.
     
     Returns:
         The sequence.
     """
     if strand == '-':
-        return genome.reverse_complement()[start : stop]
+        return genome.reverse_complement()[left : right]
     else:
-        return genome[start : stop]
+        return genome[left : right]
 
 def delete_blast_zip(UPLOAD_FOLDER):
     """Deletes the Blast zip so that any updates that are made are reflected in the blast files.
@@ -116,14 +104,14 @@ def delete_blast_zip(UPLOAD_FOLDER):
         return "Blast zip file has not been created yet."
     return "success"
 
-def get_frame_and_status(start, stop, strand, coding_potential):
+def get_frame_and_status(left, right, strand, coding_potential):
     """Finds the frame that a given CDS is on and whether it covers the coding potential.
 
     Args:
-        start:
-            The start position for a given cds.
-        stop:
-            The stop postition for a given cds.
+        left:
+            The left position for a given cds.
+        right:
+            The right postition for a given cds.
         strand:
             The strand of a given cds.
         coding_potential:
@@ -132,48 +120,48 @@ def get_frame_and_status(start, stop, strand, coding_potential):
     Returns:
         The frame and status of a given CDS.
     """
-    start_index = 0
-    find_base = start
+    left_index = 0
+    find_base = left
     found = False
     while not found:
         if find_base < 1 or find_base > len(coding_potential['x_data']):
-            start_index = 0
+            left_index = 0
             break
         found = True
         try:
-            start_index = coding_potential['x_data'].index(find_base)
+            left_index = coding_potential['x_data'].index(find_base)
         except:
             found = False
             find_base -= 1
-    if start_index > 0:
-        start_index -= 1
-    stop_index = 0
-    find_base = stop
+    if left_index > 0:
+        left_index -= 1
+    right_index = 0
+    find_base = right
     found = False
     while not found:
         if find_base < 1 or find_base > len(coding_potential['x_data']):
-            stop_index = len(coding_potential['x_data']) - 1
+            right_index = len(coding_potential['x_data']) - 1
             break
         found = True
         try:
-            stop_index = coding_potential['x_data'].index(find_base)
+            right_index = coding_potential['x_data'].index(find_base)
         except:
             found = False
             find_base += 1
-    if stop_index < len(coding_potential['x_data']) - 1:
-        start_index += 1
+    if right_index < len(coding_potential['x_data']) - 1:
+        left_index += 1
     frame = 0
     if strand == "-":
-        frame = ((stop + 2) % 3) + 4
+        frame = ((right + 2) % 3) + 4
     else:
-        frame = ((start + 2) % 3) + 1
+        frame = ((left + 2) % 3) + 1
 
     y_key = 'y_data_' + str(frame)
     status = "Pass"
-    if coding_potential[y_key][start_index] >= .5 or coding_potential[y_key][stop_index] >= .5:
-        print(coding_potential[y_key][start_index])
-        print(start_index)
-        print(coding_potential[y_key][stop_index])
-        print(stop_index)
+    if coding_potential[y_key][left_index] >= .5 or coding_potential[y_key][right_index] >= .5:
+        print(coding_potential[y_key][left_index])
+        print(left_index)
+        print(coding_potential[y_key][right_index])
+        print(right_index)
         status = "Fail"
     return frame, status

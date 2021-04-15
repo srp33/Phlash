@@ -5,8 +5,70 @@
       style="color: white; font-size: 1.5em"
     >
       <a class="navbar-brand" href="/">
-        <img id="logo" src="/phlash/images/logonav.png" width="35" />
+        <img id="logo" src="/phlash/images/logonav.png" width="50" />
       </a>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav">
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              phlash
+            </a>
+            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+              <a class="dropdown-item" href="#"><router-link to="/" style="color: black">home</router-link></a>
+              <a v-if="settings" class="dropdown-item" href="#" @click="getSettings">settings</a>
+              <a v-if="annotations && blast" class="dropdown-item" href="#" @click="showShare = true">share</a>
+              <div v-if="logout" class="dropdown-divider"></div>
+              <a v-if="logout" class="dropdown-item" style="margin-left:0px; text-align:left;" href="#"><GoogleLogin class="btn btn-dark btn-block" :params="params" :onSuccess="onSuccess" :logoutButton=true>logout</GoogleLogin></a>
+            </div>
+          </li>
+          <li class="nav-item" v-if="upload">
+            <router-link
+              :to="{ name: 'Upload', params: { phageID: this.phageID } }"
+              :event="upload ? 'click' : ''"
+            >
+              <a class="nav-link" href="#">upload</a>
+            </router-link>
+          </li>
+          <li class="nav-item" v-if="blast">
+            <router-link
+              :to="{ name: 'Blast', params: { phageID: this.phageID } }"
+              :event="blast ? 'click' : ''"
+            >
+              <a class="nav-link" href="#">blast</a>
+            </router-link>
+          </li>
+          <li class="nav-item" v-if="annotations">
+            <router-link
+              :to="{ name: 'Annotations', params: { phageID: this.phageID } }"
+              :event="annotations ? 'click' : ''"
+            >
+              <a class="nav-link" href="#">annotations</a>
+            </router-link>
+          </li>
+          <li class="nav-item" v-if="annotations">
+            <router-link
+              :to="{ name: 'GeneMap', params: { phageID: this.phageID } }"
+              :event="annotations ? 'click' : ''"
+            >
+              <a class="nav-link" href="#">genome map</a>
+            </router-link>
+          </li>
+          <li class="nav-item" v-if="annotations">
+            <router-link
+              :to="{ name: 'GenBank', params: { phageID: this.phageID } }"
+              :event="annotations ? 'click' : ''"
+            >
+              <a class="nav-link" href="#">genbank</a>
+            </router-link>
+          </li>
+          <li class="nav-item">
+            <router-link to="/contact"
+              ><a class="nav-link" href="#">about</a></router-link
+            >
+          </li>
+        </ul>
+      </div>
+      <span v-if="annotations && !blast" class="navbar-text">&#128065; VIEW ONLY &#128065;</span>
       <button
         class="navbar-toggler"
         type="button"
@@ -18,71 +80,51 @@
       >
         <span class="navbar-toggler-icon"></span>
       </button>
-      <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav">
-          <li class="nav-item">
-            <router-link to="/"
-              ><a class="nav-link" href="#">home</a></router-link
-            >
-          </li>
-          <li class="nav-item">
-            <router-link
-              :to="{ name: 'Upload', params: { phageID: this.phageID } }"
-              :event="upload ? 'click' : ''"
-            >
-              <a class="nav-link" href="#">upload</a>
-            </router-link>
-          </li>
-          <li class="nav-item">
-            <router-link
-              :to="{ name: 'Blast', params: { phageID: this.phageID } }"
-              :event="geneMap ? 'click' : ''"
-            >
-              <a class="nav-link" href="#">blast</a>
-            </router-link>
-          </li>
-          <li class="nav-item">
-            <router-link
-              :to="{ name: 'Annotations', params: { phageID: this.phageID } }"
-              :event="annotations ? 'click' : ''"
-            >
-              <a class="nav-link" href="#">annotations</a>
-            </router-link>
-          </li>
-          <li class="nav-item">
-            <router-link
-              :to="{ name: 'GeneMap', params: { phageID: this.phageID } }"
-              :event="annotations ? 'click' : ''"
-            >
-              <a class="nav-link" href="#">genome map</a>
-            </router-link>
-          </li>
-          <li class="nav-item">
-            <router-link
-              :to="{ name: 'GenBank', params: { phageID: this.phageID } }"
-              :event="annotations ? 'click' : ''"
-            >
-              <a class="nav-link" href="#">genbank</a>
-            </router-link>
-          </li>
-          <li class="nav-item" v-if="settings">
-            <a class="nav-link" href="#" @click="getSettings">settings</a>
-          </li>
-          <li class="nav-item">
-            <router-link to="/contact"
-              ><a class="nav-link" href="#">contact</a></router-link
-            >
-          </li>
-        </ul>
-      </div>
     </nav>
     <b-modal
+      class="text-size"
+      v-model="showShare"
+      ref="shareModal"
+      id="share-modal"
+      hide-footer
+    >
+      <template #modal-title>
+        <div class="text-size">Share Annotations</div>
+      </template>
+      <b-form @submit="onShare" align="left">
+        Enter the email of the user that you would like to share this phage's annotations with. 
+        Please note that they will only be able to view your annotations and will not have permission to edit.
+        <hr />
+        <b-form-group
+          label="Email:"
+          label-size="lg"
+          label-for="share-email"
+        >
+          <b-form-input
+            class="form-input"
+            id="share-email"
+            type="text"
+            v-model="shareEmail"
+            required
+            placeholder="jane_doe@gmail.com"
+          ></b-form-input>
+        </b-form-group>
+        <hr />
+        <b-button type="submit" class="mt-3" block style="margin-top: 0em">
+          <strong>Submit</strong>
+        </b-button>
+      </b-form>
+    </b-modal>
+    <b-modal
+      class="text-size"
       v-model="showSettings"
       ref="settingsModal"
       id="settings-modal"
-      title="Settings"
       hide-footer
     >
+      <template #modal-title>
+        <div class="text-size">Settings</div>
+      </template>
       Refresh the page for the new settings to take effect.
       <hr />
       <b-form @submit="onSubmit" align="left">
@@ -95,6 +137,7 @@
           from the current start position alternate start codons will be
           searched for.
           <b-form-input
+            class="form-input"
             id="search-back-input"
             type="number"
             v-model="backStartRange"
@@ -111,6 +154,7 @@
           from the current start position alternate start codons will be
           searched for.
           <b-form-input
+            class="form-input"
             id="search-forward-input"
             type="number"
             v-model="forwardStartRange"
@@ -123,6 +167,7 @@
           of base pairs between two adjacent genes. Gaps greater than this
           number will be flagged.
           <b-form-input
+            class="form-input"
             id="gap-input"
             type="number"
             v-model="gap"
@@ -139,6 +184,7 @@
           of base pairs two adjacent genes overlap. Overlaps greater than this
           number will be flagged.
           <b-form-input
+            class="form-input"
             id="overlap-input"
             type="number"
             v-model="overlap"
@@ -155,6 +201,7 @@
           of base pairs between two adjacent genes on different strands. Gaps
           shorter than this number will be flagged.
           <b-form-input
+            class="form-input"
             id="opposite-gap-input"
             type="number"
             v-model="oppositeGap"
@@ -171,6 +218,7 @@
           number of base pairs in a gene. Genes shorter than this number will be
           flagged.
           <b-form-input
+            class="form-input"
             id="short-input"
             type="number"
             v-model="short"
@@ -184,14 +232,24 @@
         </b-button>
       </b-form>
     </b-modal>
+    <b-toast id="share-status" variant="primary">
+      <template #toast-title>
+        <strong class="text-size"> {{statusTitle}} </strong>
+      </template>
+      <div class="text-size">{{ statusMessage }}</div>
+    </b-toast>
   </div>
 </template>
 
 <script>
 import axios from 'axios';
+import GoogleLogin from 'vue-google-login';
 
 export default {
   name: 'Navbar',
+  components: {
+    GoogleLogin,
+  },
   props: {
     upload: Boolean,
     blast: Boolean,
@@ -199,6 +257,7 @@ export default {
     geneMap: Boolean,
     settings: Boolean,
     phageID: String,
+    logout: Boolean,
   },
 
   data() {
@@ -211,6 +270,10 @@ export default {
       backStartRange: null,
       forwardStartRange: null,
       short: null,
+      showShare: false,
+      shareEmail: null,
+      statusMessage: "",
+      statusTitle: "",
     };
   },
 
@@ -224,8 +287,8 @@ export default {
           )
           .then((response) => {
             console.log(response.data);
-            this.backStartRange = response.data.back_start_range;
-            this.forwardStartRange = response.data.forward_start_range;
+            this.backStartRange = response.data.back_left_range;
+            this.forwardStartRange = response.data.forward_left_range;
             this.gap = response.data.gap;
             this.overlap = response.data.overlap;
             this.oppositeGap = response.data.opposite_gap;
@@ -260,6 +323,29 @@ export default {
           console.error(error);
         });
     },
+
+    onShare(evt) {
+      evt.preventDefault();
+      this.$refs.shareModal.hide();
+      console.log(this.shareEmail);
+      axios
+        .post(
+          process.env.VUE_APP_BASE_URL +
+            `/share/${this.$route.params.phageID}/${this.shareEmail}`
+        )
+        .then((response) => {
+          this.statusTitle = "STATUS";
+          this.statusMessage = response.data;
+          this.$bvToast.show('share-status');
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    },
+
+    onSuccess() {
+      window.location.reload();
+    },
   },
 };
 </script>
@@ -276,4 +362,14 @@ export default {
 .bg-light {
   background-color: #e3f2fd;
 }
+
+.text-size {
+  font-size: 1.2em;
+}
+
+.form-input {
+  height: 2em; 
+  font-size: 15pt;
+}
+
 </style>

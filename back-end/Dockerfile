@@ -46,6 +46,7 @@ RUN pip3 install phanotate
 ADD phanotate.py /usr/local/lib/python3.7/site-packages/
 RUN chmod 777 /usr/local/lib/python3.7/site-packages/phanotate.py
 ADD *.py /app/
+ADD prestart.sh /app/
 ADD genemark_suite_linux_64.tar.gz /
 ADD gm_key_64.gz /
 

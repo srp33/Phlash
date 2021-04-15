@@ -7,6 +7,7 @@
       :geneMap="navGeneMap"
       :settings="navSettings"
       :phageID="navPhageID"
+      :logout="true"
     />
     <div class="container">
       <h1>Upload</h1>
@@ -83,6 +84,12 @@
         <hr />
       </div>
     </div>
+    <b-toast id="upload-status" variant="primary" no-auto-hide>
+      <template #toast-title>
+        <strong class="text-size"> {{statusTitle}} </strong>
+      </template>
+      <div class="text-size">{{ statusMessage }}</div>
+    </b-toast>
   </div>
 </template>
 
@@ -91,6 +98,8 @@ import axios from 'axios';
 import vue2Dropzone from 'vue2-dropzone';
 import 'vue2-dropzone/dist/vue2Dropzone.min.css';
 import Navbar from '../components/Navbar.vue';
+import { LoaderPlugin } from 'vue-google-login';
+import Vue from 'vue';
 
 export default {
   name: 'Upload',
@@ -105,7 +114,30 @@ export default {
       dropzoneOptions: this.setDropzone(),
       blastCompleted: false,
       interval: null,
+      statusMessage: "",
+      statusTitle: "",
     };
+  },
+
+  beforeCreate() {
+    Vue.GoogleAuth.then(auth2 => {
+      if (!auth2.isSignedIn.get()) {
+        this.$router.push('/');
+      }
+      axios
+        .get(process.env.VUE_APP_BASE_URL + `/check_user/${auth2.currentUser.get().Qs.zt}/${this.$route.params.phageID}`)
+        .then((response) => {
+          if (response.data === "fail") {
+            this.$router.push('/');
+          }
+          else if (response.data.view) {
+            this.$router.push('/');
+          }
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    })
   },
 
   created() {
@@ -164,7 +196,8 @@ export default {
         url: this.getUploadUrl(),
         addRemoveLinks: true,
         acceptedFiles: '.fasta, .fna, .fa',
-        chunking: false,
+        chunking: true,
+        chunkSize: 1000000,
         maxFiles: 1,
         dictDefaultMessage: 'Drag FASTA file here or click to browse.',
         dictInvalidFileType:
@@ -292,15 +325,10 @@ export default {
      */
     uploadReminder() {
       if (!this.fasta) {
-        this.$bvToast.toast(
-          `You must upload a FASTA file to continue. 
-            If you have uploaded a file and still cannot continue it is because the FASTA file is not in the correct FASTA format.`,
-          {
-            title: 'UPLOAD FASTA FILE',
-            autoHideDelay: 15000,
-            appendToast: false,
-          }
-        );
+        this.statusMessage = `You must upload a FASTA file to continue. 
+                              If you have uploaded a file and still cannot continue it is because the FASTA file is not in the correct FASTA format.`;
+        this.statusTitle = "UPLOAD FASTA FILE";
+        this.$bvToast.show('upload-status');
       }
     },
   },
@@ -338,5 +366,9 @@ h1 {
 
 .btn-dark {
   font-size: 15pt;
+}
+
+.text-size {
+  font-size: 1.2em;
 }
 </style>
