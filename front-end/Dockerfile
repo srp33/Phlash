@@ -5,8 +5,7 @@ COPY package*.json ./
 RUN npm install
 RUN npm audit fix
 COPY ./ .
-# COPY .env.production .
-COPY .env.development .env.production
+COPY .env.production .
 RUN npm run build
 FROM nginx as production-stage
 RUN mkdir /app
