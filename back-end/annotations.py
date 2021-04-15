@@ -39,7 +39,6 @@ def get_annotations_data(phage_id):
     response_object['short'] = setting.short
     annotations = []
     for cds in db.session.query(Annotations).filter_by(phage_id=phage_id).order_by(Annotations.left):
-        print(cds.function)
         function = cds.function[:cds.function.find('#')]
         if cds.function.find('#') is -1:
             function = cds.function
@@ -70,7 +69,7 @@ def add_blast_task(phage_id, UPLOAD_FOLDER):
                         arguments=args,
                         complete=False,
                         result="waiting",
-                        time=datetime.now())
+                        time=str(datetime.now()))
         try:
             db.session.add(task)
             db.session.commit()
@@ -151,11 +150,11 @@ def add_cds(request, UPLOAD_FOLDER, phage_id):
         db.session.add(cds)
         db.session.commit()
         response_object['message'] = "Added succesfully."
-        # id_index = 0
-        # for cds in db.session.query(Annotations).filter_by(phage_id=phage_id).order_by(Annotations.left):
-        #     id_index += 1
-        #     cds.id = str(id_index)
-        # db.session.commit()
+        id_index = 0
+        for cds in db.session.query(Annotations).filter_by(phage_id=phage_id).order_by(Annotations.left):
+            id_index += 1
+            cds.id = str(id_index)
+        db.session.commit()
         id_index = 0
         phage_name = db.session.query(Users).filter_by(id=phage_id).first().phage_id
         for cds in db.session.query(Annotations).filter_by(phage_id=phage_id).order_by(Annotations.left):
@@ -171,11 +170,11 @@ def add_cds(request, UPLOAD_FOLDER, phage_id):
         db.session.add(cds)
         db.session.commit()
         response_object['message'] = "Added succesfully."
-        # id_index = 0
-        # for cds in db.session.query(Annotations).filter_by(phage_id=phage_id).order_by(Annotations.left):
-        #     id_index += 1
-        #     cds.id = str(id_index)
-        # db.session.commit()
+        id_index = 0
+        for cds in db.session.query(Annotations).filter_by(phage_id=phage_id).order_by(Annotations.left):
+            id_index += 1
+            cds.id = str(id_index)
+        db.session.commit()
         id_index = 0
         phage_name = db.session.query(Users).filter_by(id=phage_id).first().phage_id
         for cds in db.session.query(Annotations).filter_by(phage_id=phage_id).order_by(Annotations.left):

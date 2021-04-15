@@ -160,7 +160,7 @@
               </li>
               <li>
                 <strong>Standard Protein BLAST:</strong>
-                On the BLaST page ensure that the main heading says
+                On the BLAST page ensure that the main heading says
                 <i>'Standard Protein BLAST'</i>. If it does not, select the
                 <i>'blastp'</i> tab.
               </li>
@@ -351,6 +351,8 @@ export default {
   destroyed() {
     this.stopChecking();
   },
+
+  
 
   computed: {
     navUpload: function () {
@@ -591,9 +593,9 @@ export default {
         .then((response) => {
           console.log(response.data);
           this.blastDownloaded = response.data.blast_downloaded;
-          if (!this.blastDownloaded) {
+          if (!this.blastDownloaded && !response.data.blast_input_in_progress) {
             this.createInputFiles();
-          } else {
+          } else if (!response.data.blast_input_in_progress) {
             this.orfLoading = false;
           }
           if (response.data.uploaded) {
@@ -625,9 +627,6 @@ export default {
         )
         .then((response) => {
           console.log(response.data);
-          this.numFiles = response.data;
-          this.orfLoading = false;
-          this.blastDownloaded = true;
         })
         .catch((error) => {
           console.log(error);
@@ -740,17 +739,17 @@ export default {
      */
     displayOutputFiles() {
       this.interval = setInterval(() => {
-        console.log('displayOutputFiles');
         axios
           .post(
             process.env.VUE_APP_BASE_URL +
               `/blast/${this.$route.params.phageID}/displayOutput/standard`
           )
           .then((response) => {
+            console.log(response.data);
             this.fileNames = response.data.file_names;
             this.badFiles = response.data.bad_files;
             if (
-              this.fileNames.length === this.numFiles &&
+              this.fileNames.length == this.numFiles &&
               this.badFiles.length === 0
             ) {
               this.blastUploaded = true;
@@ -778,6 +777,11 @@ export default {
                 this.statusTitle = "ERROR";
                 this.$bvToast.show('blast-status');
               }
+            }
+            if (response.data.blast_input_complete) {
+              this.numFiles = response.data.num_files;
+              this.orfLoading = false;
+              this.blastDownloaded = true;
             }
           })
           .catch((error) => {

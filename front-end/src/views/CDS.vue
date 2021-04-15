@@ -453,7 +453,7 @@ export default {
           this.updatedCDS.strand = this.currentCDS.strand;
           this.updatedCDS.status = this.currentCDS.status;
           this.updatedCDS.function = this.currentCDS.function;
-          if (this.currentCDS.function !== 'DELETED') {
+          if (this.currentCDS.function !== '@DELETED') {
             this.newFunction = this.currentCDS.function;
             this.displayFunction = this.newFunction;
             let indexSeparation = this.newFunction.indexOf('##');
@@ -608,9 +608,9 @@ export default {
       this.updatedCDS = this.currentCDS;
       this.updatedCDS.left = this.newLeft;
       this.updatedCDS.right = this.newRight;
-      // if (this.updatedCDS.function.charAt(0) != '@') {
-      //   this.updatedCDS.function = '@' + this.newFunction;
-      // }
+      if (this.newFunction === 'None selected') {
+        this.newFunction = '@' + this.newFunction;
+      }
       const payload = {
         id: this.updatedCDS.id,
         left: this.updatedCDS.left,
@@ -659,7 +659,7 @@ export default {
           payload
         )
         .then(() => {
-          if (this.newFunction !== 'DELETED') {
+          if (this.newFunction !== '@DELETED') {
             this.statusMessage = `The CDS ${cdsID} has been saved.`;
             this.statusTitle = "SAVED";
             this.$bvToast.show('cds-status');
@@ -680,7 +680,7 @@ export default {
      * @param {string} cdsID the ID of the CDS to be deleted.
      */
     deleteCDS(cdsID) {
-      this.newFunction = 'DELETED';
+      this.newFunction = '@DELETED';
       this.editCDS();
     },
 

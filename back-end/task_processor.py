@@ -26,6 +26,8 @@ def run_task(task):
     args = list(task.arguments.split(" "))
     if task.function == "parse_blast":
         task.result = parse_blast(args[0], args[1], session)
+    elif task.function == "blast_input":
+        task.result = create_blast_input(args[0], args[1])
     elif task.function == "auto_annotate":
         try:
             run_genemark(args[0], args[1])
@@ -61,6 +63,16 @@ def handle_unfinished_tasks():
                 for filename in os.listdir(args[0]):
                     if not filename.endswith(".fasta") and not filename.endswith(".json"):
                         os.remove(os.path.join(args[0], filename))
+                old_task.result = "waiting"
+                session.commit()
+            elif old_task.function == "blast_input":
+                try:
+                    USER_FOLDER = args[0][:-8]
+                    for file in os.listdir(USER_FOLDER):
+                        if file.endswith(".zip") or file.endswith(".fasta"):
+                            os.remove(os.path.join(USER_FOLDER, file))
+                except FileNotFoundError:
+                    print("zip file not found")
                 old_task.result = "waiting"
                 session.commit()
             else:

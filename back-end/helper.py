@@ -25,10 +25,7 @@ from builtins import FileNotFoundError
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 FASTA_EXTENSIONS = set(['.fasta', '.fna', '.fa'])
-GENBANK_EXTENSIONS = set(['.gb', '.gbk', '.gbf'])
 GDATA_EXTENSIONS = set(['.gdata'])
-LDATA_EXTENSIONS = set(['.ldata'])
-BLAST_EXTENSIONS = set(['.json'])
 
 def allowed_file(filename, allowed_extensions):
     """Checks if file extension is acceptable.
@@ -60,18 +57,9 @@ def get_file_path(preference, upload_directory):
         if preference == "fasta":
             if file_ext in FASTA_EXTENSIONS:
                 return os.path.join(upload_directory, filename)
-        elif preference == "genbank":
-            if file_ext in GENBANK_EXTENSIONS:
-                return os.path.join(upload_directory, filename)
-        elif preference == "ldata":
-            if file_ext in LDATA_EXTENSIONS:
-                return os.path.join(upload_directory, filename)
         elif preference == "gdata":
             if file_ext in GDATA_EXTENSIONS:
                 return os.path.join(upload_directory, filename)
-        elif preference == "blast":
-            if file_ext in BLAST_EXTENSIONS:
-                blast_files.append(os.path.join(upload_directory, filename))
         else:
             return("Couldn't find file.")
     return blast_files

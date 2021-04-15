@@ -157,7 +157,7 @@ def blast(phage_id, file_method, file_path):
             return download_blast_input(phage_id)
 
         elif file_method == "createInput":
-            return jsonify(create_blast_input(UPLOAD_FOLDER, phage_id))
+            return jsonify(add_blast_input_task(UPLOAD_FOLDER, phage_id))
 
         elif file_method == "displayOutput":
             return jsonify(get_blast_output_names(phage_id, UPLOAD_FOLDER, file_path))

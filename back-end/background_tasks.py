@@ -6,6 +6,9 @@ from models import *
 import models
 from datetime import datetime
 import json
+from Bio import SeqIO, Seq, SeqFeature
+from sys import getsizeof
+import zipfile
 
 def run_genemark(UPLOAD_FOLDER, phage_id):
     fasta_file_path = os.path.join(UPLOAD_FOLDER, phage_id + ".fasta")
@@ -423,3 +426,182 @@ def parse_blast(phage_id, UPLOAD_FOLDER, session):
             
     print(datetime.now())
     return(message)
+
+def create_blast_input(UPLOAD_FOLDER, phage_id):
+    """Creates fasta file(s) for BLAST input.
+
+    If more than one file is created, then each file should be 30 kb.
+
+    Args:
+        UPLOAD_FOLDER:
+            The path to the directory containing files for the current user.
+        phage_id:
+            The ID of the current user.
+
+    Returns:
+        The Number of blast fasta files created.
+    """
+    fasta_file = os.path.join(UPLOAD_FOLDER, phage_id + ".fasta")
+    filename = re.search('(.*/users/.*)/uploads/.*.\w*', fasta_file)
+    genome = SeqIO.read(fasta_file, "fasta").seq
+    output = ""
+    blast_file_count = 1  # keep track of num blast files created
+    out_file = f"{str(filename.group(1))}/{phage_id}_blast_{blast_file_count}.fasta"
+    files_to_zip = [out_file]
+    lefts, rights = get_starts_stops('+', genome)
+    for i in range(len(lefts)):
+        output += f">+, {lefts[i]}-{rights[i]}\n"
+        output += f"{Seq.translate(sequence=get_sequence(genome, '+', lefts[i]-1, rights[i]), table=11)}\n"
+        if getsizeof(output) > 30000:  # only file size to reach 30 kb, else you get a CPU limit from NCBI blast
+            with open(out_file, "w") as f:
+                f.write(output)
+            output = ""
+            blast_file_count += 1
+            out_file = f"{str(filename.group(1))}/{phage_id}_blast_{blast_file_count}.fasta"
+            files_to_zip.append(out_file)
+    lefts, rights = get_starts_stops('-', genome)
+    for i in range(len(lefts)):
+        output += f">-, {lefts[i]}-{rights[i]}\n"
+        left = len(genome) - rights[i]
+        right = len(genome) - lefts[i] + 1
+        output += f"{Seq.translate(sequence=get_sequence(genome, '-', left, right), table=11)}\n"
+        if getsizeof(output) > 30000:  # only file size to reach 30 kb, else you get a CPU limit from NCBI blast
+            with open(out_file, "w") as f:
+                f.write(output)
+            output = ""
+            blast_file_count += 1
+            out_file = f"{str(filename.group(1))}/{phage_id}_blast_{blast_file_count}.fasta"
+            files_to_zip.append(out_file)
+
+    with open(out_file, "w") as f:
+        f.write(output)
+    
+    # zip all out_files together.
+    zip_file = zipfile.ZipFile(f"{str(filename.group(1))}/{phage_id}_blast.zip", 'w', zipfile.ZIP_DEFLATED)
+    for filename in files_to_zip:
+        arcname = filename.rsplit('/', 1)[-1].lower()
+        zip_file.write(filename, arcname)
+    zip_file.close()
+    
+    # delete files that are not in zip folder.
+    USER_FOLDER = UPLOAD_FOLDER[:-8]
+    for filename in os.listdir(os.path.join(USER_FOLDER)):
+        if filename.endswith(".fasta"):
+            os.remove(os.path.join(USER_FOLDER, filename))
+
+    return blast_file_count
+
+# ----- BLAST CREATION HELPER FUNCTIONS ------
+def get_stop_options(genome, start, strand):
+    """Finds the next stop codon given a start codon index.
+
+    Args:
+        genome:
+            The genome of the phage.
+        start:
+            The location of the start codon.
+        strand:
+            Complimentary or direct strand.
+
+    Returns:
+        The stop codon index.
+    """
+    
+    bacteria_stop_codons = ["TAG", "TAA", "TGA", "tag", "taa", "tga"]
+    start -= 1
+    gene = ""
+    if (strand != "-"):
+        gene = genome[start:]
+    else:
+        gene = genome.reverse_complement()[start:]
+    for index in range(0, len(gene), 3):
+        codon = gene[index:index + 3]
+        if codon in bacteria_stop_codons:
+            return (start + index + 3)
+
+def get_starts_stops(strand, genome):
+    """Finds alternative, possible start and stop positions for a given CDS. 
+    
+    Args:
+        cds_id:
+            The ID of the CDS.
+        genome:
+            The genome of the phage.
+
+    Returns:
+        start_options, stop_options: 
+            list of alternative starts and an associated list of alternative stops.
+    """
+
+    genome_length = len(genome)
+    possible_start_options = get_start_options(genome, genome_length - 1, strand, 0)
+
+    start_options = []
+    stop_options = []
+    for start in possible_start_options:
+        stop_options.append(get_stop_options(genome, start, strand))
+        if stop_options[-1] is None:
+            stop_options.pop()
+        elif stop_options[-1] - start < 30:
+            stop_options.pop()
+        else:
+            if strand == '+':
+                start_options.append(start)
+            else:
+                start_options.append(genome_length - start + 1)
+                stop = stop_options.pop()
+                stop_options.append(genome_length - stop + 1)
+
+    if strand == '+':
+        return start_options, stop_options
+    else:
+        return stop_options, start_options
+
+def get_start_options(genome, maximum, strand, minimum):
+    """Finds all the start codons within a range of DNA indicated by the minimum and maximum parameters.
+
+    Args:
+        genome:
+            The genome of the phage.
+        maximum:
+            The max index to search for start codons.
+        strand:
+            Complimentary or direct strand.
+        minimum:
+            The minimum index to search for start codons.
+    """
+
+    bacteria_start_codons = ["ATG", "GTG", "TTG", "atg", "gtg", "ttg"]
+    start_options = []
+    maximum += 3
+    gene = ""
+    if (strand != "-"):
+        gene = genome[minimum:maximum]
+    else:
+        gene = genome.reverse_complement()[minimum:maximum]
+    for index in range(0, len(gene)):
+        codon = gene[index:index + 3]
+        if codon in bacteria_start_codons:
+            start_options.append(minimum + index + 1)
+    return start_options
+
+def get_sequence(genome, strand, left, right):
+    """Gets sequence (ranging from left to right) of the direct or complementary strand of genome.
+
+    Args:
+        genome:
+            The genome of the phage.
+        strand:
+            Direct or complimentary strand.
+        left:
+            The index of the left codon.
+        right:
+            The index of the right codon.
+    
+    Returns:
+        The sequence.
+    """
+    if strand == '-':
+        return genome.reverse_complement()[left : right]
+    else:
+        return genome[left : right]

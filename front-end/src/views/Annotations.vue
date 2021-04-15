@@ -590,7 +590,7 @@ export default {
               this.statusTitle = "ERROR";
               this.statusMessage = `An unknown error occurred. 
                                     Try removing and reuploading the BLAST files. 
-                                    If you ignore this error not all of your BLAST results will be shown. 
+                                    If you ignore this error not all of your BLAST results or ORFs will be shown. 
                                     If this error continues, please contact us by visiting the 'about' page.`;
               this.$bvToast.show('annotations-status');
             } else if (response.data !== 'complete') {
