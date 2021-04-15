@@ -39,9 +39,10 @@ def get_annotations_data(phage_id):
     response_object['short'] = setting.short
     annotations = []
     for cds in db.session.query(Annotations).filter_by(phage_id=phage_id).order_by(Annotations.left):
+        print(cds.function)
         function = cds.function[:cds.function.find('#')]
-        if cds.function == "None selected":
-            function = "None selected"
+        if cds.function.find('#') is -1:
+            function = cds.function
         annotations.append({'id': cds.id,
                             'left': cds.left,
                             'right': cds.right,

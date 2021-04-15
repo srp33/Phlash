@@ -20,17 +20,19 @@
       <div class="alert alert-secondary">
         <hr />
         <p><strong>Instructions</strong></p>
-        <p>
-          Here you can make any necessary changes to this CDS by editing its
+        <div>
+          <div v-if="!viewOnly">Here you can make any necessary changes to this CDS by editing its
           start and stop sites and its function. Before making any final
           decisions you should review and consider all of the information below
           including the alternative open reading frames, the coding potential
-          graphs, and the BLAST results. The range of alternate open reading frames 
-          and BLAST results shown can be changed in 'Settings'  Click 'Save' to save changes made to
-          this CDS or you can click 'Delete' if you wish to remove this CDS.
-          Above you can see generic information for the current CDS including
+          graphs, and the BLAST results. Click 'Save' to save changes made to this CDS 
+          or you can click 'Delete' if you wish to remove this CDS.</div>
+          <div v-else>Here you can view alternative open reading frames, the coding potential
+          graphs, and the BLAST results. Click 'Save Notes' to save any edits that are made to the notes.
+          The range of alternate open reading frames and BLAST results shown can be changed in 'Settings'.</div>
+          Below you can see generic information for the current CDS including
           which auto-annotation programs called that gene.
-        </p>
+        </div>
         <hr />
         <div style="float: right; width: 50%">
           <p><strong>Notes:</strong></p>
@@ -53,10 +55,14 @@
           <strong>Called by:</strong> {{ this.calledBy }}<br />
           <strong>Product:</strong> {{ displayFunction }}
         </p>
-        <button type="button" class="btn btn-dark btn-action" @click="editCDS">
+        <button v-if="!viewOnly" type="button" class="btn btn-dark btn-action" @click="editCDS">
           <strong>&#9998; Save</strong>
         </button>
+        <button v-else type="button" class="btn btn-dark btn-action" @click="editNotes">
+          <strong>&#9998; Save Notes</strong>
+        </button>
         <button
+          v-if="!viewOnly"
           type="button"
           class="btn btn-dark btn-action"
           @click="deleteCDS($route.params.cdsID)"
@@ -115,7 +121,8 @@
                         class="btn btn-dark btn-sm"
                         @click="setORF(left, dirRightOptions[index], '+')"
                       >
-                        <strong>Select</strong>
+                        <strong v-if="!viewOnly">Select</strong>
+                        <strong v-else>View</strong>
                       </button>
                     </td>
                   </tr>
@@ -139,7 +146,8 @@
                         class="btn btn-dark btn-sm"
                         @click="setORF(left, compRightOptions[index], '-')"
                       >
-                        <strong>Select</strong>
+                        <strong v-if="!viewOnly">Select</strong>
+                        <strong v-else>View</strong>
                       </button>
                     </td>
                   </tr>
@@ -205,7 +213,7 @@
               currentCDS.strand
           ]
         "
-        :allowSelect="true"
+        :viewOnly="viewOnly"
         @newFunction="setFunction"
       />
       <hr />
@@ -231,10 +239,14 @@
           <strong>Called by:</strong> {{ this.calledBy }}<br />
           <strong>Product:</strong> {{ displayFunction }}
         </p>
-        <button type="button" class="btn btn-dark btn-action" @click="editCDS">
+        <button v-if="!viewOnly" type="button" class="btn btn-dark btn-action" @click="editCDS">
           <strong>&#9998; Save</strong>
         </button>
+        <button v-else type="button" class="btn btn-dark btn-action" @click="editNotes">
+          <strong>&#9998; Save Notes</strong>
+        </button>
         <button
+          v-if="!viewOnly"
           type="button"
           class="btn btn-dark btn-action"
           @click="deleteCDS($route.params.cdsID)"
@@ -289,7 +301,6 @@ import BlastResults from '../components/BlastResults.vue';
 import Graphs from '../components/Graphs.vue';
 import Loading from 'vue-loading-overlay';
 import 'vue-loading-overlay/dist/vue-loading.css';
-import { LoaderPlugin } from 'vue-google-login';
 import Vue from 'vue';
 
 export default {
@@ -360,9 +371,6 @@ export default {
   },
 
   beforeCreate() {
-    Vue.use(LoaderPlugin, {
-      client_id: process.env.GOOGLE_CLIENT_ID
-    });
     Vue.GoogleAuth.then(auth2 => {
       if (!auth2.isSignedIn.get()) {
         this.$router.push('/');
@@ -439,6 +447,12 @@ export default {
             this.$router.push(`/annotations/${this.$route.params.phageID}`);
           }
           this.currentCDS = response.data.cds;
+          this.updatedCDS.id = this.currentCDS.id;
+          this.updatedCDS.left = this.currentCDS.left;
+          this.updatedCDS.right = this.currentCDS.right;
+          this.updatedCDS.strand = this.currentCDS.strand;
+          this.updatedCDS.status = this.currentCDS.status;
+          this.updatedCDS.function = this.currentCDS.function;
           if (this.currentCDS.function !== 'DELETED') {
             this.newFunction = this.currentCDS.function;
             this.displayFunction = this.newFunction;
@@ -549,7 +563,7 @@ export default {
      */
     navNextCDS() {
       var cont = true;
-      if (!this.saved) {
+      if (!this.saved && !this.viewOnly) {
         cont = confirm('Are you sure you want to continue without saving?');
       }
       if (cont === true) {
@@ -570,7 +584,7 @@ export default {
      */
     navPrevCDS() {
       var cont = true;
-      if (!this.saved) {
+      if (!this.saved && !this.viewOnly) {
         cont = confirm('Are you sure you want to continue without saving?');
       }
       if (cont === true) {
@@ -594,17 +608,42 @@ export default {
       this.updatedCDS = this.currentCDS;
       this.updatedCDS.left = this.newLeft;
       this.updatedCDS.right = this.newRight;
-      this.updatedCDS.function = '@' + this.newFunction;
+      // if (this.updatedCDS.function.charAt(0) != '@') {
+      //   this.updatedCDS.function = '@' + this.newFunction;
+      // }
       const payload = {
         id: this.updatedCDS.id,
         left: this.updatedCDS.left,
         right: this.updatedCDS.right,
         strand: this.updatedCDS.strand,
-        function: this.updatedCDS.function,
+        function: this.newFunction,
         notes: this.notes,
         status: this.currentCDS.status,
       };
       this.updateCDS(payload, this.updatedCDS.id);
+    },
+
+    /**
+     * Changes the CDS data to reflect the user's changes.
+     */
+    editNotes() {
+      const payload = {
+        notes: this.notes,
+      };
+      axios
+        .put(
+          process.env.VUE_APP_BASE_URL +
+            `/annotations/cds/${this.$route.params.phageID}/${this.updatedCDS.id}`,
+          payload
+        )
+        .then(() => {
+          this.statusMessage = `The CDS ${this.updatedCDS.id} has been saved.`;
+          this.statusTitle = "SAVED";
+          this.$bvToast.show('cds-status');
+        })
+        .catch((error) => {
+          console.error(error);
+        });
     },
 
     /**
@@ -655,7 +694,7 @@ export default {
       let match = funct.match(/(.*)##(.*)/);
       this.displayFunction = match[1];
       console.log(this.displayFunction);
-      this.newFunction = funct;
+      this.newFunction = '@' + funct;
     },
 
     /**
@@ -667,7 +706,7 @@ export default {
       this.saved = false;
       if (left !== this.newLeft || right !== this.newRight) {
         this.dataExists = false;
-        this.newFunction = '';
+        this.newFunction = '@None selected';
         this.displayFunction = 'None selected';
         this.newRight = right;
         this.currentCDS.right = right;

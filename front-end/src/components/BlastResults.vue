@@ -1,12 +1,6 @@
 <template>
   <div id="wrapper">
     <div class="table-responsive">
-      <div v-if="showWarning" class="alert alert-warning">
-        <strong
-          >This function does not correspond to the selected open reading
-          frame.</strong
-        >
-      </div>
       <table id="blast-table" class="table table-hover">
         <thead>
           <tr>
@@ -33,18 +27,11 @@
             </td>
             <td>
               <button
-                v-if="allowSelect"
                 class="btn btn-dark btn-sm"
                 @click="setFunction(alignment.title, alignment.accession)"
               >
-                <strong>Select</strong>
-              </button>
-              <button
-                v-if="!allowSelect"
-                class="btn btn-dark btn-sm"
-                @click="showWarning = true"
-              >
-                <strong>Select</strong>
+                <strong v-if="!viewOnly">Select</strong>
+                <strong v-else>View</strong>
               </button>
             </td>
           </tr>
@@ -64,8 +51,7 @@ export default {
   name: 'BlastResults',
   props: {
     blastResults: Array,
-    allowSelect: false,
-    showWarning: false,
+    viewOnly: false,
   },
 
   data() {

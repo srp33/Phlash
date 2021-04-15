@@ -213,6 +213,7 @@ def get_blast_output_names(phage_id, UPLOAD_FOLDER, type_of_call):
     response_object["file_mods"] = file_mods
     response_object["in_process"] = False
     response_object["position"] = -1
+    response_object["result"] = "not complete"
     task = db.session.query(Tasks).filter_by(phage_id=phage_id).filter_by(function="auto_annotate").first()
     if (task is not None):
         curr_tasks = db.session.query(Tasks).filter_by(complete=False).order_by(Tasks.time)

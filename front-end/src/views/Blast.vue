@@ -324,9 +324,6 @@ export default {
   },
 
   beforeCreate() {
-    Vue.use(LoaderPlugin, {
-      client_id: process.env.GOOGLE_CLIENT_ID
-    });
     Vue.GoogleAuth.then(auth2 => {
       if (!auth2.isSignedIn.get()) {
         this.$router.push('/');
@@ -739,6 +736,7 @@ export default {
      * Gets all of the names of all of the blast output files that have been uploaded.
      * Gets all of the names of blast files that failed to upload correctly.
      * Determines if the needed number of files have been uploaded.
+     * Determines if auto-annotation is complete.
      */
     displayOutputFiles() {
       this.interval = setInterval(() => {
@@ -773,7 +771,7 @@ export default {
                 this.statusTitle = "FINISHED";
                 this.$bvToast.show('blast-status');
               }
-              else {
+              else if (response.data.result != "not complete") {
                 this.statusMessage = `An unknown error occured while auto-annotating. 
                                       Please reupload your FASTA file and try again. 
                                       If this problem persits please contact us by visiting the 'about' page.`;

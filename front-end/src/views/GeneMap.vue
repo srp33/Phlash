@@ -10,19 +10,6 @@
       :logout="true"
     />
     <div class="container">
-      <loading
-        :active.sync="pageLoading"
-        :is-full-page="true"
-        :height="100"
-        :width="100"
-      ></loading>
-      <loading
-        :active.sync="pageLoading"
-        :is-full-page="true"
-        :height="100"
-        :width="100"
-        >Creating Genome Map...</loading
-      >
       <h1>Genome Map</h1>
       <div class="alert alert-secondary">
         <hr />
@@ -64,6 +51,19 @@
       </div>
     </div>
     <div style="overflow-x:auto; width=100%;">
+      <loading
+        :active.sync="pageLoading"
+        :is-full-page="true"
+        :height="100"
+        :width="100"
+      ></loading>
+      <loading
+        :active.sync="pageLoading"
+        :is-full-page="true"
+        :height="100"
+        :width="100"
+        >Creating Genome Map...</loading
+      >
       <img v-bind:src="image" />
     </div>
     <div class="container">
@@ -119,9 +119,6 @@ export default {
   },
 
   beforeCreate() {
-    Vue.use(LoaderPlugin, {
-      client_id: process.env.GOOGLE_CLIENT_ID
-    });
     Vue.GoogleAuth.then(auth2 => {
       if (!auth2.isSignedIn.get()) {
         this.$router.push('/');

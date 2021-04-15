@@ -85,7 +85,7 @@ def check_upload(phage_id):
     """
     UPLOAD_FOLDER = os.path.join(ROOT, 'users', phage_id, 'uploads')
 
-    return jsonify(check_uploaded_files(UPLOAD_FOLDER))
+    return jsonify(check_uploaded_files(UPLOAD_FOLDER, phage_id))
 
 @app.route('/phlash_api/check_user/<current_user>/<phage_id>', methods=['GET'])
 def check_user(current_user, phage_id):
@@ -210,7 +210,7 @@ def create_genbank(phage_id, file_method):
     if request.method == "POST":
         return get_genbank(UPLOAD_FOLDER, phage_id, request)
 
-@app.route('/phlash_api/annotations/cds/<phage_id>/<cds_id>', methods=['GET', 'POST', 'PUT', 'DELETE'])
+@app.route('/phlash_api/annotations/cds/<phage_id>/<cds_id>', methods=['GET', 'PUT'])
 def cds_annotation(phage_id, cds_id):
     """
     Annotation information for each CDS.

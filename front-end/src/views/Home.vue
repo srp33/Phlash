@@ -230,9 +230,6 @@ export default {
   },
 
   created() {
-    Vue.use(LoaderPlugin, {
-      client_id: process.env.GOOGLE_CLIENT_ID
-    });
     Vue.GoogleAuth.then(auth2 => {
       if (auth2.isSignedIn.get()) {
         this.loggedIn = true;

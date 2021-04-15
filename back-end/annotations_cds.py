@@ -38,11 +38,14 @@ def annotate_cds(phage_id, request, cds_id, UPLOAD_FOLDER):
     put_data = request.get_json()
     cds = Annotations.query.filter_by(phage_id=phage_id).filter_by(id=cds_id).first()
     if cds:
-        cds.strand = put_data.get('strand')
-        cds.left = put_data.get('left')
-        cds.right = put_data.get('right')
-        cds.function = put_data.get('function')
-        cds.notes = put_data.get('notes')
+        if put_data.get('strand'):
+            cds.strand = put_data.get('strand')
+            cds.left = put_data.get('left')
+            cds.right = put_data.get('right')
+            cds.function = put_data.get('function')
+            cds.notes = put_data.get('notes')
+        else:
+            cds.notes = put_data.get('notes')
         response_object['message'] = 'CDS updated!'
     else:
         response_object['message'] = 'CDS did not update.'
@@ -181,7 +184,7 @@ def get_blasts(phage_id, left):
     comp_rights = []
     lefts = []
     rights = []
-    setting = db.session.query(Settings).order_by(Settings.back_left_range).first()
+    setting = db.session.query(Settings).filter_by(phage_id=phage_id).first()
     minimum = left - setting.back_left_range
     maximum = left + setting.forward_left_range
     for blast in db.session.query(Blast_Results).filter_by(phage_id=phage_id).filter_by(strand='+').order_by(Blast_Results.left):

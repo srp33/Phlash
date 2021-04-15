@@ -16,7 +16,6 @@
         :height="100"
         :width="100"
       ></loading>
-      <h2 v-if="viewOnly">&#128065; VIEW ONLY &#128065;</h2>
       <h1>Annotations</h1>
       <div class="alert alert-secondary">
         <hr />
@@ -74,7 +73,7 @@
             <strong>&#43; Add CDS</strong>
           </button>
         </p>
-        <p v-if="!viewOnly">
+        <p v-else>
           <strong>View: </strong>When clicked, the annotations for this CDS may be viewed.<br />
           <strong>White background: </strong>This CDS has already been updated by the owner.
         </p>
@@ -100,7 +99,7 @@
         </div>
         <hr />
       </div>
-      <div v-if="blastLoading" class="alert alert-primary alert-dismissible">
+      <div v-if="blastLoading" class="alert alert-primary alert-dismissible text-size">
         <a href="#" class="close" data-dismiss="alert" aria-label="close"
           >&times;</a
         >
@@ -149,26 +148,23 @@
             </thead>
             <tbody>
               <tr v-for="(curr, index) in phageAnnotations" :key="index">
-                <td
-                  v-if="
-                    curr.function === '@DELETED' || curr.status === 'trnaDELETED'
-                  "
-                >
-                  {{ curr.id }}
-                </td>
-                <td v-else>{{ curr.id }}</td>
+                <!-- ID -->
+                <td>{{ curr.id }}</td>
+                <!-- Left -->
                 <td
                   v-if="
                     curr.function === '@DELETED' || curr.status === 'trnaDELETED'
                   "
                 ></td>
                 <td v-else>{{ curr.left }}</td>
+                <!-- Right -->
                 <td
                   v-if="
                     curr.function === '@DELETED' || curr.status === 'trnaDELETED'
                   "
                 ></td>
                 <td v-else>{{ curr.right }}</td>
+                <!-- Strand -->
                 <td
                   v-if="
                     curr.function === '@DELETED' || curr.status === 'trnaDELETED'
@@ -176,6 +172,7 @@
                 ></td>
                 <td v-else-if="curr.strand === '-'">Complementary</td>
                 <td v-else>Direct</td>
+                <!-- Product -->
                 <td
                   v-if="
                     curr.function === '@DELETED' || curr.status === 'trnaDELETED'
@@ -196,6 +193,7 @@
                 <td v-else style="font-size: 1.2em">
                   {{ curr.function.substring(1, 14) }}...
                 </td>
+                <!-- Status -->
                 <td
                   v-if="
                     curr.function === '@DELETED' || curr.status === 'trnaDELETED'
@@ -210,6 +208,7 @@
                 <td v-else-if="curr.status === 'Fail'" style="color: #d95f02">
                   {{ getStatus(index) }}
                 </td>
+                <!-- Action -->
                 <td
                   v-if="
                     (curr.function === '@DELETED' || curr.status === 'trnaDELETED') && !viewOnly
@@ -228,7 +227,6 @@
                     curr.function === '@DELETED' || curr.status === 'trnaDELETED'
                   "
                 >
-                  Deleted
                 </td>
                 <td v-else-if="curr.status === 'tRNA' && !viewOnly">
                   <button
@@ -240,7 +238,6 @@
                   </button>
                 </td>
                 <td v-else-if="curr.status === 'tRNA'">
-                  tRNA
                 </td>
                 <td v-else>
                   <router-link
@@ -429,21 +426,6 @@ export default {
         force: false,
         read: [],
       },
-      genbankAnnotations: {
-        phageName: "",
-        source: "",
-        organism: "",
-        isolationSource: "",
-        labHost: "",
-        identifiedBy: "",
-        authors: "",
-        title: "",
-        journal: "",
-        country: "USA",
-        molType: "genomic DNA",
-        notes: "complete genome",
-        includeNotes: false,
-      },
       strandOptions: [
         { value: null, text: "Please select a direction" },
         { value: "+", text: "+ (Direct)" },
@@ -472,9 +454,6 @@ export default {
   },
 
   beforeCreate() {
-    Vue.use(LoaderPlugin, {
-      client_id: process.env.GOOGLE_CLIENT_ID
-    });
     Vue.GoogleAuth.then(auth2 => {
       if (!auth2.isSignedIn.get()) {
         this.$router.push('/');
@@ -541,12 +520,13 @@ export default {
         )
         .then((response) => {
           this.phageAnnotations = response.data.annotations;
+          console.log(this.phageAnnotations[0]);
+          console.log(this.phageAnnotations[1]);
           this.gap = response.data.gap;
           this.overlap = response.data.overlap;
           this.oppositeGap = response.data.opposite_gap;
           this.short = response.data.short;
           this.pageLoading = false;
-          this.genbankAnnotations.phageName = this.$route.params.phageID;
           for (var i = 0; i < this.phageAnnotations.length; i += 1) {
             if (this.phageAnnotations[i].function !== 'None selected')
               this.completedGenes += 1;
@@ -731,7 +711,7 @@ export default {
         if (index + nextGene >= this.phageAnnotations.length) {
           return status;
         }
-        if (this.phageAnnotations[index + nextGene].function !== 'DELETED') {
+        if (this.phageAnnotations[index + nextGene].function !== '@DELETED') {
           overlap =
             this.phageAnnotations[index].right - this.phageAnnotations[index + nextGene].left;
         } else {
@@ -765,7 +745,7 @@ export default {
         if (index - nextGene < 0) {
           return status;
         }
-        if (this.phageAnnotations[index - nextGene].function !== 'DELETED') {
+        if (this.phageAnnotations[index - nextGene].function !== '@DELETED') {
           leadingOverlap =
             this.phageAnnotations[index - nextGene].right - this.phageAnnotations[index].left;
         } else {

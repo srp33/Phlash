@@ -120,9 +120,6 @@ export default {
   },
 
   beforeCreate() {
-    Vue.use(LoaderPlugin, {
-      client_id: process.env.GOOGLE_CLIENT_ID
-    });
     Vue.GoogleAuth.then(auth2 => {
       if (!auth2.isSignedIn.get()) {
         this.$router.push('/');
@@ -199,7 +196,8 @@ export default {
         url: this.getUploadUrl(),
         addRemoveLinks: true,
         acceptedFiles: '.fasta, .fna, .fa',
-        chunking: false,
+        chunking: true,
+        chunkSize: 1000000,
         maxFiles: 1,
         dictDefaultMessage: 'Drag FASTA file here or click to browse.',
         dictInvalidFileType:

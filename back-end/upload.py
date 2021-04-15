@@ -24,6 +24,7 @@ import models
 import helper
 import shutil
 import pandas as pd
+import re
 
 response_object = {}
 ROOT = os.path.dirname(os.path.abspath(__file__))
@@ -33,7 +34,7 @@ GDATA_EXTENSIONS = set(['.gdata'])
 LDATA_EXTENSIONS = set(['.ldata'])
 
 # ------------------------------ MAIN FUNCTIONS ------------------------------
-def check_uploaded_files(UPLOAD_FOLDER):
+def check_uploaded_files(UPLOAD_FOLDER, phage_id):
     """Checks if fasta file is uploaded and if blast results have been added to the data base.
 
     Args:
@@ -50,7 +51,7 @@ def check_uploaded_files(UPLOAD_FOLDER):
         if ext in FASTA_EXTENSIONS:
             response_object["fasta"] = handle_fasta(UPLOAD_FOLDER)
 
-    response_object["blast_completed"] = False if db.session.query(Blast_Results).first() is None else True
+    response_object["blast_completed"] = False if db.session.query(Blast_Results).filter_by(phage_id=phage_id).first() is None else True
 
     return response_object
 
@@ -86,15 +87,15 @@ def delete_file(phage_id, file_path, UPLOAD_FOLDER):
         A dictionary containing a success message.
     """
     try:
-        # if (db.session.query(Tasks).filter_by(phage_id=phage_id).first() is None):
-        if (file_path.endswith(".fasta") or file_path.endswith(".fna") or file_path.endswith(".fa")):
-            db.session.query(Files).filter_by(phage_id=phage_id).delete()
-            db.session.query(Annotations).filter_by(phage_id=phage_id).delete()
-            db.session.query(Blast_Results).filter_by(phage_id=phage_id).delete()
-            db.session.query(Gene_Calls).filter_by(phage_id=phage_id).delete()
-            db.session.query(Tasks).filter_by(phage_id=phage_id).delete()
-            for file in os.listdir(UPLOAD_FOLDER):
-                os.remove(os.path.join(UPLOAD_FOLDER, file))
+        if (db.session.query(Tasks).filter_by(phage_id=phage_id).first() is None):
+            if (file_path.endswith(".fasta") or file_path.endswith(".fna") or file_path.endswith(".fa")):
+                db.session.query(Files).filter_by(phage_id=phage_id).delete()
+                db.session.query(Annotations).filter_by(phage_id=phage_id).delete()
+                db.session.query(Blast_Results).filter_by(phage_id=phage_id).delete()
+                db.session.query(Gene_Calls).filter_by(phage_id=phage_id).delete()
+                db.session.query(Tasks).filter_by(phage_id=phage_id).delete()
+                for file in os.listdir(UPLOAD_FOLDER):
+                    os.remove(os.path.join(UPLOAD_FOLDER, file))
     except:
         print("error")
         response_object["status"] = "error in deleting files"
@@ -119,17 +120,17 @@ def dropzone_fasta(UPLOAD_FOLDER, request, phage_id):
         phage_id:
             The ID of the current user.
     """
-
-    file = request.files['file']
-    contents = str(file.read(), 'utf-8')
-    print(request.files)
-    if file:
-        with open(os.path.join(UPLOAD_FOLDER, phage_id + ".fasta"), 'w') as f:
-            f.write(contents)
+    if (db.session.query(Tasks).filter_by(phage_id=phage_id).first() is None):
+        file = request.files['file']
+        contents = str(file.read(), 'utf-8')
+        print(request.files)
+        if file:
+            with open(os.path.join(UPLOAD_FOLDER, phage_id + ".fasta"), 'a') as f:
+                f.write(contents)
 
 # ---------- FASTA FILE HELPER FUNCTIONS ----------
 def handle_fasta(UPLOAD_FOLDER):
-    """Runs GeneMark and parses through ldata file.
+    """Ensures that the file is in FastA format.
 
     Args:
         UPLOAD_FOLDER:
@@ -137,5 +138,15 @@ def handle_fasta(UPLOAD_FOLDER):
     """
     fasta_file = helper.get_file_path("fasta", UPLOAD_FOLDER)
     with open(fasta_file, "r") as handle:
-        fasta = SeqIO.parse(handle, "fasta")
-        return any(fasta)
+        lines = handle.readlines()
+        correct_start = False
+        not_empty = False
+        for line in lines:
+            if line.startswith('>') and not correct_start:
+                correct_start = True
+            elif not bool(re.match('^[ACTGN\n]+$', line.upper())):
+                print(line.upper())
+                return False
+            elif len(line) > 3:
+                not_empty = True
+        return correct_start and not_empty

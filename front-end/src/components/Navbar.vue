@@ -7,17 +7,6 @@
       <a class="navbar-brand" href="/">
         <img id="logo" src="/phlash/images/logonav.png" width="50" />
       </a>
-      <button
-        class="navbar-toggler"
-        type="button"
-        data-toggle="collapse"
-        data-target="#navbarNavDropdown"
-        aria-controls="navbarNavDropdown"
-        aria-expanded="false"
-        aria-label="Toggle navigation"
-      >
-        <span class="navbar-toggler-icon"></span>
-      </button>
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav">
           <li class="nav-item dropdown">
@@ -27,7 +16,7 @@
             <div class="dropdown-menu" aria-labelledby="navbarDropdown">
               <a class="dropdown-item" href="#"><router-link to="/" style="color: black">home</router-link></a>
               <a v-if="settings" class="dropdown-item" href="#" @click="getSettings">settings</a>
-              <a v-if="annotations" class="dropdown-item" href="#" @click="showShare = true">share</a>
+              <a v-if="annotations && blast" class="dropdown-item" href="#" @click="showShare = true">share</a>
               <div v-if="logout" class="dropdown-divider"></div>
               <a v-if="logout" class="dropdown-item" style="margin-left:0px; text-align:left;" href="#"><GoogleLogin class="btn btn-dark btn-block" :params="params" :onSuccess="onSuccess" :logoutButton=true>logout</GoogleLogin></a>
             </div>
@@ -79,6 +68,18 @@
           </li>
         </ul>
       </div>
+      <span v-if="annotations && !blast" class="navbar-text">&#128065; VIEW ONLY &#128065;</span>
+      <button
+        class="navbar-toggler"
+        type="button"
+        data-toggle="collapse"
+        data-target="#navbarNav"
+        aria-controls="navbarNav"
+        aria-expanded="false"
+        aria-label="Toggle navigation"
+      >
+        <span class="navbar-toggler-icon"></span>
+      </button>
     </nav>
     <b-modal
       class="text-size"
