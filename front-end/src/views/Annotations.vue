@@ -447,7 +447,7 @@ export default {
       oppositeGap: 50,
       short: 200,
       interval: null,
-      waitMessage: "Your Blast results will be interpretted.",
+      waitMessage: "Your Blast results will be interpreted.",
       statusMessage: "",
       statusTitle: "",
     };
@@ -582,7 +582,7 @@ export default {
               this.blastLoading = false;
               this.stopChecking();
               this.statusTitle = "FINISHED";
-              this.statusMessage = "All of the BLAST results have finished being interpretted.";
+              this.statusMessage = "All of the BLAST results have finished being interpreted.";
               this.$bvToast.show('annotations-status');
             } else if (response.data === 'error') {
               this.blastLoading = false;
@@ -595,9 +595,9 @@ export default {
               this.$bvToast.show('annotations-status');
             } else if (response.data !== 'complete') {
               if (response.data === '0') {
-                this.waitMessage = "Your Blast results are currently being interpretted. This may take several minutes."
+                this.waitMessage = "Your Blast results are currently being interpreted. This may take several minutes."
               } else {
-                this.waitMessage = "Your Blast results are number " + response.data + " in line to be interpretted."
+                this.waitMessage = "Your Blast results are number " + response.data + " in line to be interpreted."
               }
             }
           })

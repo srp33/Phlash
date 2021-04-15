@@ -1,7 +1,5 @@
 # PHLASH
 
-*STILL IN DEVELOPMENT.*
-
 ## Introduction
 *Phlash* is an interactive web application that accelerates the manual process of bacteriophage genome annotation. Please watch this [demo](https://www.youtube.com/watch?v=dxf7szHk5aI&feature=youtu.be) to get a preview of how it works! 
 

@@ -226,7 +226,8 @@
               that file. Note that if you attempt to upload a duplicate file it
               will not upload. If you rename the files, do not include any
               special characters, including whitespace, as this may result in
-              errors.
+              errors. <div style="color:red">Please, DO NOT leave this page while the files are uploading 
+              as this may result in errors.</div>
               <vue-dropzone
                 ref="myVueDropzone"
                 id="dropzone"
@@ -818,7 +819,7 @@ export default {
         )
         .then((response) => {
           if (response.data === 'fail') {
-            this.statusMessage = `The BLAST results are currently being interpretted which may take several minutes. 
+            this.statusMessage = `The BLAST results are currently being interpreted which may take several minutes. 
                                   Removal of the BLAST output files is not possible at this time.`;
             this.statusTitle = "BLAST OUTPUT FILES IN USE";
             this.$bvToast.show('blast-status');
