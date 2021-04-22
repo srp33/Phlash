@@ -11,11 +11,10 @@ import { LoaderPlugin } from 'vue-google-login';
 
 Vue.use(BootstrapVue);
 Vue.use(GSignInButton);
-// console.log('http://daniel.byu.edu:5000/phlash_api/google_client_id.txt'.toURL().text);
 console.log(process.env.VUE_APP_BASE_URL);
 console.log(process.env.GOOGLE);
 Vue.use(LoaderPlugin, {
-  client_id: "780981769382-odbkfqn6mr1f2d9kkeaokbks7eqfrvu7.apps.googleusercontent.com"
+  client_id: process.env.GOOGLE
 });
 
 Vue.GoogleAuth.then(auth2 => {
