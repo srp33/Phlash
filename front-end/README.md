@@ -3,9 +3,9 @@
 ## Project setup
 - Create a google client ID for the application.
     - Visit [Google Cloud Platform](https://console.cloud.google.com/apis/credentials) and click "Create Credentials" and then "OAuth client ID". 
-    - Enter the URL that points to the server under "Authorized JavaScript origins". 
+    - Enter the URL that points to the server you are hosting under "Authorized JavaScript origins". 
     - Copy your client ID.
-- Create a file called `.env.production` in the front-end directory to point to the API (back-end) server you are hosting and to store your google client id. 
+- Create a file called `.env.production` in the front-end directory to point to the API (back-end) server and to store your google client id. 
     - Within the file add the two following lines with your url and client ID:  
         - VUE_APP_BASE_URL=https://example.url:5000/phlash_api  
         - GOOGLE=my-clientID.apps.googleusercontent.com  
