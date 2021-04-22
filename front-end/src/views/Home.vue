@@ -206,7 +206,7 @@ export default {
       dateToBeDeleted: null,
       blastComplete: false,
       params: {
-        client_id: process.env.GOOGLE_CLIENT_ID,
+        client_id: process.env.VUE_APP_API_KEY,
       },
       renderParams: {
         width: 250,
@@ -220,7 +220,7 @@ export default {
 
   beforeCreate() {
     Vue.use(LoaderPlugin, {
-      client_id: process.env.GOOGLE_CLIENT_ID
+      client_id: process.env.VUE_APP_API_KEY
     });
     Vue.GoogleAuth.then(auth2 => {
       if (auth2.isSignedIn.get()) {
@@ -233,13 +233,12 @@ export default {
     Vue.GoogleAuth.then(auth2 => {
       if (auth2.isSignedIn.get()) {
         this.loggedIn = true;
-        console.log(this.loggedIn);
-        this.user = auth2.currentUser.get().Qs.zt;
-        this.userName = auth2.currentUser.get().Qs.Te;
-        this.imageURL = auth2.currentUser.get().Qs.getImageUrl();
-        console.log(this.imageURL);
+        console.log(auth2.currentUser.get());
+        this.user = auth2.currentUser.get().ft.Qt;
+        this.userName = auth2.currentUser.get().ft.Ue;
+        this.imageURL = auth2.currentUser.get().ft.getImageUrl();
         axios
-          .get(process.env.VUE_APP_BASE_URL + `/get_user_data/${auth2.currentUser.get().Qs.zt}`)
+          .get(process.env.VUE_APP_BASE_URL + `/get_user_data/${this.user}`)
           .then((response) => {
             console.log(response.data);
             this.loggedIn = true;
@@ -255,7 +254,7 @@ export default {
               this.phageViewIDs = response.data.id_view_list;
               this.phageViewPages = response.data.phage_view_pages;
             }
-            document.getElementById('userImage').src = auth2.currentUser.get().Qs.getImageUrl();
+            document.getElementById('userImage').src = this.imageURL;
           })
           .catch((error) => {
             console.error(error);

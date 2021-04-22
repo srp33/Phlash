@@ -78,7 +78,7 @@ export default {
 
   beforeCreate() {
     Vue.use(LoaderPlugin, {
-      client_id: process.env.GOOGLE_CLIENT_ID
+      client_id: process.env.VUE_APP_API_KEY
     });
     Vue.GoogleAuth.then(auth2 => {
       if (auth2.isSignedIn.get()) {

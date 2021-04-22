@@ -278,23 +278,6 @@
                       <strong>View</strong>
                     </button>
                   </router-link>
-                  <!-- <router-link
-                    :to="{
-                      name: 'CDS',
-                      params: {
-                        phageID: $route.params.phageID,
-                        cdsID: curr.id,
-                      },
-                    }"
-                  >
-                    <button
-                      class="btn btn-dark btn-sm"
-                      style="width: 6.25em"
-                      v-if="curr.function === 'None selected'"
-                    >
-                      <strong>Annotate</strong>
-                    </button>
-                  </router-link> -->
                 </td>
               </tr>
             </tbody>
@@ -391,12 +374,6 @@
       </template>
       <div class="text-size">{{ statusMessage }}</div>
     </b-toast>
-    <!-- <b-toast id="view-only-annotations" toaster="b-toaster-top-center" no-auto-hide>
-      <template #toast-title>
-        <strong class="text-size" style="text-align:center;">&#128065; View Only &#128065;</strong>
-      </template>
-      <div class="text-size" style="text-align:center;">You may not edit anything.</div>
-    </b-toast> -->
   </div>
 </template>
 
@@ -459,7 +436,7 @@ export default {
         this.$router.push('/');
       }
       axios
-        .get(process.env.VUE_APP_BASE_URL + `/check_user/${auth2.currentUser.get().Qs.zt}/${this.$route.params.phageID}`)
+        .get(process.env.VUE_APP_BASE_URL + `/check_user/${auth2.currentUser.get().ft.Qt}/${this.$route.params.phageID}`)
         .then((response) => {
           if (response.data === "fail") {
             this.$router.push('/');
