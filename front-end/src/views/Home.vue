@@ -243,6 +243,7 @@ export default {
             console.log(response.data);
             this.loggedIn = true;
             console.log(this.loggedIn);
+            console.log(process.env.VUE_APP_BASE_URL);
             if (response.data !== "empty") {
               this.phageNames = response.data.phage_id_list;
               this.phageCreationDates = response.data.phage_creation_date_list;

@@ -279,6 +279,7 @@ export default {
 
   methods: {
     getSettings() {
+      console.log(process.env.VUE_APP_BASE_URL);
       (this.showSettings = true),
         axios
           .get(
@@ -328,6 +329,7 @@ export default {
       evt.preventDefault();
       this.$refs.shareModal.hide();
       console.log(this.shareEmail);
+      console.log(process.env.VUE_APP_BASE_URL);
       axios
         .post(
           process.env.VUE_APP_BASE_URL +

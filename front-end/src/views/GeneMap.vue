@@ -172,6 +172,7 @@ export default {
   methods: {
 
     getGraph() {
+      console.log(process.env.VUE_APP_BASE_URL);
       axios
         .get(
           process.env.VUE_APP_BASE_URL +
