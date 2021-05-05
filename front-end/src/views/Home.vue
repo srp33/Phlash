@@ -314,7 +314,9 @@ export default {
      * Handles a failed user login.
      */
     onFailure() {
-      this.statusMessage = `Google sign in failed. Please try again.`;
+      this.statusMessage = `Google sign in failed. Please try again.
+                            Note that if cookies are not enabled Google sign in will not work.
+                            If you are in incognito mode on your web browser, make sure to allow cookies.`;
       this.statusTitle = "LOGIN FAILED";
       this.$bvToast.show('home-status');
     },
