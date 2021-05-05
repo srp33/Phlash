@@ -175,7 +175,7 @@ export default {
       console.log(process.env.VUE_APP_BASE_URL);
       axios
         .get(
-          process.env.VUE_APP_BASE_URL +
+          "https://bioapps.byu.edu/phlash_api" +
             `/annotations/geneMap/${this.$route.params.phageID}`
         )
         .then((response) => {
