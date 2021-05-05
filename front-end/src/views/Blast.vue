@@ -783,6 +783,13 @@ export default {
               this.numFiles = response.data.num_files;
               this.orfLoading = false;
               this.blastDownloaded = true;
+              if (response.data.num_files == "error") {
+                this.statusMessage = `An unknown error occured while auto-annotating. 
+                                      Please reupload your FASTA file and try again. 
+                                      If this problem persits please contact us by visiting the 'about' page.`;
+                this.statusTitle = "ERROR";
+                this.$bvToast.show('blast-status');
+              }
             }
           })
           .catch((error) => {

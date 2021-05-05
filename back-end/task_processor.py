@@ -25,9 +25,17 @@ def run_task(task):
     session.commit()
     args = list(task.arguments.split(" "))
     if task.function == "parse_blast":
-        task.result = parse_blast(args[0], args[1], session)
+        try:
+            task.result = parse_blast(args[0], args[1], session)
+        except:
+            task.result = "error"
+            return None   
     elif task.function == "blast_input":
-        task.result = create_blast_input(args[0], args[1])
+        try:
+            task.result = create_blast_input(args[0], args[1])
+        except:
+            task.result = "error"
+            return None
     elif task.function == "auto_annotate":
         try:
             run_genemark(args[0], args[1])
@@ -49,7 +57,11 @@ def run_task(task):
         except:
             task.result = "error"
             return None
-        task.result = auto_annotate(args[0], args[1], session)
+        try:
+            task.result = auto_annotate(args[0], args[1], session)
+        except:
+            task.result = "error"
+            return None
 
 def handle_unfinished_tasks():
     old_tasks = session.query(Tasks).filter_by(complete=False).filter_by(result="executing").order_by(Tasks.time)

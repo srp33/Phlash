@@ -508,7 +508,6 @@ export default {
             if (this.phageAnnotations[i].function !== 'None selected')
               this.completedGenes += 1;
           }
-          // if (this.viewOnly) { this.$bvToast.show('view-only-annotations'); }
           this.parseBlast();
         })
         .catch((error) => {
