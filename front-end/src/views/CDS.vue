@@ -25,7 +25,7 @@
           start and stop sites and its function. Before making any final
           decisions you should review and consider all of the information below
           including the alternative open reading frames, the coding potential
-          graphs, and the BLAST results. Click 'Save' to save changes made to this CDS 
+          graphs, and the BLAST results. Click 'Save' to save changes made to this CDS including the notes 
           or you can click 'Delete' if you wish to remove this CDS.</div>
           <div v-else>Here you can view alternative open reading frames, the coding potential
           graphs, and the BLAST results. Click 'Save Notes' to save any edits that are made to the notes.

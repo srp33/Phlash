@@ -162,9 +162,11 @@ def get_blast_output_names(phage_id, UPLOAD_FOLDER, type_of_call):
         counter = 0
         for curr_task in curr_tasks:
             if curr_task.phage_id == phage_id:
+                response_object["position"] = counter
+                if curr_task.result == "executing":
+                    response_object["position"] = 0
                 break
             counter += 1
-        response_object["position"] = counter
         response_object["in_process"] = True
         if (task.complete):
             response_object["in_process"] = False

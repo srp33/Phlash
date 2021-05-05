@@ -102,6 +102,8 @@ def check_blast_task(phage_id):
         return result
     elif task is None:
         return "complete"
+    elif task.result == "executing":
+        return "0"
     else:
         return str(counter)
 
