@@ -125,7 +125,7 @@ export default {
       } else if (site === 'Contact') {
         window.open('https://biology.byu.edu/piccolo-lab/contact', '_blank');
       } else if (site === 'GitHub') {
-        window.open('https://biology.byu.edu/piccolo-lab', '_blank');
+        window.open('https://github.com/srp33/Phlash', '_blank');
       }
     },
   },
