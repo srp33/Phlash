@@ -22,9 +22,12 @@
         <hr />
         <p><strong>Key</strong></p>
         <p>
-          <strong style="color: #4b72b9">Blue:</strong> An arrow pointing right
+          <strong style="color: #1b9e77">Green:</strong> An arrow pointing right
           indicates a gene on the direct strand.<br />
-          <strong style="color: #e98b69">Orange:</strong> An arrow pointing left
+          <strong style="color: #d95f02">Orange:</strong> An arrow pointing left
+          indicates a gene on the complimentary strand.<br />
+          <strong style="color: #7570b3">Purple:</strong> An arrow pointing right 
+          indicates a tRNA on the direct strand and an arrow pointing left
           indicates a gene on the complimentary strand.<br />
         </p>
         <hr />
@@ -175,7 +178,7 @@ export default {
       console.log(process.env.VUE_APP_BASE_URL);
       axios
         .get(
-          "https://bioapps.byu.edu/phlash_api" +
+          process.env.VUE_APP_BASE_URL +
             `/annotations/geneMap/${this.$route.params.phageID}`
         )
         .then((response) => {

@@ -32,11 +32,17 @@ def get_map(phage_id, UPLOAD_FOLDER):
     """
     features = []
     for cds in db.session.query(Annotations).filter_by(phage_id=phage_id).order_by(Annotations.left):
-        if cds.function != 'DELETED':
+        if cds.function != '@DELETED' and cds.status != 'trnaDELETED':
             if cds.strand == '+':
-                features.append(GraphicFeature(start=cds.left, end=cds.right, strand=+1, color="#add8e6", label=cds.id))
+                if cds.status == "tRNA":
+                    features.append(GraphicFeature(start=cds.left, end=cds.right, strand=+1, color="#7570b3", label=cds.id))
+                else:   
+                    features.append(GraphicFeature(start=cds.left, end=cds.right, strand=+1, color="#1b9e77", label=cds.id))
             else:
-                features.append(GraphicFeature(start=cds.left, end=cds.right, strand=-1, color="#fed8b1", label=cds.id))
+                if cds.status == "tRNA":
+                    features.append(GraphicFeature(start=cds.left, end=cds.right, strand=-1, color="#7570b3", label=cds.id))
+                else:
+                    features.append(GraphicFeature(start=cds.left, end=cds.right, strand=-1, color="#d95f02", label=cds.id))
     fasta_file = helper.get_file_path("fasta", UPLOAD_FOLDER)
     genome = SeqIO.read(fasta_file, "fasta").seq
     sequence = str(genome)
