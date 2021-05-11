@@ -283,7 +283,7 @@ export default {
       (this.showSettings = true),
         axios
           .get(
-            process.env.VUE_APP_BASE_URL +
+            '//bioapps.byu.edu/phlash_api' +
               `/settings/${this.$route.params.phageID}/none`
           )
           .then((response) => {
