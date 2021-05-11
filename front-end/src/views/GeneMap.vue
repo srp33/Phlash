@@ -179,7 +179,7 @@ export default {
       axios
         .get(
           process.env.VUE_APP_BASE_URL +
-            `/annotations/geneMap/${this.$route.params.phageID}`
+            `/annotations/${this.$route.params.phageID}/geneMap`
         )
         .then((response) => {
           this.image =

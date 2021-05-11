@@ -192,6 +192,8 @@ def annotate_data(phage_id, file_method):
             return jsonify(check_blast_task(phage_id))
         elif file_method == "blast":
             return jsonify(add_blast_task(phage_id, UPLOAD_FOLDER))
+        elif file_method == "geneMap":
+            return jsonify(get_map(phage_id, UPLOAD_FOLDER))
         else:
             return jsonify(get_annotations_data(phage_id))
 
