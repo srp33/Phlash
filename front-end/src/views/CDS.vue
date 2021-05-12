@@ -442,7 +442,6 @@ export default {
             `/annotations/cds/${this.$route.params.phageID}/${cdsID}`
         )
         .then((response) => {
-          console.log(response.data);
           if (response.data.message !== 'Finished') {
             this.$router.push(`/annotations/${this.$route.params.phageID}`);
           }
@@ -466,7 +465,6 @@ export default {
             if (this.newFunction[0] === '@') {
               this.displayFunction = this.displayFunction.substring(1);
             }
-            console.log(this.displayFunction);
           }
           this.dirBlastResults = response.data.dir_blast;
           this.compBlastResults = response.data.comp_blast;
@@ -689,11 +687,9 @@ export default {
      * @param {string} function the user selected function.
      */
     setFunction(funct) {
-      console.log(funct);
       this.saved = false;
       let match = funct.match(/(.*)##(.*)/);
       this.displayFunction = match[1];
-      console.log(this.displayFunction);
       this.newFunction = '@' + funct;
     },
 
@@ -743,7 +739,6 @@ export default {
         if (this.currentCDS.strand === '-') {
           this.frame = ((this.currentCDS.right + 2) % 3) + 4;
         } else this.frame = ((this.currentCDS.left + 2) % 3) + 1;
-        console.log(this.frame);
         this.$nextTick().then(() => {
           this.dataExists = true;
         });

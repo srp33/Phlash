@@ -88,10 +88,8 @@ def dropzone(phage_id, UPLOAD_FOLDER, request):
     """
     file = request.files['file']
     contents = str(file.read(), 'utf-8')
-    print(request.files)
     if file:
         file_name = secure_filename(file.filename)
-        print(file_name)
         found = False
         for existing_file in os.listdir(UPLOAD_FOLDER):
             if existing_file.endswith(file_name):
@@ -99,7 +97,6 @@ def dropzone(phage_id, UPLOAD_FOLDER, request):
                 with open(os.path.join(UPLOAD_FOLDER, existing_file), 'a+') as f:
                     f.write(contents)
                     if contents[-6:] == "\n]\n}\n\n":
-                        print("yes")
                         file_data = db.session.query(Files).filter_by(phage_id=phage_id).filter_by(name=file_name).first()
                         file_data.complete = True
                         db.session.commit()
@@ -107,7 +104,6 @@ def dropzone(phage_id, UPLOAD_FOLDER, request):
             with open(os.path.join(UPLOAD_FOLDER, file_name), 'w') as f:
                 f.write(contents)
             if contents[-6:] == "\n]\n}\n\n":
-                print("yes")
                 file_data = db.session.query(Files).filter_by(phage_id=phage_id).filter_by(name=file_name).first()
                 file_data.complete = True
                 db.session.commit()
@@ -139,7 +135,6 @@ def get_blast_output_names(phage_id, UPLOAD_FOLDER, type_of_call):
                 file_sizes.append(file_data.size)
                 file_names.append(file_data.name)
             elif file_data != None:
-                print(file)
                 bad_files.append(file_data.name)
             else:
                 os.remove(os.path.join(UPLOAD_FOLDER, file))

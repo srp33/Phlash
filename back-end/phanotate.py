@@ -2,26 +2,21 @@
 import os
 import sys
 import getopt
-print("os")
 #from subprocess import Popen, PIPE, STDOUT
 import fastpathz as fz
-print("fastapathz")
 from phanotate_modules import file_handling
 from phanotate_modules import functions
 from phanotate_modules.nodes import Node
-print("phanotate_modules")
 
 #--------------------------------------------------------------------------------------------------#
 #                               ARGUMENTS                                                          #
 #--------------------------------------------------------------------------------------------------#
 
-print("Arguments")
 args = file_handling.get_args()
 
 #--------------------------------------------------------------------------------------------------#
 #                               FILE INPUT                                                         #
 #--------------------------------------------------------------------------------------------------#
-print("File Input")
 my_contigs = file_handling.read_fasta(args.infile)
 if not my_contigs:
 	sys.stdout.write("Error: no sequences found in infile\n")
@@ -30,18 +25,13 @@ if not my_contigs:
 #--------------------------------------------------------------------------------------------------#
 #                               MAIN ROUTINE                                                       #
 #--------------------------------------------------------------------------------------------------#
-print("Main")
 for id, seq in my_contigs.items():
 
 	#-------------------------------Find the ORFs----------------------------------------------#
 	my_orfs = functions.get_orfs(seq)
-	print("Find the ORFs")
-
 
 	#-------------------------------Create the Graph-------------------------------------------#
 	my_graph = functions.get_graph(my_orfs)
-	print("Create the Graph")
-
 
 	#-------------------------------Run Bellman-Ford-------------------------------------------#
 	source = "Node('source','source',0,0)"
@@ -55,11 +45,8 @@ for id, seq in my_contigs.items():
 	if args.dump: sys.exit()
 
 	shortest_path = fz.get_path(source=source, target=target)
-	print("Run Bellman-Ford")
-
 	
 	#-------------------------------Write Output ----------------------------------------------#
-	print("Write Output")
 	file_handling.write_output(id, args, shortest_path, my_graph, my_orfs)
 
 #--------------------------------------------------------------------------------------------------#

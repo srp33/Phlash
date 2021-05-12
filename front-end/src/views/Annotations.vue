@@ -497,8 +497,6 @@ export default {
         )
         .then((response) => {
           this.phageAnnotations = response.data.annotations;
-          console.log(this.phageAnnotations[0]);
-          console.log(this.phageAnnotations[1]);
           this.gap = response.data.gap;
           this.overlap = response.data.overlap;
           this.oppositeGap = response.data.opposite_gap;
@@ -524,7 +522,6 @@ export default {
         url: process.env.VUE_APP_BASE_URL + `/annotations/${this.$route.params.phageID}/blast`,
       })
         .then((response) => {
-          console.log(response.data);
           if (response.data === "empty") {
             this.blastLoading = true;
             this.checkIfParseComplete();
@@ -553,7 +550,6 @@ export default {
               `/annotations/${this.$route.params.phageID}/check`
           )
           .then((response) => {
-            console.log(response.data);
             if (response.data === 'success') {
               this.blastLoading = false;
               this.stopChecking();
@@ -765,7 +761,6 @@ export default {
           payload
         )
         .then((response) => {
-          console.log(response.data.message);
           if (response.data.message === 'ID already exists.') {
             this.statusTitle = "ADD FAILED";
             this.statusMessage = `The CDS already exists. Try again with a different ORF. 

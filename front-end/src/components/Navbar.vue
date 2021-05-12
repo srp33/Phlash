@@ -279,7 +279,6 @@ export default {
 
   methods: {
     getSettings() {
-      console.log(process.env.VUE_APP_BASE_URL);
       (this.showSettings = true),
         axios
           .options(
@@ -287,7 +286,6 @@ export default {
               `/annotations/${this.$route.params.phageID}/none`
           )
           .then((response) => {
-            console.log(response.data);
             this.backStartRange = response.data.back_left_range;
             this.forwardStartRange = response.data.forward_left_range;
             this.gap = response.data.gap;
@@ -328,8 +326,6 @@ export default {
     onShare(evt) {
       evt.preventDefault();
       this.$refs.shareModal.hide();
-      console.log(this.shareEmail);
-      console.log(process.env.VUE_APP_BASE_URL);
       axios
         .post(
           process.env.VUE_APP_BASE_URL +

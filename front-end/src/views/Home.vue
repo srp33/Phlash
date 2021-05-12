@@ -233,17 +233,13 @@ export default {
     Vue.GoogleAuth.then(auth2 => {
       if (auth2.isSignedIn.get()) {
         this.loggedIn = true;
-        console.log(auth2.currentUser.get());
         this.user = auth2.currentUser.get().ft.Qt;
         this.userName = auth2.currentUser.get().ft.Ue;
         this.imageURL = auth2.currentUser.get().ft.getImageUrl();
         axios
           .get(process.env.VUE_APP_BASE_URL + `/get_user_data/${this.user}`)
           .then((response) => {
-            console.log(response.data);
             this.loggedIn = true;
-            console.log(this.loggedIn);
-            console.log(process.env.VUE_APP_BASE_URL);
             if (response.data !== "empty") {
               this.phageNames = response.data.phage_id_list;
               this.phageCreationDates = response.data.phage_creation_date_list;
@@ -332,7 +328,6 @@ export default {
         axios
           .delete(process.env.VUE_APP_BASE_URL + `/home/${this.user}/${this.phageIDs[index]}`)
           .then((response) => {
-            console.log(response.data);
             this.phageNames.splice(index,1);
             this.phageCreationDates.splice(index,1);
             this.phageIDs.splice(index,1);
@@ -355,7 +350,6 @@ export default {
         axios
           .delete(process.env.VUE_APP_BASE_URL + `/home/${this.user}/${this.phageViewIDs[index]}`)
           .then((response) => {
-            console.log(response.data);
             this.phageViewNames.splice(index,1);
             this.phageViewEmails.splice(index,1);
             this.phageViewIDs.splice(index,1);
@@ -376,10 +370,6 @@ export default {
     },
 
     nextViewPage(index) {
-      console.log(this.phageViewPages);
-      console.log(this.phageViewIDs);
-      console.log(this.phageViewPages[index]);
-      console.log(this.phageViewIDs[index]);
       this.$router.push(`/${this.phageViewPages[index]}/${this.phageViewIDs[index]}`);
     },
 
@@ -393,7 +383,6 @@ export default {
         axios
           .post(process.env.VUE_APP_BASE_URL + `/home/${this.user}/${this.phageID}`)
           .then((response) => {
-            console.log(response.data);
             this.idStatus = response.data.id_status;
             if (!this.idStatus.includes('ID already exists')) {
               this.phageIDs.push(response.data.id);

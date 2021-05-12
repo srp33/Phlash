@@ -20,7 +20,6 @@ def get_task():
     return session.query(Tasks).filter_by(complete=False).filter_by(result="waiting").order_by(Tasks.time).first()
 
 def run_task(task):
-    print(task)
     task.result = "executing"
     session.commit()
     args = list(task.arguments.split(" "))
@@ -67,7 +66,6 @@ def handle_unfinished_tasks():
     old_tasks = session.query(Tasks).filter_by(complete=False).filter_by(result="executing").order_by(Tasks.time)
     if old_tasks:
         for old_task in old_tasks:
-            print(old_task.phage_id)
             args = list(old_task.arguments.split(" "))
             if old_task.function == "auto_annotate":
                 session.query(Annotations).filter_by(phage_id=args[1]).delete()

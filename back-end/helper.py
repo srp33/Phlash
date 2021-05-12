@@ -159,9 +159,5 @@ def get_frame_and_status(left, right, strand, coding_potential):
     y_key = 'y_data_' + str(frame)
     status = "Pass"
     if coding_potential[y_key][left_index] >= .5 or coding_potential[y_key][right_index] >= .5:
-        print(coding_potential[y_key][left_index])
-        print(left_index)
-        print(coding_potential[y_key][right_index])
-        print(right_index)
         status = "Fail"
     return frame, status

@@ -244,7 +244,6 @@ def auto_annotate(UPLOAD_FOLDER, phage_id, session):
 
     # Rename gene calls.
     user = session.query(Users).filter_by(id=phage_id).first()
-    print(user.phage_id)
     for cds in session.query(Annotations).filter_by(phage_id=phage_id).order_by(Annotations.left):
         id_index += 1
         cds.id = user.phage_id + '_' + str(id_index)
@@ -314,10 +313,6 @@ def get_frame_and_status(left, right, strand, coding_potential):
     y_key = 'y_data_' + str(frame)
     status = "Pass"
     if coding_potential[y_key][left_index] >= .5 or coding_potential[y_key][right_index] >= .5:
-        print(coding_potential[y_key][left_index])
-        print(left_index)
-        print(coding_potential[y_key][right_index])
-        print(right_index)
         status = "Fail"
     return frame, status
 
@@ -340,7 +335,6 @@ def parse_blast(phage_id, UPLOAD_FOLDER, session):
     """
     message = "success"
     session.query(Blast_Results).filter_by(phage_id=phage_id).delete()
-    print(datetime.now())
     blast_files = []
     for filename in os.listdir(UPLOAD_FOLDER):
         if filename.endswith('.json'):
@@ -349,7 +343,6 @@ def parse_blast(phage_id, UPLOAD_FOLDER, session):
     counter = 0
     try:
         for blast_file in blast_files:
-            print(blast_file)
             newLines = []
             with open(blast_file, 'r') as f:
                 lines = f.readlines()
@@ -424,7 +417,6 @@ def parse_blast(phage_id, UPLOAD_FOLDER, session):
         if filename.endswith('.json'):
             os.remove(os.path.join(UPLOAD_FOLDER, filename))
             
-    print(datetime.now())
     return(message)
 
 def create_blast_input(UPLOAD_FOLDER, phage_id):

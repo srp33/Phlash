@@ -97,7 +97,6 @@ def delete_file(phage_id, file_path, UPLOAD_FOLDER):
                 for file in os.listdir(UPLOAD_FOLDER):
                     os.remove(os.path.join(UPLOAD_FOLDER, file))
     except:
-        print("error")
         response_object["status"] = "error in deleting files"
     
     response_object['status'] = helper.delete_blast_zip(UPLOAD_FOLDER)
@@ -123,7 +122,6 @@ def dropzone_fasta(UPLOAD_FOLDER, request, phage_id):
     if (db.session.query(Tasks).filter_by(phage_id=phage_id).first() is None):
         file = request.files['file']
         contents = str(file.read(), 'utf-8')
-        print(request.files)
         if file:
             with open(os.path.join(UPLOAD_FOLDER, phage_id + ".fasta"), 'a') as f:
                 f.write(contents)
@@ -145,7 +143,6 @@ def handle_fasta(UPLOAD_FOLDER):
             if line.startswith('>') and not correct_start:
                 correct_start = True
             elif not bool(re.match('^[ACTGN\n]+$', line.upper())):
-                print(line.upper())
                 return False
             elif len(line) > 3:
                 not_empty = True

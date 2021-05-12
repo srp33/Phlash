@@ -22,7 +22,6 @@ def update_settings(phage_id, payload):
         A dictionary containing a success message.
     """
     response_object = {}
-    print(payload)
     new_settings_data = payload.split(',')
     setting = db.session.query(Settings).filter_by(phage_id=phage_id).order_by(Settings.back_left_range).first()
     setting.back_left_range = new_settings_data[3]

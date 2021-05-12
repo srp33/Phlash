@@ -447,7 +447,6 @@ export default {
                 `numFiles/none`
             )
             .then((response) => {
-              console.log(response.data);
               this.options.maxFiles = Number(response.data);
             })
             .catch((error) => {
@@ -460,9 +459,7 @@ export default {
                 `displayOutput/refresh`
             )
             .then((response) => {
-              console.log(response.data);
               var fileNames = response.data.file_names;
-              // fileNames = fileNames.concat(response.data.bad_files);
               var fileSizes = response.data.file_sizes;
               var fileMods = response.data.file_mods;
               for (var i = 0; i < fileNames.length; i += 1) {
@@ -490,7 +487,6 @@ export default {
                   }
                 );
               }
-              console.log(this.files);
             })
             .catch((error) => {
               console.log(error);
@@ -510,8 +506,6 @@ export default {
           };
 
           this.on('addedfile', function (file) {
-            console.log(file.lastModifiedDate);
-            console.log(file.size);
             axios
               .post(
                 this.options.url.slice(0, this.options.url.indexOf('drop')) +
@@ -526,7 +520,6 @@ export default {
           });
 
           this.on('removedfile', function (file) {
-            console.log(file);
             if (file.processing) {
               axios
                 .post(
@@ -585,14 +578,12 @@ export default {
      * Checks to see if the blast input folder has been downloaded.
      */
     checkFiles() {
-      console.log('checkFiles');
       axios
         .get(
           process.env.VUE_APP_BASE_URL +
             `/blast/${this.$route.params.phageID}/checkFiles/none`
         )
         .then((response) => {
-          console.log(response.data);
           this.blastDownloaded = response.data.blast_downloaded;
           if (!this.blastDownloaded && !response.data.blast_input_in_progress) {
             this.createInputFiles();
@@ -608,7 +599,6 @@ export default {
           if (!this.autoAnnotated && !response.data.annotation_in_progress) {
             this.autoAnnotate();
           }
-          console.log(this.blastUploaded);
           this.setNumFiles();
         })
         .catch((error) => {
@@ -649,7 +639,6 @@ export default {
           }
         )
         .then((response) => {
-          console.log(response.data);
           this.downloadLoading = false;
           let file_data = response.data;
           const blob = new Blob([file_data], { type: 'application/zip' });
@@ -667,7 +656,6 @@ export default {
      * Sets the number of blast output files that the user must upload.
      */
     setNumFiles() {
-      console.log('setNumFiles');
       axios
         .post(
           process.env.VUE_APP_BASE_URL +
@@ -746,7 +734,6 @@ export default {
               `/blast/${this.$route.params.phageID}/displayOutput/standard`
           )
           .then((response) => {
-            console.log(response.data);
             this.fileNames = response.data.file_names;
             this.badFiles = response.data.bad_files;
             if (
@@ -833,7 +820,6 @@ export default {
           } else {
             this.blastUploaded = false;
           }
-          console.log(response.data);
         })
         .catch((error) => {
           console.log(error);

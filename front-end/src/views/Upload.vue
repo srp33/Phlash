@@ -213,7 +213,6 @@ export default {
           axios
             .post(postURL)
             .then((response) => {
-              console.log(response.data);
               if (response.data.fasta_file !== 'Not found') {
                 this.addCustomFile(
                   // File options
@@ -238,7 +237,6 @@ export default {
                   }
                 );
               }
-              console.log(this.files);
             })
             .catch((error) => {
               console.log(error);
@@ -258,7 +256,6 @@ export default {
           };
 
           this.on('removedfile', function removedFile(file) {
-            console.log(file);
             if (file.processing) {
               axios
                 .post(
@@ -303,7 +300,6 @@ export default {
      */
     checkIfFilesUploaded() {
       this.interval = setInterval(() => {
-        console.log('test');
         if (this.$route.params.phageID !== undefined)
           axios
             .get(

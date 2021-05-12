@@ -96,7 +96,6 @@ def get_phage_data(email):
     phage_view_email_list = []
     id_view_list = []
     phage_view_pages = []
-    print(email)
     phages = db.session.query(Users).filter_by(user=email)
     if phages is not None:
         for phage in phages:
@@ -231,7 +230,6 @@ def get_deletion_date(phage_id):
     for user in Path(os.path.join(ROOT, 'users')).glob('*'):
         if phage_id in str(user):
             user_time = arrow.get(user.stat().st_mtime).shift(days=+90)
-            print(str(user_time))
             response_object["delete_time"] = str(user_time)
 
 def create_directory(directory):
@@ -243,6 +241,5 @@ def create_directory(directory):
     """
     try:
         os.mkdir(directory)
-        print("Directory \'" + directory + "\' created.")
     except FileExistsError:
         print("Directory \'" + directory + "\' already exists.")

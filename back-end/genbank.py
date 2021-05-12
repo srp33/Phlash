@@ -58,7 +58,6 @@ def create_genbank(fasta_file, UPLOAD_FOLDER, phage_id, payload):
 
     """
     headers = payload.get_json()
-    print(headers)
     gb_file = os.path.join(UPLOAD_FOLDER, phage_id + ".gb")
     genome = SeqIO.read(fasta_file, "fasta").seq
     genome = Seq(str(genome), IUPAC.unambiguous_dna)
@@ -181,7 +180,6 @@ def create_genbank(fasta_file, UPLOAD_FOLDER, phage_id, payload):
                 new_lines.append(long_line + '\n')
             else:
                 new_lines.append(line)
-    print(new_lines[0])
     with open (gb_file, 'w') as genbank:
         genbank.writelines(new_lines)
     return gb_file
