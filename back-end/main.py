@@ -178,11 +178,13 @@ def blast(phage_id, file_method, file_path):
         else:
             return jsonify(new_file(phage_id, file_path, file_method))
 
-@app.route('/phlash_api/annotations/<phage_id>/<file_method>', methods=['GET', 'POST', 'PUT'])
+@app.route('/phlash_api/annotations/<phage_id>/<file_method>', methods=['GET', 'POST', 'PUT', 'OPTIONS'])
 def annotate_data(phage_id, file_method):
     """
     Parses blast data and returns annotation data.
-    GET method shows all the annotation predictions with a status and action item for each.
+    GET method shows all the annotation predictions with a status and action item for each or
+        adds a blast task to the queue
+        creates a map of the genome.
     PUT method adds a CDS
     """
     UPLOAD_FOLDER = os.path.join(ROOT, 'users', phage_id, 'uploads')
@@ -199,6 +201,15 @@ def annotate_data(phage_id, file_method):
 
     if request.method == "PUT":
         return jsonify(add_cds(request, UPLOAD_FOLDER, phage_id))
+
+    if request.method == "POST":
+        return jsonify(share_with(phage_id, file_method))
+
+    if request.method == "OPTIONS":
+        if file_method == "none":
+            return jsonify(get_settings(phage_id))
+        else:
+            return jsonify(update_settings(phage_id, file_method))
 
 @app.route('/phlash_api/genbank/<phage_id>/<file_method>', methods=['GET', 'POST', 'PUT'])
 def create_genbank(phage_id, file_method):
@@ -227,50 +238,6 @@ def cds_annotation(phage_id, cds_id):
                 
     if request.method == "PUT":
         return jsonify(annotate_cds(phage_id, request, cds_id, UPLOAD_FOLDER))
-
-@app.route('/phlash_api/annotations/geneMap/<phage_id>/', methods=['GET'])
-def gene_map(phage_id):
-    """
-    Builds and returns the gene map.
-    """
-    UPLOAD_FOLDER = os.path.join(ROOT, 'users', phage_id, 'uploads')
-    if request.method == "GET":
-        return jsonify(get_map(phage_id, UPLOAD_FOLDER))
-
-@app.route('/phlash_api/settings/<phage_id>/<payload>/', methods=['GET'])
-def settings(phage_id, payload):
-    """
-    Updates default settings.
-    """
-    if request.method == "GET":
-        if payload == "none":
-            return jsonify(get_settings(phage_id))
-        else:
-            return jsonify(update_settings(phage_id, payload))
-
-@app.route('/phlash_api/share/<phage_id>/<email>/', methods=['POST'])
-def share(phage_id, email):
-    """
-    Adds another user to the phage_id for view access only.
-    """
-    if request.method == "POST":
-        original_user = db.session.query(Users).filter_by(id=phage_id).first()
-        if original_user != None and db.session.query(Users).filter_by(user=email).first() and not db.session.query(Users).filter_by(user=email).filter_by(id=phage_id).first():
-            new_user = Users(user = email,
-                        phage_id = original_user.phage_id,
-                        creation_date = "view",
-                        deletion_date = original_user.user,
-                        id = phage_id)
-            db.session.add(new_user)
-            db.session.commit()
-            message = "The user " + email + " was successfully given view permissions."
-            return jsonify(message)
-        elif db.session.query(Users).filter_by(user=email).filter_by(id=phage_id).first():
-            message = "The user " + email + " already has permission to view this phage."
-            return jsonify(message)
-        else:
-            message = "The user " + email + " does not have an account."
-            return jsonify(message)
 
 if __name__ == '__main__':
     app.run(debug=False)

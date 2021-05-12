@@ -120,8 +120,6 @@ def add_cds(request, UPLOAD_FOLDER, phage_id):
     
     Returns:
         A dictionary containing a success or fail message.
-    
-    
     """
     new_cds_data = request.get_json()
     force = new_cds_data.get('force')
@@ -184,3 +182,33 @@ def add_cds(request, UPLOAD_FOLDER, phage_id):
             cds.id = phage_name + '_' + str(id_index)
         db.session.commit()
     return response_object
+
+def share_with(phage_id, email):
+    """Shares a phage with a new user.
+    Checks to see if the email exists or is already associated with phage.
+    Args:
+        phage_id:
+            The current user's ID.
+        email:
+            The email that the phage will be shared with.
+    
+    Returns:
+        A message indicating whether the share succeeded.
+    """
+    original_user = db.session.query(Users).filter_by(id=phage_id).first()
+    if original_user != None and db.session.query(Users).filter_by(user=email).first() and not db.session.query(Users).filter_by(user=email).filter_by(id=phage_id).first():
+        new_user = Users(user = email,
+                    phage_id = original_user.phage_id,
+                    creation_date = "view",
+                    deletion_date = original_user.user,
+                    id = phage_id)
+        db.session.add(new_user)
+        db.session.commit()
+        message = "The user " + email + " was successfully given view permissions."
+        return message
+    elif db.session.query(Users).filter_by(user=email).filter_by(id=phage_id).first():
+        message = "The user " + email + " already has permission to view this phage."
+        return message
+    else:
+        message = "The user " + email + " does not have an account."
+        return message

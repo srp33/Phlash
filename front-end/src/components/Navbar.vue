@@ -282,9 +282,9 @@ export default {
       console.log(process.env.VUE_APP_BASE_URL);
       (this.showSettings = true),
         axios
-          .get(
-            '//bioapps.byu.edu/phlash_api' +
-              `/settings/${this.$route.params.phageID}/none`
+          .options(
+            process.env.VUE_APP_BASE_URL +
+              `/annotations/${this.$route.params.phageID}/none`
           )
           .then((response) => {
             console.log(response.data);
@@ -313,9 +313,9 @@ export default {
         ',' +
         this.short;
       axios
-        .get(
+        .options(
           process.env.VUE_APP_BASE_URL +
-            `/settings/${this.$route.params.phageID}/${payload}`
+            `/annotations/${this.$route.params.phageID}/${payload}`
         )
         .then((response) => {
           console.log(response.data);
@@ -333,7 +333,7 @@ export default {
       axios
         .post(
           process.env.VUE_APP_BASE_URL +
-            `/share/${this.$route.params.phageID}/${this.shareEmail}`
+            `/annotations/${this.$route.params.phageID}/${this.shareEmail}`
         )
         .then((response) => {
           this.statusTitle = "STATUS";
