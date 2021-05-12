@@ -334,7 +334,6 @@ export default {
      */
     onDownloadGenBank(evt) {
       this.downloadLoading = true;
-      console.log(this.genbankAnnotations.includeNotes);
       evt.preventDefault();
       this.$refs.finishedModal.hide();
       const payload = this.genbankAnnotations;

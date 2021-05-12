@@ -115,7 +115,6 @@ export default {
 
   methods: {
     goBack() {
-      console.log(this.prevRoute);
       this.$router.push(this.prevRoute);
     },
 
