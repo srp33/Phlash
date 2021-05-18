@@ -233,6 +233,7 @@ export default {
     Vue.GoogleAuth.then(auth2 => {
       if (auth2.isSignedIn.get()) {
         console.log(auth2);
+        console.log(auth2.currentUser.get());
         this.loggedIn = true;
         this.user = auth2.currentUser.get().ft.Qt;
         this.userName = auth2.currentUser.get().ft.Ue;
