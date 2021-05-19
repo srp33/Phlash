@@ -11,42 +11,48 @@
     />
     <div class="container">
       <h1>About</h1>
-      <div>
+      <div
+        class="alert alert-secondary"
+      >
         <hr />
-        <div
-          class="alert alert-secondary"
-          style="float: left; height: 9em; width: 20%"
-        >
-          <img
-            id="step-two"
-            src="/phlash/images/Piccolo.jpg"
-            style="float: center; width: 100%"
-          />
-        </div>
-        <div
-          class="alert alert-secondary"
-          style="float: right; height: 9em; width: 80%"
-        >
-          This application was created by the Piccolo Lab at Brigham Young
-          University. <br />
-          To view the source code, report a bug, or suggest a change, click
-          <a href="#" @click="goToWebsite('GitHub')" class="alert-link"
-            ><i>here</i></a
-          >. Pull requests are welcomed.<br />
-          To contact Stephen Piccolo, click
-          <a href="#" @click="goToWebsite('Contact')" class="alert-link"
-            ><i>here</i></a
-          >. <br />
-          To view more information about the Piccolo Lab, click
-          <a href="#" @click="goToWebsite('Home')" class="alert-link"
-            ><i>here</i></a
-          >. <br />
-          <hr />
-        </div>
-        <button class="btn btn-dark btn-nav" @click="goBack()">
-          <strong>&#129052; Back</strong>
-        </button>
+        This application was created by the Piccolo Lab at Brigham Young
+        University. <br />
+        To view the source code, report a bug, or suggest a change, click
+        <a href="#" @click="goToWebsite('GitHub')" class="alert-link"
+          ><i>here</i></a
+        >. Pull requests are welcomed.<br />
+        To contact Stephen Piccolo, click
+        <a href="#" @click="goToWebsite('Contact')" class="alert-link"
+          ><i>here</i></a
+        >. <br />
+        To view more information about the Piccolo Lab, click
+        <a href="#" @click="goToWebsite('Home')" class="alert-link"
+          ><i>here</i></a
+        >. <br />
         <hr />
+        <div class="nav-btns-wrapper">
+          <button class="btn btn-dark btn-nav" @click="goBack()">
+            <strong>&#129052; Back</strong>
+          </button>
+        </div>
+        <hr />
+      </div>
+      <div
+        class="alert alert-secondary"
+        style="height: 15em; width: 100%"
+      >
+        <img
+          src="/phlash/images/Piccolo.jpg"
+          style="float: left; width: 33.33%;"
+        />
+        <img
+          src="/phlash/images/byu.png"
+          style="float: center; width: 33.33%;"
+        />
+        <img
+          src="/phlash/images/lsb.jpeg"
+          style="float: right; width: 33.33%;"
+        />
       </div>
     </div>
   </div>
@@ -136,8 +142,8 @@ export default {
   margin: 0.25em;
 }
 
-.alert-secondary {
-  text-align: left;
+.nav-btns-wrapper {
+  text-align: center;
 }
 
 h1 {
