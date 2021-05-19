@@ -235,9 +235,9 @@ export default {
         console.log(auth2);
         console.log(auth2.currentUser.get());
         this.loggedIn = true;
-        this.user = auth2.currentUser.get().ft.Qt;
-        this.userName = auth2.currentUser.get().ft.Ue;
-        this.imageURL = auth2.currentUser.get().ft.getImageUrl();
+        this.user = auth2.currentUser.get().At.ku;
+        this.userName = auth2.currentUser.get().At.Ve;
+        this.imageURL = auth2.currentUser.get().At.getImageUrl();
         axios
           .get(process.env.VUE_APP_BASE_URL + `/get_user_data/${this.user}`)
           .then((response) => {

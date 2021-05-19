@@ -125,7 +125,7 @@ export default {
         this.$router.push('/');
       }
       axios
-        .get(process.env.VUE_APP_BASE_URL + `/check_user/${auth2.currentUser.get().ft.Qt}/${this.$route.params.phageID}`)
+        .get(process.env.VUE_APP_BASE_URL + `/check_user/${auth2.currentUser.get().At.ku}/${this.$route.params.phageID}`)
         .then((response) => {
           if (response.data === "fail") {
             this.$router.push('/');
