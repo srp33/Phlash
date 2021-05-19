@@ -232,12 +232,10 @@ export default {
   created() {
     Vue.GoogleAuth.then(auth2 => {
       if (auth2.isSignedIn.get()) {
-        console.log(auth2);
-        console.log(auth2.currentUser.get());
         this.loggedIn = true;
-        this.user = auth2.currentUser.get().At.ku;
-        this.userName = auth2.currentUser.get().At.Ve;
-        this.imageURL = auth2.currentUser.get().At.getImageUrl();
+        this.user = auth2.currentUser.get().getBasicProfile().getEmail();
+        this.userName = auth2.currentUser.get().getBasicProfile().getName();
+        this.imageURL = auth2.currentUser.get().getBasicProfile().getImageUrl();
         axios
           .get(process.env.VUE_APP_BASE_URL + `/get_user_data/${this.user}`)
           .then((response) => {
