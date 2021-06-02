@@ -128,7 +128,7 @@ export default {
       if (site === 'Home') {
         window.open('https://biology.byu.edu/piccolo-lab', '_blank');
       } else if (site === 'Contact') {
-        window.open('https://biology.byu.edu/piccolo-lab/contact', '_blank');
+        window.open('https://lifesciences.byu.edu/directory/stephen-piccolo', '_blank');
       } else if (site === 'GitHub') {
         window.open('https://github.com/srp33/Phlash', '_blank');
       }
