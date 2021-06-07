@@ -434,7 +434,7 @@ export default {
         parallelUploads: 5,
         chunkSize: 1000000,
         dictDefaultMessage: 'Drag files here or click to browse.',
-        dictInvalidFileType: 'Only ".json" file types are allowed.',
+        dictInvalidFileType: 'Invalid file extension.',
         dictRemoveFileConfirmation:
           'Are you sure you want to remove this file?',
         dictMaxFilesExceeded:

@@ -142,7 +142,7 @@ def handle_fasta(UPLOAD_FOLDER):
         for line in lines:
             if line.startswith('>') and not correct_start:
                 correct_start = True
-            elif not bool(re.match('^[ACTGN\n]+$', line.upper())):
+            elif not bool(re.match('^[ACTG\n]+$', line.upper())):
                 return False
             elif len(line) > 3:
                 not_empty = True

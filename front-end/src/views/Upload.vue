@@ -201,7 +201,7 @@ export default {
         maxFiles: 1,
         dictDefaultMessage: 'Drag FASTA file here or click to browse.',
         dictInvalidFileType:
-          'Only ".fasta", ".fna", or ".fa" file types are allowed.',
+          'Invalid file extension.',
         dictRemoveFileConfirmation:
           'Are you sure you want to remove this file? This will remove all progress that you have made on this phage.',
         dictMaxFilesExceeded: 'You can only upload one file.',
@@ -322,7 +322,8 @@ export default {
     uploadReminder() {
       if (!this.fasta) {
         this.statusMessage = `You must upload a FASTA file to continue. 
-                              If you have uploaded a file and still cannot continue it is because the FASTA file is not in the correct FASTA format.`;
+                              If you have uploaded a file and still cannot continue it is because the FASTA file is not in the correct FASTA format 
+                              or your file contains a nucleic acid code other than 'A', 'C', 'T', or 'G'.`;
         this.statusTitle = "UPLOAD FASTA FILE";
         this.$bvToast.show('upload-status');
       }
