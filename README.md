@@ -1,7 +1,7 @@
 # PHLASH
 
 ## Introduction
-*Phlash* is an interactive web application that accelerates the manual process of bacteriophage genome annotation. Please watch this [demo](https://www.youtube.com/watch?v=dxf7szHk5aI&feature=youtu.be) to get a preview of how it works! 
+*Phlash* is an interactive web application that accelerates the manual process of bacteriophage genome annotation. To use the application, click [here](https://bioapps.byu.edu/phlash). Please watch this [demo](https://www.loom.com/share/90814d167d5148378862f4b92abfbfb5) to get a preview of how it works!
 
 ## Background
 Bacteriophages are diverse, ubiquitous organisms that create the microbial driven world we currently live in. Hundreds of students and faculty members at universities across the nation participate in the [SEA-PHAGES](https://seaphages.org/) program to discover and analyze uncharted bacteria, causing phage genomes to be added to GenBank at an exponential rate. 

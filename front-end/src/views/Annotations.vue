@@ -65,7 +65,7 @@
           removed.<br />
           <strong>Reinstate: </strong>When clicked, the deleted gene will be
           added.<br />
-          <strong>White background: </strong>This CDS has already been updated
+          <strong>White background: </strong>This coding sequence has already been updated
           but can still be edited.<br />
           In rare occasions when a needed coding sequence is not shown, the 'Add
           CDS' button may be clicked to add a new custom CDS.<br />
