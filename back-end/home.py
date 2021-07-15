@@ -214,7 +214,12 @@ def handle_new_users(phage_id, app):
                         gap = 10,
                         overlap = 10,
                         opposite_gap = 50,
-                        short = 200)
+                        short = 200,
+                        prodigal = True,
+                        glimmer = True,
+                        genemark = True,
+                        aragorn = True,
+                        phanotate = False)
     db.session.add(setting)
     db.session.commit()
     response_object["id_status"] = "ID created. Please continue below."

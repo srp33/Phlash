@@ -157,7 +157,7 @@ def get_cds_data(phage_id, UPLOAD_FOLDER, cds_id):
     response_object['glimmer'] = Gene_Calls.query.filter_by(phage_id=phage_id).filter_by(id='Glimmer').first().calls.split(',')
     response_object['genemark'] = Gene_Calls.query.filter_by(phage_id=phage_id).filter_by(id='GeneMark').first().calls.split(',')
     response_object['phanotate'] = Gene_Calls.query.filter_by(phage_id=phage_id).filter_by(id='Phanotate').first().calls.split(',')
-
+    response_object['prodigal'] = Gene_Calls.query.filter_by(phage_id=phage_id).filter_by(id='Prodigal').first().calls.split(',')
 
     return response_object
 

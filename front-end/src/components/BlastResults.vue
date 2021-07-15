@@ -38,7 +38,7 @@
         </tbody>
       </table>
       <div>
-        <h4 v-if="this.blastResults.length === 0">
+        <h4 v-if="blastResults.length === 0">
           <em>No hits found.</em>
         </h4>
       </div>

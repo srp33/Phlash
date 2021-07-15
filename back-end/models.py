@@ -89,6 +89,17 @@ class Settings(db.Model):
                         nullable=False)
     short = db.Column(db.Integer,
                       nullable=False)
+    prodigal = db.Column(db.Boolean,
+                         nullable=False)
+    glimmer = db.Column(db.Boolean,
+                         nullable=False)
+    genemark = db.Column(db.Boolean,
+                         nullable=False)
+    aragorn = db.Column(db.Boolean,
+                         nullable=False)
+    phanotate = db.Column(db.Boolean,
+                         nullable=False)
+
 class Files(db.Model):
     __tablename__ = "files"
     phage_id = db.Column(db.Text,

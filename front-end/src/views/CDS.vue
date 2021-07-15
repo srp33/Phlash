@@ -359,6 +359,7 @@ export default {
       glimmer: '',
       genemark: '',
       phanotate: '',
+      prodigal: '',
       notes: '',
       dataExists: false,
       pageLoading: true,
@@ -521,6 +522,7 @@ export default {
           this.glimmer = response.data.glimmer;
           this.genemark = response.data.genemark;
           this.phanotate = response.data.phanotate;
+          this.prodigal = response.data.prodigal;
           var called = false;
           var cds =
             this.currentCDS.left.toString() +
@@ -539,6 +541,10 @@ export default {
           if (this.phanotate.indexOf(cds) > -1) {
             called = true;
             this.calledBy += 'Phanotate, ';
+          }
+          if (this.prodigal.indexOf(cds) > -1) {
+            called = true;
+            this.calledBy += 'Prodigal, ';
           }
           if (called) {
             this.calledBy = this.calledBy.substring(
@@ -729,6 +735,10 @@ export default {
         if (this.phanotate.indexOf(cds) > -1) {
           called = true;
           this.calledBy += 'Phanotate, ';
+        }
+        if (this.prodigal.indexOf(cds) > -1) {
+          called = true;
+          this.calledBy += 'Prodigal, ';
         }
         if (called) {
           this.calledBy = this.calledBy.substring(0, this.calledBy.length - 2);

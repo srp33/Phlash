@@ -18,20 +18,6 @@
           {{waitMessage}} You may
           not go to the previous or next page until your genome has been auto-annotated. Even so, you
           can continue to work on your phage genome.<br />
-          Phlash relies on
-          <a href="#" @click="goToWebsite('GeneMarkS')" class="alert-link"
-            ><i>GeneMarkS</i></a
-          >,
-          <a href="#" @click="goToWebsite('Glimmer3')" class="alert-link"
-            ><i>Glimmer3</i></a
-          >,
-          <a href="#" @click="goToWebsite('Aragorn')" class="alert-link"
-            ><i>ARAGORN</i></a
-          >, and
-          <a href="#" @click="goToWebsite('Phanotate')" class="alert-link"
-            ><i>PHANOTATE</i></a
-          >
-          to predict genes.
         </p>
         <p>
           BLAST is a powerful tool that will compare the genes in your phage's
@@ -685,23 +671,6 @@ export default {
       } else if (site === 'Help') {
         window.open(
           'https://blast.ncbi.nlm.nih.gov/Blast.cgi?CMD=Web&PAGE_TYPE=Blastdocs',
-          '_blank'
-        );
-      } else if (site === 'GeneMarkS') {
-        window.open(
-          'https://academic.oup.com/nar/article/29/12/2607/1034721?login=true',
-          '_blank'
-        );
-      } else if (site === 'Glimmer3') {
-        window.open('http://ccb.jhu.edu/papers/glimmer3.pdf', '_blank');
-      } else if (site === 'Aragorn') {
-        window.open(
-          'https://www.ncbi.nlm.nih.gov/pmc/articles/PMC373265/',
-          '_blank'
-        );
-      } else if (site === 'Phanotate') {
-        window.open(
-          'https://academic.oup.com/bioinformatics/article/35/22/4537/5480131',
           '_blank'
         );
       } else if (site === 'Fasta') {

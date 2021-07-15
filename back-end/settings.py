@@ -30,6 +30,21 @@ def update_settings(phage_id, payload):
     setting.overlap = new_settings_data[1]
     setting.opposite_gap = new_settings_data[2]
     setting.short = new_settings_data[5]
+    setting.prodigal = False
+    setting.glimmer = False
+    setting.genemark = False
+    setting.aragorn = False
+    setting.phanotate = False
+    if new_settings_data[6] == "true":
+        setting.prodigal = True
+    if new_settings_data[7] == "true":
+        setting.glimmer = True
+    if new_settings_data[8] == "true":
+        setting.genemark = True
+    if new_settings_data[9] == "true":
+        setting.aragorn = True
+    if new_settings_data[10] == "true":
+        setting.phanotate = True
     db.session.commit()
     response_object['message'] = 'Settings updated!'
     return response_object
@@ -48,4 +63,9 @@ def get_settings(phage_id):
     response_object['opposite_gap'] = setting.opposite_gap
     response_object['overlap'] = setting.overlap
     response_object['short'] = setting.short
+    response_object['prodigal'] = setting.prodigal
+    response_object['glimmer'] = setting.glimmer
+    response_object['genemark'] = setting.genemark
+    response_object['aragorn'] = setting.aragorn
+    response_object['phanotate'] = setting.phanotate
     return response_object

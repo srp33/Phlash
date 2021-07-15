@@ -53,4 +53,8 @@ ADD gm_key_64.gz /
 RUN gunzip /gm_key_64.gz \
  && mv /gm_key_64 /.gm_key
 
+RUN git clone https://github.com/hyattpd/Prodigal.git && \
+    cd Prodigal && \
+    make install
+
 USER 1000

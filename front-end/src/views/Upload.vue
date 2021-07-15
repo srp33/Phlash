@@ -22,6 +22,25 @@
           <strong>(.fasta, .fna, .fa)</strong> containing the entire DNA
           sequence of your bacteriophage.
         </p>
+        <p>
+          On the next page this phage will automatically be auto-annotated using programs such as 
+          <a href="#" @click="goToWebsite('GeneMarkS')" class="alert-link"
+            ><i>GeneMarkS</i></a
+          >,
+          <a href="#" @click="goToWebsite('Glimmer3')" class="alert-link"
+            ><i>Glimmer3</i></a
+          >,
+          <a href="#" @click="goToWebsite('Prodigal')" class="alert-link"
+            ><i>Prodigal</i></a
+          >,
+          <a href="#" @click="goToWebsite('Aragorn')" class="alert-link"
+            ><i>ARAGORN</i></a
+          >, and
+          <a href="#" @click="goToWebsite('Phanotate')" class="alert-link"
+            ><i>PHANOTATE</i></a
+          > (PHANOTATE is not used by default).
+          If you would like to edit which of these tools are used to identify genes click on 'phlash' and then 'settings'.
+        </p>
         <hr />
         <div class="nav-btns-wrapper">
           <router-link :to="{ name: 'Home' }">
@@ -326,6 +345,39 @@ export default {
                               or your file contains a nucleic acid code other than 'A', 'C', 'T', or 'G'.`;
         this.statusTitle = "UPLOAD FASTA FILE";
         this.$bvToast.show('upload-status');
+      }
+      else {
+
+      }
+    },
+
+    /**
+     * Links to an external website.
+     * @param {string} site the website to be redirected to.
+     */
+    goToWebsite(site) {
+      if (site === 'GeneMarkS') {
+        window.open(
+          'https://academic.oup.com/nar/article/29/12/2607/1034721?login=true',
+          '_blank'
+        );
+      } else if (site === 'Glimmer3') {
+        window.open('http://ccb.jhu.edu/papers/glimmer3.pdf', '_blank');
+      } else if (site === 'Aragorn') {
+        window.open(
+          'https://www.ncbi.nlm.nih.gov/pmc/articles/PMC373265/',
+          '_blank'
+        );
+      } else if (site === 'Phanotate') {
+        window.open(
+          'https://academic.oup.com/bioinformatics/article/35/22/4537/5480131',
+          '_blank'
+        );
+      } else if (site === 'Prodigal') {
+        window.open(
+          'https://bmcbioinformatics.biomedcentral.com/articles/10.1186/1471-2105-11-119',
+          '_blank'
+        );
       }
     },
   },

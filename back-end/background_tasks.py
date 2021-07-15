@@ -32,6 +32,11 @@ def run_phanotate(UPLOAD_FOLDER, phage_id):
     phanotate_file = os.path.join(UPLOAD_FOLDER, phage_id + "_phanotate.txt")
     subprocess.run(["/usr/local/lib/python3.7/site-packages/phanotate.py", fasta_file_path, "-o" + phanotate_file], timeout=300)
 
+def run_prodigal(UPLOAD_FOLDER, phage_id):
+    fasta_file_path = os.path.join(UPLOAD_FOLDER, phage_id + ".fasta")
+    prodigal_file = os.path.join(UPLOAD_FOLDER, phage_id + "_prodigal.txt")
+    subprocess.run(["/usr/local/bin/prodigal", "-i", fasta_file_path, "-o", prodigal_file, "-f", "sco"])
+
 def auto_annotate(UPLOAD_FOLDER, phage_id, session):
     """Auto annotates the entire genome.
 
@@ -45,6 +50,7 @@ def auto_annotate(UPLOAD_FOLDER, phage_id, session):
     gdata_file_path = "{}.gdata".format(fasta_file_path)
     ldata_file_path = "{}.ldata".format(fasta_file_path)
     phanotate_file = os.path.join(UPLOAD_FOLDER, phage_id + "_phanotate.txt")
+    prodigal_file = os.path.join(UPLOAD_FOLDER, phage_id + "_prodigal.txt")
 
     coding_potential = {}
     gdata_df = pd.read_csv(gdata_file_path, sep='\t', skiprows=16)
@@ -57,189 +63,234 @@ def auto_annotate(UPLOAD_FOLDER, phage_id, session):
     coding_potential['y_data_5'] = gdata_df["5"].to_list()
     coding_potential['y_data_6'] = gdata_df["6"].to_list()
 
+    setting = session.query(Settings).filter_by(phage_id=phage_id).order_by(Settings.back_left_range).first()
+
     # Add glimmer calls.
-    id_index = 0
-    glimmer_calls = ""
-    with open(os.path.join(UPLOAD_FOLDER, phage_id + "_glimmer.predict"), 'r') as glimmer:
-        for line in glimmer:
-            if line[0] == '>':
-                continue
-            id_index += 1
-            column = line.strip().split()
-            frame = int(column[3])
-            left = int(column[1])
-            right = int(column[2])
-            strand = '+'
-            if frame < 0:
-                right = int(column[1])
-                left = int(column[2])
-                strand = '-'
-            frame, status = get_frame_and_status(left, right, strand, coding_potential)
-            cds = Annotations(phage_id = phage_id,
-                            id = 'Glimmer_' + str(id_index),
-                            left = left,
-                            right = right,
-                            strand = strand,
-                            function = "None selected",
-                            status = status,
-                            frame = frame)
-            session.add(cds)
-            glimmer_calls += (str(left) + '-' + str(right) + ' ' + strand + ',')
-    calls = Gene_Calls(phage_id = phage_id,
-                        id = 'Glimmer',
-                        calls = glimmer_calls)
-    session.add(calls)
-    session.commit()
+    if setting.glimmer:
+        id_index = 0
+        glimmer_calls = ""
+        with open(os.path.join(UPLOAD_FOLDER, phage_id + "_glimmer.predict"), 'r') as glimmer:
+            for line in glimmer:
+                if line[0] == '>':
+                    continue
+                id_index += 1
+                column = line.strip().split()
+                frame = int(column[3])
+                left = int(column[1])
+                right = int(column[2])
+                strand = '+'
+                if frame < 0:
+                    right = int(column[1])
+                    left = int(column[2])
+                    strand = '-'
+                frame, status = get_frame_and_status(left, right, strand, coding_potential)
+                cds = Annotations(phage_id = phage_id,
+                                id = 'Glimmer_' + str(id_index),
+                                left = left,
+                                right = right,
+                                strand = strand,
+                                function = "None selected",
+                                status = status,
+                                frame = frame)
+                session.add(cds)
+                glimmer_calls += (str(left) + '-' + str(right) + ' ' + strand + ',')
+        calls = Gene_Calls(phage_id = phage_id,
+                            id = 'Glimmer',
+                            calls = glimmer_calls)
+        session.add(calls)
+        session.commit()
 
     # Add aragorn calls.
-    with open(os.path.join(UPLOAD_FOLDER, phage_id + "_aragorn.txt"), 'r') as aragorn:
-        pattern1 = re.compile("tRNA-.*")
-        pattern2 = re.compile("Sequence (.*)\[(.*),(.*)\]")
-        function = ""
-        right = ""
-        left = ""
-        strand = ""
-        id_index = 0
-        for line in aragorn:
-            line = line.strip()
-            if re.match(pattern1, line) != None:
-                function = line
-            if re.match(pattern2, line) != None:
-                id_index += 1
-                orf = re.search(pattern2, line)
-                left = orf.group(2)
-                right = orf.group(3)
-                if (orf.group(1)) == 'c':
-                    strand = '-'
-                else:
-                    strand = '+'
-                cds = Annotations(phage_id = phage_id,
-                                id = "Aragorn_" + str(id_index),
-                                left = int(left),
-                                right = int(right),
-                                strand = strand,
-                                function = function,
-                                status = "tRNA",
-                                frame = 0)
-                session.add(cds)
-    session.commit()
+    if setting.aragorn:
+        with open(os.path.join(UPLOAD_FOLDER, phage_id + "_aragorn.txt"), 'r') as aragorn:
+            pattern1 = re.compile("tRNA-.*")
+            pattern2 = re.compile("Sequence (.*)\[(.*),(.*)\]")
+            function = ""
+            right = ""
+            left = ""
+            strand = ""
+            id_index = 0
+            for line in aragorn:
+                line = line.strip()
+                if re.match(pattern1, line) != None:
+                    function = line
+                if re.match(pattern2, line) != None:
+                    id_index += 1
+                    orf = re.search(pattern2, line)
+                    left = orf.group(2)
+                    right = orf.group(3)
+                    if (orf.group(1)) == 'c':
+                        strand = '-'
+                    else:
+                        strand = '+'
+                    cds = Annotations(phage_id = phage_id,
+                                    id = "Aragorn_" + str(id_index),
+                                    left = int(left),
+                                    right = int(right),
+                                    strand = strand,
+                                    function = function,
+                                    status = "tRNA",
+                                    frame = 0)
+                    session.add(cds)
+        session.commit()
 
     # Add genemark calls.
-    genemark_calls = ""
-    with open(ldata_file_path) as genemark:
-        left = 0
-        right = 0
-        frame = 0
-        prob = 0.0
-        id_index = 0
-        first = True
-        for line in genemark:
-            if line == '\n':
-                break
-            if line[0] != '#':
-                column = line.strip().split()
-                new_prob = 0.0
-                try:
-                    new_prob = (float(column[3]) + float(column[4])) / 2
-                except:
+    if setting.genemark:
+        genemark_calls = ""
+        with open(ldata_file_path) as genemark:
+            left = 0
+            right = 0
+            frame = 0
+            prob = 0.0
+            id_index = 0
+            first = True
+            for line in genemark:
+                if line == '\n':
+                    break
+                if line[0] != '#':
+                    column = line.strip().split()
                     new_prob = 0.0
-                if frame > 3 and left == int(column[0]) and new_prob < prob:
-                    continue
-                if frame < 3 and right == int(column[1]) and new_prob < prob:
-                    continue
-                if (first) or (frame > 3 and left == int(column[0])) or (frame < 3 and right == int(column[1])):
-                    first = False
-                    left = int(column[0])
-                    right = int(column[1])
-                    frame = int(column[2])
-                    prob = new_prob
-                else:
-                    found = False
-                    if frame > 3:
-                        genemark_calls += (str(left) + '-' + str(right) + ' ' + '-' + ',')
-                        cds = session.query(Annotations).filter_by(phage_id=phage_id).filter_by(left=left).first()
-                        if cds == None or cds.status == 'Fail':
-                            frame, status = get_frame_and_status(left, right, '-', coding_potential)
-                            if cds == None or (cds.status == 'Fail' and status == 'Pass'):
-                                if cds != None:
-                                    session.delete(cds)
-                                id_index += 1
-                                cds = Annotations(phage_id = phage_id,
-                                                id = "Genemark_" + str(id_index),
-                                                left = int(left),
-                                                right = int(right),
-                                                strand = '-',
-                                                function = "None selected",
-                                                status = status,
-                                                frame = frame)
-                            session.add(cds)
-                            session.commit()
+                    try:
+                        new_prob = (float(column[3]) + float(column[4])) / 2
+                    except:
+                        new_prob = 0.0
+                    if frame > 3 and left == int(column[0]) and new_prob < prob:
+                        continue
+                    if frame < 3 and right == int(column[1]) and new_prob < prob:
+                        continue
+                    if (first) or (frame > 3 and left == int(column[0])) or (frame < 3 and right == int(column[1])):
+                        first = False
+                        left = int(column[0])
+                        right = int(column[1])
+                        frame = int(column[2])
+                        prob = new_prob
                     else:
-                        genemark_calls += (str(left) + '-' + str(right) + ' ' + '+' + ',')
-                        cds = session.query(Annotations).filter_by(phage_id=phage_id).filter_by(right=right).first()
-                        if cds == None or cds.status == 'Fail':
-                            frame, status = get_frame_and_status(left, right, '+', coding_potential)
-                            if cds == None or (cds.status == 'Fail' and status == 'Pass'):
-                                if cds != None:
-                                    session.delete(cds)
-                                id_index += 1
-                                cds = Annotations(phage_id = phage_id,
-                                                id = "Genemark_" + str(id_index),
-                                                left = int(left),
-                                                right = int(right),
-                                                strand = '+',
-                                                function = "None selected",
-                                                status = status,
-                                                frame = frame)
+                        found = False
+                        if frame > 3:
+                            genemark_calls += (str(left) + '-' + str(right) + ' ' + '-' + ',')
+                            cds = session.query(Annotations).filter_by(phage_id=phage_id).filter_by(left=left).first()
+                            if cds == None or cds.status == 'Fail':
+                                frame, status = get_frame_and_status(left, right, '-', coding_potential)
+                                if cds == None or (cds.status == 'Fail' and status == 'Pass'):
+                                    if cds != None:
+                                        session.delete(cds)
+                                    id_index += 1
+                                    cds = Annotations(phage_id = phage_id,
+                                                    id = "Genemark_" + str(id_index),
+                                                    left = int(left),
+                                                    right = int(right),
+                                                    strand = '-',
+                                                    function = "None selected",
+                                                    status = status,
+                                                    frame = frame)
                                 session.add(cds)
                                 session.commit()
-                    left = int(column[0])
-                    right = int(column[1])
-                    frame = int(column[2])
-                    prob = new_prob
-    calls = Gene_Calls(phage_id = phage_id,
-                       id = 'GeneMark',
-                       calls = genemark_calls)
-    session.add(calls)
-    session.commit()
+                        else:
+                            genemark_calls += (str(left) + '-' + str(right) + ' ' + '+' + ',')
+                            cds = session.query(Annotations).filter_by(phage_id=phage_id).filter_by(right=right).first()
+                            if cds == None or cds.status == 'Fail':
+                                frame, status = get_frame_and_status(left, right, '+', coding_potential)
+                                if cds == None or (cds.status == 'Fail' and status == 'Pass'):
+                                    if cds != None:
+                                        session.delete(cds)
+                                    id_index += 1
+                                    cds = Annotations(phage_id = phage_id,
+                                                    id = "Genemark_" + str(id_index),
+                                                    left = int(left),
+                                                    right = int(right),
+                                                    strand = '+',
+                                                    function = "None selected",
+                                                    status = status,
+                                                    frame = frame)
+                                    session.add(cds)
+                                    session.commit()
+                        left = int(column[0])
+                        right = int(column[1])
+                        frame = int(column[2])
+                        prob = new_prob
+        calls = Gene_Calls(phage_id = phage_id,
+                        id = 'GeneMark',
+                        calls = genemark_calls)
+        session.add(calls)
+        session.commit()
+
+    # Add prodigal calls.
+    if setting.prodigal:
+        prodigal_calls = ""
+        id_index = 0
+        with open(prodigal_file, 'r') as prodigal:
+            for line in prodigal:
+                if line[0] != '>':
+                    continue
+                id_index += 1
+                column = line.strip().split('_')
+                strand = str(column[3])
+                left = int(column[2])
+                right = int(column[1])
+                cds = session.query(Annotations).filter_by(phage_id=phage_id).filter_by(left=left).first()
+                if strand == '+':
+                    left = int(column[1])
+                    right = int(column[2])
+                    cds = session.query(Annotations).filter_by(phage_id=phage_id).filter_by(right=right).first()
+                prodigal_calls += (str(left) + '-' + str(right) + ' ' + strand + ',')
+                if cds == None or cds.status == 'Fail':
+                    frame, status = get_frame_and_status(left, right, strand, coding_potential)
+                    if cds == None or (cds.status == 'Fail' and status == 'Pass'):
+                        if cds != None:
+                            session.delete(cds)
+                        cds = Annotations(phage_id = phage_id,
+                                        id = 'Prodigal_' + str(id_index),
+                                        left = left,
+                                        right = right,
+                                        strand = strand,
+                                        function = "None selected",
+                                        status = status,
+                                        frame = frame)
+                        session.add(cds)
+        calls = Gene_Calls(phage_id = phage_id,
+                        id = 'Prodigal',
+                        calls = prodigal_calls)
+        session.add(calls)
+        session.commit()
 
     # Add phanotate calls.
-    phanotate_calls = ""
-    id_index = 0
-    with open(phanotate_file, 'r') as phanotate:
-        for line in phanotate:
-            if line[0] == '#':
-                continue
-            id_index += 1
-            column = line.strip().split()
-            strand = str(column[2])
-            left = int(column[1])
-            right = int(column[0])
-            cds = session.query(Annotations).filter_by(phage_id=phage_id).filter_by(left=left).first()
-            if strand == '+':
-                left = int(column[0])
-                right = int(column[1])
-                cds = session.query(Annotations).filter_by(phage_id=phage_id).filter_by(right=right).first()
-            phanotate_calls += (str(left) + '-' + str(right) + ' ' + strand + ',')
-            if cds == None or cds.status == 'Fail':
-                frame, status = get_frame_and_status(left, right, strand, coding_potential)
-                if cds == None or (cds.status == 'Fail' and status == 'Pass'):
-                    if cds != None:
-                        session.delete(cds)
-                    cds = Annotations(phage_id = phage_id,
-                                    id = 'Phanotate_' + str(id_index),
-                                    left = left,
-                                    right = right,
-                                    strand = strand,
-                                    function = "None selected",
-                                    status = status,
-                                    frame = frame)
-                    session.add(cds)
-    calls = Gene_Calls(phage_id = phage_id,
-                       id = 'Phanotate',
-                       calls = phanotate_calls)
-    session.add(calls)
-    session.commit()
+    if setting.phanotate:
+        phanotate_calls = ""
+        id_index = 0
+        with open(phanotate_file, 'r') as phanotate:
+            for line in phanotate:
+                if line[0] == '#':
+                    continue
+                id_index += 1
+                column = line.strip().split()
+                strand = str(column[2])
+                left = int(column[1])
+                right = int(column[0])
+                cds = session.query(Annotations).filter_by(phage_id=phage_id).filter_by(left=left).first()
+                if strand == '+':
+                    left = int(column[0])
+                    right = int(column[1])
+                    cds = session.query(Annotations).filter_by(phage_id=phage_id).filter_by(right=right).first()
+                phanotate_calls += (str(left) + '-' + str(right) + ' ' + strand + ',')
+                if cds == None or cds.status == 'Fail':
+                    frame, status = get_frame_and_status(left, right, strand, coding_potential)
+                    if cds == None or (cds.status == 'Fail' and status == 'Pass'):
+                        if cds != None:
+                            session.delete(cds)
+                        cds = Annotations(phage_id = phage_id,
+                                        id = 'Phanotate_' + str(id_index),
+                                        left = left,
+                                        right = right,
+                                        strand = strand,
+                                        function = "None selected",
+                                        status = status,
+                                        frame = frame)
+                        session.add(cds)
+        calls = Gene_Calls(phage_id = phage_id,
+                        id = 'Phanotate',
+                        calls = phanotate_calls)
+        session.add(calls)
+        session.commit()
     id_index = 0
 
     # Rename gene calls.

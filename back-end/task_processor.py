@@ -36,26 +36,36 @@ def run_task(task):
             task.result = "error"
             return None
     elif task.function == "auto_annotate":
+        setting = session.query(Settings).filter_by(phage_id=args[1]).order_by(Settings.back_left_range).first()
         try:
             run_genemark(args[0], args[1])
         except:
             task.result = "error"
             return None
-        try:
-            run_glimmer(args[0], args[1])
-        except:
-            task.result = "error"
-            return None
-        try:
-            run_aragorn(args[0], args[1])
-        except:
-            task.result = "error"
-            return None
-        try:
-            run_phanotate(args[0], args[1])
-        except:
-            task.result = "error"
-            return None
+        if setting.glimmer:
+            try:
+                run_glimmer(args[0], args[1])
+            except:
+                task.result = "error"
+                return None
+        if setting.aragorn:
+            try:
+                run_aragorn(args[0], args[1])
+            except:
+                task.result = "error"
+                return None
+        if setting.phanotate:
+            try:
+                run_phanotate(args[0], args[1])
+            except:
+                task.result = "error"
+                return None
+        if setting.prodigal:
+            try:
+                run_prodigal(args[0], args[1])
+            except:
+                task.result = "error"
+                return None
         try:
             task.result = auto_annotate(args[0], args[1], session)
         except:

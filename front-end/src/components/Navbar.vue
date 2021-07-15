@@ -125,107 +125,156 @@
       <template #modal-title>
         <div class="text-size">Settings</div>
       </template>
-      Refresh the page for the new settings to take effect.
-      <hr />
       <b-form @submit="onSubmit" align="left">
-        <b-form-group
-          label="Start Search Range (back):"
-          label-size="lg"
-          label-for="search-back-input"
-        >
-          This number (defaulted at 300) represents how many base pairs back
-          from the current start position alternate start codons will be
-          searched for.
-          <b-form-input
-            class="form-input"
-            id="search-back-input"
-            type="number"
-            v-model="backStartRange"
-            required
-            placeholder="Enter start search range"
-          ></b-form-input>
-        </b-form-group>
-        <b-form-group
-          label="Start Search Range (forward):"
-          label-size="lg"
-          label-for="search-forward-input"
-        >
-          This number (defaulted at 100) represents how many base pairs forward
-          from the current start position alternate start codons will be
-          searched for.
-          <b-form-input
-            class="form-input"
-            id="search-forward-input"
-            type="number"
-            v-model="forwardStartRange"
-            required
-            placeholder="Enter start search range"
-          ></b-form-input>
-        </b-form-group>
-        <b-form-group label="Gap:" label-size="lg" label-for="gap-input">
-          This number (defaulted at 10) represents the maximum acceptable number
-          of base pairs between two adjacent genes. Gaps greater than this
-          number will be flagged.
-          <b-form-input
-            class="form-input"
-            id="gap-input"
-            type="number"
-            v-model="gap"
-            required
-            placeholder="Enter acceptable gap length"
-          ></b-form-input>
-        </b-form-group>
-        <b-form-group
-          label="Overlap:"
-          label-size="lg"
-          label-for="overlap-input"
-        >
-          This number (defaulted at 10) represents the maximum acceptable number
-          of base pairs two adjacent genes overlap. Overlaps greater than this
-          number will be flagged.
-          <b-form-input
-            class="form-input"
-            id="overlap-input"
-            type="number"
-            v-model="overlap"
-            required
-            placeholder="Enter acceptable overlap length."
-          ></b-form-input>
-        </b-form-group>
-        <b-form-group
-          label="Opposite Strand Gap:"
-          label-size="lg"
-          label-for="opposite-gap-input"
-        >
-          This number (defaulted at 50) represents the minimum acceptable number
-          of base pairs between two adjacent genes on different strands. Gaps
-          shorter than this number will be flagged.
-          <b-form-input
-            class="form-input"
-            id="opposite-gap-input"
-            type="number"
-            v-model="oppositeGap"
-            required
-            placeholder="Enter acceptable gap length"
-          ></b-form-input>
-        </b-form-group>
-        <b-form-group
-          label="Minimum Gene Length:"
-          label-size="lg"
-          label-for="short-input"
-        >
-          This number (defaulted at 200) represents the minimum acceptable
-          number of base pairs in a gene. Genes shorter than this number will be
-          flagged.
-          <b-form-input
-            class="form-input"
-            id="short-input"
-            type="number"
-            v-model="short"
-            required
-            placeholder="Enter acceptable minimum gene length"
-          ></b-form-input>
-        </b-form-group>
+        <button class="btn btn-secondary btn-block" style="margin-top:1em; margin-bottom:.5em;" type="button" data-toggle="collapse" data-target="#AnnotationSoftware" aria-expanded="false" aria-controls="AnnotationSoftware">
+          Annotation Software Settings
+        </button>
+        <div class="collapse" id="AnnotationSoftware">
+          Click 'Submit' and remove and re-upload the fasta file for the new settings to take effect.
+          <hr />
+          <b-form-checkbox
+            id="glimmer-input"
+            type="checkbox"
+            v-model="glimmer"
+          > Glimmer3
+          </b-form-checkbox>
+          <b-form-checkbox
+            id="genemark-input"
+            type="checkbox"
+            v-model="genemark"
+          > GeneMarkS
+          </b-form-checkbox>
+          <b-form-checkbox
+            id="prodigal-input"
+            type="checkbox"
+            v-model="prodigal"
+          > Prodigal
+          </b-form-checkbox>
+          <b-form-checkbox
+            id="phanotate-input"
+            type="checkbox"
+            v-model="phanotate"
+          > PHANOTATE
+          </b-form-checkbox>
+          <b-form-checkbox
+            id="aragorn-input"
+            type="checkbox"
+            v-model="aragorn"
+          > ARAGORN
+          </b-form-checkbox>
+        </div>
+        <button class="btn btn-secondary btn-block" style="margin-top:1em; margin-bottom:.5em;" type="button" data-toggle="collapse" data-target="#SearchRange" aria-expanded="false" aria-controls="SearchRange">
+          Search Range Settings
+        </button>
+        <div class="collapse" id="SearchRange">
+          Click 'Submit' and refresh the page for the new settings to take effect.
+          <hr />
+          <b-form-group
+            label="Start Search Range (back):"
+            label-size="lg"
+            label-for="search-back-input"
+          >
+            This number (defaulted at 300) represents how many base pairs back
+            from the current start position alternate start codons will be
+            searched for.
+            <b-form-input
+              class="form-input"
+              id="search-back-input"
+              type="number"
+              v-model="backStartRange"
+              required
+              placeholder="Enter start search range"
+            ></b-form-input>
+          </b-form-group>
+          <b-form-group
+            label="Start Search Range (forward):"
+            label-size="lg"
+            label-for="search-forward-input"
+          >
+            This number (defaulted at 100) represents how many base pairs forward
+            from the current start position alternate start codons will be
+            searched for.
+            <b-form-input
+              class="form-input"
+              id="search-forward-input"
+              type="number"
+              v-model="forwardStartRange"
+              required
+              placeholder="Enter start search range"
+            ></b-form-input>
+          </b-form-group>
+        </div>
+        <button class="btn btn-secondary btn-block" style="margin-top:1em; margin-bottom:.5em;" type="button" data-toggle="collapse" data-target="#Status" aria-expanded="false" aria-controls="Status">
+          Status Settings
+        </button>
+        <div class="collapse" id="Status">
+          Click 'Submit' and refresh the page for the new settings to take effect.
+          <hr />
+          <b-form-group label="Gap:" label-size="lg" label-for="gap-input">
+            This number (defaulted at 10) represents the maximum acceptable number
+            of base pairs between two adjacent genes. Gaps greater than this
+            number will be flagged.
+            <b-form-input
+              class="form-input"
+              id="gap-input"
+              type="number"
+              v-model="gap"
+              required
+              placeholder="Enter acceptable gap length"
+            ></b-form-input>
+          </b-form-group>
+          <b-form-group
+            label="Overlap:"
+            label-size="lg"
+            label-for="overlap-input"
+          >
+            This number (defaulted at 10) represents the maximum acceptable number
+            of base pairs two adjacent genes overlap. Overlaps greater than this
+            number will be flagged.
+            <b-form-input
+              class="form-input"
+              id="overlap-input"
+              type="number"
+              v-model="overlap"
+              required
+              placeholder="Enter acceptable overlap length."
+            ></b-form-input>
+          </b-form-group>
+          <b-form-group
+            label="Opposite Strand Gap:"
+            label-size="lg"
+            label-for="opposite-gap-input"
+          >
+            This number (defaulted at 50) represents the minimum acceptable number
+            of base pairs between two adjacent genes on different strands. Gaps
+            shorter than this number will be flagged.
+            <b-form-input
+              class="form-input"
+              id="opposite-gap-input"
+              type="number"
+              v-model="oppositeGap"
+              required
+              placeholder="Enter acceptable gap length"
+            ></b-form-input>
+          </b-form-group>
+          <b-form-group
+            label="Minimum Gene Length:"
+            label-size="lg"
+            label-for="short-input"
+          >
+            This number (defaulted at 200) represents the minimum acceptable
+            number of base pairs in a gene. Genes shorter than this number will be
+            flagged.
+            <b-form-input
+              class="form-input"
+              id="short-input"
+              type="number"
+              v-model="short"
+              required
+              placeholder="Enter acceptable minimum gene length"
+            ></b-form-input>
+          </b-form-group>
+        </div>
         <hr />
         <b-button type="submit" class="mt-3" block style="margin-top: 0em">
           <strong>Submit</strong>
@@ -264,6 +313,11 @@ export default {
     return {
       activeCLass: 'active',
       showSettings: false,
+      prodigal: null,
+      glimmer: null,
+      genemark: null,
+      aragorn: null,
+      phanotate: null,
       gap: null,
       overlap: null,
       oppositeGap: null,
@@ -286,6 +340,11 @@ export default {
               `/annotations/${this.$route.params.phageID}/none`
           )
           .then((response) => {
+            this.prodigal = response.data.prodigal;
+            this.glimmer = response.data.glimmer;
+            this.genemark = response.data.genemark;
+            this.aragorn = response.data.aragorn;
+            this.phanotate = response.data.phanotate;
             this.backStartRange = response.data.back_left_range;
             this.forwardStartRange = response.data.forward_left_range;
             this.gap = response.data.gap;
@@ -309,7 +368,17 @@ export default {
         ',' +
         this.forwardStartRange +
         ',' +
-        this.short;
+        this.short +
+        ',' +
+        this.prodigal.toString() +
+        ',' + 
+        this.glimmer.toString() +
+        ',' + 
+        this.genemark.toString() +
+        ',' + 
+        this.aragorn.toString() +
+        ',' + 
+        this.phanotate.toString();
       axios
         .options(
           process.env.VUE_APP_BASE_URL +
