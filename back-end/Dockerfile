@@ -42,11 +42,9 @@ RUN mkdir /data
 RUN apt install aragorn
 
 RUN pip3 install phanotate
-
 ADD phanotate.py /usr/local/lib/python3.7/site-packages/
 RUN chmod 777 /usr/local/lib/python3.7/site-packages/phanotate.py
-ADD *.py /app/
-ADD prestart.sh /app/
+
 ADD genemark_suite_linux_64.tar.gz /
 ADD gm_key_64.gz /
 
@@ -56,5 +54,9 @@ RUN gunzip /gm_key_64.gz \
 RUN git clone https://github.com/hyattpd/Prodigal.git && \
     cd Prodigal && \
     make install
+
+ADD *.py /app/
+ADD prestart.sh /app/
+ADD VERSION /app/
 
 USER 1000

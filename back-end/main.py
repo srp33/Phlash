@@ -5,27 +5,16 @@ from flask_cors import CORS
 from flask import *
 import os
 from models import *
-import models
 from home import *
 import home
 from upload import *
-import upload
 from blast import *
-import blast
 from annotations import *
-import annotations
 from annotations_cds import *
-import annotations_cds
 from gene_map import *
-import gene_map
 from genbank import *
-import genbank
 from settings import *
-import settings
-import threading
-import time
-import subprocess
-import asyncio
+from database_migration import *
 
 # Configuration
 ROOT = os.path.dirname(os.path.abspath(__file__))
@@ -44,6 +33,22 @@ app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE
 with app.app_context():
     # db.drop_all()
     db.create_all()
+    merge0_0(os.path.join(ROOT, 'users', "Phlash.db"))
+    # metadata = db.session.query(MetaData).first()
+    # with open(os.path.join(ROOT, "VERSION"), 'r') as versionNum:
+    #     currVersion = int(versionNum.read())
+    #     if not metadata:
+    #         metadata = MetaData(version = currVersion)
+    #         db.session.add(metadata)       
+    #     elif metadata.version != currVersion:
+    #         try:
+    #             print(eval('merge' + str(metadata.version) + '_' + str(currVersion) + '("' + os.path.join(ROOT, 'users', "Phlash.db") + '")'))
+    #             metadata.version = currVersion
+    #         except Exception as e:
+    #             print(e)
+    #             print("Write a method in database_migration called " + 'merge' + str(metadata.version) + '_' + str(currVersion) + '()' " to merge database changes.")
+    #         print(metadata.version)
+    #     db.session.commit()
 
 # routers ------------------------------------------------------------------
 @app.route('/phlash_api/test', methods=['GET'])
