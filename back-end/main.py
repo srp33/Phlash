@@ -34,20 +34,20 @@ with app.app_context():
     # db.drop_all()
     db.create_all()
     debug_tables(os.path.join(ROOT, 'users', "Phlash.db"))
-    metadata = db.session.query(MetaData).first()
+    database_version = db.session.query(Database_Version).first()
     with open(os.path.join(ROOT, "VERSION"), 'r') as versionNum:
         currVersion = int(versionNum.read())
-        if not metadata:
-            metadata = MetaData(version = currVersion)
-            db.session.add(metadata)       
-        elif metadata.version != currVersion:
+        if not database_version:
+            database_version = Database_Version(version = currVersion)
+            db.session.add(database_version)       
+        elif database_version.version != currVersion:
             try:
-                print(eval('merge' + str(metadata.version) + '_' + str(currVersion) + '("' + os.path.join(ROOT, 'users', "Phlash.db") + '")'))
-                metadata.version = currVersion
+                print(eval('merge' + str(database_version.version) + '_' + str(currVersion) + '("' + os.path.join(ROOT, 'users', "Phlash.db") + '")'))
+                database_version.version = currVersion
             except Exception as e:
                 print(e)
-                print("Write a method in database_migration called " + 'merge' + str(metadata.version) + '_' + str(currVersion) + '()' " to merge database changes.")
-            print(metadata.version)
+                print("Write a method in database_migration called " + 'merge' + str(database_version.version) + '_' + str(currVersion) + '()' " to merge database changes.")
+            print(database_version.version)
         db.session.commit()
 
 # routers ------------------------------------------------------------------

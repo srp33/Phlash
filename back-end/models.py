@@ -132,7 +132,7 @@ class Tasks(db.Model):
     time = db.Column(db.Text,
                      nullable=False)
 
-class MetaData(db.Model):
-    __tablename__= "metadata"
+class Database_Version(db.Model):
+    __tablename__= "database_version"
     version = db.Column(db.Integer,
                         primary_key=True)

@@ -8,8 +8,8 @@ def merge0_0(DATABASE):
     cursor      = connection.cursor()
 
     # Make necessary changes to tables
-    dropTable = 'DROP TABLE metadata'
-    createTable = 'CREATE TABLE metadata (version INTEGER, PRIMARY KEY(version));'
+    dropTable = 'DROP TABLE database_version'
+    createTable = 'CREATE TABLE database_version (version INTEGER, PRIMARY KEY(version));'
     addColumn = 'ALTER TABLE settings ADD COLUMN prodigal BOOLEAN DEFAULT "True" NOT NULL'
 
     # # Execute changes
