@@ -38,6 +38,7 @@ def merge0_0(DATABASE):
     return "Merged Successfully"
 
 def debug_tables(DATABASE):
+    print("debug_tables")
     # Create a connection object
     connection  = sqlite3.connect(DATABASE)
 

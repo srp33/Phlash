@@ -1,1 +1,2 @@
-# python /app/task_processor.py &
+python /app/database_initiation.py
+python /app/task_processor.py &

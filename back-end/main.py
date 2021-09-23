@@ -31,24 +31,7 @@ CORS(app)
 DATABASE = "sqlite:///{}".format(os.path.join(ROOT, 'users', "Phlash.db"))
 app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE
 with app.app_context():
-    # db.drop_all()
     db.create_all()
-    debug_tables(os.path.join(ROOT, 'users', "Phlash.db"))
-    database_version = db.session.query(Database_Version).first()
-    with open(os.path.join(ROOT, "VERSION"), 'r') as versionNum:
-        currVersion = int(versionNum.read())
-        if not database_version:
-            database_version = Database_Version(version = currVersion)
-            db.session.add(database_version)       
-        elif database_version.version != currVersion:
-            try:
-                print(eval('merge' + str(database_version.version) + '_' + str(currVersion) + '("' + os.path.join(ROOT, 'users', "Phlash.db") + '")'))
-                database_version.version = currVersion
-            except Exception as e:
-                print(e)
-                print("Write a method in database_migration called " + 'merge' + str(database_version.version) + '_' + str(currVersion) + '()' " to merge database changes.")
-            print(database_version.version)
-        db.session.commit()
 
 # routers ------------------------------------------------------------------
 @app.route('/phlash_api/test', methods=['GET'])
