@@ -37,13 +37,12 @@ def merge0_0(DATABASE):
 
     return "Merged Successfully"
 
-def debug_tables(DATABASE):
-    print("debug_tables")
+def print_tables(DATABASE):
     # Create a connection object
-    connection  = sqlite3.connect(DATABASE)
+    connection = sqlite3.connect(DATABASE)
 
     # Get a cursor
-    cursor      = connection.cursor()
+    cursor = connection.cursor()
 
     # Query the SQLite master table
     tableQuery = "select * from sqlite_master"
@@ -57,6 +56,32 @@ def debug_tables(DATABASE):
         print("Name of the table: %s"%(table[2]))
         print("Root page: %s"%(table[3]))
         print("SQL Statement: %s"%(table[4]))
+
+    # close the database connection
+    connection.close()
+
+    return "Merged Successfully"
+
+def merge0_1(DATABASE):
+    # Create a connection object
+    connection  = sqlite3.connect(DATABASE)
+
+    # Get a cursor
+    cursor      = connection.cursor()
+
+    # Make necessary changes to tables
+    addGlimmer = 'ALTER TABLE settings ADD COLUMN glimmer BOOLEAN DEFAULT "True" NOT NULL'
+    addGeneMark = 'ALTER TABLE settings ADD COLUMN genemark BOOLEAN DEFAULT "True" NOT NULL'
+    addAragorn = 'ALTER TABLE settings ADD COLUMN aragorn BOOLEAN DEFAULT "True" NOT NULL'
+    addPhanotate = 'ALTER TABLE settings ADD COLUMN phanotate BOOLEAN DEFAULT "False" NOT NULL'
+
+    # # Execute changes
+    cursor.execute(addGlimmer)
+    cursor.execute(addGeneMark)
+    cursor.execute(addAragorn)
+    cursor.execute(addPhanotate)
+
+    print_tables(DATABASE)
 
     # close the database connection
     connection.close()

@@ -11,8 +11,6 @@ engine = create_engine(DATABASE)
 Session = sessionmaker(bind=engine)
 session = Session()
 
-print("before_debug_tables")
-debug_tables(os.path.join(ROOT, 'users', "Phlash.db"))
 database_version = session.query(Database_Version).first()
 with open(os.path.join(ROOT, "VERSION"), 'r') as version_num:
     curr_version = int(version_num.read())
