@@ -10,7 +10,7 @@ DATABASE = "sqlite:///{}".format(os.path.join(ROOT, 'users', "Phlash.db"))
 engine = create_engine(DATABASE)
 Session = sessionmaker(bind=engine)
 session = Session()
-print_tables(DATABASE)
+print_tables(os.path.join(ROOT, 'users', "Phlash.db"))
 database_version = session.query(Database_Version).first()
 with open(os.path.join(ROOT, "VERSION"), 'r') as version_num:
     curr_version = int(version_num.read())
