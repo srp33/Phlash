@@ -3,6 +3,7 @@ import os
 from models import *
 from sqlalchemy import *
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy_utils import database_exists, create_database, drop_database
 from database_migration import *
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
@@ -13,7 +14,7 @@ session = Session()
 print_tables(os.path.join(ROOT, 'users', "Phlash.db"))
 with open(os.path.join(ROOT, "VERSION"), 'r+') as version_num:
     version = version_num.read()
-    if version == "":
+    if version == "" or not database_exists(engine.url):
         version_num.write("0")
         version = "0"
         app = Flask(__name__)
