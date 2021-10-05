@@ -3,17 +3,30 @@ import os
 from models import *
 from sqlalchemy import *
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy_utils import database_exists, create_database
 from database_migration import *
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 DATABASE = "sqlite:///{}".format(os.path.join(ROOT, 'users', "Phlash.db"))
 engine = create_engine(DATABASE)
+if not database_exists(engine.url):
+    create_database(engine.url)
 Session = sessionmaker(bind=engine)
 session = Session()
 print_tables(os.path.join(ROOT, 'users', "Phlash.db"))
 database_version = session.query(Database_Version).first()
-with open(os.path.join(ROOT, "VERSION"), 'r') as version_num:
-    curr_version = int(version_num.read())
+with open(os.path.join(ROOT, "VERSION"), 'r+') as version_num:
+    version = version_num.read()
+    if version == "":
+        version_num.write("0")
+        version = "0"
+        app = Flask(__name__)
+        app.config.from_object(__name__)
+        db.init_app(app)
+        app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE
+        with app.app_context():
+            db.create_all()
+    curr_version = int(version)
     if not database_version:
         database_version = Database_Version(version = curr_version)
         session.add(database_version)       

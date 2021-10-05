@@ -30,8 +30,6 @@ CORS(app)
 # Database instantiation
 DATABASE = "sqlite:///{}".format(os.path.join(ROOT, 'users', "Phlash.db"))
 app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE
-with app.app_context():
-    db.create_all()
 
 # routers ------------------------------------------------------------------
 @app.route('/phlash_api/test', methods=['GET'])
