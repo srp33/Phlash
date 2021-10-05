@@ -3,7 +3,7 @@ import os
 from models import *
 from sqlalchemy import *
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy_utils import database_exists, create_database
+from sqlalchemy_utils import database_exists, create_database, drop_database
 from database_migration import *
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
@@ -14,7 +14,6 @@ if not database_exists(engine.url):
 Session = sessionmaker(bind=engine)
 session = Session()
 print_tables(os.path.join(ROOT, 'users', "Phlash.db"))
-database_version = session.query(Database_Version).first()
 with open(os.path.join(ROOT, "VERSION"), 'r+') as version_num:
     version = version_num.read()
     if version == "":
@@ -27,6 +26,7 @@ with open(os.path.join(ROOT, "VERSION"), 'r+') as version_num:
         with app.app_context():
             db.create_all()
     curr_version = int(version)
+    database_version = session.query(Database_Version).first()
     if not database_version:
         database_version = Database_Version(version = curr_version)
         session.add(database_version)       
