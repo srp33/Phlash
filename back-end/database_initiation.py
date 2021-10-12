@@ -14,22 +14,33 @@ engine = create_engine(DATABASE)
 Session = sessionmaker(bind=engine)
 session = Session()
 print_tables(os.path.join(ROOT, 'users', "Phlash.db"))
-with open(os.path.join(ROOT, "VERSION"), 'r+') as version_num:
+
+version_file_path = os.path.join(ROOT, "VERSION")
+
+if not os.path.exists(version_file_path):
+    raise Exception("No VERSION file exists.")
+
+with open(version_file_path, 'r') as version_num:
     version = version_num.read()
+
     if version == "":
         raise EOFError("The file VERSION needs an integer value indicating the version number to continue.")
+
     if not database_exists(engine.url):
         app = Flask(__name__)
         app.config.from_object(__name__)
         db.init_app(app)
         app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE
+
         with app.app_context():
             db.create_all()
+
     curr_version = int(version)
     database_version = session.query(Database_Version).first()
+
     if not database_version:
         database_version = Database_Version(version = curr_version)
-        session.add(database_version)       
+        session.add(database_version)
     elif database_version.version != curr_version:
         try:
             print(eval('merge' + str(database_version.version) + '_' + str(curr_version) + '("' + os.path.join(ROOT, 'users', "Phlash.db") + '")'))
