@@ -48,5 +48,4 @@ with open(version_file_path, 'r') as version_num:
         except Exception as e:
             print(e)
             print("Write a method in database_migration called " + 'merge' + str(database_version.version) + '_' + str(curr_version) + '()' " to merge database changes.")
-        print(database_version.version)
     session.commit()
