@@ -1,5 +1,7 @@
 from flask import *
 import os
+
+from sqlalchemy.sql.ddl import DropConstraint
 from models import *
 from sqlalchemy import *
 from sqlalchemy.orm import sessionmaker
@@ -14,9 +16,9 @@ session = Session()
 print_tables(os.path.join(ROOT, 'users', "Phlash.db"))
 with open(os.path.join(ROOT, "VERSION"), 'r+') as version_num:
     version = version_num.read()
-    if version == "" or not database_exists(engine.url):
-        version_num.write("0")
-        version = "0"
+    if version == "":
+        raise EOFError("The file VERSION needs an integer value indicating the version number to continue.")
+    if not database_exists(engine.url):
         app = Flask(__name__)
         app.config.from_object(__name__)
         db.init_app(app)
