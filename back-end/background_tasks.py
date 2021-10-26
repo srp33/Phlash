@@ -291,7 +291,7 @@ def auto_annotate(UPLOAD_FOLDER, phage_id, session):
                         calls = phanotate_calls)
         session.add(calls)
         session.commit()
-    id_index = 0
+    id_index = 1
 
     # Rename gene calls.
     user = session.query(Users).filter_by(id=phage_id).first()
