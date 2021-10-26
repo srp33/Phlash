@@ -296,10 +296,11 @@ def auto_annotate(UPLOAD_FOLDER, phage_id, session):
     # Rename gene calls.
     user = session.query(Users).filter_by(id=phage_id).first()
     for cds in session.query(Annotations).filter_by(phage_id=phage_id).order_by(Annotations.left):
-        id_index += 1
         cds.id = user.phage_id + '_' + str(id_index)
         if (cds.right < cds.left) or (session.query(Blast_Results).filter_by(phage_id=phage_id).filter_by(left=cds.left, right=cds.right, strand=cds.strand).first()):
             session.delete(cds)
+        else:
+            id_index += 1
     session.commit()
 
     # Remove files created for auto-annotation.
