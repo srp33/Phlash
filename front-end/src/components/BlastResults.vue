@@ -13,7 +13,7 @@
             <th scope="col">Action</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody id="hits">
           <tr v-for="alignment in blastResults" :key="alignment.accession">
             <td style="font-size: 1.4em">{{ alignment.accession }}</td>
             <td>{{ alignment.title }}</td>
@@ -38,8 +38,8 @@
         </tbody>
       </table>
       <div>
-        <h4 v-if="blastResults.length === 0">
-          <em>No hits found.</em>
+        <h4>
+          <em>No more hits found.</em>
         </h4>
       </div>
     </div>

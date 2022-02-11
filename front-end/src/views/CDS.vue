@@ -530,19 +530,19 @@ export default {
             this.currentCDS.right.toString() +
             ' ' +
             this.currentCDS.strand;
-          if (this.glimmer.indexOf(cds) > -1) {
+          if (this.glimmer && this.glimmer.indexOf(cds) > -1) {
             called = true;
             this.calledBy += 'Glimmer, ';
           }
-          if (this.genemark.indexOf(cds) > -1) {
+          if (this.genemark && this.genemark.indexOf(cds) > -1) {
             called = true;
             this.calledBy += 'GeneMark, ';
           }
-          if (this.phanotate.indexOf(cds) > -1) {
+          if (this.phanotate && this.phanotate.indexOf(cds) > -1) {
             called = true;
             this.calledBy += 'Phanotate, ';
           }
-          if (this.prodigal.indexOf(cds) > -1) {
+          if (this.prodigal && this.prodigal.indexOf(cds) > -1) {
             called = true;
             this.calledBy += 'Prodigal, ';
           }
@@ -724,19 +724,19 @@ export default {
           this.currentCDS.right.toString() +
           ' ' +
           this.currentCDS.strand;
-        if (this.glimmer.indexOf(cds) > -1) {
+        if (this.glimmer && this.glimmer.indexOf(cds) > -1) {
           called = true;
           this.calledBy += 'Glimmer, ';
         }
-        if (this.genemark.indexOf(cds) > -1) {
+        if (this.genemark && this.genemark.indexOf(cds) > -1) {
           called = true;
           this.calledBy += 'GeneMark, ';
         }
-        if (this.phanotate.indexOf(cds) > -1) {
+        if (this.phanotate && this.phanotate.indexOf(cds) > -1) {
           called = true;
           this.calledBy += 'Phanotate, ';
         }
-        if (this.prodigal.indexOf(cds) > -1) {
+        if (this.prodigal && this.prodigal.indexOf(cds) > -1) {
           called = true;
           this.calledBy += 'Prodigal, ';
         }
