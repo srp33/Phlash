@@ -29,7 +29,7 @@
         </div>
       </div>
       <div v-if="loggedIn">
-        <h1>Home</h1>
+        <h1>Home *TEST*</h1>
         <p style="margin: 1em">
           <img id="userImage" src="/phlash/images/logohome.png" width="100" />
         </p>
