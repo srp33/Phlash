@@ -1,12 +1,14 @@
-FROM node:latest as build-stage
+FROM node:lts-alpine as build-stage
 
 WORKDIR /app
+
 COPY package*.json ./
 RUN npm install
-RUN npm audit fix
+#RUN npm audit fix
 COPY ./ .
 COPY .env.production .
 RUN npm run build
+
 FROM nginx as production-stage
 RUN mkdir /app
 COPY --from=build-stage /app/dist /app/phlash
