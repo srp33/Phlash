@@ -23,7 +23,7 @@
           sequence of your bacteriophage.
         </p>
         <p>
-          On the next page this phage will automatically be auto-annotated using programs such as 
+          On the next page this phage will be auto-annotated using programs such as 
           <a href="#" @click="goToWebsite('GeneMarkS')" class="alert-link"
             ><i>GeneMarkS</i></a
           >,
@@ -32,14 +32,13 @@
           >,
           <a href="#" @click="goToWebsite('Prodigal')" class="alert-link"
             ><i>Prodigal</i></a
-          >,
+          >, and
           <a href="#" @click="goToWebsite('Aragorn')" class="alert-link"
             ><i>ARAGORN</i></a
-          >, and
-          <a href="#" @click="goToWebsite('Phanotate')" class="alert-link"
+          >. It is also possible to auto-annotate with <a href="#" @click="goToWebsite('Phanotate')" class="alert-link"
             ><i>PHANOTATE</i></a
-          > (PHANOTATE is not used by default).
-          If you would like to edit which of these tools are used to identify genes click on 'phlash' and then 'settings'.
+          >, although this tool is not used by default.
+          If you would like to edit which of these tools are used, go to the 'phlash' menu and then click on 'settings'.
         </p>
         <hr />
         <div class="nav-btns-wrapper">
