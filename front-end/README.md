@@ -5,7 +5,8 @@
     - Visit [Google Cloud Platform](https://console.cloud.google.com/apis/credentials) and click "Create Credentials" and then "OAuth client ID". 
     - Under "Application type" select "Web Application".
     - Enter a name for the application.
-    - Under "Authorized JavaScript origins" click "Add URL" and enter the URL that points to the server you are hosting. 
+    - Under "Authorized JavaScript origins," click "Add URL" and enter the URL that points to the server you are hosting. 
+    - Under "Authorized redirect URIs," click "Add URL" and enter the URL that points to the server you are hosting. 
     - Click "CREATE".
     - Copy your client ID.
 - Create a file called `.env.production` in the front-end directory to point to the API (back-end) server and to store your google client id. 
