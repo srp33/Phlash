@@ -15,17 +15,12 @@
         <hr />
         <p><strong>Instructions</strong></p>
         <p v-if="annotating">
-          {{waitMessage}} You may
-          not go to the previous or next page until your genome has been auto-annotated. Even so, you
-          can continue to work on your phage genome.<br />
+          {{waitMessage}} Please wait until your genome has been auto-annotated. To ensure that all of the steps are executed in the correct order, you will not be able to navigate to other pages while auto-annotation is in process. However, in the meantime, you can submit your genome to BLAST.<br />
         </p>
         <p>
-          BLAST is a powerful tool that will compare the genes in your phage's
-          genome with a database of genes in other organisms. The BLAST results
-          will help you determine the likelihood of a given gene call being
-          accurate.
+          BLAST will enable you to compare your phage genome against a database of thousands of other genomes. The BLAST results will help you determine the likelihood that a given gene call is accurate.
         </p>
-        <p>Complete all of the steps below and then click 'Next'.</p>
+        <p>Please complete the following steps.</p>
         <hr />
         <div class="nav-btns-wrapper">
           <router-link
@@ -76,7 +71,7 @@
           <li class="step">
             <strong>Download and extract BLAST input files. </strong>
             Phlash will locate every open reading frame (ORF) on every frame of
-            the phage's DNA sequence. Phlash will put the ORFS in
+            the phage's DNA sequence. Phlash will put the ORFs in
             <a href="#" @click="goToWebsite('Fasta')" class="alert-link"
               >multi-FASTA format</a
             >

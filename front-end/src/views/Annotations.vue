@@ -20,8 +20,8 @@
       <div class="alert alert-secondary">
         <hr />
         <p><strong>Instructions</strong></p>
-        <p>
-          Gene calls that have been made from <i>GeneMarkS</i>, <i>Glimmer3</i>,
+        <p>{navSettings}
+          Gene calls that have been made from <i>GeneMarkS</i>, <i>Glimmer</i>,
           <i>ARAGORN</i>, and <i>PHANOTATE</i> are shown below. To have the most
           accurate annotation of this genome manual annotation is necessary. The
           status for each gene is shown below which are mearly guides and

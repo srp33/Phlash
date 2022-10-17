@@ -15,44 +15,18 @@
         class="alert alert-secondary"
       >
         <hr />
-        This application was created by the Piccolo Lab at Brigham Young
-        University. <br />
-        To view the source code, report a bug, or suggest a change, click
-        <a href="#" @click="goToWebsite('GitHub')" class="alert-link"
-          ><i>here</i></a
-        >. Pull requests are welcomed.<br />
-        To contact Stephen Piccolo, click
-        <a href="#" @click="goToWebsite('Contact')" class="alert-link"
-          ><i>here</i></a
-        >. <br />
-        To view more information about the Piccolo Lab, click
-        <a href="#" @click="goToWebsite('Home')" class="alert-link"
-          ><i>here</i></a
-        >. <br />
+        <p>This application was created by the <a href="https://biology.byu.edu/piccolo-lab" class="alert-link" target="_new">Piccolo Lab</a> at <a href="https://www.byu.edu" class="alert-link" target="_new">Brigham Young University</a>.</p>
+
+        <p>Please use <a href="https://github.com/srp33/Phlash" class="alert-link" target="_new">GitHub</a> to view the source code, report a bug, or suggest a change. Pull requests are welcome.</p>
+
         <hr />
+        
         <div class="nav-btns-wrapper">
           <button class="btn btn-dark btn-nav" @click="goBack()">
             <strong>&#129052; Back</strong>
           </button>
         </div>
         <hr />
-      </div>
-      <div
-        class="alert alert-secondary"
-        style="height: 15em; width: 100%"
-      >
-        <img
-          src="/phlash/images/Piccolo.jpg"
-          style="float: left; width: 33.33%;"
-        />
-        <img
-          src="/phlash/images/byu.png"
-          style="float: center; width: 33.33%;"
-        />
-        <img
-          src="/phlash/images/lsb.jpeg"
-          style="float: right; width: 33.33%;"
-        />
       </div>
     </div>
   </div>
@@ -122,16 +96,6 @@ export default {
   methods: {
     goBack() {
       this.$router.push(this.prevRoute);
-    },
-
-    goToWebsite(site) {
-      if (site === 'Home') {
-        window.open('https://biology.byu.edu/piccolo-lab', '_blank');
-      } else if (site === 'Contact') {
-        window.open('https://lifesciences.byu.edu/directory/stephen-piccolo', '_blank');
-      } else if (site === 'GitHub') {
-        window.open('https://github.com/srp33/Phlash', '_blank');
-      }
     },
   },
 };
