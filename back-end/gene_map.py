@@ -19,6 +19,8 @@ import helper
 import base64
 
 # ------------------------------ MAIN FUNCTIONS ------------------------------
+
+
 def get_map(phage_id, UPLOAD_FOLDER):
     """Creates and returns a map of the genome.
 
@@ -35,23 +37,31 @@ def get_map(phage_id, UPLOAD_FOLDER):
         if cds.function != '@DELETED' and cds.status != 'trnaDELETED':
             if cds.strand == '+':
                 if cds.status == "tRNA":
-                    features.append(GraphicFeature(start=cds.left, end=cds.right, strand=+1, color="#7570b3", label=cds.id))
-                else:   
-                    features.append(GraphicFeature(start=cds.left, end=cds.right, strand=+1, color="#1b9e77", label=cds.id))
+                    features.append(GraphicFeature(
+                        start=cds.left, end=cds.right, strand=+1, color="#7570b3", label=cds.id))
+                else:
+                    features.append(GraphicFeature(
+                        start=cds.left, end=cds.right, strand=+1, color="#1b9e77", label=cds.id))
             else:
                 if cds.status == "tRNA":
-                    features.append(GraphicFeature(start=cds.left, end=cds.right, strand=-1, color="#7570b3", label=cds.id))
+                    features.append(GraphicFeature(
+                        start=cds.left, end=cds.right, strand=-1, color="#7570b3", label=cds.id))
                 else:
-                    features.append(GraphicFeature(start=cds.left, end=cds.right, strand=-1, color="#d95f02", label=cds.id))
+                    features.append(GraphicFeature(
+                        start=cds.left, end=cds.right, strand=-1, color="#d95f02", label=cds.id))
+
     fasta_file = helper.get_file_path("fasta", UPLOAD_FOLDER)
     genome = SeqIO.read(fasta_file, "fasta").seq
     sequence = str(genome)
     record = GraphicRecord(sequence_length=len(sequence), features=features)
     ax, _ = record.plot(figure_width=len(sequence)/1000)
-    ax.figure.savefig(os.path.join(UPLOAD_FOLDER, 'sequence_and_translation.png'), bbox_inches='tight')
+    ax.figure.savefig(os.path.join(
+        UPLOAD_FOLDER, 'sequence_and_translation.png'), bbox_inches='tight')
     image_byte_string = ""
+
     with open(os.path.join(UPLOAD_FOLDER, 'sequence_and_translation.png'), "rb") as image_file:
         image_byte_string = base64.b64encode(image_file.read())
+
     response_object = {}
     response_object['status'] = "success"
     response_object['image'] = str(image_byte_string)

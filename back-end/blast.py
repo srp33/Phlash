@@ -45,16 +45,21 @@ def find_blast_zip(phage_id):
     response_object["annotated"] = False
     response_object["annotation_in_progress"] = False
     response_object["blast_input_in_progress"] = False
+
     if db.session.query(Tasks).filter_by(phage_id=phage_id).filter_by(function="auto_annotate").first() is not None:
         response_object["annotation_in_progress"] = True
+
     for filename in os.listdir(os.path.join(ROOT, 'users', phage_id, 'uploads')):
         if (filename.endswith('.gdata')):
             response_object["annotated"] = True
             break
+
     if (db.session.query(Blast_Results).filter_by(phage_id=phage_id).first() is None):
         response_object["uploaded"] = False
+
     if db.session.query(Tasks).filter_by(phage_id=phage_id).filter_by(function="blast_input").first() is not None:
         response_object["blast_input_in_progress"] = True
+
     for filename in os.listdir(os.path.join(ROOT, 'users', phage_id)):
         if filename.endswith('.zip'):
             response_object["blast_downloaded"] = True
@@ -88,9 +93,11 @@ def dropzone(phage_id, UPLOAD_FOLDER, request):
     """
     file = request.files['file']
     contents = str(file.read(), 'utf-8')
+
     if file:
         file_name = secure_filename(file.filename)
         found = False
+
         for existing_file in os.listdir(UPLOAD_FOLDER):
             if existing_file.endswith(file_name):
                 found = True
@@ -127,6 +134,7 @@ def get_blast_output_names(phage_id, UPLOAD_FOLDER, type_of_call):
     file_sizes = []
     file_mods = []
     bad_files = []
+
     for file in os.listdir(UPLOAD_FOLDER):
         if file.endswith(".json"):
             file_data = db.session.query(Files).filter_by(phage_id=phage_id).filter_by(name=file).first()
@@ -138,6 +146,7 @@ def get_blast_output_names(phage_id, UPLOAD_FOLDER, type_of_call):
                 bad_files.append(file_data.name)
             else:
                 os.remove(os.path.join(UPLOAD_FOLDER, file))
+
     if type_of_call == "refresh":
         for file_name in bad_files:
             os.remove(os.path.join(UPLOAD_FOLDER, file_name))
@@ -152,9 +161,11 @@ def get_blast_output_names(phage_id, UPLOAD_FOLDER, type_of_call):
     response_object["result"] = "not complete"
     response_object["blast_input_complete"] = False
     task = db.session.query(Tasks).filter_by(phage_id=phage_id).filter_by(function="auto_annotate").first()
+
     if (task is not None):
         curr_tasks = db.session.query(Tasks).filter_by(complete=False).order_by(Tasks.time)
         counter = 0
+
         for curr_task in curr_tasks:
             if curr_task.phage_id == phage_id:
                 response_object["position"] = counter
@@ -163,17 +174,21 @@ def get_blast_output_names(phage_id, UPLOAD_FOLDER, type_of_call):
                 break
             counter += 1
         response_object["in_process"] = True
+
         if (task.complete):
             response_object["in_process"] = False
             response_object["result"] = task.result
             db.session.delete(task)
             db.session.commit()
+
     task = db.session.query(Tasks).filter_by(phage_id=phage_id).filter_by(function="blast_input").first()
+
     if (task and task.complete):
         response_object["blast_input_complete"] = True
         response_object["num_files"] = task.result
         db.session.delete(task)
         db.session.commit()
+
     return response_object
 
 def delete_blast_output(phage_id, UPLOAD_FOLDER, file_path):
@@ -197,6 +212,7 @@ def delete_blast_output(phage_id, UPLOAD_FOLDER, file_path):
         db.session.delete(delete_file)
         response_object["status"] = "success"
         db.session.query(Blast_Results).filter_by(phage_id=phage_id).delete()
+        
         try:
             db.session.commit()
         except:

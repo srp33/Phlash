@@ -38,6 +38,7 @@ def get_annotations_data(phage_id):
     response_object['overlap'] = setting.overlap
     response_object['short'] = setting.short
     annotations = []
+
     for cds in db.session.query(Annotations).filter_by(phage_id=phage_id).order_by(Annotations.left):
         function = cds.function[:cds.function.find('#')]
         if cds.function.find('#') is -1:
@@ -95,6 +96,7 @@ def check_blast_task(phage_id):
             break
         counter += 1
     task = db.session.query(Tasks).filter_by(phage_id=phage_id).filter_by(function="parse_blast").first()
+
     if task is not None and task.complete:
         result = task.result
         db.session.delete(task)
@@ -127,6 +129,7 @@ def add_cds(request, UPLOAD_FOLDER, phage_id):
     genemark_gdata_file = helper.get_file_path("gdata", UPLOAD_FOLDER)
     gdata_df = pd.read_csv(genemark_gdata_file, sep='\t', skiprows=16)
     gdata_df.columns = ['Base', '1', '2', '3', '4', '5', '6']
+
     coding_potential['x_data'] = gdata_df["Base"].to_list()
     coding_potential['y_data_1'] = gdata_df["1"].to_list()
     coding_potential['y_data_2'] = gdata_df["2"].to_list()
@@ -135,6 +138,7 @@ def add_cds(request, UPLOAD_FOLDER, phage_id):
     coding_potential['y_data_5'] = gdata_df["5"].to_list()
     coding_potential['y_data_6'] = gdata_df["6"].to_list()
     frame, status = helper.get_frame_and_status(int(new_cds_data.get('left')), int(new_cds_data.get('right')), new_cds_data.get('strand'), coding_potential)
+
     cds = Annotations(phage_id = phage_id,
                     id = new_cds_data.get('id'),
                     left = new_cds_data.get('left'),
@@ -146,6 +150,7 @@ def add_cds(request, UPLOAD_FOLDER, phage_id):
 
     exists = Annotations.query.filter_by(phage_id=phage_id).filter_by(left=new_cds_data.get('left'), right=new_cds_data.get('right'), strand=new_cds_data.get('strand')).first()
     orf = Blast_Results.query.filter_by(phage_id=phage_id).filter_by(left=new_cds_data.get('left'), right=new_cds_data.get('right'), strand=new_cds_data.get('strand')).first()
+
     if force:
         db.session.add(cds)
         db.session.commit()
@@ -162,6 +167,7 @@ def add_cds(request, UPLOAD_FOLDER, phage_id):
             cds.id = phage_name + '_' + str(id_index)
         db.session.commit()
         return response_object
+
     if exists:
         response_object['message'] = "ID already exists."
     elif not orf:
@@ -171,16 +177,19 @@ def add_cds(request, UPLOAD_FOLDER, phage_id):
         db.session.commit()
         response_object['message'] = "Added succesfully."
         id_index = 0
+        
         for cds in db.session.query(Annotations).filter_by(phage_id=phage_id).order_by(Annotations.left):
             id_index += 1
             cds.id = str(id_index)
         db.session.commit()
         id_index = 0
         phage_name = db.session.query(Users).filter_by(id=phage_id).first().phage_id
+
         for cds in db.session.query(Annotations).filter_by(phage_id=phage_id).order_by(Annotations.left):
             id_index += 1
             cds.id = phage_name + '_' + str(id_index)
         db.session.commit()
+
     return response_object
 
 def share_with(phage_id, email):

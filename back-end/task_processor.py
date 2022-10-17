@@ -25,7 +25,7 @@ def run_task(task):
             task.result = parse_blast(args[0], args[1], session)
         except:
             task.result = "error"
-            return None   
+            return None
     elif task.function == "blast_input":
         try:
             task.result = create_blast_input(args[0], args[1])
